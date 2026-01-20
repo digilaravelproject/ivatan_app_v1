@@ -65,27 +65,45 @@ class HomePage extends StatelessWidget {
               elevation: 0,
               automaticallyImplyLeading: false,
               toolbarHeight: 60,
-              title: Text(
-                "iVatan", 
-                style: TextStyle(
-                  fontFamily: 'Billabong', // Verify if font exists, else fallback
-                  fontSize: 32,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
+              title: Padding(
+                padding: const EdgeInsets.only(top: 8.0, left: 4),
+                child: Text(
+                  "iVatan", 
+                  style: TextStyle(
+                    fontFamily: 'Billabong', 
+                    fontSize: 32,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
               actions: [
-                Container(
-                  margin: EdgeInsets.only(right: 8),
-                  child: IconButton(
-                    icon: Icon(Icons.chat_bubble_outline, color: Colors.black87),
-                    onPressed: () => Get.to(dashboard()),
-                  ),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.chat_bubble_outline, color: Colors.black87, size: 26),
+                      onPressed: () => Get.to(dashboard()),
+                    ),
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.5),
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-                Container(
-                  margin: EdgeInsets.only(right: 16),
+                Padding(
+                  padding: const EdgeInsets.only(right: 12.0),
                   child: IconButton(
-                    icon: Icon(Icons.menu, color: Colors.black87),
+                    icon: Icon(Icons.menu_rounded, color: Colors.black87, size: 28),
                     onPressed: () => controller.openDrawer(),
                   ),
                 ),
@@ -103,8 +121,9 @@ class HomePage extends StatelessWidget {
                   }
                   
                 return Container(
-                  height: 140, // Rectangular Cards
-                  margin: EdgeInsets.only(top: 12, bottom: 8),
+                  height: 160, // Rectangular Cards
+                  color: Colors.white,
+                  padding: EdgeInsets.only(top: 12, bottom: 8),
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: EdgeInsets.symmetric(horizontal: 16),
@@ -355,15 +374,18 @@ class HomePage extends StatelessWidget {
                       Row(
                         children: [
                           Flexible(
-                            child: Text(
-                              post.user.username.isNotEmpty ? post.user.username : post.user.name,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                                color: Colors.black87,
+                            child: GestureDetector(
+                              onTap: () => Get.to(ProfileScreen(viewUserName: post.user.username)),
+                              child: Text(
+                                post.user.username.isNotEmpty ? post.user.username : post.user.name,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           if (post.user.isVerified) ...[
@@ -411,7 +433,7 @@ class HomePage extends StatelessWidget {
                 ),
 
                 // Follow Button
-                if (!post.is_mine) ...[
+                if (!post.is_mine && !post.is_following) ...[
                   SizedBox(width: 8),
                   GestureDetector(
                     onTap: () {
@@ -444,7 +466,7 @@ class HomePage extends StatelessWidget {
                 // More Menu
                 IconButton(
                    icon: Icon(Icons.more_horiz, color: Colors.black87),
-                   onPressed: () => _showSideMenu(context, post.id),
+                   onPressed: () => _showSideMenu(context, post.id, post.user.username),
                    padding: EdgeInsets.zero,
                    constraints: BoxConstraints(),
                    splashRadius: 20,
@@ -458,6 +480,7 @@ class HomePage extends StatelessWidget {
             FeedMediaWidget(
               media: post.media,
               type: post.type,
+              isLiked: post.stats.isLiked ?? false,
               onDoubleTap: () => controller.likePost(post.id, index),
             ),
 
@@ -472,14 +495,19 @@ class HomePage extends StatelessWidget {
                     // Like
                     GestureDetector(
                       onTap: () => controller.likePost(post.id, index),
-                      child: Icon(
-                        post.stats.isLiked == true
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: post.stats.isLiked == true
-                            ? Colors.red
-                            : Colors.black87,
-                        size: 26,
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                        child: Icon(
+                          post.stats.isLiked == true
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          key: ValueKey(post.stats.isLiked),
+                          color: post.stats.isLiked == true
+                              ? Colors.red
+                              : Colors.black87,
+                          size: 28,
+                        ),
                       ),
                     ),
                     
@@ -534,6 +562,7 @@ class HomePage extends StatelessWidget {
                    ExpandableCaption(
                       text: post.caption!,
                       username: post.user.username.isNotEmpty ? post.user.username : post.user.name,
+                      onUsernameTap: () => Get.to(ProfileScreen(viewUserName: post.user.username)),
                    ),
                 ]
               ],
@@ -546,7 +575,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  void _showSideMenu(BuildContext context, int postId) {
+  void _showSideMenu(BuildContext context, int postId, String username) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -558,37 +587,75 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              margin: EdgeInsets.only(top: 8, bottom: 8),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
+            // Handle
+            Center(
+              child: Container(
+                margin: EdgeInsets.only(top: 10, bottom: 6),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ),
+            
+            // 1. Report
             ListTile(
-              leading: Icon(Icons.flag_outlined, color: Colors.black87),
-              title: Text("Report", style: TextStyle(fontWeight: FontWeight.w500)),
+              leading: Icon(Icons.report_gmailerrorred_outlined, color: Colors.redAccent),
+              title: Text("Report", style: TextStyle(fontWeight: FontWeight.w500, color: Colors.redAccent)),
               onTap: () {
                 Navigator.pop(context);
                 controller.openReportBottomSheet(postId: postId);
               },
             ),
+             Divider(height: 1, thickness: 0.5, color: Colors.grey.shade100, indent: 16, endIndent: 16),
+
+
+            // 2. About this profile
             ListTile(
-              leading: Icon(Icons.bookmark_border, color: Colors.black87),
-              title: Text("Save", style: TextStyle(fontWeight: FontWeight.w500)),
+              leading: Icon(Icons.info_outline_rounded, color: Colors.black87),
+              title: Text("About this profile", style: TextStyle(fontWeight: FontWeight.w500)),
               onTap: () {
                 Navigator.pop(context);
+                if (username.isNotEmpty) {
+                  Get.to(ProfileScreen(viewUserName: username));
+                }
               },
             ),
-            ListTile(
-              leading: Icon(Icons.block_outlined, color: Colors.red.shade400),
-              title: Text("Block", style: TextStyle(fontWeight: FontWeight.w500, color: Colors.red.shade400)),
+
+            // 3. Block
+             ListTile(
+              leading: Icon(Icons.block, color: Colors.redAccent),
+              title: Text("Block", style: TextStyle(fontWeight: FontWeight.w500, color: Colors.redAccent)),
               onTap: () {
                 Navigator.pop(context);
+                // Action
               },
             ),
+            Divider(height: 1, thickness: 0.5, color: Colors.grey.shade100, indent: 16, endIndent: 16),
+
+
+            // 4. Interested
+            ListTile(
+              leading: Icon(Icons.star_border_rounded, color: Colors.black87),
+              title: Text("Interested", style: TextStyle(fontWeight: FontWeight.w500)),
+              onTap: () {
+                Navigator.pop(context);
+                // Action
+              },
+            ),
+
+            // 5. Not Interested
+             ListTile(
+              leading: Icon(Icons.visibility_off_outlined, color: Colors.black87),
+              title: Text("Not interested", style: TextStyle(fontWeight: FontWeight.w500)),
+              onTap: () {
+                Navigator.pop(context);
+                // Action
+              },
+            ),
+
             SizedBox(height: 20),
           ],
         ),
@@ -642,27 +709,15 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               topLeft: Radius.circular(24),
               topRight: Radius.circular(24),
             ),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.white.withOpacity(0.85),
-                      Colors.white.withOpacity(0.55),
-                    ],
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
-                  ),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
-                    width: 1.5,
-                  ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
                 ),
+              ),
+
                 child: Column(
                   children: [
                     /// --- HEADER ----
@@ -697,7 +752,6 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                   ],
                 ),
               ),
-            ),
           );
         },
       ),
@@ -845,20 +899,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                         )
                             : null,
                       ),
-                      if (comment.is_mine == true)
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            width: 12,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                          ),
-                        ),
+
                     ],
                   ),
                   const SizedBox(width: 12),

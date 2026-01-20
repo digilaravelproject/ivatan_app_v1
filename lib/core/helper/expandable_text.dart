@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class ExpandableCaption extends StatefulWidget {
   final String text;
   final String username;
+  final VoidCallback? onUsernameTap;
 
   const ExpandableCaption({
     Key? key,
     required this.text,
     this.username = "",
+    this.onUsernameTap,
   }) : super(key: key);
 
   @override
@@ -45,7 +47,13 @@ class _ExpandableCaptionState extends State<ExpandableCaption> {
     
     // 1. Username
     if (widget.username.isNotEmpty) {
-      fullSpans.add(TextSpan(text: "${widget.username} ", style: styleUsername));
+      fullSpans.add(
+        TextSpan(
+          text: "${widget.username} ", 
+          style: styleUsername,
+          recognizer: TapGestureRecognizer()..onTap = widget.onUsernameTap,
+        )
+      );
     }
 
     // 2. Caption Parsing

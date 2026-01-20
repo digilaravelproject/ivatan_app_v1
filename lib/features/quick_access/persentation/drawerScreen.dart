@@ -24,21 +24,14 @@ class DrawerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF1683EE),
-            Color(0xFF20BDEF),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppColors.white,
       ),
-      width: MediaQuery.of(context).size.width * 0.65,
-    //  color: Colors.white,
+      width: MediaQuery.of(context).size.width * 0.75, // Slightly wider for better layout
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // --- HEADER ---
             Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -46,84 +39,49 @@ class DrawerScreen extends StatelessWidget {
                   Row(
                     children: [
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           Navigator.of(context).pop();
                         },
                         child: Container(
-                          padding: const EdgeInsets.all(2), // optional (to give space around icon)
+                          padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: AppColors.white,
-                            border: Border.all(
-                              color: AppColors.white,
-                            ),
-                            shape: BoxShape.circle,   // 🔥 makes it a perfect circle
+                            color: AppColors.lightBackground,
+                            shape: BoxShape.circle,
                           ),
-                          child: Icon(
-                            Icons.keyboard_arrow_left_outlined,
-                            color: AppColors.primaryDark,
-                            weight: 900,
-                            size: 20,
+                          child: const Icon(
+                            Icons.keyboard_arrow_left_rounded,
+                            color: AppColors.black,
+                            size: 24,
                           ),
                         ),
                       ),
-
-                      const SizedBox(width: 10),
-                      Text(
-                        "Quick Access Bar",
+                      const SizedBox(width: 16),
+                      const Text(
+                        "Quick Access",
                         style: TextStyle(
-                          fontSize: 18,
-                          color: AppColors.white,
+                          fontSize: 20,
+                          color: AppColors.black,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 20,),
+                  const SizedBox(height: 24),
+                  
+                  // --- SOS & BELL ROW ---
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(2), // optional (to give space around icon)
-                        decoration: BoxDecoration(
-                        //  color: AppColors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(4)),
-                          border: Border.all(
-                            color: AppColors.white,
-                            width: 1.5
-                          ),),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 3,horizontal: 20),
-                          child: Icon(
-                            CupertinoIcons.bell,
-                            color: AppColors.white,
-                            weight: 900,
-                            size: 24,
-                          ),
-                        ),
+                      _buildQuickActionButton(
+                        icon: CupertinoIcons.bell,
+                        label: null,
                       ),
-                      Container(
-                        padding: const EdgeInsets.all(2), // optional (to give space around icon)
-                        decoration: BoxDecoration(
-                          //  color: AppColors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(4)),
-                          border: Border.all(
-                            color: AppColors.white,
-                            width: 1.5
-                          ),),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 3,horizontal: 5),
-                          child: Row(
-                            children: [
-                              Icon(
-                                CupertinoIcons.bell,
-                                color: AppColors.white,
-                                weight: 900,
-                                size: 24,
-                              ),
-                              SizedBox(width: 5,),
-                              Text("SOS",style: TextStyle(color: AppColors.white,fontSize: 16,fontWeight: FontWeight.bold),)
-                            ],
-                          ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildQuickActionButton(
+                          icon: CupertinoIcons.exclamationmark_triangle,
+                          label: "SOS",
+                          isAlert: true,
                         ),
                       ),
                     ],
@@ -131,144 +89,183 @@ class DrawerScreen extends StatelessWidget {
                 ],
               ),
             ),
-            drawerItem(Icons.live_help_outlined, "Live Chat",() {
-              Get.to(LiveChatList());
-            }),
-            drawerItem(Icons.perm_contact_calendar_outlined, "Contact",(){
-              Get.to(ContactScreen());
-            }),
-            drawerItem(Icons.format_list_numbered, "Playlist",(){
-              Get.to(ComingSoonScreen());
-            }),
-            drawerItem(Icons.history, "History",(){
-              Get.to(HistoryScreen());
-            }),
-            drawerItem(CupertinoIcons.home, "Banking",(){
-              Get.to(ComingSoonScreen());
+            
+            const Divider(height: 1, color: AppColors.lightDivider),
+            const SizedBox(height: 10),
 
-            }),
-            drawerItem(Icons.settings_outlined, "Settings",(){
-              Get.to(SettingsScreen());
-            }),
-            drawerItem(Icons.logout, "Logout",(){
-              _showLogoutDialog(context);
-            }),
-
-            SizedBox(height: 30,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(2), // optional (to give space around icon)
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    border: Border.all(
-                      color: AppColors.primaryDark,
-                      width: 2
-                    ),),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 3,horizontal: 8),
-                    child: Column(
-                      children: [
-                        Icon(
-                          CupertinoIcons.bell,
-                          color: AppColors.primaryDark,
-                          weight: 900,
-                          size: 24,
-                        ),
-                        Text("i-QuickHire",style: TextStyle(color: AppColors.black,fontWeight: FontWeight.bold),)
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(2), // optional (to give space around icon)
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    border: Border.all(
-                        color: AppColors.primaryDark,
-                        width: 2
-                    ),),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 3,horizontal: 8),
-                    child: Column(
-                      children: [
-                        Icon(
-                          CupertinoIcons.bell,
-                          color: AppColors.primaryDark,
-                          weight: 900,
-                          size: 24,
-                        ),
-                        Text("Universal App",style: TextStyle(color: AppColors.black,fontWeight: FontWeight.bold),)
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Spacer(),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: GestureDetector(
-                onTap: (){
-                  Get.to(HelpCenter());
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(2), // optional (to give space around icon)
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    border: Border.all(
-                        color: AppColors.white,
-                        width: 2
-                    ),),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 3,horizontal: 15),
-                    child: Row(
-                      children: [
-                        Text("Help Center",style: TextStyle(color: AppColors.black,
-                            fontWeight: FontWeight.bold,fontSize: 18),),
-                        SizedBox(width: 10,),
-                        Icon(
-                          Icons.support_agent_sharp,
-                          color: AppColors.primaryDark,
-                          weight: 900,
-                          size: 24,
-                        ),
-                      ],
-                    ),
-                  ),
+            // --- MENU ITEMS ---
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    drawerItem(Icons.live_help_outlined, "Live Chat", () {
+                      Get.to(LiveChatList());
+                    }),
+                    drawerItem(Icons.perm_contact_calendar_outlined, "Contact", () {
+                      Get.to(ContactScreen());
+                    }),
+                    drawerItem(Icons.format_list_numbered, "Playlist", () {
+                      Get.to(ComingSoonScreen());
+                    }),
+                    drawerItem(Icons.history, "History", () {
+                      Get.to(HistoryScreen());
+                    }),
+                    drawerItem(CupertinoIcons.home, "Banking", () {
+                      Get.to(ComingSoonScreen());
+                    }),
+                    drawerItem(Icons.settings_outlined, "Settings", () {
+                      Get.to(SettingsScreen());
+                    }),
+                    const SizedBox(height: 10),
+                    const Divider(height: 1, color: AppColors.lightDivider, indent: 20, endIndent: 20),
+                    drawerItem(Icons.logout, "Logout", () {
+                      _showLogoutDialog(context);
+                    }, isDestructive: true),
+                  ],
                 ),
               ),
             ),
 
+            // --- BOTTOM SECTION ---
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.lightBackground,
+                border: const Border(top: BorderSide(color: AppColors.lightDivider)),
+              ),
+              child: Column(
+                children: [
+                   Row(
+                    children: [
+                      Expanded(child: _buildBottomCard("i-QuickHire", CupertinoIcons.briefcase)),
+                      const SizedBox(width: 12),
+                      Expanded(child: _buildBottomCard("Universal App", CupertinoIcons.app_badge)),
+                    ],
+                   ),
+                   const SizedBox(height: 16),
+                   GestureDetector(
+                    onTap: () => Get.to(HelpCenter()),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.black,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.support_agent_rounded, color: Colors.white, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            "Help Center",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                   ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget drawerItem(IconData icon, String title, VoidCallback onTap) {
+  Widget drawerItem(IconData icon, String title, VoidCallback onTap, {bool isDestructive = false}) {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
         child: Row(
           children: [
-            Icon(icon, size: 26, color: Colors.white),
-            const SizedBox(width: 10),
+            Icon(icon, size: 24, color: isDestructive ? AppColors.error : AppColors.lightTextSecondary),
+            const SizedBox(width: 16),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
-                color: AppColors.white,
+                color: isDestructive ? AppColors.error : AppColors.black,
                 fontWeight: FontWeight.w500,
               ),
             ),
+            const Spacer(),
+            Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey.shade300),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildQuickActionButton({required IconData icon, String? label, bool isAlert = false}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: isAlert ? AppColors.error.withOpacity(0.1) : AppColors.lightBackground,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isAlert ? AppColors.error : AppColors.lightBorder,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: isAlert ? AppColors.error : AppColors.black,
+            size: 24,
+          ),
+          if (label != null) ...[
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: isAlert ? AppColors.error : AppColors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+            ),
+          ]
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomCard(String title, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.lightBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: AppColors.black, size: 22),
+          const SizedBox(height: 6),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppColors.black,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

@@ -7,12 +7,14 @@ class FeedMediaWidget extends StatefulWidget {
   final List<PostMedia> media;
   final String type; // "image" or "video"
   final VoidCallback onDoubleTap;
+  final bool isLiked;
 
   const FeedMediaWidget({
     Key? key,
     required this.media,
     required this.type,
     required this.onDoubleTap,
+    required this.isLiked,
   }) : super(key: key);
 
   @override
@@ -24,9 +26,15 @@ class _FeedMediaWidgetState extends State<FeedMediaWidget> {
   int _currentIndex = 0;
   bool _showHeartAnimation = false;
 
+  Color _heartColor = Colors.red;
+
   void _handleDoubleTap() {
+    // 1. Always toggle (Like/Unlike) on double tap
     widget.onDoubleTap();
+    
+    // 2. Determine color and show animation
     setState(() {
+      _heartColor = widget.isLiked ? Colors.white : Colors.red;
       _showHeartAnimation = true;
     });
 
@@ -60,10 +68,10 @@ class _FeedMediaWidgetState extends State<FeedMediaWidget> {
               builder: (context, value, child) {
                 return Transform.scale(
                   scale: value,
-                  child: const Icon(
+                  child: Icon(
                     Icons.favorite,
-                    color: Colors.white,
-                    size: 100,
+                    color: _heartColor,
+                    size: 110,
                     shadows: [
                       Shadow(
                         color: Colors.black26,

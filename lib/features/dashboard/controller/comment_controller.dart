@@ -41,8 +41,6 @@ class CommentController extends GetxController {
 
   Future<void> createComment({required int postId, required String body}) async {
     try {
-      isLoading.value = true;
-
       final response = await api.callPost(
         "api/v1/comments/UserPost/$postId",
         data: {
@@ -61,15 +59,11 @@ class CommentController extends GetxController {
       }
     } catch (e) {
       print("Create Comment Error: $e");
-    } finally {
-      isLoading.value = false;
     }
   }
 
   Future<void> createReplyComment({required int postId,required int commentId, required String body}) async {
     try {
-      isLoading.value = true;
-
       final response = await api.callPost(
         "api/v1/comments/UserPost/$postId/$commentId",
         data: {
@@ -94,13 +88,9 @@ class CommentController extends GetxController {
           commentsList.refresh();
         }
 
-
-
       }
     } catch (e) {
       print("Create reply Comment Error: $e");
-    } finally {
-      isLoading.value = false;
     }
   }
 

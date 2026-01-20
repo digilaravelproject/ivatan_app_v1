@@ -7,6 +7,7 @@ import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/iconoir.dart';
 
 import '../controller/navigationController.dart';
+import '../../../../core/network/app_urls.dart';
 
 class DashboardPage extends StatelessWidget {
   DashboardPage({super.key});
@@ -68,7 +69,7 @@ class DashboardPage extends StatelessWidget {
                   _item(context, Icons.search_sharp, 1),
                   _item(context, Icons.slow_motion_video_outlined, 2),
                   _item(context, Icons.video_library_outlined, 3),
-                  _item(context, Icons.account_circle_outlined, 4, imageUrl: DashboardController().userProfileImage),
+                  _item(context, Icons.account_circle_outlined, 4, imageUrl: controller.userProfileImage),
                 ],
               ),
             ),
@@ -107,10 +108,7 @@ class DashboardPage extends StatelessWidget {
                      padding: const EdgeInsets.all(1.5),
                      child: ClipOval(
                       child: Image.network(
-                        "https://www.ivatan.in/" + imageUrl, // Assuming base URL needed or it's full path. 
-                        // Checking home_screen.dart it uses AppUrls.imageurl + imageUrl
-                        // I should import AppUrls or just hardcode base if imports are tricky. 
-                        // Lets verify imports first. 
+                        AppUrls.imageurl + imageUrl, 
                         fit: BoxFit.cover,
                         errorBuilder: (_,__,___) => Icon(iconData, size: 24, color: Colors.grey),
                       ),
