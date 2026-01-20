@@ -658,7 +658,7 @@ class StoryController extends GetxController {
                     alignLabelWithHint: true,
                     hintText: "Highlight",
                     hintStyle: TextStyle(
-                      color: AppColors.darkText,
+                      color: AppColors.darkTextPrimary,
                     ),
                     border: InputBorder.none,
                   ),

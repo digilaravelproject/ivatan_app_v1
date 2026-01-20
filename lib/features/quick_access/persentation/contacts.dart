@@ -31,7 +31,7 @@ class ContactScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: AppColors.backgroundGradient,
+          colors: AppColors.lightBackgroundGradient,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -82,7 +82,7 @@ class ContactScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: AppColors.gray,
+                    color: AppColors.neutralGray,
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
@@ -142,7 +142,7 @@ class ContactScreen extends StatelessWidget {
                         return Text(
                           contactController.syncedContacts.length.toString(),
                           style: TextStyle(
-                            color: AppColors.darkText,
+                            color: AppColors.darkTextPrimary,
                             fontSize: 16,
                           ),
                         );

@@ -22,7 +22,7 @@ class FollowTabs extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: AppColors.backgroundGradient,
+          colors: AppColors.lightBackgroundGradient,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -37,7 +37,7 @@ class FollowTabs extends StatelessWidget {
             title: Text("Connections"),
             bottom: TabBar(
               labelColor: Colors.black,
-              unselectedLabelColor: AppColors.darkText,
+              unselectedLabelColor: AppColors.darkTextPrimary,
               indicatorWeight: 2, // line thickness
               indicatorSize: TabBarIndicatorSize.tab,
               // indicatorSize: TabBarIndicatorSize.label,
@@ -87,7 +87,7 @@ class FollowingList extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14),
               height: 35,
               decoration: BoxDecoration(
-                color: AppColors.gray,
+                color: AppColors.neutralGray,
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
@@ -210,7 +210,7 @@ class FollowingList extends StatelessWidget {
                                       Text(
                                         "${user.username}",
                                         style: TextStyle(
-                                          color: AppColors.darkText,
+                                          color: AppColors.darkTextPrimary,
                                           fontSize: 14,
                                         ),
                                       ),
@@ -291,7 +291,7 @@ class FollowerList extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14),
               height: 35,
               decoration: BoxDecoration(
-                color: AppColors.gray,
+                color: AppColors.neutralGray,
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
@@ -417,7 +417,7 @@ class FollowerList extends StatelessWidget {
                                       Text(
                                         "${user.username}",
                                         style: TextStyle(
-                                          color: AppColors.darkText,
+                                          color: AppColors.darkTextPrimary,
                                           fontSize: 14,
                                         ),
                                       ),

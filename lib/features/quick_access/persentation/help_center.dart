@@ -17,7 +17,7 @@ class HelpCenter extends StatelessWidget {
     return Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: AppColors.backgroundGradient,
+            colors: AppColors.lightBackgroundGradient,
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -62,7 +62,7 @@ class HelpCenter extends StatelessWidget {
                         Text(
                           "120 Friends",
                           style: TextStyle(
-                            color: AppColors.darkText,
+                            color: AppColors.darkTextPrimary,
                             fontSize: 16,
                           ),
                         ),
@@ -70,7 +70,7 @@ class HelpCenter extends StatelessWidget {
                     ),
                     Text(
                       "See All",
-                      style: TextStyle(color: AppColors.darkText, fontSize: 16),
+                      style: TextStyle(color: AppColors.darkTextPrimary, fontSize: 16),
                     ),
                   ],
                 ),
@@ -91,7 +91,7 @@ class HelpCenter extends StatelessWidget {
                     Text(
                       "120 Friends",
                       style: TextStyle(
-                        color: AppColors.darkText,
+                        color: AppColors.darkTextPrimary,
                         fontSize: 16,
                       ),
                     ),
@@ -137,7 +137,7 @@ class HelpCenter extends StatelessWidget {
                         padding: EdgeInsets.symmetric(vertical: 5, horizontal: 0),
                         child: Text(
                           "10:20 AM",
-                          style: TextStyle(color: AppColors.darkText),
+                          style: TextStyle(color: AppColors.darkTextPrimary),
                         ),
                       ),
 
@@ -158,7 +158,7 @@ class HelpCenter extends StatelessWidget {
                     Text(
                       "See All",
                       style: TextStyle(
-                        color: AppColors.darkText,
+                        color: AppColors.darkTextPrimary,
                         fontSize: 12,
                       ),
                     ),
@@ -221,7 +221,7 @@ class HelpCenter extends StatelessWidget {
                     Text(
                       "See All",
                       style: TextStyle(
-                        color: AppColors.darkText,
+                        color: AppColors.darkTextPrimary,
                         fontSize: 12,
                       ),
                     ),

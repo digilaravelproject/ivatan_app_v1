@@ -29,7 +29,7 @@ class SettingsScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: AppColors.backgroundGradient,
+          colors: AppColors.lightBackgroundGradient,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -425,7 +425,7 @@ class SettingsScreen extends StatelessWidget {
                 height: 28,
                 padding: EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: toggle.value ? Colors.black : AppColors.gray,
+                  color: toggle.value ? Colors.black : AppColors.neutralGray,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Align(

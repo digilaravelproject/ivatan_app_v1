@@ -13,7 +13,7 @@ class LiveChatList extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: AppColors.backgroundGradient,
+          colors: AppColors.lightBackgroundGradient,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -57,7 +57,7 @@ class LiveChatList extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   height: 45,
                   decoration: BoxDecoration(
-                    color: AppColors.gray,
+                    color: AppColors. neutralGray,
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
@@ -112,7 +112,7 @@ class LiveChatList extends StatelessWidget {
                         Text(
                           "120 Friends",
                           style: TextStyle(
-                            color: AppColors.darkText,
+                            color: AppColors.darkTextPrimary,
                             fontSize: 16,
                           ),
                         ),
@@ -120,7 +120,7 @@ class LiveChatList extends StatelessWidget {
                     ),
                     Text(
                       "See All",
-                      style: TextStyle(color: AppColors.darkText, fontSize: 16),
+                      style: TextStyle(color: AppColors.darkTextPrimary, fontSize: 16),
                     ),
                   ],
                 ),
@@ -200,11 +200,11 @@ class LiveChatList extends StatelessWidget {
                                     children: [
                                       Icon(
                                         Icons.person_outlined,
-                                        color: AppColors.darkText,
+                                        color: AppColors.darkTextPrimary,
                                       ),
                                       Text(
                                         "126K",
-                                        style: TextStyle(color: AppColors.darkText),
+                                        style: TextStyle(color: AppColors.darkTextPrimary),
                                       ),
                                     ],
                                   ),

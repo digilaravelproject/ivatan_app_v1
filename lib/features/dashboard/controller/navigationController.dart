@@ -31,17 +31,7 @@ class NavigationController extends GetxController {
 
     _initDeepLinks();
 
-   //  final AppLinks appLinks = AppLinks();
-   //  _linkSub = appLinks.uriLinkStream.listen((uri) {
-   //    if (uri.pathSegments.length >= 2 && uri.pathSegments[0] == 'post') {
-   //      final postId = uri.pathSegments[1];
-   //
-   //      // GetX navigation use kar rahe
-   // //    Get.to(() => ImagePostScreen(postId: 0,));
-   //      Get.to(() => ImagePostScreen(postId: int.tryParse(postId ?? '0') ?? 0));
-   //
-   //    }
-   //  });
+
 
   }
 

@@ -377,7 +377,7 @@ class _ImageSliderState extends State<ImageSlider> {
                     decoration: BoxDecoration(
                       color: _currentPage == i + 1
                           ? AppColors.primaryDark
-                          : AppColors.gray,
+                          : AppColors.neutralGray,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),

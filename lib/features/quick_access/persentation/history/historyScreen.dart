@@ -11,7 +11,7 @@ class HistoryScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: AppColors.backgroundGradient,
+          colors: AppColors.lightBackgroundGradient,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -42,7 +42,7 @@ class HistoryScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     height: 45,
                     decoration: BoxDecoration(
-                      color: AppColors.gray,
+                      color: AppColors.neutralGray,
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: [
                         BoxShadow(
@@ -97,7 +97,7 @@ class HistoryScreen extends StatelessWidget {
                           Text(
                             "120 Friends",
                             style: TextStyle(
-                              color: AppColors.darkText,
+                              color: AppColors.darkTextPrimary,
                               fontSize: 16,
                             ),
                           ),
@@ -105,7 +105,7 @@ class HistoryScreen extends StatelessWidget {
                       ),
                       Text(
                         "See All",
-                        style: TextStyle(color: AppColors.darkText, fontSize: 16),
+                        style: TextStyle(color: AppColors.darkTextPrimary, fontSize: 16),
                       ),
                     ],
                   ),

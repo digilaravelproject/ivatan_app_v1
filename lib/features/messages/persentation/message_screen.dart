@@ -36,7 +36,7 @@ class _MessageListScreenState extends State<MessageListScreen> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: AppColors.backgroundGradient,
+          colors: AppColors.lightBackgroundGradient,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -96,7 +96,7 @@ class _MessageListScreenState extends State<MessageListScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  color: AppColors.gray,
+                  color: AppColors.neutralGray,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(

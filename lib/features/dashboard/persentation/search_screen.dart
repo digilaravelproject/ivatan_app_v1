@@ -35,7 +35,7 @@ class _SerachScreenState extends State<SerachScreen> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors:AppColors.backgroundGradient,
+          colors:AppColors.lightBackgroundGradient,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

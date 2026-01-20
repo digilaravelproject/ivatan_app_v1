@@ -79,7 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Container(
       child: Scaffold(
-        backgroundColor: AppColors.gray,
+        backgroundColor: AppColors.neutralGray,
         body: Obx(() {
           final user = profileController.userProfile.value;
           if (user == null) {
@@ -92,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   expandedHeight: 100,
                   floating: false,
                   pinned: true,
-                  backgroundColor: AppColors.gray,
+                  backgroundColor: AppColors.neutralGray,
                   flexibleSpace: FlexibleSpaceBar(
                     background: Stack(
                       fit: StackFit.expand,
@@ -219,7 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ),
                                           Text(
                                             "Post",
-                                            style: TextStyle(color: AppColors.gray),
+                                            style: TextStyle(color: AppColors.neutralGray),
                                           ),
                                         ],
                                       ),
@@ -254,7 +254,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             ),
                                             Text(
                                               "Followers",
-                                              style: TextStyle(color: AppColors.gray),
+                                              style: TextStyle(color: AppColors.neutralGray),
                                             ),
                                           ],
                                         ),
@@ -287,7 +287,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             ),
                                             Text(
                                               "Following",
-                                              style: TextStyle(color: AppColors.gray),
+                                              style: TextStyle(color: AppColors.neutralGray),
                                             ),
                                           ],
                                         ),
@@ -387,8 +387,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             decoration: BoxDecoration(
                                               gradient: LinearGradient(
                                                 colors: [
-                                                  AppColors.gray,
-                                                  AppColors.gray,
+                                                  AppColors.neutralGray,
+                                                  AppColors.neutralGray,
                                                 ],
                                                 begin: Alignment.topCenter,
                                                 end: Alignment.bottomCenter,
@@ -439,7 +439,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             child: Container(
                                               decoration: BoxDecoration(
                                                 border: Border.all(
-                                                  color: AppColors.gray,
+                                                  color: AppColors.neutralGray,
                                                   width: 1,
                                                 ),
                                                 borderRadius: BorderRadius.circular(10),
@@ -475,7 +475,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               width: 40,
                                               height: 40,
                                               decoration: BoxDecoration(
-                                                color: AppColors.gray,
+                                                color: AppColors.neutralGray,
                                                 shape: BoxShape.circle,
                                               ),
                                               child: Icon(
@@ -521,7 +521,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           Container(
                                             decoration: BoxDecoration(
                                               border: Border.all(
-                                                color: AppColors.gray,
+                                                color: AppColors.neutralGray,
                                                 width: 1,
                                               ),
                                               borderRadius: BorderRadius.circular(10),
@@ -710,9 +710,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //   return
   //     Container(
   //     child: Scaffold(
-  //       backgroundColor: AppColors.gray,
+  //       backgroundColor: AppColors.neutralGray,
   //       // appBar: AppBar(
-  //       //   backgroundColor: AppColors.gray,
+  //       //   backgroundColor: AppColors.neutralGray,
   //       //   // leading: GestureDetector(
   //       //   //   onTap: () {
   //       //   //     Get.back();
@@ -876,7 +876,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //                                   ),
   //                                   Text(
   //                                     "Post",
-  //                                     style: TextStyle(color: AppColors.gray),
+  //                                     style: TextStyle(color: AppColors.neutralGray),
   //                                   ),
   //                                 ],
   //                               ),
@@ -911,7 +911,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //                                     ),
   //                                     Text(
   //                                       "Followers",
-  //                                       style: TextStyle(color: AppColors.gray),
+  //                                       style: TextStyle(color: AppColors.neutralGray),
   //                                     ),
   //                                   ],
   //                                 ),
@@ -944,7 +944,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //                                     ),
   //                                     Text(
   //                                       "Following",
-  //                                       style: TextStyle(color: AppColors.gray),
+  //                                       style: TextStyle(color: AppColors.neutralGray),
   //                                     ),
   //                                   ],
   //                                 ),
@@ -1059,8 +1059,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //                                               decoration: BoxDecoration(
   //                                                 gradient: LinearGradient(
   //                                                   colors: [
-  //                                                     AppColors.gray,
-  //                                                     AppColors.gray,
+  //                                                     AppColors.neutralGray,
+  //                                                     AppColors.neutralGray,
   //                                                   ],
   //                                                   begin: Alignment.topCenter,
   //                                                   end: Alignment.bottomCenter,
@@ -1129,7 +1129,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //                                               child: Container(
   //                                                 decoration: BoxDecoration(
   //                                                   border: Border.all(
-  //                                                     color: AppColors.gray,
+  //                                                     color: AppColors.neutralGray,
   //                                                     width: 1,
   //                                                   ),
   //                                                   borderRadius: BorderRadius.only(
@@ -1174,7 +1174,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //                                                 width: 40,
   //                                                 height: 40,
   //                                                 decoration: BoxDecoration(
-  //                                                   color: AppColors.gray,
+  //                                                   color: AppColors.neutralGray,
   //                                                   shape: BoxShape.circle,
   //                                                   //    border: Border.all(color: Colors.grey.shade300, width: 2),
   //                                                 ),
@@ -1230,7 +1230,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //                                             Container(
   //                                               decoration: BoxDecoration(
   //                                                 border: Border.all(
-  //                                                   color: AppColors.gray,
+  //                                                   color: AppColors.neutralGray,
   //                                                   width: 1,
   //                                                 ),
   //                                                 borderRadius: BorderRadius.only(
@@ -1525,7 +1525,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           item,
           style: TextStyle(
             fontSize: 15,
-            color: AppColors.gray,
+            color: AppColors.neutralGray,
             fontWeight: FontWeight.w400,
           ),
           textAlign: TextAlign.center,
@@ -1782,7 +1782,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //                                 ),
 //                                 Text(
 //                                   "Post",
-//                                   style: TextStyle(color: AppColors.gray),
+//                                   style: TextStyle(color: AppColors.neutralGray),
 //                                 ),
 //                               ],
 //                             ),
@@ -1818,7 +1818,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //                                   ),
 //                                   Text(
 //                                     "Followers",
-//                                     style: TextStyle(color: AppColors.gray),
+//                                     style: TextStyle(color: AppColors.neutralGray),
 //                                   ),
 //                                 ],
 //                               ),
@@ -1852,7 +1852,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //                                   ),
 //                                   Text(
 //                                     "Following",
-//                                     style: TextStyle(color: AppColors.gray),
+//                                     style: TextStyle(color: AppColors.neutralGray),
 //                                   ),
 //                                 ],
 //                               ),
@@ -1981,8 +1981,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //                                     decoration: BoxDecoration(
 //                                       gradient: LinearGradient(
 //                                         colors: [
-//                                           AppColors.gray,
-//                                           AppColors.gray,
+//                                           AppColors.neutralGray,
+//                                           AppColors.neutralGray,
 //                                         ],
 //                                         begin: Alignment.topCenter,
 //                                         end: Alignment.bottomCenter,
@@ -2070,7 +2070,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //                                     child: Container(
 //                                       decoration: BoxDecoration(
 //                                         border: Border.all(
-//                                           color: AppColors.gray,
+//                                           color: AppColors.neutralGray,
 //                                           width: 1,
 //                                         ),
 //                                         borderRadius:
@@ -2125,7 +2125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //                                       width: 40,
 //                                       height: 40,
 //                                       decoration: BoxDecoration(
-//                                         color: AppColors.gray,
+//                                         color: AppColors.neutralGray,
 //                                         shape: BoxShape.circle,
 //                                         //    border: Border.all(color: Colors.grey.shade300, width: 2),
 //                                       ),
@@ -2192,7 +2192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //                                   Container(
 //                                     decoration: BoxDecoration(
 //                                       border: Border.all(
-//                                         color: AppColors.gray,
+//                                         color: AppColors.neutralGray,
 //                                         width: 1,
 //                                       ),
 //                                       borderRadius:

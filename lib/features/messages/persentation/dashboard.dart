@@ -69,7 +69,7 @@ class _dashboardState extends State<dashboard> {
                 backgroundColor: Colors.transparent,
                 elevation: 0,
                 selectedItemColor: AppColors.primary,
-                unselectedItemColor: AppColors.gray,
+                unselectedItemColor: AppColors.neutralGray,
                 type: BottomNavigationBarType.fixed,
                 currentIndex: _selectedIndex > 2 ? _selectedIndex : (_selectedIndex == 2 ? -1 : _selectedIndex),
                 onTap: (index) {
