@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "661840110268",
+    "project_id": "i-vatan-5ed0a",
+    "storage_bucket": "i-vatan-5ed0a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:661840110268:android:5a2d26a164b2c3e4f726b9",
+        "android_client_info": {
+          "package_name": "com.octroid.ivatan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "661840110268-d1vf25hrjk4sf7hppa38l23onl90ulsf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.octroid.ivatan",
+            "certificate_hash": "656fbbb7d62ba7cae74d0b3375b0e12fdc9d816c"
+          }
+        },
+        {
+          "client_id": "661840110268-msmntlie0flfu7te08d30k9bcdiljnvg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.octroid.ivatan",
+            "certificate_hash": "df3f76b745008ae4642586c4977a4a8f7a166032"
+          }
+        },
+        {
+          "client_id": "661840110268-2v4tdc4l41o9aq51f16iitaal1ae8iiv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfkZpuP9pwK_awmbDSLGjycq0JTqhOF-c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "661840110268-2v4tdc4l41o9aq51f16iitaal1ae8iiv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "661840110268-ok7ccg4li2is60k1avt6sf1esg12dprv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.iVatanApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
