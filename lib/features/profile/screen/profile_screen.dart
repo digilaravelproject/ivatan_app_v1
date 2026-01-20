@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:i_vatan_app/features/story/persentation/highlightFullScreen.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../core/constants/app_assets.dart';
 import '../../../core/helper/custom_image_view.dart';
@@ -24,6 +25,8 @@ import '../controller/profile_controller.dart';
 import 'follow_tabs.dart';
 import 'my_post.dart';
 import 'my_video_screen.dart';
+import 'profile_shop_screen.dart';
+import 'profile_live_posts.dart';
 
 class ProfileScreen extends StatefulWidget {
   //ProfileScreen({Key? key}) : super(key: key);
@@ -79,630 +82,439 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Container(
       child: Scaffold(
-        backgroundColor: AppColors.neutralGray,
+        backgroundColor: AppColors.white,
         body: Obx(() {
           final user = profileController.userProfile.value;
           if (user == null) {
             return Center(child: CircularProgressIndicator());
           }
-          return NestedScrollView(
-            headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                SliverAppBar(
-                  expandedHeight: 100,
-                  floating: false,
-                  pinned: true,
-                  backgroundColor: AppColors.neutralGray,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Image.network(
-                          user?.profilePhotoPath != null && user!.profilePhotoPath!.isNotEmpty
-                              ? "${AppUrls.imageurl}${user!.profilePhotoPath}"
-                              : "",
-                          width: 90,
-                          height: 90,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Image.asset(
-                              AppAssets.imgAppLogo,
-                              width: 90,
-                              height: 90,
-                              fit: BoxFit.cover,
-                            );
-                          },
-                        ),
-                        BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                          child: Container(
-                            color: Colors.black.withOpacity(0.2),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () => Get.back(),
-                  ),
-                  actions: [
-                    const Icon(Icons.more_vert, color: Colors.white),
-                    SizedBox(width: 12),
-                  ],
-                ),
-                SliverToBoxAdapter(
-                  child: Column(
-                    children: [
-                      SizedBox(height: 50), // Profile image ke liye space
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                           Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.white,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(50),
-                                  topRight: Radius.circular(50),
-                                ),
-                              ),
-                              child: Column(
-                                children: [
-                                  SizedBox(height: 50),
-                                  const SizedBox(height: 20),
-                                  // Name with info icon
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+          return DefaultTabController(
+            length: 4,
+            child: Stack(
+              children: [
+                NestedScrollView(
+                  headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                    return <Widget>[
+                      SliverToBoxAdapter(
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            // 1. Cover Image & Info Container
+                            Column(
+                              children: [
+                                // Cover Area
+                                Container(
+                                  height: 240,
+                                  width: double.infinity,
+                                  child: Stack(
+                                    fit: StackFit.expand,
                                     children: [
-                                      Text(
-                                        user?.username ?? "",
-                                        style: TextStyle(
-                                          fontSize: 26,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.black,
-                                          letterSpacing: 0.5,
+                                      Image.network(
+                                        user.profilePhotoPath != null && user.profilePhotoPath!.isNotEmpty
+                                            ? "${AppUrls.imageurl}${user.profilePhotoPath}"
+                                            : "",
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                                      ),
+                                      ClipRect(
+                                        child: BackdropFilter(
+                                          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                                          child: Container(color: Colors.black.withOpacity(0.3)),
                                         ),
                                       ),
-                                      const SizedBox(width: 6),
-                                      GestureDetector(
-                                        onTap: () {
-                                          _showBioDialog(user?.bio ?? "");
-                                        },
-                                        child: Image.asset(AppAssets.iButton, height: 18, width: 18),
-                                      )
-                                    ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {},
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(top: 4),
-                                          child: Text(
-                                            user.occupation.toString(),
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
-                                            ),
+                                       Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: [Colors.black54, Colors.transparent, Colors.black54],
                                           ),
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                                    child: Text(
-                                      user?.bio ?? "",
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: AppColors.black,
-                                        height: 1.5,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 10),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Column(
-                                        children: [
-                                          Text(
-                                            (user.postsCount ?? 0).toString(),
-                                            style: TextStyle(
-                                              color: AppColors.primaryDark,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 28,
+                                      // Back Button (Only for other profiles)
+                                      if (isOtherProfile)
+                                        Positioned(
+                                          top: 40,
+                                          left: 10,
+                                          child: IconButton(
+                                            icon: Container(
+                                              padding: const EdgeInsets.all(6),
+                                              decoration: const BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
+                                              child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
                                             ),
+                                            onPressed: () => Get.back(),
                                           ),
-                                          Text(
-                                            "Post",
-                                            style: TextStyle(color: AppColors.neutralGray),
-                                          ),
-                                        ],
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          if (user.accountPrivacy == "private" &&
-                                              (user.is_following ?? false) == false && (user.is_mine ?? false) == false) {
-                                            CustomSnackBar.showSuccess(
-                                              message: "First Follow User ",
-                                            );
-                                            return;
-                                          }
-                                          print(
-                                            "userid access from profile  : ${user.id}",
-                                          );
-                                          Get.to(
-                                                () => FollowTabs(
-                                              initialTab: 0,
-                                              userId: user.id!,
-                                            ),
-                                          );
-                                        },
-                                        child: Column(
+                                        ),
+
+                                       // Icons
+                                      Positioned(
+                                        top: 40,
+                                        right: 10,
+                                        child: Row(
                                           children: [
-                                            Text(
-                                              (user.followersCount ?? 0).toString(),
-                                              style: TextStyle(
-                                                color: AppColors.primaryDark,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 28,
+                                            IconButton(
+                                              icon: Container(
+                                                padding: const EdgeInsets.all(6),
+                                                decoration: BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
+                                                child: const Icon(Icons.settings, color: Colors.white, size: 20),
                                               ),
+                                              onPressed: () => Get.to(() => SettingsScreen()),
                                             ),
-                                            Text(
-                                              "Followers",
-                                              style: TextStyle(color: AppColors.neutralGray),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          if (user.accountPrivacy == "private" &&
-                                              (user.is_following ?? false) && (user.is_mine ?? false) == false) {
-                                            CustomSnackBar.showSuccess(
-                                              message: "First Follow User ",
-                                            );
-                                            return;
-                                          }
-                                          Get.to(
-                                                () => FollowTabs(
-                                              initialTab: 1,
-                                              userId: user.id!,
-                                            ),
-                                          );
-                                        },
-                                        child: Column(
-                                          children: [
-                                            Text(
-                                              (user.followingCount ?? 0).toString(),
-                                              style: TextStyle(
-                                                color: AppColors.primaryDark,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 28,
+                                            IconButton(
+                                              icon: Container(
+                                                padding: const EdgeInsets.all(6),
+                                                decoration: BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
+                                                child: const Icon(Icons.mail_outline_rounded, color: Colors.white, size: 20),
                                               ),
-                                            ),
-                                            Text(
-                                              "Following",
-                                              style: TextStyle(color: AppColors.neutralGray),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 10),
-                                  isOtherProfile &&
-                                      (user.accountPrivacy) == "private" &&
-                                      (user.is_following ?? false) == false
-                                      ? GestureDetector(
-                                    onTap: () {
-                                      if (user.id != null) {
-                                        profileController.toggleFollowForPostUser(
-                                          user.id!,
-                                        );
-                                      }
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            AppColors.primaryDark,
-                                            AppColors.primaryLight.withOpacity(0.8),
-                                          ],
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                        ),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 15,
-                                          vertical: 5,
-                                        ),
-                                        child: Text(
-                                          (user.is_following ?? false)
-                                              ? "Request"
-                                              : "Follow",
-                                          style: TextStyle(
-                                            color: AppColors.white,
-                                            fontSize: 18,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                      : Column(
-                                    children: [
-                                      isOtherProfile
-                                          ? Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              if (user.id != null) {
-                                                profileController
-                                                    .toggleFollowForPostUser(
-                                                  user.id!,
-                                                );
-                                              }
-                                            },
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    AppColors.primaryDark,
-                                                    AppColors.primaryLight
-                                                        .withOpacity(0.8),
-                                                  ],
-                                                  begin: Alignment.topCenter,
-                                                  end: Alignment.bottomCenter,
-                                                ),
-                                                borderRadius:
-                                                BorderRadius.circular(10),
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                const EdgeInsets.symmetric(
-                                                  horizontal: 15,
-                                                  vertical: 5,
-                                                ),
-                                                child: Text(
-                                                  (user.is_following ?? false)
-                                                      ? "Following"
-                                                      : "Follow",
-                                                  style: TextStyle(
-                                                    color: AppColors.white,
-                                                    fontSize: 18,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                colors: [
-                                                  AppColors.neutralGray,
-                                                  AppColors.neutralGray,
-                                                ],
-                                                begin: Alignment.topCenter,
-                                                end: Alignment.bottomCenter,
-                                              ),
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                            child: InkWell(
-                                              onTap: () async {
-                                                if (user.chat_id != null) {
-                                                  Get.toNamed(
-                                                    AppRoutes.chattingScreen,
-                                                    arguments: user.chat_id,
-                                                  );
-                                                } else {
-                                                  CustomSnackBar.showInfo(message: "Creating chat user id"+user.id.toString());
-                                                  final newChatId = await chatController.createSinglePrivateChat(user.id!.toInt());
-                                                  CustomSnackBar.showInfo(message: "Creating chat...$newChatId");
-                                                  if (newChatId != null) {
-                                                    Get.toNamed(
-                                                      AppRoutes.chattingScreen,
-                                                      arguments: newChatId,
-                                                    );
-                                                  } else {
-                                                    CustomSnackBar.showError(message: "Unable to start chat");
-                                                  }
-                                                }
-                                              },
-                                              child: Padding(
-                                                padding:
-                                                const EdgeInsets.symmetric(
-                                                  horizontal: 15,
-                                                  vertical: 5,
-                                                ),
-                                                child: Text(
-                                                  "Message",
-                                                  style: TextStyle(
-                                                    color: AppColors.black,
-                                                    fontSize: 18,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          InkWell(
-                                            onTap: (){
-                                              CustomSnackBar.showInfo(message: "Coming Soon....");
-                                            },
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: AppColors.neutralGray,
-                                                  width: 1,
-                                                ),
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                const EdgeInsets.symmetric(
-                                                  horizontal: 15,
-                                                  vertical: 4,
-                                                ),
-                                                child: Text(
-                                                  "Exclusive",
-                                                  style: TextStyle(
-                                                    color: AppColors.black,
-                                                    fontSize: 18,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Icon(Icons.more_vert),
-                                        ],
-                                      )
-                                          : Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              controller.showPickerOptions();
-                                            },
-                                            child: Container(
-                                              width: 40,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                color: AppColors.neutralGray,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Icon(
-                                                Icons.add,
-                                                color: Colors.grey[700],
-                                              ),
-                                            ),
-                                          ),
-                                          GestureDetector(
-                                            onTap: () {
-                                              Get.to(SettingsScreen());
-                                            },
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    AppColors.primaryDark,
-                                                    AppColors.primaryLight
-                                                        .withOpacity(0.8),
-                                                  ],
-                                                  begin: Alignment.topCenter,
-                                                  end: Alignment.bottomCenter,
-                                                ),
-                                                borderRadius:
-                                                BorderRadius.circular(10),
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                const EdgeInsets.symmetric(
-                                                  horizontal: 25,
-                                                  vertical: 5,
-                                                ),
-                                                child: Text(
-                                                  "Edit Profile",
-                                                  style: TextStyle(
-                                                    color: AppColors.white,
-                                                    fontSize: 18,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: AppColors.neutralGray,
-                                                width: 1,
-                                              ),
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                              const EdgeInsets.symmetric(
-                                                horizontal: 25,
-                                                vertical: 4,
-                                              ),
-                                              child: Text(
-                                                "Trending",
-                                                style: TextStyle(
-                                                  color: AppColors.black,
-                                                  fontSize: 18,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Icon(Icons.more_vert),
-                                        ],
-                                      ),
-                                      SizedBox(height: 10),
-                                      Obx(() {
-                                        if (controller.isLoading.value) {
-                                          return SizedBox(
-                                            height: 80,
-                                            child: Center(
-                                              child: CircularProgressIndicator(),
-                                            ),
-                                          );
-                                        }
-                                        return SizedBox(
-                                          height: 90,
-                                          child: ListView.builder(
-                                            scrollDirection: Axis.horizontal,
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                            ),
-                                            itemCount:
-                                            controller.highlights.length + 1,
-                                            itemBuilder: (context, index) {
-                                              if (index == 0) {
-                                                return GestureDetector(
-                                                  onTap: () {},
-                                                  child: _buildAddStory(),
-                                                );
-                                              }
-
-                                              final storyIndex = index - 1;
-
-                                              if (storyIndex >= controller.highlights.length) {
-                                                return SizedBox();
-                                              }
-
-                                              final story = controller.highlights[storyIndex];
-
-                                              return GestureDetector(
-                                                onTap: () {
-                                                  if (story.stories.isEmpty) {
-                                                    Get.snackbar(
-                                                      "No Highlights",
-                                                      "Highlights not added yet.",
-                                                      snackPosition: SnackPosition.BOTTOM,
-                                                    );
-                                                    return;
-                                                  }
-                                                  Get.to(
-                                                        () => HighlightScreenStoryViewer(
-                                                      stories: story.stories,
-                                                      highlightId: story.id,
-                                                      initialIndex: 0,
-                                                    ),
-                                                  );
+                                              onPressed: () async {
+                                                   if (user.chat_id != null) {
+                                                     Get.toNamed(AppRoutes.chattingScreen, arguments: user.chat_id);
+                                                   } else if (user.id != null) {
+                                                     final newChatId = await chatController.createSinglePrivateChat(user.id!.toInt());
+                                                     if (newChatId != null) {
+                                                       Get.toNamed(AppRoutes.chattingScreen, arguments: newChatId);
+                                                     }
+                                                   }
                                                 },
-                                                child: _buildStoryItem(
-                                                  story.title,
-                                                  story.cover_media_url,
-                                                ),
-                                              );
-                                            },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Positioned(
+                                        left: 20,
+                                        bottom: 80,
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              user.username ?? "Unknown",
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            if (user.isVerified ?? false) ...[
+                                              const SizedBox(width: 6),
+                                              const Icon(Icons.verified, color: Colors.blue, size: 20),
+                                            ]
+                                          ],
+                                        ),
+                                      ),
+                                      // Stats Pill
+                                      Positioned(
+                                        right: 16,
+                                        bottom: 20,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.2),
+                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(color: Colors.white30, width: 0.5),
                                           ),
-                                        );
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              _buildStatItem("${user.followersCount ?? 0} Followers", user, 0),
+                                              Container(width: 1, height: 16, color: Colors.white30),
+                                              _buildStatItem("${user.followingCount ?? 0} Following", user, 1),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Body Info Container
+                                Container(
+                                  color: AppColors.white,
+                                  padding: const EdgeInsets.only(top: 60, left: 16, right: 16, bottom: 20),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                       Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                  Text(
+                                                    user.occupation?.isNotEmpty == true ? user.occupation! : "Digital Creator",
+                                                    style: TextStyle(
+                                                      color: AppColors.black,
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
+                                                    maxLines: 1, overflow: TextOverflow.ellipsis,
+                                                  ),
+                                              ]
+                                            ),
+                                          ),
+                                          if (!isOtherProfile) ...[
+                                            _buildActionButton("More", () {}),
+                                            SizedBox(width: 10)
+                                          ],
+
+                                          if (!isOtherProfile)
+                                            InkWell(
+                                              onTap: () {
+                                                Get.bottomSheet(
+                                                  Container(
+                                                    decoration: const BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                                                    ),
+                                                    padding: const EdgeInsets.only(top: 12, bottom: 30, left: 20, right: 20),
+                                                    child: Column(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        // Drag Handle
+                                                        Container(
+                                                          width: 40,
+                                                          height: 4,
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.grey.shade300,
+                                                            borderRadius: BorderRadius.circular(2),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 20),
+                                                        const Text("Create New", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                                        const SizedBox(height: 25),
+                                                        
+                                                        // Options
+                                                        _buildCreateOption(
+                                                          icon: Icons.post_add_rounded,
+                                                          color: Colors.blueAccent,
+                                                          title: "Post",
+                                                          subtitle: "Share a photo or write something",
+                                                          onTap: () { 
+                                                            Get.back();
+                                                            // Direct action to avoid 2nd bottom sheet
+                                                            controller.pickImage(ImageSource.gallery);
+                                                          },
+                                                        ),
+                                                        const SizedBox(height: 16),
+                                                        _buildCreateOption(
+                                                          icon: Icons.movie_creation_outlined,
+                                                          color: Colors.pink,
+                                                          title: "Reel",
+                                                          subtitle: "Share a short video",
+                                                          onTap: () { 
+                                                            Get.back(); 
+                                                            // Future: Pick Video
+                                                          },
+                                                        ),
+                                                        const SizedBox(height: 16),
+                                                        _buildCreateOption(
+                                                          icon: Icons.live_tv_rounded,
+                                                          color: Colors.redAccent,
+                                                          title: "Live",
+                                                          subtitle: "Go live with your followers",
+                                                          onTap: () { Get.back(); /* Handle Live */ },
+                                                        ),
+                                                        const SizedBox(height: 16),
+                                                        _buildCreateOption(
+                                                          icon: Icons.camera_alt_rounded,
+                                                          color: Colors.orange,
+                                                          title: "Story",
+                                                          subtitle: "Capture a moment",
+                                                          onTap: () { 
+                                                            Get.back(); 
+                                                            // Direct action
+                                                             controller.pickImage(ImageSource.camera);
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  isScrollControlled: true,
+                                                );
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey.shade100,
+                                                  borderRadius: BorderRadius.circular(20),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(Icons.add, size: 14, color: AppColors.black),
+                                                    SizedBox(width: 6),
+                                                    Text("Create", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 16),
+                                      SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          children: [
+                                            if (!isOtherProfile) ...[
+                                                _buildActionButton("Add Bio", () => _showBioDialog(user.bio ?? "")), 
+                                                SizedBox(width: 10)
+                                            ],
+                                             if (isOtherProfile) ...[
+                                                 _buildFollowButton(user),
+                                                 SizedBox(width: 10),
+                                             ],
+
+                                          ],
+                                        ),
+                                      ),
+                                       SizedBox(height: 16),
+                                       if((user.bio ?? "").isNotEmpty)
+                                          Text(user.bio!, style: TextStyle(color: Colors.black87, fontSize: 13)),
+                                      SizedBox(height: 20),
+                                      Obx(() {
+                                          if (controller.isLoading.value) return const SizedBox.shrink();
+                                          return SizedBox(
+                                            height: 90,
+                                            child: ListView.builder(
+                                              scrollDirection: Axis.horizontal,
+                                              itemCount: controller.highlights.length + 1,
+                                              itemBuilder: (context, index) {
+                                                if (index == 0) return GestureDetector(onTap: (){}, child: _buildAddStory());
+                                                final story = controller.highlights[index - 1];
+                                                return GestureDetector(
+                                                    onTap: () => Get.to(() => HighlightScreenStoryViewer(stories: story.stories, highlightId: story.id, initialIndex: 0)),
+                                                    child: _buildStoryItem(story.title, story.cover_media_url)
+                                                );
+                                              },
+                                            ),
+                                          );
                                       }),
                                     ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          Positioned(
-                            top: -40,
-                            left: MediaQuery.of(context).size.width / 2 - 50,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Color(0xFF2196F3), width: 4),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.15),
-                                    blurRadius: 20,
-                                    offset: Offset(0, 8),
+                            // Profile Picture (Moved to ensure top z-index)
+                            Positioned(
+                              top: 190, // 240 - 50
+                              left: 20,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.white, width: 3),
+                                  boxShadow: [
+                                    BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4)),
+                                  ],
+                                ),
+                                child: CircleAvatar(
+                                  radius: 45,
+                                  backgroundColor: Colors.grey.shade200,
+                                  backgroundImage: NetworkImage(
+                                      user.profilePhotoPath != null && user.profilePhotoPath!.isNotEmpty
+                                          ? "${AppUrls.imageurl}${user.profilePhotoPath}"
+                                          : ""
                                   ),
-                                ],
-                              ),
-                              child: ClipOval(
-                                child: Image.network(
-                                  user?.profilePhotoPath != null && user!.profilePhotoPath!.isNotEmpty
-                                      ? "${AppUrls.imageurl}${user!.profilePhotoPath}"
-                                      : "",
-                                  width: 90,
-                                  height: 90,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Image.asset(
-                                      AppAssets.imgAppLogo,
-                                      width: 90,
-                                      height: 90,
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
+                                  onBackgroundImageError: (_,__) {},
+                                  child: (user.profilePhotoPath == null || user.profilePhotoPath!.isEmpty)
+                                      ? Image.asset(AppAssets.imgAppLogo)
+                                      : null,
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                      
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: _SliverAppBarDelegate(
+                          TabBar(
+                            isScrollable: false,
+                            dividerColor: Colors.grey.shade200,
+                            labelColor: Colors.black,
+                            unselectedLabelColor: Colors.grey,
+                            indicatorColor: Colors.blue,
+                            indicatorWeight: 2,
+                            labelPadding: EdgeInsets.symmetric(horizontal: 12),
+                            tabs: [
+                              Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 
+                              Tab(child: Image.asset(AppAssets.icVideo, width: 24, height: 24)),
+                              Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)),
+                              Tab(child: Icon(Icons.person_add_alt_1_outlined, color: Colors.black, size: 26)), 
+                            ],
+                          ),
+                        ),
+                      ),
+                    ];
+                  },
+                  body: TabBarView(
+                    children: [
+                      MyPostScreen(username: finalUserName),
+                      MyVideoScreen(username: finalUserName),
+                      const ProfileShopScreen(),
+                      ProfileLivePostsScreen(username: finalUserName),
                     ],
                   ),
                 ),
-              ];
-            },
-            body: Container(
-              color: AppColors.white,
-              child: DefaultTabController(
-                length: 2,
-                child: Column(
-                  children: [
-                    TabBar(
-                      isScrollable: false,
-                      dividerColor: Colors.grey,
-                      labelColor: Colors.blue,
-                      unselectedLabelColor: AppColors.black,
-                      indicatorColor: Colors.blue,
-                      indicator: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.blue,
-                            width: 3,
-                          ),
-                        ),
-                      ),
-                      labelPadding: EdgeInsets.symmetric(horizontal: 12),
-                      tabs: [
-                        Tab(
-                          child: Image.asset("assets/images/category.png"),
-                        ),
-                        Tab(
-                          child: Image.asset(
-                            "assets/images/video.png",
-                            height: 24,
-                            width: 24,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                      child: TabBarView(
-                        children: [
-                          MyPostScreen(username: finalUserName),
-                          MyVideoScreen(username: finalUserName),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+
+
+
+              ],
             ),
           );
         }),
       ),
     );
+  }
+
+  Widget _buildStatItem(String label, dynamic user, int index) {
+      return InkWell(
+          onTap: () {
+               if (user.accountPrivacy == "private" &&  (user.is_following ?? false) == false && (user.is_mine ?? false) == false) return;
+                Get.to(() => FollowTabs(initialTab: index, userId: user.id!));
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Text(
+              label,
+              style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+            ),
+          ),
+      );
+  }
+
+  Widget _buildActionButton(String label, VoidCallback onTap) {
+      return InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100, // Light grey background
+            borderRadius: BorderRadius.circular(8),
+             // border: Border.all(color: Colors.grey.shade300)
+          ),
+          child: Text(
+            label,
+            style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 13),
+          ),
+        ),
+      );
+  }
+  
+  Widget _buildFollowButton(dynamic user) {
+       bool isFollowing = user.is_following ?? false;
+       bool isRequested = false; // Add request logic if needed
+       return InkWell(
+        onTap: () => profileController.toggleFollowForPostUser(user.id!),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+          decoration: BoxDecoration(
+            color: isFollowing ? Colors.grey.shade100 : Colors.blueAccent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            isFollowing ? "Following" : "Follow",
+            style: TextStyle( color: isFollowing ? Colors.black : Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+          ),
+        ),
+      );
   }
 
 
@@ -1606,6 +1418,75 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildCreateOption({
+    required IconData icon,
+    required Color color,
+    required String title, 
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade100),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87)),
+                Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+              ],
+            ),
+            const Spacer(),
+            const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar _tabBar;
+
+  _SliverAppBarDelegate(this._tabBar);
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: AppColors.white,
+      child: _tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return false;
   }
 }
 

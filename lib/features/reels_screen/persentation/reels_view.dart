@@ -133,6 +133,12 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
   late AnimationController _likeAnimationController;
   late Animation<double> _likeAnimation;
   final ValueNotifier<bool> _isLiked = ValueNotifier(false);
+
+  // Volume Animation
+  late AnimationController _volumeAnimationController;
+  late Animation<double> _volumeAnimation;
+  final ValueNotifier<bool> _isMuted = ValueNotifier(false);
+
   int _currentPage = 0;
 
   double _dragDistance = 0.0;
@@ -173,6 +179,16 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
       end: 1,
     ).animate(_likeAnimationController);
 
+    // Volume Init
+    _volumeAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _volumeAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _volumeAnimationController, curve: Curves.easeOut));
+
     _dismissAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -208,9 +224,31 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
       controller?.dispose();
     }
     _likeAnimationController.dispose();
+    _volumeAnimationController.dispose();
     _dismissAnimationController.dispose();
     _isLiked.dispose();
+    _isMuted.dispose();
     super.dispose();
+  }
+
+  void _toggleSound() {
+    if (_videoControllers[_currentPage] == null) return;
+    
+    final controller = _videoControllers[_currentPage]!;
+    if (controller.value.volume > 0) {
+      controller.setVolume(0.0);
+      _isMuted.value = true;
+    } else {
+      controller.setVolume(1.0);
+      _isMuted.value = false;
+    }
+
+    _volumeAnimationController.reset();
+    _volumeAnimationController.forward().then((_) {
+        Future.delayed(const Duration(milliseconds: 600), () {
+             if(mounted) _volumeAnimationController.reverse();
+        });
+    });
   }
 
   void _initializeControllersForPage(int page) {
@@ -389,6 +427,11 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
                 isLiked: _isLiked,
                 onLike: _toggleLike,
                 onFollow: _followAuthor,
+                // Volume Props
+                isMuted: _isMuted,
+                onToggleSound: _toggleSound,
+                volumeAnimation: _volumeAnimation,
+                
                 allowDoubleTapToLike: widget.allowDoubleTapToLike,
                 allowTapToPause: widget.allowTapToPause,
                 commentIcon: widget.commentIcon,
@@ -445,6 +488,12 @@ class VideoReel extends StatelessWidget {
   final VoidCallback onFollow;
   final Animation<double> likeAnimation;
   final ValueNotifier<bool> isLiked;
+  
+  // New Volume Props
+  final ValueNotifier<bool> isMuted;
+  final VoidCallback onToggleSound;
+  final Animation<double> volumeAnimation;
+
   final bool allowDoubleTapToLike;
   final bool allowTapToPause;
   final Widget? likeIcon;
@@ -495,6 +544,11 @@ class VideoReel extends StatelessWidget {
     required this.onFollow,
     required this.likeAnimation,
     required this.isLiked,
+    // Required Volume Props
+    required this.isMuted,
+    required this.onToggleSound,
+    required this.volumeAnimation,
+
     required this.allowDoubleTapToLike,
     required this.allowTapToPause,
     required this.pageController,
@@ -540,15 +594,9 @@ class VideoReel extends StatelessWidget {
     final bottomNavHeight = kBottomNavigationBarHeight;
     return GestureDetector(
       onDoubleTap: allowDoubleTapToLike ? onLike : null,
-      onTap: () {
-        if (allowTapToPause) {
-          if (controller.value.isPlaying) {
-            controller.pause();
-          } else {
-            controller.play();
-          }
-        }
-      },
+      onLongPressStart: (_) => controller.pause(),
+      onLongPressEnd: (_) => controller.play(),
+      onTap: onToggleSound, // Use the callback
       child: Container(
         // margin: EdgeInsets.only(
         //   //top: appBarHeight,
@@ -557,7 +605,7 @@ class VideoReel extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            VideoPlayerWidget(
+            CustomReelPlayer(
               controller: controller,
               //  thumbnailUrl: reel.media[index].url,
               thumbnailUrl:
@@ -567,6 +615,13 @@ class VideoReel extends StatelessWidget {
             ),
             if (showPlayPause) VideoOverlay(controller: controller),
             if (showLikeAnimation) LikeAnimation(likeAnimation: likeAnimation),
+            // Volume Animation Overlay
+            ValueListenableBuilder<bool>(
+              valueListenable: isMuted,
+              builder: (context, muted, child) {
+                return VolumeAnimation(volumeAnimation: volumeAnimation, isMuted: muted);
+              },
+            ),
             if (showGradient) const VideoGradient(),
             ScreenOptions(
               item: reel,
@@ -586,13 +641,13 @@ class VideoReel extends StatelessWidget {
   }
 }
 
-class VideoPlayerWidget extends StatelessWidget {
+class CustomReelPlayer extends StatelessWidget {
   final VideoPlayerController controller;
   final String thumbnailUrl;
   final Widget? loadingWidget;
   final Widget? errorWidget;
 
-  const VideoPlayerWidget({
+  const CustomReelPlayer({
     super.key,
     required this.controller,
     required this.thumbnailUrl,
@@ -602,62 +657,54 @@ class VideoPlayerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: controller,
-      builder: (context, value, child) {
-        if (value.isInitialized) {
-          /*return FittedBox(
-            fit: BoxFit.contain,
-            child: SizedBox(
-              width: value.size.width,
-              height: value.size.height,
-              child: VideoPlayer(controller),
-            ),
-          );*/
-          return Center(  // ✅ Add Center
-            child: AspectRatio(  // ✅ FittedBox ki jagah AspectRatio use karo
-              aspectRatio: value.aspectRatio,
-              child: VideoPlayer(controller),
-            ),
-          );
-        } else if (value.hasError) {
-          debugPrint(
-            "ValueListenableBuilder  ERROR --> \n ${value.errorDescription} ",
-          );
-          return errorWidget ??
+    return Container(
+      color: Colors.black, // Background for letterboxing if needed
+      child: ValueListenableBuilder(
+        valueListenable: controller,
+        builder: (context, value, child) {
+          if (value.isInitialized) {
+             // 1. Calculate aspect ratios
+            final videoAspectRatio = value.size.width / value.size.height;
+            // Use MediaQuery to get screen aspect ratio, but here we are in a PageView likely full screen
+            // For Reels, we generally want cover. 
+            // However, creating a truly custom layout:
+            return SizedBox.expand(
+              child: FittedBox(
+                fit: BoxFit.cover, // FORCE FILL SCREEN like TikTok
+                child: SizedBox(
+                   width: value.size.width,
+                   height: value.size.height,
+                   child: VideoPlayer(controller),
+                ),
+              ),
+            );
+          } else if (value.hasError) {
+             return errorWidget ??
               Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  spacing: 12,
                   children: [
-                    Icon(
-                      Icons.report_problem_rounded,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                    Text(
-                      textAlign: TextAlign.center,
-                      'We are getting error in loading this video please ',
-                      style: const TextStyle(color: Colors.white),
-                    ),
+                    const Icon(Icons.error_outline, color: Colors.white, size: 40),
+                    const SizedBox(height: 8),
+                    const Text('Failed to load', style: TextStyle(color: Colors.white)),
                   ],
                 ),
               );
-        } else {
-          return SizedBox.expand(
-            child: CachedNetworkImage(
-              imageUrl: thumbnailUrl,
-              fit: BoxFit.cover,
-              placeholder:
-                  (context, url) =>
-                      loadingWidget ??
-                      const Center(child: CircularProgressIndicator()),
-              errorWidget:
-                  (context, url, error) => errorWidget ?? const Icon(Icons.error),
-            ),
-          );
-        }
-      },
+          } else {
+            // Loading State: Show Thumbnail
+            return SizedBox.expand(
+              child: CachedNetworkImage(
+                imageUrl: thumbnailUrl,
+                fit: BoxFit.cover,
+                placeholder: (context, url) =>
+                    loadingWidget ??
+                    const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
+                errorWidget: (context, url, error) => const SizedBox(),
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 }
@@ -701,7 +748,35 @@ class LikeAnimation extends StatelessWidget {
     return FadeTransition(
       opacity: likeAnimation,
       child: const Center(
-        child: Icon(Icons.favorite, size: 30, color: Colors.red),
+        child: Icon(Icons.favorite, size: 80, color: Colors.red), // Increased size
+      ),
+    );
+  }
+}
+
+class VolumeAnimation extends StatelessWidget {
+  final Animation<double> volumeAnimation;
+  final bool isMuted;
+
+  const VolumeAnimation({super.key, required this.volumeAnimation, required this.isMuted});
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: volumeAnimation,
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.5),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            isMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+            size: 50,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }
@@ -789,24 +864,58 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
         nav.changePage(4, username: item.user.username);
       },
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          item.user.avatar.isNotEmpty
-              ? CustomImageView(
-                url: item.user.avatar,
-                height: 30,
-                width: 30,
-                radius: BorderRadius.circular(15),
-              )
-              : const CircleAvatar(
-                radius: 16,
-                child: Icon(Icons.person, size: 18),
-              ),
-          const SizedBox(width: 12),
-          Flexible(
-            child: Text(
-              item.user.username,
-              style: const TextStyle(color: Colors.white),
+          Container(
+            padding: const EdgeInsets.all(1.5),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
             ),
+            child: item.user.avatar.isNotEmpty
+                ? CustomImageView(
+                    url: item.user.avatar,
+                    height: 38,
+                    width: 38,
+                    radius: BorderRadius.circular(19),
+                  )
+                : const CircleAvatar(
+                    radius: 19,
+                    backgroundColor: Colors.grey,
+                    child: Icon(Icons.person, size: 24, color: Colors.white),
+                  ),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    item.user.username,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(color: Colors.black, offset: Offset(0, 1), blurRadius: 4),
+                      ],
+                    ),
+                  ),
+                   const SizedBox(width: 8),
+                   // Simple Follow Button (Visual)
+                   Container(
+                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                     decoration: BoxDecoration(
+                       border: Border.all(color: Colors.white, width: 1),
+                       borderRadius: BorderRadius.circular(6),
+                     ),
+                     child: const Text("Follow", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                   ),
+                ],
+              ),
+            ],
           ),
         ],
       ),
@@ -901,24 +1010,27 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
           onTap: onPressed,
           behavior: HitTestBehavior.translucent,
           child: Container(
-            width: 35,
-            height: 35,
+            // Removed background circle for cleaner look
+            padding: const EdgeInsets.all(10), // slight padding for touch area
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.1),
+               shape: BoxShape.circle,
+               // color: Colors.black.withOpacity(0.1), // Optional: very subtle
             ),
-            child: Center(child: icon),
+            child: icon,
           ),
         ),
         if (label != null) ...[
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.9),
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              shadows: [
+                Shadow(color: Colors.black45, offset: Offset(0, 1), blurRadius: 4),
+              ],
             ),
           ),
         ],
@@ -1109,60 +1221,38 @@ class VideoProgressBar extends GetWidget<ShortPlayController> {
   Widget build(BuildContext context) {
     return Positioned(
       bottom: 0,
-      left: 15,
-      right: 15,
+      left: 0,
+      right: 0,
       child: ValueListenableBuilder(
         valueListenable: videoController,
         builder: (context, value, child) {
+          // View Count Logic preserved
           if (value.isInitialized && !_hasCalledApi) {
-            final halfDuration = value.duration.inSeconds / 2;
-            if (value.position.inSeconds >= halfDuration) {
-              _hasCalledApi = true;
-              // controller.setViewsCount(
-              //   modal.courseCategoryId ?? "",
-              //   modal.id ?? "",
-              // );
-            }
+             final halfDuration = value.duration.inSeconds / 2;
+             if (value.position.inSeconds >= halfDuration) {
+               _hasCalledApi = true;
+             }
           }
-          return Row(
-            spacing: 12,
-            children: [
-              SizedBox(
-                child: Text(
-                  '${value.position.inMinutes.toString().padLeft(2, '0')}:${(value.position.inSeconds % 60).toString().padLeft(2, '0')}',
-                  style: const TextStyle(color: Colors.white),
-                ),
+          return SizedBox(
+            height: 4, // Very thin container
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                thumbShape: SliderComponentShape.noThumb, // Provide no thumb options
+                overlayShape: SliderComponentShape.noOverlay,
+                trackHeight: 2.0,
+                activeTrackColor: AppColors.secondary, // Using Secondary (Cyan) as Primary is Black
+                inactiveTrackColor: AppColors.secondary.withValues(alpha: 0.3),
+                trackShape: const RectangularSliderTrackShape(), // Full width
               ),
-              Expanded(
-                child: SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    thumbShape: const RoundSliderThumbShape(
-                      enabledThumbRadius: 8.0,
-                    ),
-                    overlayShape: const RoundSliderOverlayShape(
-                      overlayRadius: 16.0,
-                    ),
-                    trackHeight: 2.0,
-                  ),
-                  child: Slider(
-                    value: value.position.inSeconds.toDouble(),
-                    min: 0.0,
-                    max: value.duration.inSeconds.toDouble(),
-                    onChanged: (value) {
-                      videoController.seekTo(Duration(seconds: value.toInt()));
-                    },
-                    activeColor: color ?? Colors.red,
-                    inactiveColor: Colors.grey,
-                  ),
-                ),
+              child: Slider(
+                value: value.position.inSeconds.toDouble().clamp(0.0, value.duration.inSeconds.toDouble()),
+                min: 0.0,
+                max: value.duration.inSeconds.toDouble() > 0 ? value.duration.inSeconds.toDouble() : 1.0,
+                onChanged: (value) {
+                  videoController.seekTo(Duration(seconds: value.toInt()));
+                },
               ),
-              SizedBox(
-                child: Text(
-                  '${value.duration.inMinutes.toString().padLeft(2, '0')}:${(value.duration.inSeconds % 60).toString().padLeft(2, '0')}',
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
+            ),
           );
         },
       ),

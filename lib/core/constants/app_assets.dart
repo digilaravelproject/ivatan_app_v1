@@ -13,6 +13,7 @@ class AppAssets {
   static const String imgShare = "assets/images/share.png";
   static const String icGoogle = "assets/images/ic_google.svg";
   static const String iButton = "assets/images/i_button.png";
-
-
+  static const String icCategory = "assets/images/category.png";
+  static const String icVideo = "assets/images/video.png";
+  static const String icProduct = "assets/images/product.png";
 }

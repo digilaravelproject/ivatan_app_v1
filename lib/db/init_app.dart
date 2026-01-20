@@ -98,7 +98,7 @@ Future<void> _initNotifications() async {
 
     // 🔔 Initialization settings
     const AndroidInitializationSettings androidInitSettings =
-        AndroidInitializationSettings('@drawable/app_svg_logo');
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const InitializationSettings initSettings = InitializationSettings(
       android: androidInitSettings,
     );

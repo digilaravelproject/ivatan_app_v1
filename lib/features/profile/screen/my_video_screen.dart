@@ -2,19 +2,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../videos/persentation/play_video_screen.dart';
 import '../controller/ownpostController.dart';
 
 class MyVideoScreen extends StatelessWidget {
-  String username;
+  final String username;
   MyVideoScreen({Key? key, required this.username}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final OwnPostController controller = Get.put(OwnPostController(filterType: "videos", UserName: username ));
     return Scaffold(
-      backgroundColor: AppColors.transparent,
+      backgroundColor: AppColors.white,
       body: NotificationListener<ScrollNotification>(
         onNotification: (scroll) {
           if (!controller.isLoading.value &&
@@ -27,45 +28,52 @@ class MyVideoScreen extends StatelessWidget {
         child: RefreshIndicator(
           onRefresh: () async {
             await controller.fetchOwnPosts(filterType: "videos", username: username);
-            //  await controller.fetchStories();
           },
           child: SafeArea(
             child: Column(
               children: [
-                SizedBox(height: 10),
-
-                /// *** ONLY ONE EXPANDED ***
+                SizedBox(height: 2), // Tiny gap
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 0), // Full width
                     child: Obx(() {
                       if (controller.isLoading.value && controller.posts.isEmpty) {
                         return const Center(child: CircularProgressIndicator());
                       }
 
                       if (controller.posts.isEmpty) {
-                        return const Center(child: Text("No posts found"));
+                        return const Center(child: Text("No videos found"));
                       }
 
                       return GridView.builder(
-                      //  controller: controller.scrollController,   // OPTIONAL, If needed
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        physics: const BouncingScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
-                          crossAxisSpacing: 0,
-                          mainAxisSpacing: 0,
-                          childAspectRatio: 1,
+                          crossAxisSpacing: 2,
+                          mainAxisSpacing: 2,
+                          childAspectRatio: 0.7, // Taller for functionality feeling (Reels/TikTok style)
                         ),
                         itemCount: controller.posts.length,
                         itemBuilder: (context, index) {
                           final post = controller.posts[index];
+                          // Safely get thumbnail
+                          String thumb = "";
+                          if(post.media.isNotEmpty) {
+                             thumb = post.media.first.thumbnail.isNotEmpty 
+                                ? post.media.first.thumbnail 
+                                : post.media.first.url;
+                          }
+
                           return GestureDetector(
                               onTap: () {
+                                if(post.media.isNotEmpty) {
                                   Get.to(() => VideoPlayerScreen(
                                     videoUrl: post.media.first.url,
                                     videoId: post.id,
                                   ));
+                                }
                               },
-                              child: profileGridItem(post.media.first.thumbnail)
+                              child: _buildVideoItem(thumb, post.stats.viewCount)
                           );
                         },
                       );
@@ -80,87 +88,30 @@ class MyVideoScreen extends StatelessWidget {
     );
   }
 
-/*
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.transparent,
-      body: NotificationListener<ScrollNotification>(
-        onNotification: (scroll) {
-          if (!controller.isLoading.value &&
-              controller.isMoreDataAvailable.value &&
-              scroll.metrics.pixels >= scroll.metrics.maxScrollExtent * 0.8) {
-            controller.fetchOwnPosts(loadMore: true);
-          }
-
-          return true;
-        },
-        child: SafeArea(
-          child: Column(
-            children: [
-              SizedBox(height: 10,),
-              Expanded(
-                child: Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Obx(() {
-                      if (controller.isLoading.value) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      if (controller.posts.isEmpty) {
-                        return const Center(child: Text("No posts found"));
-                      }
-
-                      return GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 0,
-                          mainAxisSpacing: 0,
-                          childAspectRatio: 1,
-                        ),
-                        itemCount: controller.posts.length,
-                        itemBuilder: (context, index) {
-                          final post = controller.posts[index];
-
-                          return profileGridItem(post.media.first.thumbnail);
-                          // if your API is like post.media.first.path
-                          // return profileGridItem(post.media[0].filePath);
-                        },
-                      );
-                    }),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-
-  }
-*/
-
-
-  Widget profileGridItem(String imageUrl) {
+  Widget _buildVideoItem(String imageUrl, int viewCount) {
     return Container(
       decoration: BoxDecoration(
-        image: DecorationImage(
+        color: Colors.black12,
+        image: imageUrl.isNotEmpty ? DecorationImage(
           image: NetworkImage(imageUrl),
           fit: BoxFit.cover,
-        ),
+          onError: (_, __) {}
+        ) : null,
       ),
       child: Stack(
         children: [
+          if(imageUrl.isEmpty) const Center(child: Icon(Icons.videocam_off, color: Colors.grey)),
+          
           // Gradient Overlay
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Colors.black.withOpacity(0.1),
-                    Colors.black.withOpacity(0.4),
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.6),
                   ],
-                  begin: Alignment.topCenter,
+                  begin: Alignment.center,
                   end: Alignment.bottomCenter,
                 ),
               ),
@@ -173,15 +124,14 @@ class MyVideoScreen extends StatelessWidget {
             left: 8,
             child: Row(
               children: [
-                Icon(Icons.play_circle_fill,
-                    color: Colors.white, size: 18),
-                SizedBox(width: 4),
+                const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 4),
                 Text(
-                  "1.2M",
-                  style: TextStyle(
+                  _formatCount(viewCount),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
-                    fontSize: 13,
+                    fontSize: 12,
                   ),
                 ),
               ],
@@ -191,6 +141,13 @@ class MyVideoScreen extends StatelessWidget {
       ),
     );
   }
-
-
+  
+  String _formatCount(int count) {
+    if (count >= 1000000) {
+      return '${(count / 1000000).toStringAsFixed(1)}M';
+    } else if (count >= 1000) {
+      return '${(count / 1000).toStringAsFixed(1)}k';
+    }
+    return count.toString();
+  }
 }
