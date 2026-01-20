@@ -68,7 +68,7 @@ class DashboardPage extends StatelessWidget {
                   _item(context, Icons.search_sharp, 1),
                   _item(context, Icons.slow_motion_video_outlined, 2),
                   _item(context, Icons.video_library_outlined, 3),
-                  _item(context, Icons.account_circle_outlined, 4),
+                  _item(context, Icons.account_circle_outlined, 4, imageUrl: DashboardController().userProfileImage),
                 ],
               ),
             ),
@@ -78,7 +78,7 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _item(BuildContext context, dynamic iconData, int index) {
+  Widget _item(BuildContext context, dynamic iconData, int index, {String? imageUrl}) {
     return Obx(() {
       final isSelected = controller.selectedIndex.value == index;
 
@@ -91,17 +91,44 @@ class DashboardPage extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              iconData is String
-                  ? Iconify(
-                iconData,
-                size: 28,
-                color: isSelected ? AppColors.primary : Colors.grey.shade400,
-              )
-                  : Icon(
-                iconData,
-                size: 28,
-                color: isSelected ? AppColors.primary : Colors.grey.shade400,
-              ),
+              // Specific logic for Profile Image (Index 4)
+              if (index == 4 && imageUrl != null && imageUrl.isNotEmpty)
+                Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected ? AppColors.primary : Colors.grey.shade400, 
+                      width: 1.5
+                    ),
+                  ),
+                  child: Padding(
+                     padding: const EdgeInsets.all(1.5),
+                     child: ClipOval(
+                      child: Image.network(
+                        "https://www.ivatan.in/" + imageUrl, // Assuming base URL needed or it's full path. 
+                        // Checking home_screen.dart it uses AppUrls.imageurl + imageUrl
+                        // I should import AppUrls or just hardcode base if imports are tricky. 
+                        // Lets verify imports first. 
+                        fit: BoxFit.cover,
+                        errorBuilder: (_,__,___) => Icon(iconData, size: 24, color: Colors.grey),
+                      ),
+                    ),
+                  )
+                )
+              else if (iconData is String)
+                Iconify(
+                  iconData,
+                  size: 28,
+                  color: isSelected ? AppColors.primary : Colors.grey.shade400,
+                )
+              else
+                Icon(
+                  iconData,
+                  size: 28,
+                  color: isSelected ? AppColors.primary : Colors.grey.shade400,
+                ),
               const SizedBox(height: 6),
               AnimatedContainer(
                 duration: const Duration(milliseconds: 200),

@@ -135,6 +135,8 @@ class DashboardController extends GetxController {
   StreamSubscription<Uri>? _linkSub;
   Uri? _pendingDeepLink;
 
+  String get userProfileImage => SharedPrefManager().user?.profilePhotoPath ?? "";
+
   /// Screens (ORDER is IMPORTANT)
   late final List<Widget> screenList;
 
