@@ -176,12 +176,12 @@ class ApiServices extends GetxService {
       } else if (response.statusCode == 422) {
         return body;
       } else {
-        if (showErrorToast) {
+        if (showErrorToast && response.statusCode < 500) {
           _handleError(
             "Server returned ${response.statusCode}: ${response.reasonPhrase}",
           );
         } else {
-             printMessage("HTTP ERROR: Server returned ${response.statusCode}: ${response.reasonPhrase}");
+          printMessage("HTTP ERROR: Server returned ${response.statusCode}: ${response.reasonPhrase}");
         }
       }
     } catch (e) {

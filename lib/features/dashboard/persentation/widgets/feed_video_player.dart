@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import '../../../../core/network/app_urls.dart';
 
 class FeedVideoPlayer extends StatefulWidget {
   final String videoUrl;
@@ -23,7 +24,7 @@ class _FeedVideoPlayerState extends State<FeedVideoPlayer> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
+    _controller = VideoPlayerController.networkUrl(Uri.parse(AppUrls.getFullImageUrl(widget.videoUrl)))
       ..initialize().then((_) {
         setState(() {
           _initialized = true;

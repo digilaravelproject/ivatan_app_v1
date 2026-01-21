@@ -32,7 +32,7 @@ class VideoController extends GetxController {
   void onInit() {
     super.onInit();
     fetchVideo();
-    fetchRelatedVideos(110);
+    fetchRelatedVideos(videoId);
   }
 
   Future<void> fetchVideo({bool loadMore = false}) async {
@@ -85,7 +85,7 @@ class VideoController extends GetxController {
       isLoading.value = true;
 
       final response =
-      await api.callGet("api/v1/posts/video/110/related");
+      await api.callGet("api/v1/posts/video/$videoId/related", showErrorToast: false);
 
       print("Related Videos Response: " + response.toString());
 

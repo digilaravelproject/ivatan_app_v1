@@ -19,6 +19,7 @@ import '../controller/create_story_controller.dart';
 import '../model/post_model.dart';
 import '../model/story_model.dart';
 import 'widgets/feed_media_widget.dart';
+import '../../../core/network/app_urls.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({Key? key}) : super(key: key);
@@ -276,7 +277,7 @@ class HomePage extends StatelessWidget {
                   : null),
           image: (!hasStory && userAvatar.isNotEmpty)
               ? DecorationImage(
-                  image: NetworkImage(userAvatar), // Use user avatar for background if no story
+                  image: NetworkImage(AppUrls.getFullImageUrl(userAvatar)), // Use user avatar for background if no story
                   fit: BoxFit.cover,
                   colorFilter: ColorFilter.mode(
                     Colors.black.withOpacity(0.5), 
@@ -522,7 +523,7 @@ class HomePage extends StatelessWidget {
                     ),
                     child: ClipOval(
                       child: post.user.avatar != null && post.user.avatar!.isNotEmpty
-                          ? Image.network(post.user.avatar!, fit: BoxFit.cover)
+                          ? Image.network(AppUrls.getFullImageUrl(post.user.avatar!), fit: BoxFit.cover)
                           : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
                     ),
                   ),
@@ -1064,7 +1065,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                         backgroundColor: Colors.grey.shade100,
                         backgroundImage: (comment.user?.avtar != null &&
                             comment.user?.avtar != "")
-                            ? NetworkImage(comment.user!.avtar!)
+                            ? NetworkImage(AppUrls.getFullImageUrl(comment.user!.avtar!))
                             : null,
                         child: (comment.user?.avtar == null ||
                             comment.user?.avtar == "")
@@ -1200,7 +1201,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               backgroundColor: Colors.grey.shade100,
               backgroundImage: (reply.user?.avtar != null &&
                   reply.user?.avtar != "")
-                  ? NetworkImage(reply.user!.avtar!)
+                  ? NetworkImage(AppUrls.getFullImageUrl(reply.user!.avtar!))
                   : null,
               child: (reply.user?.avtar == null ||
                   reply.user?.avtar == "")

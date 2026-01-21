@@ -8,6 +8,15 @@ class AppUrls {
 
   static const String imageurl = "https://www.ivatan.in/storage/";
 
+  static String getFullImageUrl(String? path) {
+    if (path == null || path.isEmpty) return "";
+    if (path.startsWith('http')) return path;
+    
+    // Remove leading slash if present to avoid double slashes
+    String cleanPath = path.startsWith('/') ? path.substring(1) : path;
+    return "$imageurl$cleanPath";
+  }
+
   static const login = "api/auth/login";
   static const loginOtp = "api/auth/mobile_login";
   static const register = "api/auth/register";

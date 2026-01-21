@@ -11,6 +11,7 @@ import '../../../core/helper/custom_snack_bar.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../dashboard/controller/follow_controller.dart';
 import '../../dashboard/persentation/comming_soon.dart';
+import '../../../../core/network/app_urls.dart';
 import '../controller/followListController.dart';
 
 // CustomEmptyState widget
@@ -207,7 +208,7 @@ class FollowingList extends StatelessWidget {
                               radius: 26,
                               backgroundColor: Colors.grey.shade200,
                               backgroundImage: (user.avatar != null && user.avatar!.isNotEmpty)
-                                  ? NetworkImage(user.avatar!)
+                                  ? NetworkImage(AppUrls.getFullImageUrl(user.avatar))
                                   : null,
                               child: (user.avatar == null || user.avatar!.isEmpty)
                                   ? const Icon(Icons.person, size: 26)
@@ -386,7 +387,7 @@ class FollowerList extends StatelessWidget {
                               radius: 26,
                               backgroundColor: Colors.grey.shade200,
                               backgroundImage: (user.avatar != null && user.avatar!.isNotEmpty)
-                                  ? NetworkImage(user.avatar!)
+                                  ? NetworkImage(AppUrls.getFullImageUrl(user.avatar))
                                   : null,
                               child: (user.avatar == null || user.avatar!.isEmpty)
                                   ? const Icon(Icons.person, size: 26)
@@ -486,7 +487,7 @@ void _showUnfollowBottomSheet(BuildContext context, dynamic user, dynamic contro
             radius: 40,
             backgroundColor: Colors.grey.shade200,
             backgroundImage: user.avatar != null && user.avatar!.isNotEmpty
-                ? NetworkImage(user.avatar!)
+                ? NetworkImage(AppUrls.getFullImageUrl(user.avatar))
                 : null,
             child: (user.avatar == null || user.avatar!.isEmpty)
                 ? const Icon(Icons.person, size: 40)

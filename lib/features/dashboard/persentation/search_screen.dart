@@ -13,6 +13,7 @@ import '../../../core/helper/my_image_slider.dart';
 import '../../post/presentation/image_post_screen.dart';
 import '../../videos/persentation/play_video_screen.dart';
 import 'comming_soon.dart';
+import '../../../core/network/app_urls.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -264,7 +265,7 @@ class TrendingScreen extends StatelessWidget {
                             height: (index % 2 == 0) ? 220 : 150,
                             color: Colors.grey.shade300,
                             child: FadeInImage(
-                              image: NetworkImage(thumb),
+                              image: NetworkImage(AppUrls.getFullImageUrl(thumb)),
                               placeholder: const AssetImage(AppAssets.imgOnbording1),
                               imageErrorBuilder: (context, error, stackTrace) {
                                 return Image.asset(
@@ -542,7 +543,7 @@ class LiveScreen extends StatelessWidget {
              // backgroundColor: Colors.white,
               child: CircleAvatar(
                 radius: avatarRadius - 3,
-                backgroundImage: NetworkImage(imageUrl),
+                backgroundImage: NetworkImage(AppUrls.getFullImageUrl(imageUrl)),
               ),
             ),
           ),
