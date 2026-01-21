@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/features/auth/persentation/login_screen.dart';
 
+import '../../../../core/helper/custom_date_picker.dart';
 import '../../../../core/helper/custom_snack_bar.dart';
 import '../../../route/app_pages.dart';
 import '../../dashboard/persentation/dashboard_page.dart';
@@ -151,6 +152,7 @@ class RegisterController extends GetxController {
 
   /// Selected occupation
   RxString selectedOccupation = "".obs;
+  var countryCode = "+91".obs;
 
 
   /// Text controllers
@@ -273,11 +275,14 @@ class RegisterController extends GetxController {
   }
 
   Future<void> pickDate(BuildContext context) async {
-    DateTime? pickedDate = await showDatePicker(
+    // Calculate date 18 years ago from today
+    final DateTime eighteenYearsAgo = DateTime.now().subtract(const Duration(days: 365 * 18));
+    
+    DateTime? pickedDate = await CustomDatePicker.show(
       context: context,
-      initialDate: DateTime(2000),
+      initialDate: eighteenYearsAgo, // Start at 18 years ago (valid date)
       firstDate: DateTime(1950),
-      lastDate: DateTime.now(),
+      lastDate: eighteenYearsAgo, // User must be at least 18 years old
     );
     if (pickedDate != null) {
       // format date → MM/dd/yyyy
@@ -288,7 +293,6 @@ class RegisterController extends GetxController {
 
       dobController.text = formattedDate;
     }
-
   }
 
 
@@ -321,13 +325,10 @@ class RegisterController extends GetxController {
 
       print("registrationrequset : "+req.name+ req.email+ req.phone+req.username+req.password+req.dateOfBirth+req.occupation+req.interests.toString());
 
-    final modal = await dataSource.makeUserRegister(req);
-      final msg = "Congratulations, you have successfully logged in!";
+      final modal = await dataSource.makeUserRegister(req);
+      final msg = "Registration successful! Welcome ${modal.name}";
 
-    //  print("registermsg : "+modal.phone);
-      //Get.offAllNamed(AppRoutes.login);
-      Get.to(LoginPage());
-      // Navigator.push(context, DashboardPage() as Route<Object?>);
+      Get.offAll(() =>  DashboardPage());
       CustomSnackBar.showSuccess(message: msg);
     } catch (e) {
       CustomSnackBar.showError(message: e.toString());

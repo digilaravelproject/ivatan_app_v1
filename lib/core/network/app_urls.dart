@@ -15,6 +15,7 @@ class AppUrls {
 
   static const verifyForgetPassword  ="api/forgot-password/verify";
   static const changePassword  ="api/forgot-password/reset";
+  static const interests  ="api/interests";
 
 
 

@@ -40,6 +40,7 @@ class ApiServices extends GetxService {
     required Map<String, dynamic> data,
     bool isUserRequired = false,
     bool isFormData = false,
+    bool showErrorToast = true,
   }) async {
     if (isUserRequired) {
       final userId = {
@@ -82,12 +83,12 @@ class ApiServices extends GetxService {
 
         final streamedResponse = await request.send().timeout(_timeout);
         final response = await http.Response.fromStream(streamedResponse);
-        return _parseResponse(response);
+        return _parseResponse(response, showErrorToast: showErrorToast);
       } else {
         final response = await http
             .post(uri, headers: _defaultHeaders(), body: jsonEncode(data))
             .timeout(_timeout);
-        return _parseResponse(response);
+        return _parseResponse(response, showErrorToast: showErrorToast);
       }
     });
   }
@@ -158,24 +159,32 @@ class ApiServices extends GetxService {
   }
 
   /// Parse response body safely
-  Map<String, dynamic>? _parseResponse(http.Response response) {
+  Map<String, dynamic>? _parseResponse(http.Response response, {bool showErrorToast = true}) {
     try {
       final body = response.body.isNotEmpty ? jsonDecode(response.body) : {};
       logApiMessage(" Response --> $body  ${response.statusCode}");
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return body is Map<String, dynamic> ? body : {"data": body};
       } else if (response.statusCode == 401 || response.statusCode == 404) {
-        _handleError(body['message']);
+        if (showErrorToast) {
+          _handleError(body['message']);
+        } else {
+          printMessage("HTTP ERROR: ${body['message']}");
+        }
         return body;
       } else if (response.statusCode == 422) {
         return body;
       } else {
-        _handleError(
-          "Server returned ${response.statusCode}: ${response.reasonPhrase}",
-        );
+        if (showErrorToast) {
+          _handleError(
+            "Server returned ${response.statusCode}: ${response.reasonPhrase}",
+          );
+        } else {
+             printMessage("HTTP ERROR: Server returned ${response.statusCode}: ${response.reasonPhrase}");
+        }
       }
     } catch (e) {
-      _handleError("Invalid JSON: $e");
+      if (showErrorToast) _handleError("Invalid JSON: $e");
     }
     return null;
   }

@@ -12,7 +12,7 @@ abstract class AuthRemoteDataSource {
 
   Future<UserModel> UserLoginWithPassword(LoginReqModel req);
 
-  Future<void> makeUserRegister(RegisterReqModel req);
+  Future<UserModel> makeUserRegister(RegisterReqModel req);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -25,6 +25,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       //data: req.toPasswordMap(),
       data: req.toMap(),
       isFormData: true,
+      showErrorToast: false, // LoginController will handle errors
     );
     if (response == null) {
       throw Exception("Invalid Credentials");
@@ -64,7 +65,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> makeUserRegister(RegisterReqModel req) async {
+  Future<UserModel> makeUserRegister(RegisterReqModel req) async {
     final response = await Get.find<ApiServices>().callPost(
       AppUrls.register,
       data: req.toMap(),
@@ -82,6 +83,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
       throw Exception("Registration failed");
     }
-    return;
+
+    // Save user session
+    final userModel = UserModel.fromJson(response['data']);
+    final pref = SharedPrefManager();
+    await pref.saveUserData(userModel.toJson());
+    
+    return userModel;
   }
 }

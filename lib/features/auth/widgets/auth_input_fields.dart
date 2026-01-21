@@ -101,6 +101,7 @@ class AuthInputFields extends StatefulWidget {
   final TextInputType textInputType;
   final IconData? iconData;
   final IconData? endIcon;
+  final Widget? suffixIcon; // Added generic suffix widget
   final bool showLabel;
   final bool isObscure;
   final GestureTapCallback? onEndIconTap;
@@ -119,6 +120,7 @@ class AuthInputFields extends StatefulWidget {
     this.iconData,
     this.controller,
     this.endIcon,
+    this.suffixIcon,
     this.hint,
     this.onEndIconTap,
     this.validator,
@@ -170,41 +172,69 @@ class _AuthInputFieldsState extends State<AuthInputFields> {
       readOnly: widget.readOnly,
       onTap: widget.onTap,
 
-      style: const TextStyle(color: Colors.black, fontSize: 15),
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: widget.readOnly ? Colors.grey.shade600 : Colors.black87,
+      ),
 
       decoration: InputDecoration(
         labelText: widget.label,
         labelStyle: TextStyle(
           fontSize: 14,
-          color: _isFocused ? Colors.blue : Colors.grey,
-          fontWeight: FontWeight.w600,
+          color: _isFocused ? AppColors.primary : Colors.grey.shade600,
+          fontWeight: FontWeight.w500,
         ),
 
         hintText: widget.hintText,
+        hintStyle: TextStyle(
+          fontSize: 14,
+          color: Colors.grey.shade400,
+        ),
 
         prefixIcon: widget.iconData == null
             ? null
-            : Icon(widget.iconData, size: 20, color: Colors.grey),
+            : Icon(widget.iconData, size: 20, color: AppColors.primary),
 
-        suffixIcon: widget.endIcon == null
+        // Prefer suffixIcon widget, else fallback to endIcon button
+        suffixIcon: widget.suffixIcon ?? (widget.endIcon == null
             ? null
             : IconButton(
           onPressed: widget.onEndIconTap,
-          icon: Icon(widget.endIcon, color: Colors.grey),
+          icon: Icon(widget.endIcon, size: 20),
+          color: AppColors.primary,
+        )),
+
+        // Premium rounded borders with fill
+        filled: true,
+        fillColor: widget.readOnly ? Colors.grey.shade50 : Colors.white,
+
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Colors.red, width: 1),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: Colors.grey.shade200),
         ),
 
-        // 🔥 Box हट गया, border हट गया
-        filled: false,
-
-        // 🔥 केवल underline (grey + blue on focus)
-        enabledBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey, width: 1),
-        ),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.blue, width: 1.5),
-        ),
-
-        contentPadding: const EdgeInsets.symmetric(vertical: 10),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       ),
     );
   }
@@ -358,48 +388,68 @@ class _AuthInputFieldsBorderState extends State<AuthInputFieldsBorder> {
       readOnly: widget.readOnly,
       onTap: widget.onTap,
 
-      style: const TextStyle(color: Colors.black, fontSize: 15),
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: widget.readOnly ? Colors.grey.shade600 : Colors.black87,
+      ),
 
       decoration: InputDecoration(
         labelText: widget.label,
         labelStyle: TextStyle(
           fontSize: 14,
-          color: _isFocused ? Colors.blue : Colors.grey,
-          fontWeight: FontWeight.w600,
+          color: _isFocused ? AppColors.primary : Colors.grey.shade600,
+          fontWeight: FontWeight.w500,
         ),
 
         hintText: widget.hintText,
+        hintStyle: TextStyle(
+          fontSize: 14,
+          color: Colors.grey.shade400,
+        ),
 
         prefixIcon: widget.iconData == null
             ? null
-            : Icon(widget.iconData, size: 20, color: Colors.grey),
+            : Icon(widget.iconData, size: 20, color: AppColors.primary),
 
         suffixIcon: widget.endIcon == null
             ? null
             : IconButton(
           onPressed: widget.onEndIconTap,
-          icon: Icon(widget.endIcon, color: Colors.grey),
+          icon: Icon(widget.endIcon, size: 20),
+          color: AppColors.primary,
         ),
 
-        filled: false,
+        // Premium rounded borders with fill
+        filled: true,
+        fillColor: widget.readOnly ? Colors.grey.shade50 : Colors.white,
 
-        // 🔥 SAME BORDER ON BOTH STATES
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.grey, width: 1),
-        ),
-
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.blue, width: 1.5),
-        ),
-
-        // 🔥 ALSO ADDING default border to avoid Flutter override issues
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Colors.red, width: 1),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: Colors.grey.shade200),
         ),
 
-        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       ),
 
     );

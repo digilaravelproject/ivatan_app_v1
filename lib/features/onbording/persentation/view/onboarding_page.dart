@@ -87,7 +87,7 @@ class OnboardingPage extends StatelessWidget {
             top: 50,
             right: 20,
             child: TextButton(
-              onPressed: controller.goToNextPage, // Functionally skips to login/home
+              onPressed: controller.skipToLogin, // Directly skips to Login
               style: TextButton.styleFrom(
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -119,7 +119,7 @@ class OnboardingPage extends StatelessWidget {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(3),
                           color: controller.currentPage.value == index
-                              ? AppColors.secondary // Cyan/Secondary stands out more
+                              ? Colors.white // White for contrast on Black overlay
                               : Colors.white38,
                         ),
                       ),
@@ -146,7 +146,7 @@ class OnboardingPage extends StatelessWidget {
                       }
                     },
                     gradient: const LinearGradient(
-                      colors: [AppColors.secondary, AppColors.secondaryDark],
+                      colors: [AppColors.primary, AppColors.primaryLight], // Primary (Black) Theme
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),

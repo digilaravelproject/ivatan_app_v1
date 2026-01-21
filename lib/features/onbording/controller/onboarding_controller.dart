@@ -44,9 +44,11 @@ class OnboardingController extends GetxController {
     if (currentPage.value < onboardingList.length - 1) {
       currentPage.value++;
     } else {
-   //   Get.to(LoginPage());
-      Get.to(() =>  LoginPage(), binding: AuthBinding());
-
+      skipToLogin();
     }
+  }
+
+  void skipToLogin() {
+    Get.offAll(() => LoginPage(), binding: AuthBinding());
   }
 }

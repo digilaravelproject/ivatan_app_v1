@@ -15,11 +15,22 @@ import '../../../route/app_pages.dart';
 import '../data/data_source/auth_remote_data_source.dart';
 import '../data/model/req/login_req_model.dart';
 import '../persentation/verifyOtp.dart';
+import 'intrest_controller.dart';
+import '../persentation/interest_screen.dart';
+import '../controller/register_controller.dart';
 
 class LoginController extends GetxController {
   final AuthRemoteDataSource authDataSource;
 
   LoginController({required this.authDataSource});
+
+  @override
+  void onInit() {
+    super.onInit();
+    // ⚡️ Pre-fetch Interests API in background so Register screen loads instantly
+    // "login se register page pe jane pe loading show ho rhi hai wo phele hi load ho jaye"
+    Get.put(InterestController()); 
+  }
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   Rx<OtpFlowType> otpFlowType = OtpFlowType.login.obs;
@@ -29,6 +40,7 @@ class LoginController extends GetxController {
   var resetToken;
 
 
+  var countryCode = "+91".obs;
   final mobileController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPassworController = TextEditingController();
@@ -165,78 +177,128 @@ class LoginController extends GetxController {
 
       CustomSnackBar.showSuccess(message: msg);
     } catch (e, stk) {
-      printMessage("Exception : " + e.toString() + "\n$stk");
-      CustomSnackBar.showError(message: e.toString());
+      String errorMsg = e.toString();
+      printMessage("Exception : " + errorMsg + "\n$stk");
+      CustomLoader.hide(); // Hide loader before redirecting
+
+      if (errorMsg.contains("Mobile number not registered")) {
+        // Redirecting silently to Registration...
+        
+        // Inject RegisterController and pre-fill phone
+        if (!Get.isRegistered<RegisterController>()) {
+          Get.put(RegisterController(dataSource: authDataSource));
+        }
+        final registerController = Get.find<RegisterController>();
+        registerController.phoneController.text = phone;
+        registerController.countryCode.value = countryCode.value;
+        
+        // Navigate to Interest Screen (Step 1)
+        Get.to(() => const InterestScreen());
+      } else {
+        CustomSnackBar.showError(message: errorMsg);
+      }
     } finally {
       isCallingApi.value = false;
-      CustomLoader.hide();
+      // CustomLoader.hide(); // Handled above for specific cases
     }
   }
 
   Future<void> sendOTP({required OtpFlowType flowType}) async {
-
     print("sendotp : click here");
 
     String phone = mobileController.text.trim();
 
-    if (phone.isEmpty) throw Exception('Please enter mobile number');
-    if (phone.length != 10) throw Exception('Please enter valid phone number');
+    if (phone.isEmpty) {
+      CustomSnackBar.showError(message: 'Please enter mobile number');
+      return;
+    }
+    if (phone.length != 10) {
+      CustomSnackBar.showError(message: 'Please enter valid phone number');
+      return;
+    }
 
     otpFlowType.value = flowType;
-
     isLoading.value = true;
-    String phoneNumber = '+91$phone';
+    String phoneNumber = '${countryCode.value}$phone';
 
-    await _auth.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      timeout: const Duration(seconds: 60),
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        UserCredential userCredential = await _auth.signInWithCredential(
-          credential,
-        );
-        String? firebaseToken = await userCredential.user?.getIdToken();
-
-        await _handleOtpSuccess(firebaseToken!);
-       // await callLoginAPI(phone, firebaseToken!);
-        isLoading.value = false;
-      },
-      verificationFailed: (FirebaseAuthException e) {
-        isLoading.value = false;
-        CustomSnackBar.showError(
-          message: e.message ?? 'Phone verification failed',
-        );
-      },
-      codeSent: (String verificationId, int? resendToken) {
-        isLoading.value = false;
-        print('OTP sent. VerificationId: $verificationId');
-        Get.to(
-          () => VerifyOtp(
-            verificationId: verificationId,
-            phoneNumber: phoneNumber,
-          ),
-        );
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {},
-    );
+    try {
+      await _auth.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        timeout: const Duration(seconds: 60),
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          // Auto-resolution on Android
+          try {
+            UserCredential userCredential = await _auth.signInWithCredential(credential);
+            String? firebaseToken = await userCredential.user?.getIdToken();
+            
+            if (firebaseToken != null) {
+              await _handleOtpSuccess(firebaseToken);
+            }
+          } catch (e) {
+            CustomSnackBar.showError(message: "Auto-verification failed: $e");
+          } finally {
+            isLoading.value = false;
+          }
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          isLoading.value = false;
+          CustomSnackBar.showError(message: e.message ?? 'Phone verification failed');
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          isLoading.value = false;
+          print('OTP sent. VerificationId: $verificationId');
+          Get.to(
+            () => VerifyOtp(
+              verificationId: verificationId,
+              phoneNumber: phoneNumber,
+            ),
+          );
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          // Ensure loading stops if code isn't sent/received in time
+          if (isLoading.value) {
+             isLoading.value = false;
+          }
+        },
+      );
+    } catch (e) {
+      isLoading.value = false;
+      CustomSnackBar.showError(message: "Failed to send OTP. Please try again.");
+      print("sendOTP Error: $e");
+    }
   }
 
   /// Verify OTP entered by user
   Future<void> verifyOTP(String verificationId, String otp) async {
-    isLoading.value = true;
-    PhoneAuthCredential credential = PhoneAuthProvider.credential(
-      verificationId: verificationId,
-      smsCode: otp,
-    );
+    try {
+      isLoading.value = true;
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: otp,
+      );
 
-    UserCredential userCredential = await _auth.signInWithCredential(
-      credential,
-    );
-    String? firebaseToken = await userCredential.user?.getIdToken();
-    print("🔥 Firebase Token: $firebaseToken");
-    print("📱 Mobile: ${mobileController.text.trim()}");
-    await _handleOtpSuccess(firebaseToken!);
-   // await callLoginAPI(mobileController.text.trim(), firebaseToken!);
-    isLoading.value = false;
+      UserCredential userCredential = await _auth.signInWithCredential(
+        credential,
+      );
+      String? firebaseToken = await userCredential.user?.getIdToken();
+      print("🔥 Firebase Token: $firebaseToken");
+      print("📱 Mobile: ${mobileController.text.trim()}");
+      
+      if (firebaseToken != null) {
+        await _handleOtpSuccess(firebaseToken);
+      } else {
+        throw Exception("Failed to retrieve token");
+      }
+    } catch (e) {
+      print("verifyOTP Error: $e");
+      String errorMessage = "Invalid OTP. Please try again.";
+      if (e is FirebaseAuthException) {
+        errorMessage = e.message ?? errorMessage;
+      }
+      CustomSnackBar.showError(message: errorMessage);
+    } finally {
+      isLoading.value = false;
+    }
   }
 
 

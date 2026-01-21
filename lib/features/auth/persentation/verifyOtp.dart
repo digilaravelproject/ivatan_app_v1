@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../../../core/helper/custom_buttons.dart';
-import '../../../core/theme/app_colors.dart';
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import '../controller/login_controller.dart';
-import '../widgets/auth_input_fields.dart';
+import '../../../core/helper/custom_buttons.dart';
 
-class VerifyOtp extends StatelessWidget {
+class VerifyOtp extends StatefulWidget {
   final String verificationId;
   final String phoneNumber;
 
@@ -17,136 +15,159 @@ class VerifyOtp extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<VerifyOtp> createState() => _VerifyOtpState();
+}
+
+class _VerifyOtpState extends State<VerifyOtp> {
+  final LoginController _controller = Get.find<LoginController>();
+  final TextEditingController _otpController = TextEditingController();
+  
+  // Timer logic typically belongs in controller, but simple visual timer here for now
+  // For this step, I'll keep it static or minimal as user asked for UI.
+
+  @override
   Widget build(BuildContext context) {
-    final LoginController _controller = Get.find<LoginController>();
-    final TextEditingController _otpController = TextEditingController();
-
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            width: double.infinity,
-            height: 300,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
-                bottomRight: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: BackButton(color: Colors.black, onPressed: () => Get.back()),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+              // Icon
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
                 ),
-              ],
-            ),
-          ),
+                child: const Icon(
+                  Icons.lock_outline_rounded,
+                  size: 40,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: 24),
 
-          // 📜 Scrollable content below header
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-              child: Column(
+              // Title
+              const Text(
+                "Verification Code",
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Subtitle
+              Text(
+                "We have sent the code verification to\n${widget.phoneNumber}", // Masking logic can be added if needed
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey.shade600,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 48),
+
+              // OTP Input Field (Premium Style)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey.shade300),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: _otpController,
+                  keyboardType: TextInputType.number,
+                  textAlign: TextAlign.center,
+                  maxLength: 6,
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 16, // Spacing to mimic individual boxes
+                    color: AppColors.primary,
+                  ),
+                  decoration: const InputDecoration(
+                    counterText: "",
+                    border: InputBorder.none,
+                    hintText: "- - - - - -",
+                    hintStyle: TextStyle(
+                      letterSpacing: 16,
+                      color: Colors.black12,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 40),
+
+              // Timer / Resend
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 40),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 16,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Text(
-                          "Enter the OTP",
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          "Please enter the OTP sent to $phoneNumber",
-                          style: const TextStyle(
-                            color: AppColors.lightTextSecondary,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 25),
-
-                        CustomTextField(
-                          controller: _otpController,
-                          labelText: "OTP",
-                          keyboardType: TextInputType.number,
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        Obx(
-                          () => MyButton(
-                            title:
-                                _controller.isLoading.value
-                                    ? "Verifying..."
-                                    : "Verify",
-                            onPressed:
-                                _controller.isLoading.value
-                                    ? null
-                                    : () async {
-                                      String otp = _otpController.text.trim();
-                                      if (otp.length != 6) {
-                                        Get.snackbar(
-                                          "Error",
-                                          "Enter valid 6-digit OTP",
-                                        );
-                                        return;
-                                      }
-                                      await _controller.verifyOTP(
-                                        verificationId,
-                                        otp,
-                                      );
-                                    },
-                            gradient: const LinearGradient(
-                              colors: [AppColors.primary, AppColors.primary],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ),
-                            height: 40,
-                            borderRadius: 8,
-                          ),
-                        ),
-
-                        TextButton(
-                          onPressed: () {
-                           // _controller.sendOTP(); // Re-send OTP
-                          },
-                          child: const Text(
-                            "Try Another Way",
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
+                  Text(
+                    "Didn't receive code? ",
+                    style: TextStyle(color: Colors.grey.shade600),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                     // _controller.sendOTP(...); // Logic needs flow type
+                    },
+                    child: const Text(
+                      "Resend",
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
+              
+              const SizedBox(height: 40),
+
+              // Verify Button
+              Obx(() => MyButton(
+                title: _controller.isLoading.value ? "Verifying..." : "Verify & Continue",
+                onPressed: _controller.isLoading.value
+                    ? () {}
+                    : () async {
+                        String otp = _otpController.text.trim();
+                        if (otp.length != 6) {
+                          Get.snackbar("Invalid Code", "Please enter a 6-digit code");
+                          return;
+                        }
+                        await _controller.verifyOTP(widget.verificationId, otp);
+                      },
+                gradient: const LinearGradient(
+                  colors: [AppColors.primary, AppColors.primaryDark],
+                ),
+                height: 52,
+                borderRadius: 16,
+              )),
+              
+              const SizedBox(height: 20),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

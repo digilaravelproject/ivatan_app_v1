@@ -128,6 +128,8 @@ import '../widgets/auth_input_fields.dart';
   }
 }*/
 
+import 'package:flutter/services.dart'; // For Haptics
+
 class InterestScreen extends StatefulWidget {
   const InterestScreen({Key? key}) : super(key: key);
 
@@ -135,15 +137,13 @@ class InterestScreen extends StatefulWidget {
   State<InterestScreen> createState() => _InterestScreenState();
 }
 
-class _InterestScreenState extends State<InterestScreen> {
+class _InterestScreenState extends State<InterestScreen> with SingleTickerProviderStateMixin {
   final InterestController controller = Get.put(InterestController());
- // final RegisterController registerController = Get.find();
   final RegisterController registerController = Get.find<RegisterController>();
-
-
   final Set<String> selectedItems = {};
 
   void toggleSelection(String item) {
+    HapticFeedback.lightImpact(); // ✨ Tactile feedback
     setState(() {
       selectedItems.contains(item)
           ? selectedItems.remove(item)
@@ -154,334 +154,200 @@ class _InterestScreenState extends State<InterestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // background image
-          Container(
-            width: double.infinity,
-            height: 300,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
-                bottomRight: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
-              ),
-              image: const DecorationImage(
-                image: AssetImage(AppAssets.imgAuthBack),
-                fit: BoxFit.cover,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: BackButton(
+          color: Colors.black,
+          onPressed: () => Get.back(),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Center(
+              child: Text(
+                "Step 1/2",
+                style: TextStyle(
+                  color: Colors.grey.shade500,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
               ),
             ),
-          ),
-
-          SafeArea(
-            child: Obx(() {
-              if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              return SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 40),
-
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Center(
-                            child: Text(
-                              "Interest",
-                              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          const SizedBox(height: 25),
-
-                          // 🔥 API DATA LOOP
-                          for (var category in controller.interestData) ...[
-                            Text(
-                              category["category"],
-                              style: TextStyle(
-                                color: AppColors.black,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-
-                            Wrap(
-                              spacing: 20,
-                              runSpacing: 10,
-                              children: (category["interests"] as List<dynamic>)
-                                  .map(
-                                    (item) => SelectableOption(
-                                  title: item,
-                                  isSelected: selectedItems.contains(item),
-                                  onTap: () => toggleSelection(item),
-                                ),
-                              )
-                                  .toList(),
-                            ),
-
-                            const SizedBox(height: 20),
-                          ],
-
-                          const SizedBox(height: 20),
-
-                          Center(
-                            child: MyButton(
-                              title: "Next ",
-                              onPressed: () {
-                                if (selectedItems.isEmpty) {
-                                  CustomSnackBar.showError( message: 'Please select at least one interest');
-                                  return;
-                                }
-
-                                registerController.interestsController.text =
-                                    selectedItems.join(",");
-
-                                Get.to(() => RegistrationScreen());
-
-                                print("Selected => $selectedItems");
-                              },
-                              gradient: const LinearGradient(
-                                colors: [AppColors.primary, AppColors.primary],
-                              ),
-                              height: 40,
-                              borderRadius: 8,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-          ),
+          )
         ],
       ),
-    );
-  }
-}
+      body: SafeArea(
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+          }
 
-/*class InterestScreen extends StatefulWidget {
-  const InterestScreen({Key? key}) : super(key: key);
-
-  @override
-  State<InterestScreen> createState() => _InterestScreenState();
-}
-
-class _InterestScreenState extends State<InterestScreen> {
-  // 🧾 Define interest data
-  final Map<String, List<String>> interests = {
-    "Technology": [
-      "Web Development",
-      "Software Engineering",
-      "App Development",
-      "Data Science"
-    ],
-    "Sports": ["Cricket", "Football", "Tennis", "Badminton"],
-    "Arts & Culture": ["Painting", "Music", "Dance", "Photography"],
-  };
-
-
-  final Set<String> selectedItems = {};
-
-  void toggleSelection(String item) {
-    setState(() {
-      if (selectedItems.contains(item)) {
-        selectedItems.remove(item);
-      } else {
-        selectedItems.add(item);
-      }
-    });
-  }
-
-  // 🛰 API sending example
-  void submitSelections() {
-    // Example: Convert selected data to JSON-like payload
-    final data = {"interests": selectedItems.toList()};
-    print("Selected data to send API => $data");
-
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // background image
-          Container(
-            width: double.infinity,
-            height: 300,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
-                bottomRight: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-              image: const DecorationImage(
-                image: AssetImage(AppAssets.imgAuthBack),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-              child: Column(
-                children: [
-                  const SizedBox(height: 40),
-                  Container(
-                    width: double.infinity,
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Center(
-                          child: Text(
-                            "Interest",
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 25),
-
-                        // 🏷 Generate interest sections dynamically
-                        for (var entry in interests.entries) ...[
-                          Text(
-                            entry.key,
-                            style: TextStyle(
-                              color: AppColors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Wrap(
-                            spacing: 20,
-                            runSpacing: 10,
-                            children: entry.value
-                                .map(
-                                  (item) => SelectableOption(
-                                title: item,
-                                isSelected: selectedItems.contains(item),
-                                onTap: () => toggleSelection(item),
-                              ),
-                            )
-                                .toList(),
-                          ),
-                          const SizedBox(height: 20),
-                        ],
-
-                        const SizedBox(height: 20),
-
-                        Center(
-                          child: MyButton(
-                            title: "Submit",
-                            onPressed: (){
-                              Get.to(NavigationScreen());
-                            },
-                            gradient: const LinearGradient(
-                              colors: [AppColors.primary, AppColors.primary],
-                            ),
-                            height: 40,
-                            borderRadius: 8,
-                          ),
-                        ),
-                      ],
-                    ),
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header Section
+                const Text(
+                  "Pick your interests",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primary,
+                    height: 1.2,
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "We'll use this to personalize your feed and recommend people you'll love.",
+                  style: TextStyle(
+                    fontSize: 16, // Larger readable font
+                    color: Colors.grey.shade600,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                // 🔥 Categories Loop
+                if (controller.interestData.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Text("No interests found", style: TextStyle(color: Colors.grey)),
+                    ),
+                  )
+                else
+                  for (int i = 0; i < controller.interestData.length; i++) ...[
+                    _buildCategorySection(controller.interestData[i], i),
+                  ],
+
+                const SizedBox(height: 40),
+
+                // Button Inline (No Card)
+                MyButton(
+                  title: selectedItems.isEmpty
+                      ? "Continue"
+                      : "Continue (${selectedItems.length})",
+                  onPressed: () {
+                    if (selectedItems.isEmpty) {
+                      CustomSnackBar.showError(message: 'Pick at least one interest to start!');
+                      HapticFeedback.heavyImpact();
+                      return;
+                    }
+
+                    HapticFeedback.mediumImpact();
+                    registerController.interestsController.text =
+                        selectedItems.join(",");
+
+                    Get.to(() => RegistrationScreen());
+                  },
+                  gradient: LinearGradient(
+                    colors: selectedItems.isEmpty
+                        ? [Colors.grey.shade300, Colors.grey.shade400]
+                        : [AppColors.primary, AppColors.primaryDark],
+                  ),
+                  height: 52,
+                  borderRadius: 12,
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  // Animates each section in slightly delayed
+  Widget _buildCategorySection(dynamic category, int index) {
+    return TweenAnimationBuilder(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: Duration(milliseconds: 500 + (index * 100)), // Staggered delay
+      curve: Curves.easeOutQuart,
+      builder: (context, double value, child) {
+        return Transform.translate(
+          offset: Offset(0, 20 * (1 - value)), // Slide up effect
+          child: Opacity(
+            opacity: value,
+            child: child,
+          ),
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            category["category"].toString().toUpperCase(),
+            style: TextStyle(
+              color: Colors.grey.shade800,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.2,
             ),
           ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: (category["interests"] as List<dynamic>)
+                .map((item) => _buildInterestChip(item.toString()))
+                .toList(),
+          ),
+          const SizedBox(height: 32),
         ],
       ),
     );
   }
-}*/
 
-class SelectableOption extends StatelessWidget {
-  final String title;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const SelectableOption({
-    Key? key,
-    required this.title,
-    required this.isSelected,
-    required this.onTap,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildInterestChip(String item) {
+    bool isSelected = selectedItems.contains(item);
     return GestureDetector(
-      onTap: onTap,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 👇 Circle indicator like a radio button
-          Container(
-            width: 20,
-            height: 20,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isSelected ? Colors.blue : Colors.grey,
-                width: 2,
+      onTap: () => toggleSelection(item),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        padding: EdgeInsets.symmetric(
+            horizontal: isSelected ? 18 : 20, vertical: 12), // Slight squeeze effect
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : Colors.white,
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : Colors.grey.shade300,
+            width: isSelected ? 0 : 1.5,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.4),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              : [],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isSelected) ...[
+              const Icon(Icons.check, color: Colors.white, size: 16),
+              const SizedBox(width: 8),
+            ],
+            Text(
+              item,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.black,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                fontSize: 15,
               ),
             ),
-            child: isSelected
-                ? Center(
-              child: Container(
-                width: 10,
-                height: 10,
-                decoration: const BoxDecoration(
-                  color: Colors.blue,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            )
-                : null,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
+
+
 

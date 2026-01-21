@@ -2,6 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_field/country_picker_dialog.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:intl_phone_field/phone_number.dart';
 import 'package:i_vatan_app/core/helper/custom_image_view.dart';
 import 'package:i_vatan_app/core/utils/app_decoration.dart';
 
@@ -24,6 +27,7 @@ class LoginPage extends GetWidget<LoginController> {
     return Scaffold(
       backgroundColor: AppColors.primary.withOpacity(0.05),
       extendBody: true,
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -70,44 +74,62 @@ class LoginPage extends GetWidget<LoginController> {
                 children: [
                   // Logo/Brand section
                   Expanded(
-                    flex: 2,
+                    flex: 1,
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.primary.withOpacity(0.1),
+                                  AppColors.primaryLight.withOpacity(0.05),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.2),
-                                  blurRadius: 20,
-                                  spreadRadius: 5,
+                                  color: AppColors.primary.withOpacity(0.15),
+                                  blurRadius: 30,
+                                  spreadRadius: 8,
                                 ),
                               ],
                             ),
-                            child: Icon(
-                              Icons.smartphone_rounded,
-                              size: 60,
-                              color: AppColors.primary,
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  AppAssets.imgAppLogo,
+                                  width: 70,
+                                  height: 70,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 5),
                           Text(
-                            "i-app",
-                            style: context.textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
+                            "iVatan",
+                            style: context.textTheme.headlineLarge?.copyWith(
+                              fontWeight: FontWeight.w900,
                               color: AppColors.primary,
-                              letterSpacing: 1.2,
+                              letterSpacing: 1.5,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 2),
                           Text(
-                            "Connect, Share, Explore",
-                            style: context.textTheme.bodyMedium?.copyWith(
+                            "Welcome Back!",
+                            style: context.textTheme.titleMedium?.copyWith(
                               color: Colors.grey.shade600,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
@@ -125,19 +147,19 @@ class LoginPage extends GetWidget<LoginController> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30),
+                            topLeft: Radius.circular(35),
+                            topRight: Radius.circular(35),
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 20,
-                              offset: const Offset(0, -5),
+                              color: Colors.black.withOpacity(0.08),
+                              blurRadius: 25,
+                              offset: const Offset(0, -8),
                             ),
                           ],
                         ),
                         child: SingleChildScrollView(
-                          padding: const EdgeInsets.all(24),
+                          padding: const EdgeInsets.all(28),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -152,22 +174,24 @@ class LoginPage extends GetWidget<LoginController> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 28),
 
                               // Welcome Text
                               Text(
                                 "Welcome Back! 👋",
                                 style: context.textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w800,
                                   color: Colors.black87,
+                                  fontSize: 26,
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 10),
                               Text(
-                                "Login to continue your journey with i-app",
-                                style: context.textTheme.bodyMedium?.copyWith(
+                                "Sign in to continue your journey",
+                                style: context.textTheme.bodyLarge?.copyWith(
                                   color: Colors.grey.shade600,
                                   height: 1.5,
+                                  fontSize: 15,
                                 ),
                               ),
 
@@ -180,27 +204,74 @@ class LoginPage extends GetWidget<LoginController> {
                                   curve: Curves.easeInOut,
                                   child: Column(
                                     children: [
-                                      // Phone Number Input
-                                      AuthInputFieldsBorder(
-                                        textInputType: TextInputType.phone,
+                                      IntlPhoneField(
                                         controller: controller.mobileController,
-                                        label: "Mobile Number",
-                                        validator: controller.validatePhone,
+                                        decoration: InputDecoration(
+                                          labelText: 'Mobile Number',
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(15),
+                                            borderSide: BorderSide(color: Colors.grey.shade300),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(15),
+                                            borderSide: BorderSide(color: Colors.grey.shade300),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(15),
+                                            borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                                          ),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                                        ),
+                                        initialCountryCode: 'IN',
+                                        onCountryChanged: (country) {
+                                          controller.countryCode.value = "+${country.dialCode}";
+                                        },
+                                        disableLengthCheck: true,
+                                        dropdownIconPosition: IconPosition.trailing,
+                                        flagsButtonPadding: const EdgeInsets.only(left: 12),
+                                        showCountryFlag: true,
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                                        keyboardType: TextInputType.phone,
+                                        pickerDialogStyle: PickerDialogStyle(
+                                          backgroundColor: Colors.white,
+                                          searchFieldInputDecoration: InputDecoration(
+                                            labelText: 'Search Country',
+                                            prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                                            ),
+                                          ),
+                                          countryCodeStyle: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.black87,
+                                          ),
+                                          countryNameStyle: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey.shade700,
+                                          ),
+                                          listTilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                        ),
                                       ),
 
                                       // Password Input (conditional)
                                       if (!controller.isLoginPass.value) ...[
                                         const SizedBox(height: 16),
-                                        AuthInputFieldsBorder(
-                                          textInputType: TextInputType.visiblePassword,
+                                        AuthInputFields(
                                           controller: controller.passwordController,
                                           label: "Password",
+                                          textInputType: TextInputType.visiblePassword,
                                           isObscure: !controller.isPasswordVisible.value,
                                           endIcon: controller.isPasswordVisible.value
                                               ? Icons.visibility_rounded
                                               : Icons.visibility_off_rounded,
-                                          onEndIconTap: () =>
-                                              controller.isPasswordVisible.toggle(),
+                                          onEndIconTap: () => controller.isPasswordVisible.toggle(),
                                           validator: controller.validatePassword,
                                         ),
                                       ],
@@ -215,58 +286,40 @@ class LoginPage extends GetWidget<LoginController> {
                               Obx(
                                     () => InkWell(
                                   onTap: () => controller.isLoginPass.toggle(),
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 12,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary.withOpacity(0.05),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: AppColors.primary.withOpacity(0.2),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          width: 24,
-                                          height: 24,
-                                          decoration: BoxDecoration(
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 20,
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          color: controller.isLoginPass.value
+                                              ? AppColors.primary
+                                              : Colors.transparent,
+                                          border: Border.all(
                                             color: controller.isLoginPass.value
                                                 ? AppColors.primary
-                                                : Colors.transparent,
-                                            border: Border.all(
-                                              color: AppColors.primary,
-                                              width: 2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(6),
+                                                : Colors.grey.shade400,
+                                            width: 2,
                                           ),
-                                          child: controller.isLoginPass.value
-                                              ? const Icon(
-                                            Icons.check,
-                                            size: 16,
-                                            color: Colors.white,
-                                          )
-                                              : null,
+                                          borderRadius: BorderRadius.circular(4),
                                         ),
-                                        const SizedBox(width: 12),
-                                        Icon(
-                                          Icons.message_rounded,
-                                          size: 20,
-                                          color: AppColors.primary,
+                                        child: controller.isLoginPass.value
+                                            ? const Icon(
+                                          Icons.check,
+                                          size: 14,
+                                          color: Colors.white,
+                                        )
+                                            : null,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        "Login with OTP",
+                                        style: context.textTheme.bodyMedium?.copyWith(
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.grey.shade700,
                                         ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          "Login with OTP",
-                                          style: context.textTheme.bodyMedium?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                            color: AppColors.primary,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
