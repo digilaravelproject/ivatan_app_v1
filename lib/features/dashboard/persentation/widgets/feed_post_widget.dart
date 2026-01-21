@@ -1,0 +1,345 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
+
+import '../../../../core/constants/app_assets.dart';
+import '../../../../core/helper/date_helper.dart';
+import '../../../../core/helper/expandable_text.dart';
+import '../../../profile/screen/profile_screen.dart';
+import '../../controller/homeController.dart';
+import '../../model/post_model.dart';
+import '../home_screen.dart'; // For CommentsBottomSheet and _showSideMenu
+import 'feed_media_widget.dart';
+
+// Since _showSideMenu is private in HomeScreen, we might need to duplicate it or better yet, 
+// move it to a shared helper or make it part of this widget. 
+// For now, I'll copy the _showSideMenu logic here as well to make this standalone.
+
+class FeedPostWidget extends StatelessWidget {
+  final PostItem post;
+  final int index;
+  final HomeController controller; 
+  // We use HomeController for like/follow logic. 
+  // If we want to support other controllers, we might need an abstract interface or pass callbacks.
+  // Given the current architecture, passing HomeController (or finding it) is easiest.
+
+  const FeedPostWidget({
+    Key? key, 
+    required this.post, 
+    required this.index,
+    required this.controller,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ========== POST HEADER ==========
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              children: [
+                // Avatar
+                GestureDetector(
+                  onTap: () => Get.to(() => ProfileScreen(viewUserName: post.user.username)),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey.shade100
+                    ),
+                    child: ClipOval(
+                      child: post.user.avatar != null && post.user.avatar!.isNotEmpty
+                          ? Image.network(post.user.avatar!, fit: BoxFit.cover)
+                          : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 10),
+
+                // Name, Occupation & Song
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: GestureDetector(
+                              onTap: () => Get.to(() => ProfileScreen(viewUserName: post.user.username)),
+                              child: Text(
+                                post.user.username.isNotEmpty ? post.user.username : post.user.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                          if (post.user.isVerified) ...[
+                            const SizedBox(width: 4),
+                            const Icon(Icons.verified, color: Colors.blue, size: 14),
+                          ],
+                          
+                          // Date / Time
+                          Text(
+                            " • ${DateHelper.formatPostDate(post.createdAt)}",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      // Song Info / Location / Occupation
+                      Padding(
+                        padding: const EdgeInsets.only(top: 1),
+                        child: Row(
+                          children: [
+                            if (post.type == 'video') ...[
+                               const Icon(Icons.music_note, size: 12, color: Colors.black87),
+                               const SizedBox(width: 4),
+                            ],
+                            
+                            Flexible(
+                              child: Text(
+                                post.type == 'video' ? "Original Audio" : post.user.occupation,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.black87,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Follow Button (Only for others)
+                if (!post.is_mine) ...[
+                  const SizedBox(width: 8),
+                  Obx(() {
+                    final isFollowing = controller.followController.isUserFollowing(post.user.id, initialValue: post.is_following).value;
+                    final bool following = isFollowing;
+
+                    return GestureDetector(
+                      onTap: () {
+                        if (post.user.id != null) {
+                          controller.toggleFollowForPostUser(post.user.id!);
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: following ? Colors.grey.shade100 : Colors.transparent,
+                          border: Border.all(
+                              color: following ? Colors.grey.shade300 : Colors.blue.shade600,
+                              width: 1
+                          ),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          following ? "Following" : "Follow",
+                          style: TextStyle(
+                            color: following ? Colors.black87 : Colors.blue.shade600,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ],
+
+                // More Menu
+                IconButton(
+                   icon: const Icon(Icons.more_horiz, color: Colors.black87),
+                   onPressed: () => _showSideMenu(context, post.id, post.user.username),
+                   padding: EdgeInsets.zero,
+                   constraints: const BoxConstraints(),
+                   splashRadius: 20,
+                ),
+              ],
+            ),
+          ),
+
+          // ========== POST MEDIA (CAROUSEL / VIDEO) ==========
+          if (post.media.isNotEmpty)
+            FeedMediaWidget(
+              media: post.media,
+              type: post.type,
+              isLiked: post.stats.isLiked ?? false,
+              onDoubleTap: () => controller.likePost(post.id, index),
+            ),
+
+          // ========== POST ACTIONS ==========
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    // Like
+                    GestureDetector(
+                      onTap: () => controller.likePost(post.id, index),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                        child: Icon(
+                          post.stats.isLiked == true
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          key: ValueKey(post.stats.isLiked),
+                          color: post.stats.isLiked == true
+                              ? Colors.red
+                              : Colors.black87,
+                          size: 28,
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(width: 16),
+
+                    // Comment
+                    GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (_) => CommentsBottomSheet(postId: post.id),
+                        );
+                      },
+                      child: const Icon(Icons.chat_bubble_outline, color: Colors.black87, size: 24),
+                    ),
+
+                    const SizedBox(width: 16),
+
+                    // Share
+                    GestureDetector(
+                      onTap: () {
+                        final link = "https://ivatan.in/post/${post.id}?type=${post.media.first.type}";
+                        Share.share("Check this post 👇\n$link");
+                      },
+                      child: const Icon(Icons.send_outlined, color: Colors.black87, size: 24),
+                    ),
+
+                    const Spacer(),
+
+                    const Icon(Icons.bookmark_border, color: Colors.black87, size: 26),
+                  ],
+                ),
+                
+                // Like Count
+                if ((post.stats.likeCount ?? 0) > 0)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    "${post.stats.likeCount} likes",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+
+                // Caption with Username + Rich Text
+                if (post.caption != null && post.caption!.isNotEmpty) ...[
+                   const SizedBox(height: 6),
+                   ExpandableCaption(
+                      text: post.caption!,
+                      username: post.user.username.isNotEmpty ? post.user.username : post.user.name,
+                      onUsernameTap: () => Get.to(() => ProfileScreen(viewUserName: post.user.username)),
+                   ),
+                ]
+              ],
+            ),
+          ),
+          
+          Divider(height: 1, thickness: 0.5, color: Colors.grey.shade200),
+        ],
+      ),
+    );
+  }
+
+  void _showSideMenu(BuildContext context, int postId, String username) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle
+            Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 10, bottom: 6),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            
+            // 1. Report
+            ListTile(
+              leading: const Icon(Icons.report_gmailerrorred_outlined, color: Colors.redAccent),
+              title: const Text("Report", style: TextStyle(fontWeight: FontWeight.w500, color: Colors.redAccent)),
+              onTap: () {
+                Navigator.pop(context);
+                controller.openReportBottomSheet(postId: postId);
+              },
+            ),
+             Divider(height: 1, thickness: 0.5, color: Colors.grey.shade100, indent: 16, endIndent: 16),
+
+
+            // 2. About this profile
+            ListTile(
+              leading: const Icon(Icons.info_outline_rounded, color: Colors.black87),
+              title: const Text("About this profile", style: TextStyle(fontWeight: FontWeight.w500)),
+              onTap: () {
+                Navigator.pop(context);
+                if (username.isNotEmpty) {
+                  Get.to(() => ProfileScreen(viewUserName: username));
+                }
+              },
+            ),
+
+            // 3. Block
+             ListTile(
+              leading: const Icon(Icons.block, color: Colors.redAccent),
+              title: const Text("Block", style: TextStyle(fontWeight: FontWeight.w500, color: Colors.redAccent)),
+              onTap: () {
+                Navigator.pop(context);
+                // Action
+              },
+            ),
+            Divider(height: 1, thickness: 0.5, color: Colors.grey.shade100, indent: 16, endIndent: 16),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+}

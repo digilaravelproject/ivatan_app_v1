@@ -9,6 +9,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../search/controller/mixed_feed_controller.dart';
 import '../../videos/persentation/play_video_screen.dart';
 import '../controller/ownpostController.dart';
+import 'profile_feed_screen.dart';
 
 class MyPostScreen extends StatelessWidget {
   String username;
@@ -25,7 +26,7 @@ class MyPostScreen extends StatelessWidget {
       permanent: true,
     );
 
-    return Expanded(
+    return Container(
       child: NotificationListener<ScrollNotification>(
         onNotification: (scroll) {
           if (!controller.isLoading.value &&
@@ -64,7 +65,12 @@ class MyPostScreen extends StatelessWidget {
                     : "https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg";
 
                 return GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Get.to(() => ProfileFeedScreen(
+                      posts: controller.posts,
+                      initialIndex: index,
+                    ));
+                  },
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: Container(

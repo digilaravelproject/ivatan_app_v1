@@ -133,6 +133,8 @@ import 'package:get/get_connect/http/src/multipart/multipart_file.dart';
 import 'package:http/http.dart' as http;
 
 import 'ownpostController.dart';
+import '../../dashboard/controller/create_story_controller.dart';
+import '../../dashboard/persentation/createStoryScreen.dart';
 
 class ProfileController extends GetxController {
   final ImagePicker _picker = ImagePicker();
@@ -193,8 +195,15 @@ class ProfileController extends GetxController {
       if (pickedFile == null) return;
 
       imageFile.value = File(pickedFile.path);
-     // Get.to(() => PreviewScreen());
-      Get.to(() => PreviewScreen(userName: userName));
+      
+      // Route to StoryScreen for story type, otherwise PreviewScreen
+      if (selectedType.value == "story") {
+        final storyController = Get.put(StoryController());
+        storyController.imageFile.value = imageFile.value;
+        Get.to(() => StoryScreen());
+      } else {
+        Get.to(() => PreviewScreen(userName: userName));
+      }
 
     } catch (e) {
       print("Image pick error: $e");
@@ -250,7 +259,16 @@ class ProfileController extends GetxController {
       videoController!.play();
       isVideoInitialized.value = true;
 
-      Get.to(() => PreviewScreen(userName: userName));
+      // Route to StoryScreen for story type, otherwise PreviewScreen
+      if (selectedType.value == "story") {
+        final storyController = Get.put(StoryController());
+        storyController.videoFile.value = videoFile.value;
+        storyController.videoController = videoController;
+        storyController.isVideoInitialized.value = true;
+        Get.to(() => StoryScreen());
+      } else {
+        Get.to(() => PreviewScreen(userName: userName));
+      }
 
     } catch (e) {
       isVideoInitialized.value = false;
@@ -265,37 +283,111 @@ class ProfileController extends GetxController {
 
 
   void showPickerOptions() {
+    // Determine media type based on selectedType
+    final bool isImageType = selectedType.value == "post" || selectedType.value == "carousel";
+    final bool isVideoType = selectedType.value == "reel" || selectedType.value == "video";
+    final bool isStoryType = selectedType.value == "story";
+
     Get.bottomSheet(
       Container(
-        color: Colors.white,
-        child: Wrap(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              leading: const Icon(Icons.photo),
-              title: const Text("Pick Image from Gallery"),
-              onTap: () {
-                Get.back();
-                pickImage(ImageSource.gallery);
-              },
+            // Handle
+            Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 10, bottom: 6),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
             ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text("Capture Image"),
-              onTap: () {
-                Get.back();
-                pickImage(ImageSource.camera);
-              },
+            
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                isStoryType ? "Add to Story" : (isImageType ? "Add Photo" : "Add Video"),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-            ListTile(
-              leading: const Icon(Icons.video_library),
-              title: const Text("Pick Video from Gallery"),
-              onTap: () => pickVideo(ImageSource.gallery),
-            ),
-            ListTile(
-              leading: const Icon(Icons.videocam),
-              title: const Text("Record Video"),
-              onTap: () => pickVideo(ImageSource.camera),
-            ),
+            
+            // Show image options for posts and stories
+            if (isImageType || isStoryType) ...[
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.photo_library, color: Colors.blue),
+                ),
+                title: const Text("Choose from Gallery"),
+                subtitle: const Text("Select photos from your device"),
+                onTap: () {
+                  Get.back();
+                  pickImage(ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.camera_alt, color: Colors.green),
+                ),
+                title: const Text("Take Photo"),
+                subtitle: const Text("Capture a new photo"),
+                onTap: () {
+                  Get.back();
+                  pickImage(ImageSource.camera);
+                },
+              ),
+            ],
+            
+            // Show video options for reels and stories
+            if (isVideoType || isStoryType) ...[
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.purple.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.video_library, color: Colors.purple),
+                ),
+                title: const Text("Choose Video from Gallery"),
+                subtitle: const Text("Select videos from your device"),
+                onTap: () => pickVideo(ImageSource.gallery),
+              ),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.videocam, color: Colors.red),
+                ),
+                title: const Text("Record Video"),
+                subtitle: const Text("Capture a new video"),
+                onTap: () => pickVideo(ImageSource.camera),
+              ),
+            ],
+            
+            const SizedBox(height: 20),
           ],
         ),
       ),

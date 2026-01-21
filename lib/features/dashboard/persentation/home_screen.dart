@@ -18,6 +18,7 @@ import '../../story/persentation/storyfullview.dart';
 import '../../videos/persentation/play_video_screen.dart';
 import '../controller/comment_controller.dart';
 import '../controller/homeController.dart';
+import '../controller/create_story_controller.dart';
 import '../model/post_model.dart';
 import 'widgets/feed_media_widget.dart';
 
@@ -216,14 +217,26 @@ class HomePage extends StatelessWidget {
   Widget _buildAddStoryButton(String imageUrl) {
     return GestureDetector(
       onTap: () {
-        // controller.pickStory();
+        final storyController = Get.put(StoryController());
+        storyController.showPickerOptions();
       },
       child: Container(
         width: 85,
         margin: EdgeInsets.only(right: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: Colors.black,
+          color: imageUrl.isNotEmpty ? Colors.black : null,
+          gradient: imageUrl.isEmpty 
+              ? LinearGradient(
+                  colors: [
+                    Color(0xFFFBAA47), 
+                    Color(0xFFD91A46), 
+                    Color(0xFFA60F93)
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
           image: imageUrl.isNotEmpty
               ? DecorationImage(
                   image: NetworkImage(AppUrls.imageurl + imageUrl),
@@ -238,19 +251,8 @@ class HomePage extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-             if (imageUrl.isEmpty)
-               Icon(Icons.person, color: Colors.white24, size: 40),
-
-            // White Circle with Plus Icon
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.add, color: Colors.blue.shade600, size: 24),
-            ),
+            // Plus Icon
+            Icon(Icons.add_circle, color: Colors.white, size: 40),
           ],
         ),
       ),
@@ -283,7 +285,16 @@ class HomePage extends StatelessWidget {
             children: [
               // User Image
               imageUrl.isNotEmpty 
-                  ? Image.network(imageUrl, fit: BoxFit.cover)
+                  ? Image.network(
+                      imageUrl, 
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey.shade200,
+                          child: Icon(Icons.person, color: Colors.grey),
+                        );
+                      },
+                    )
                   : Container(
                       color: Colors.grey.shade200,
                       child: Icon(Icons.person, color: Colors.grey),
@@ -433,34 +444,46 @@ class HomePage extends StatelessWidget {
                 ),
 
                 // Follow Button
-                if (!post.is_mine && !post.is_following) ...[
+                if (!post.is_mine) ...[
                   SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {
-                      if (post.user.id != null) {
-                        controller.toggleFollowForPostUser(post.user.id!);
-                      }
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: post.is_following ? Colors.grey.shade100 : Colors.transparent,
-                        border: Border.all(
-                            color: post.is_following ? Colors.grey.shade300 : Colors.blue.shade600,
-                            width: 1
+                  Obx(() {
+                    final isFollowing = controller.followController.isUserFollowing(post.user.id, initialValue: post.is_following).value;
+                    
+                    // If following, you can choose to hide it or show "Following"
+                    // User said "update nhi ho rhi", implying they want to see the change.
+                    // Let's show "Following" in a subtle way or allow hiding if intended.
+                    // Given previous logic was hiding it (line 445), let's keep it visible 
+                    // but reactive so it can vanish/change smoothly.
+                    
+                    final bool following = isFollowing;
+
+                    return GestureDetector(
+                      onTap: () {
+                        if (post.user.id != null) {
+                          controller.toggleFollowForPostUser(post.user.id!);
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: following ? Colors.grey.shade100 : Colors.transparent,
+                          border: Border.all(
+                              color: following ? Colors.grey.shade300 : Colors.blue.shade600,
+                              width: 1
+                          ),
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        post.is_following ? "Following" : "Follow",
-                        style: TextStyle(
-                          color: post.is_following ? Colors.black87 : Colors.blue.shade600,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
+                        child: Text(
+                          following ? "Following" : "Follow",
+                          style: TextStyle(
+                            color: following ? Colors.black87 : Colors.blue.shade600,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
-                    ),
-                  ),
+                    );
+                  }),
                 ],
 
                 // More Menu

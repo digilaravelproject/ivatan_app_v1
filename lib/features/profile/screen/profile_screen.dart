@@ -7,10 +7,14 @@ import 'package:get/get.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:i_vatan_app/features/story/persentation/highlightFullScreen.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_assets.dart';
 import '../../../core/helper/custom_image_view.dart';
 import '../../../core/helper/custom_snack_bar.dart';
+import '../../../core/helper/extensions.dart';
 import '../../../core/network/app_urls.dart';
 import '../../../db/shared_pref_manager.dart';
 import '../../../route/app_pages.dart';
@@ -18,8 +22,10 @@ import '../../dashboard/controller/create_story_controller.dart';
 import '../../dashboard/controller/homeController.dart';
 import '../../dashboard/controller/navigationController.dart';
 import '../../dashboard/controller/settings_controller.dart';
+import '../../dashboard/model/user_profile.dart';
 import '../../dashboard/persentation/settings_page.dart';
 import '../../messages/controller/chatt_controller.dart';
+import '../../messages/persentation/chatting_screen.dart';
 import '../../story/persentation/storyfullview.dart';
 import '../controller/profile_controller.dart';
 import 'follow_tabs.dart';
@@ -43,7 +49,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late final controller;
   final nav = Get.find<DashboardController>();
   int currentStoryId = 0;
-  final profileController = Get.put(SettingsController(userName: ""));
+  late SettingsController profileController;
   final StoryController storyController = Get.put(StoryController());
   final ChattController chatController = Get.put(ChattController());
 
@@ -65,10 +71,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         selected != currentUserName) {
       isOtherProfile = true;
       finalUserName = selected!;
+      // For other profiles, use a tag with their username
+      profileController = Get.put(SettingsController(userName: finalUserName), tag: finalUserName);
     } else {
       // CASE 2: Coming from bottom navigation → load own profile
       isOtherProfile = false;
-      finalUserName = currentUserName!;
+      finalUserName = currentUserName ?? "";
+      // For own profile, use the same tag as used in SettingsPage
+      profileController = Get.put(SettingsController(userName: finalUserName), tag: finalUserName);
     }
 
     // NOW CALL API WITH CORRECT USERNAME
@@ -88,6 +98,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           if (user == null) {
             return Center(child: CircularProgressIndicator());
           }
+          
+          final isFollowing = profileController.followController.isUserFollowing(user.id!).value;
+          final bool isPrivateHidden = isOtherProfile && 
+                                     user.accountPrivacy == "private" && 
+                                     !isFollowing;
           return DefaultTabController(
             length: 4,
             child: Stack(
@@ -109,6 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: Stack(
                                     fit: StackFit.expand,
                                     children: [
+
                                       Image.network(
                                         user.profilePhotoPath != null && user.profilePhotoPath!.isNotEmpty
                                             ? "${AppUrls.imageurl}${user.profilePhotoPath}"
@@ -132,6 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ),
                                       ),
                                       // Back Button (Only for other profiles)
+
                                       if (isOtherProfile)
                                         Positioned(
                                           top: 40,
@@ -147,60 +164,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ),
 
                                        // Icons
-                                      Positioned(
-                                        top: 40,
-                                        right: 10,
-                                        child: Row(
-                                          children: [
-                                            IconButton(
-                                              icon: Container(
-                                                padding: const EdgeInsets.all(6),
-                                                decoration: BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
-                                                child: const Icon(Icons.settings, color: Colors.white, size: 20),
-                                              ),
-                                              onPressed: () => Get.to(() => SettingsScreen()),
+                                      if (!isOtherProfile)
+                                        Positioned(
+                                          top: 40,
+                                          right: 10,
+                                          child: IconButton(
+                                            icon: Container(
+                                              padding: const EdgeInsets.all(6),
+                                              decoration: BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
+                                              child: const Icon(Icons.settings, color: Colors.white, size: 20),
                                             ),
-                                            IconButton(
-                                              icon: Container(
-                                                padding: const EdgeInsets.all(6),
-                                                decoration: BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
-                                                child: const Icon(Icons.mail_outline_rounded, color: Colors.white, size: 20),
-                                              ),
-                                              onPressed: () async {
-                                                   if (user.chat_id != null) {
-                                                     Get.toNamed(AppRoutes.chattingScreen, arguments: user.chat_id);
-                                                   } else if (user.id != null) {
-                                                     final newChatId = await chatController.createSinglePrivateChat(user.id!.toInt());
-                                                     if (newChatId != null) {
-                                                       Get.toNamed(AppRoutes.chattingScreen, arguments: newChatId);
-                                                     }
-                                                   }
-                                                },
-                                            ),
-                                          ],
+                                            onPressed: () => Get.to(() => SettingsScreen()),
+                                          ),
                                         ),
-                                      ),
-                                      Positioned(
-                                        left: 20,
-                                        bottom: 80,
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              user.username ?? "Unknown",
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 24,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            if (user.isVerified ?? false) ...[
-                                              const SizedBox(width: 6),
-                                              const Icon(Icons.verified, color: Colors.blue, size: 20),
-                                            ]
-                                          ],
-                                        ),
-                                      ),
                                       // Stats Pill
+                                      Positioned(
+                                        top: 0,
+                                        bottom: 0,
+                                        left: 16,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(6),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                  "@${user.username ?? ""}".toTitleCase(),
+                                                  style: const TextStyle(color: Colors.white, fontSize: 20)
+                                              ),
+                                              if (user.isVerified ?? false) ...[
+                                                const SizedBox(width: 4),
+                                                const Icon(Icons.verified, color: Colors.blue, size: 16),
+                                              ]
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                                       Positioned(
                                         right: 16,
                                         bottom: 20,
@@ -238,22 +235,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
+                                                  // Name
                                                   Text(
-                                                    user.occupation?.isNotEmpty == true ? user.occupation! : "Digital Creator",
-                                                    style: TextStyle(
-                                                      color: AppColors.black,
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.w500,
+                                                    user.name ?? "User",
+                                                    style: const TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 20,
+                                                      fontWeight: FontWeight.bold,
                                                     ),
-                                                    maxLines: 1, overflow: TextOverflow.ellipsis,
                                                   ),
+                                                  const SizedBox(height: 2),
+                                                  
+                                                  // Username & Verification
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        "@${user.username ?? ""}", 
+                                                        style: const TextStyle(color: Colors.black54, fontSize: 14)
+                                                      ),
+                                                      if (user.isVerified ?? false) ...[
+                                                        const SizedBox(width: 4),
+                                                        const Icon(Icons.verified, color: Colors.blue, size: 16),
+                                                      ]
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 8),
+
+                                                  // Occupation pill
+                                                  Container(
+                                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                                     decoration: BoxDecoration(
+                                                       color: Colors.grey.shade100,
+                                                       borderRadius: BorderRadius.circular(4),
+                                                     ),
+                                                     child: Text(
+                                                        user.occupation?.isNotEmpty == true ? user.occupation! : "Digital Creator",
+                                                        style: TextStyle(
+                                                          color: Colors.grey.shade800,
+                                                          fontSize: 12,
+                                                          fontWeight: FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                  ),
+                                                  const SizedBox(height: 8),
+
+                                                  // Bio
+                                                  if (user.bio != null && user.bio!.isNotEmpty)
+                                                    Text(
+                                                      user.bio!,
+                                                      style: const TextStyle(
+                                                        color: Colors.black87,
+                                                        fontSize: 14,
+                                                      ),
+                                                      maxLines: 3, 
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
                                               ]
                                             ),
                                           ),
-                                          if (!isOtherProfile) ...[
-                                            _buildActionButton("More", () {}),
-                                            SizedBox(width: 10)
-                                          ],
 
                                           if (!isOtherProfile)
                                             InkWell(
@@ -348,28 +387,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ],
                                       ),
                                       const SizedBox(height: 16),
-                                      SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: Row(
-                                          children: [
-                                            if (!isOtherProfile) ...[
-                                                _buildActionButton("Add Bio", () => _showBioDialog(user.bio ?? "")), 
-                                                SizedBox(width: 10)
-                                            ],
-                                             if (isOtherProfile) ...[
-                                                 _buildFollowButton(user),
-                                                 SizedBox(width: 10),
+                                       // Edit Profile & Share Profile Buttons Row
+                                       if (!isOtherProfile) ...[
+                                         Row(
+                                           children: [
+                                             Expanded(
+                                               child: _buildActionButton("Edit Profile", () {
+                                                  Get.to(() => SettingsScreen());
+                                               }, isExpanded: true),
+                                             ),
+                                             const SizedBox(width: 10),
+                                             Expanded(
+                                               child: _buildActionButton("Share Profile", () {
+                                                  Share.share("Check out ${user.name} (@${user.username}) on iVatan!");
+                                               }, isExpanded: true),
+                                             ),
+                                           ],
+                                         ),
+                                       ],
+                                       
+                                       if (isOtherProfile) ...[
+                                         Row(
+                                           children: [
+                                             Expanded(child: _buildFollowButton(user)),
+                                             if (!isPrivateHidden) ...[
+                                               const SizedBox(width: 8),
+                                               Expanded(
+                                                 child: _buildActionButton("Message", () async {
+                                                   final chatId = await chatController.createSinglePrivateChat(user.id!);
+                                                   if (chatId != null) {
+                                                     Get.toNamed(AppRoutes.chattingScreen, arguments: chatId);
+                                                   } else {
+                                                     CustomSnackBar.showError(message: "Could not initiate chat");
+                                                   }
+                                                 }, isExpanded: true),
+                                               ),
+                                               const SizedBox(width: 8),
+                                               Expanded(
+                                                 child: _buildActionButton("Contact", () {
+                                                   _showContactBottomSheet(user);
+                                                 }, isExpanded: true),
+                                               ),
                                              ],
-
-                                          ],
-                                        ),
-                                      ),
+                                           ],
+                                         ),
+                                       ],
                                        SizedBox(height: 16),
-                                       if((user.bio ?? "").isNotEmpty)
-                                          Text(user.bio!, style: TextStyle(color: Colors.black87, fontSize: 13)),
-                                      SizedBox(height: 20),
-                                      Obx(() {
-                                          if (controller.isLoading.value) return const SizedBox.shrink();
+                                       Obx(() {
+                                          final isFollowing = profileController.followController.isUserFollowing(user.id!).value;
+                                          final bool isPrivateHidden = isOtherProfile && 
+                                                                     user.accountPrivacy == "private" && 
+                                                                     !isFollowing;
+                                                                     
+                                          if (controller.isLoading.value || isPrivateHidden) return const SizedBox.shrink();
                                           return SizedBox(
                                             height: 90,
                                             child: ListView.builder(
@@ -413,15 +483,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   onBackgroundImageError: (_,__) {},
                                   child: (user.profilePhotoPath == null || user.profilePhotoPath!.isEmpty)
-                                      ? Image.asset(AppAssets.imgAppLogo)
+                                      ? Icon(Icons.person, color: Colors.grey.shade400, size: 60)
                                       : null,
-                                ),
+                                ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+                                 .scale(duration: 600.ms, curve: Curves.easeOutBack)
+                                 .fadeIn()
+                                    .then(delay: 500.ms)
+                                 .moveY(begin: 0, end: -3, duration: 1500.ms, curve: Curves.easeInOut),
                               ),
-                            ),
+                              ),
+
                           ],
                         ),
                       ),
                       
+                        SliverToBoxAdapter(child: const SizedBox.shrink()),
+                      
+                      if (!isPrivateHidden)
                       SliverPersistentHeader(
                         pinned: true,
                         delegate: _SliverAppBarDelegate(
@@ -444,7 +522,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ];
                   },
-                  body: TabBarView(
+                  body: isPrivateHidden 
+                    ? _buildPrivatePlaceholder()
+                    : TabBarView(
                     children: [
                       MyPostScreen(username: finalUserName),
                       MyVideoScreen(username: finalUserName),
@@ -465,10 +545,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildStatItem(String label, dynamic user, int index) {
+      final isFollowing = profileController.followController.isUserFollowing(user.id!).value;
+      final bool isPrivateHidden = isOtherProfile && 
+                                 user.accountPrivacy == "private" && 
+                                 !isFollowing;
+                                 
       return InkWell(
           onTap: () {
-               if (user.accountPrivacy == "private" &&  (user.is_following ?? false) == false && (user.is_mine ?? false) == false) return;
-                Get.to(() => FollowTabs(initialTab: index, userId: user.id!));
+               if (isPrivateHidden) return;
+               Get.to(() => FollowTabs(initialTab: index, userId: user.id!));
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -480,7 +565,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
   }
 
-  Widget _buildActionButton(String label, VoidCallback onTap) {
+  Widget _buildActionButton(String label, VoidCallback onTap, {required bool isExpanded}) {
       return InkWell(
         onTap: onTap,
         child: Container(
@@ -490,31 +575,169 @@ class _ProfileScreenState extends State<ProfileScreen> {
             borderRadius: BorderRadius.circular(8),
              // border: Border.all(color: Colors.grey.shade300)
           ),
-          child: Text(
-            label,
-            style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 13),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 13),
+            ),
           ),
         ),
       );
   }
   
-  Widget _buildFollowButton(dynamic user) {
-       bool isFollowing = user.is_following ?? false;
-       bool isRequested = false; // Add request logic if needed
-       return InkWell(
-        onTap: () => profileController.toggleFollowForPostUser(user.id!),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-          decoration: BoxDecoration(
-            color: isFollowing ? Colors.grey.shade100 : Colors.blueAccent,
-            borderRadius: BorderRadius.circular(8),
+  Widget _buildFollowButton(UserData user) {
+       return Obx(() {
+        final isFollowing = profileController.followController.isUserFollowing(user.id!, initialValue: user.is_following).value;
+        return InkWell(
+          onTap: () {
+            if (isFollowing) {
+              _showUnfollowBottomSheet(user);
+            } else {
+              profileController.toggleFollowForPostUser(user.id!);
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: isFollowing ? Colors.grey.shade100 : Colors.blueAccent,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Center(
+              child: Text(
+                isFollowing ? "Following" : "Follow",
+                style: TextStyle( color: isFollowing ? Colors.black : Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+              ),
+            ),
           ),
-          child: Text(
-            isFollowing ? "Following" : "Follow",
-            style: TextStyle( color: isFollowing ? Colors.black : Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+        );
+       });
+  }
+
+  Widget _buildPrivatePlaceholder() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade300, width: 2),
+            ),
+            child: Icon(Icons.lock_outline, size: 50, color: Colors.grey.shade600),
           ),
+          const SizedBox(height: 20),
+          const Text(
+            "This Account is Private",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            "Follow to see their posts and photos.",
+            style: TextStyle(color: Colors.grey, fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showUnfollowBottomSheet(dynamic user) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-      );
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundImage: (user.profilePhotoPath != null && user.profilePhotoPath!.isNotEmpty)
+                  ? NetworkImage("${AppUrls.imageurl}${user.profilePhotoPath}")
+                  : null,
+              child: (user.profilePhotoPath == null || user.profilePhotoPath!.isEmpty)
+                  ? const Icon(Icons.person, size: 40)
+                  : null,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "Unfollow @${user.username}?",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const Divider(height: 32),
+            ListTile(
+              title: const Center(
+                child: Text(
+                  "Unfollow",
+                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                ),
+              ),
+              onTap: () {
+                Get.back();
+                profileController.toggleFollowForPostUser(user.id!);
+              },
+            ),
+            const Divider(),
+            ListTile(
+              title: const Center(child: Text("Cancel")),
+              onTap: () => Get.back(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showContactBottomSheet(dynamic user) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "Contact Options",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const Icon(Icons.phone, color: Colors.blue),
+              title: const Text("Call"),
+              subtitle: Text(user.phone ?? "No phone number"),
+              onTap: () async {
+                if (user.phone != null) {
+                  final Uri launchUri = Uri(scheme: 'tel', path: user.phone);
+                  await launchUrl(launchUri);
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.email, color: Colors.red),
+              title: const Text("Email"),
+              subtitle: Text(user.email ?? "No email address"),
+              onTap: () async {
+                if (user.email != null) {
+                  final Uri params = Uri(
+                    scheme: 'mailto',
+                    path: user.email,
+                    query: 'subject=Inquiry from iVatan',
+                  );
+                  await launchUrl(params);
+                }
+              },
+            ),
+            const SizedBox(height: 10),
+          ],
+        ),
+      ),
+    );
   }
 
 

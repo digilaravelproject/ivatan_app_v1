@@ -24,13 +24,16 @@ import '../../../core/network/api_services.dart';
 import '../../profile/controller/profile_controller.dart';
 import '../../profile/screen/postPreviewImage.dart';
 import '../persentation/createStoryScreen.dart';
+import '../persentation/story_media_picker_screen.dart';
 import 'package:dio/dio.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 
 class StoryController extends GetxController {
   final ImagePicker _picker = ImagePicker();
 
   Rx<File?> imageFile = Rx<File?>(null);
+  Rx<File?> originalImageFile = Rx<File?>(null);
   Rx<File?> videoFile = Rx<File?>(null);
   RxBool isVideoInitialized = false.obs;
   RxString videoUrl = "".obs;
@@ -60,9 +63,52 @@ class StoryController extends GetxController {
   int currentStoryId = 0;
   RxBool isLoading = false.obs;
 
+  // ------------------ IMAGE CROPPER ---------------------
+  Future<void> cropImage() async {
+    if (imageFile.value == null || isLoading.value) return;
+
+    // Safety initialization: If original is missing (e.g. after hot reload), assume current is original
+    if (originalImageFile.value == null) {
+      originalImageFile.value = imageFile.value;
+    }
+
+    try {
+      isLoading.value = true;
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: originalImageFile.value!.path, // ALWAYS crop from original
+        compressQuality: 100,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Edit Photo',
+            toolbarColor: Colors.black,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false,
+            backgroundColor: Colors.black,
+            activeControlsWidgetColor: AppColors.primary,
+          ),
+          IOSUiSettings(
+            title: 'Edit Photo',
+            doneButtonTitle: 'Done',
+            cancelButtonTitle: 'Cancel',
+          ),
+        ],
+      );
+
+      if (croppedFile != null) {
+        imageFile.value = File(croppedFile.path);
+      }
+    } catch (e) {
+      print("Crop Error: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   // --------------- PICK MEDIA (YOUR OWN LOGIC CALL HERE) ---------------------
   void setImage(File file) {
     imageFile.value = file;
+    originalImageFile.value = file; // Store original
     videoFile.value = null;
   }
 
@@ -82,6 +128,7 @@ class StoryController extends GetxController {
       if (pickedFile == null) return;
 
       imageFile.value = File(pickedFile.path);
+      originalImageFile.value = File(pickedFile.path); // Store original
       Get.to(() => StoryScreen());
     } catch (e) {
       print("Image pick error: $e");
@@ -151,42 +198,9 @@ class StoryController extends GetxController {
   }
 
 
-  void showPickerOptions() {
-    Get.bottomSheet(
-      Container(
-        color: Colors.white,
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo),
-              title: const Text("Pick Image from Gallery"),
-              onTap: () {
-                Get.back();
-                pickImage(ImageSource.gallery);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text("Capture Image"),
-              onTap: () {
-                Get.back();
-                pickImage(ImageSource.camera);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.video_library),
-              title: const Text("Pick Video from Gallery"),
-              onTap: () => pickVideo(ImageSource.gallery),
-            ),
-            ListTile(
-              leading: const Icon(Icons.videocam),
-              title: const Text("Record Video"),
-              onTap: () => pickVideo(ImageSource.camera),
-            ),
-          ],
-        ),
-      ),
-    );
+  void showPickerOptions() async {
+    // Navigate to Instagram-style media picker screen
+    Get.to(() => StoryMediaPickerScreen());
   }
 
 

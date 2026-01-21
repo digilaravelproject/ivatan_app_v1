@@ -13,12 +13,18 @@ class FollowController extends GetxController {
 
   RxMap<int, RxBool> followStatus = <int, RxBool>{}.obs;
 
-  RxBool isUserFollowing(int userId) {
-    followStatus.putIfAbsent(userId, () => false.obs);
+  RxBool isUserFollowing(int userId, {bool? initialValue}) {
+    if (!followStatus.containsKey(userId)) {
+      followStatus[userId] = (initialValue ?? false).obs;
+    }
     return followStatus[userId]!;
   }
   void setInitialFollowStatus(int userId, bool isFollowing) {
-    followStatus[userId] = isFollowing.obs;
+    if (followStatus.containsKey(userId)) {
+      followStatus[userId]!.value = isFollowing;
+    } else {
+      followStatus[userId] = isFollowing.obs;
+    }
   }
 
   // FOLLOW

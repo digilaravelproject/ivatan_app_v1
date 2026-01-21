@@ -19,7 +19,7 @@ class MessageListScreen extends StatefulWidget {
   State<MessageListScreen> createState() => _MessageListScreenState();
 }
 
-class _MessageListScreenState extends State<MessageListScreen> {
+class _MessageListScreenState extends State<MessageListScreen> with SingleTickerProviderStateMixin {
   int _selectedFilter = 0;
   final List<String> _filters = ['All', 'Read', 'Unread', 'Business'];
 
@@ -31,277 +31,530 @@ class _MessageListScreenState extends State<MessageListScreen> {
   };
 
   final ChattController controller = Get.put(ChattController());
+  late AnimationController _animationController;
+  
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _animationController.forward();
+  }
+  
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: AppColors.lightBackgroundGradient,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          colors: [
+            AppColors.white,
+            AppColors.primary.withOpacity(0.02),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
       ),
       child: Scaffold(
-        backgroundColor: AppColors.transparent,
-        appBar: AppBar(
-          backgroundColor: AppColors.transparent,
-          elevation: 0,
-          centerTitle: true,
-          leading: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GestureDetector(
-              onTap: (){
-               // Get.to(ProfileScreen());
-                Get.to(DashboardPage());
-              },
-              child: CircleAvatar(
-                radius: 30,
-                backgroundColor: Colors.grey[200],
-                child: ClipOval(
-                  child: Image.network(
-                    AppUrls.imageurl + (SharedPrefManager().user?.profilePhotoPath ?? ""),
-                    fit: BoxFit.cover,
-                    width: 60,
-                    height: 60,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Image.asset(
-                        AppAssets.imgAppLogo, // fallback asset image
-                        fit: BoxFit.cover,
-                        width: 60,
-                        height: 60,
-                      );
-                    },
+        backgroundColor: AppColors.white,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(70),
+          child: AppBar(
+            backgroundColor: AppColors.primary, // Changed to Primary
+            elevation: 0,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                 // Removed shadow for clean look
+              ),
+            ),
+            leading: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: GestureDetector(
+                onTap: () {
+                  Get.to(DashboardPage());
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2), // White border
+                  ),
+                  child: ClipOval(
+                    child: Image.network(
+                      AppUrls.imageurl + (SharedPrefManager().user?.profilePhotoPath ?? ""),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          AppAssets.imgAppLogo,
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
-
             ),
-          ),
-          title: const Text(
-            'i-message',
-            style: TextStyle(
-              color: Colors.black87,
-              fontWeight: FontWeight.w600,
+            title: const Text(
+              'Messages',
+              style: TextStyle(
+                color: Colors.white, // White text
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                letterSpacing: 0.5,
+              ),
             ),
+            centerTitle: true,
+            actions: [
+               IconButton(
+                  icon: const Icon(
+                    Icons.search,
+                    color: Colors.white,
+                    size: 26,
+                  ),
+                  onPressed: () {},
+                ),
+              Container(
+                margin: const EdgeInsets.only(right: 12),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.more_vert,
+                    color: Colors.white,
+                    size: 26,
+                  ),
+                  onPressed: () {},
+                ),
+              ),
+            ],
           ),
-
         ),
-
         body: Column(
           children: [
-            // Divider(color: Colors.grey[600]),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: AppColors.neutralGray,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      CupertinoIcons.search,
-                      color: AppColors.lightTextSecondary,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextField(
-                        onChanged: controller.searchedPerson,
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: const InputDecoration(
-                          hintText: 'Search',
-                          isDense: true,              // 🔥 key point
-                          contentPadding: EdgeInsets.zero, // 🔥 removes extra height
-                          border: InputBorder.none,
+            const SizedBox(height: 16),
+            
+            // Search bar with animation
+            FadeTransition(
+              opacity: _animationController,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, -0.5),
+                  end: Offset.zero,
+                ).animate(CurvedAnimation(
+                  parent: _animationController,
+                  curve: Curves.easeOut,
+                )),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.08),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
                         ),
-                        style: const TextStyle(
-                          color: Colors.black87,
-                        ),
-                      ),
+                      ],
                     ),
-                  ],
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            CupertinoIcons.search,
+                            color: AppColors.primary,
+                            size: 18,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            onChanged: controller.searchedPerson,
+                            style: TextStyle(
+                              color: AppColors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'Search messages...',
+                              hintStyle: TextStyle(
+                                color: AppColors.lightTextSecondary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              isDense: true,
+                              contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
-            SizedBox(height: 10),
+            
+            const SizedBox(height: 16),
+            
+            // Filter chips with improved design
             Container(
+              height: 50,
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: List.generate(_filters.length, (index) {
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _filters.length,
+                itemBuilder: (context, index) {
+                  final isSelected = _selectedFilter == index;
                   return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Text(_filters[index]),
-                      selected: _selectedFilter == index,
-                      onSelected: (selected) {
-                        setState(() {
-                          _selectedFilter = index;
-                        });
-                        final filterValue = filterMap[index];
-                        controller.fetchInbox(filter: filterValue);
-                      },
-                      selectedColor: AppColors.primary,
-                      backgroundColor: Colors.transparent,
-                      showCheckmark: false,
-                    )
-
-                    /*FilterChip(
-                      label: Text(_filters[index]),
-                      selected: _selectedFilter == index,
-                      onSelected: (selected) {
-                        setState(() {
-                          _selectedFilter = index;
-                        });
-                      },
-                      selectedColor: AppColors.primary,
-                      backgroundColor: Colors.transparent,
-                      surfaceTintColor: Colors.transparent,
-                      disabledColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      pressElevation: 0,
-                      clipBehavior: Clip.antiAlias,
-                      side: BorderSide(color: AppColors.transparent),
-                      labelStyle: TextStyle(
-                        color:
-                        _selectedFilter == index
-                            ? AppColors.white
-                            : AppColors.primary,
-                        fontWeight:
-                        _selectedFilter == index
-                            ? FontWeight.w600
-                            : FontWeight.normal,
+                    padding: const EdgeInsets.only(right: 10),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            _selectedFilter = index;
+                          });
+                          final filterValue = filterMap[index];
+                          controller.fetchInbox(filter: filterValue);
+                        },
+                        borderRadius: BorderRadius.circular(24),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          decoration: BoxDecoration(
+                            gradient: isSelected
+                                ? LinearGradient(
+                                    colors: [
+                                      AppColors.primary,
+                                      AppColors.primary.withOpacity(0.8),
+                                    ],
+                                  )
+                                : null,
+                            color: isSelected ? null : AppColors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: isSelected ? AppColors.primary : AppColors.neutralGray,
+                              width: isSelected ? 0 : 1.5,
+                            ),
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: AppColors.primary.withOpacity(0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ]
+                                : [],
+                          ),
+                          child: Center(
+                            child: Text(
+                              _filters[index],
+                              style: TextStyle(
+                                color: isSelected ? Colors.white : AppColors.black,
+                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                      showCheckmark: false,
-                    ),*/
+                    ),
                   );
-                }),
+                },
               ),
             ),
+            
+            const SizedBox(height: 12),
+            
+            // Chat list with enhanced design
             Obx(() {
               if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
+                return Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          color: AppColors.primary,
+                          strokeWidth: 3,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Loading messages...',
+                          style: TextStyle(
+                            color: AppColors.lightTextSecondary,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
               }
 
               if (controller.chatList.isEmpty) {
-                return const Center(child: Text("No Chats Found"));
+                return Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.chat_bubble_outline_rounded,
+                            size: 60,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          "No Chats Yet",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Start a conversation with someone",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.lightTextSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
               }
+              
               return Expanded(
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                   itemCount: controller.filteredChatList.length,
                   itemBuilder: (context, index) {
                     final message = controller.filteredChatList[index];
-                    return InkWell(
-                      onTap: () {
-                        Get.toNamed(
-                          AppRoutes.chattingScreen,
-                          arguments: message,
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          // color: Colors.white,
-                          border: Border(
-                            bottom: BorderSide(color: AppColors.black),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 28,
-                              backgroundColor: Colors.grey.shade300,
-                              child:
-                              message.type == "group"
-                                  ? const Icon(
-                                Icons.group,
-                                color: Colors.black,
-                              )
-                                  : Text(
-                                message.name
-                                    .substring(0, 1)
-                                    .toUpperCase(),
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
+                    final hasUnread = message.unreadCount! > 0;
+                    
+                    return FadeTransition(
+                      opacity: _animationController,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: Offset(0, 0.1 * index),
+                          end: Offset.zero,
+                        ).animate(CurvedAnimation(
+                          parent: _animationController,
+                          curve: Curves.easeOut,
+                        )),
+                        child: InkWell(
+                          onTap: () {
+                            Get.toNamed(
+                              AppRoutes.chattingScreen,
+                              arguments: message,
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              gradient: hasUnread
+                                  ? LinearGradient(
+                                      colors: [
+                                        AppColors.primary.withOpacity(0.08),
+                                        AppColors.primary.withOpacity(0.03),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    )
+                                  : null,
+                              color: hasUnread ? null : AppColors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              border: hasUnread
+                                  ? Border.all(
+                                      color: AppColors.primary.withOpacity(0.2),
+                                      width: 1,
+                                    )
+                                  : null,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: hasUnread
+                                      ? AppColors.primary.withOpacity(0.1)
+                                      : Colors.black.withOpacity(0.04),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    message.name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    message.lastMessage?.content ??
-                                        "click here to chat",
-                                    style: TextStyle(
-                                      color: Colors.grey.shade600,
-                                      fontSize: 13,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  formatChatDate(message.updatedAt.toString()),
-                                  style: TextStyle(
-                                    color: Colors.grey.shade500,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                if (message.unreadCount! > 0) ...[
-                                  const SizedBox(height: 4),
-                                  Container(
-                                    width: 20,
-                                    height: 20,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.red,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        message.unreadCount.toString(),
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
                               ],
                             ),
-                          ],
+                            child: Row(
+                              children: [
+                                // Avatar with online indicator
+                                Hero(
+                                  tag: 'avatar_${message.name}',
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              AppColors.primary,
+                                              AppColors.primary.withOpacity(0.7),
+                                            ],
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: AppColors.primary.withOpacity(0.3),
+                                              blurRadius: 12,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        child: CircleAvatar(
+                                          radius: 30,
+                                          backgroundColor: Colors.transparent,
+                                          child: message.type == "group"
+                                              ? Icon(
+                                                  Icons.group_rounded,
+                                                  color: Colors.white,
+                                                  size: 30,
+                                                )
+                                              : Text(
+                                                  message.name.substring(0, 1).toUpperCase(),
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 22,
+                                                  ),
+                                                ),
+                                        ),
+                                      ),
+                                      if (hasUnread)
+                                        Positioned(
+                                          right: 0,
+                                          bottom: 0,
+                                          child: Container(
+                                            width: 14,
+                                            height: 14,
+                                            decoration: BoxDecoration(
+                                              color: AppColors.success,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: AppColors.white,
+                                                width: 2,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                
+                                // Message content
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              message.name,
+                                              style: TextStyle(
+                                                fontWeight: hasUnread ? FontWeight.w800 : FontWeight.w600,
+                                                fontSize: 17,
+                                                color: AppColors.black,
+                                                letterSpacing: -0.3,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            formatChatDate(message.updatedAt.toString()),
+                                            style: TextStyle(
+                                              color: hasUnread 
+                                                  ? AppColors.primary 
+                                                  : AppColors.lightTextSecondary,
+                                              fontSize: 12,
+                                              fontWeight: hasUnread ? FontWeight.w700 : FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              message.lastMessage?.content ?? "Tap to start chatting",
+                                              style: TextStyle(
+                                                color: hasUnread 
+                                                    ? AppColors.black.withOpacity(0.7)
+                                                    : AppColors.lightTextSecondary,
+                                                fontSize: 14,
+                                                fontWeight: hasUnread ? FontWeight.w600 : FontWeight.w400,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          if (hasUnread) ...[
+                                            const SizedBox(width: 8),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    AppColors.primary,
+                                                    AppColors.primary.withOpacity(0.8),
+                                                  ],
+                                                ),
+                                                borderRadius: BorderRadius.circular(14),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: AppColors.primary.withOpacity(0.4),
+                                                    blurRadius: 6,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Text(
+                                                message.unreadCount.toString(),
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w800,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     );
@@ -315,34 +568,27 @@ class _MessageListScreenState extends State<MessageListScreen> {
     );
   }
 
-
-
-
-
   String formatChatDate(String dateTimeString) {
-    final DateTime dateTime = DateTime.parse(dateTimeString).toLocal();
-    final DateTime now = DateTime.now();
+    try {
+      final DateTime dateTime = DateTime.parse(dateTimeString).toLocal();
+      final DateTime now = DateTime.now();
 
-    final DateTime today =
-    DateTime(now.year, now.month, now.day);
-    final DateTime yesterday =
-    today.subtract(const Duration(days: 1));
+      final DateTime today = DateTime(now.year, now.month, now.day);
+      final DateTime yesterday = today.subtract(const Duration(days: 1));
 
-    final DateTime messageDate =
-    DateTime(dateTime.year, dateTime.month, dateTime.day);
+      final DateTime messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
 
-    if (messageDate == today) {
-      /// Today → show time
-      return DateFormat('hh:mm a').format(dateTime);
-    } else if (messageDate == yesterday) {
-      /// Yesterday
-      return "Yesterday";
-    } else {
-      /// Older → show date
-      return DateFormat('dd MMM yyyy').format(dateTime);
+      if (messageDate == today) {
+        return DateFormat('hh:mm a').format(dateTime);
+      } else if (messageDate == yesterday) {
+        return "Yesterday";
+      } else {
+        return DateFormat('dd MMM').format(dateTime);
+      }
+    } catch (e) {
+      return "";
     }
   }
-
 
   Widget _buildStoryItem(String name, String imageUrl) {
     return Padding(
@@ -354,236 +600,24 @@ class _MessageListScreenState extends State<MessageListScreen> {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.blue, width: 2),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(15),
-                topRight: Radius.circular(15),
-                bottomLeft: Radius.circular(15),
-                bottomRight: Radius.circular(15),
-              ),
+              border: Border.all(color: AppColors.primary, width: 2),
+              borderRadius: BorderRadius.circular(15),
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(13),
               child: Image.network(imageUrl, fit: BoxFit.cover),
             ),
           ),
           const SizedBox(height: 4),
           Text(
             name,
-            style: const TextStyle(fontSize: 11, color: Colors.black87),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/*class ChatScreen extends StatefulWidget {
-  final String name;
-  final String avatar;
-  final Color color;
-
-  const ChatScreen({
-    Key? key,
-    required this.name,
-    required this.avatar,
-    required this.color,
-  }) : super(key: key);
-
-  @override
-  State<ChatScreen> createState() => _ChatScreenState();
-}
-
-class _ChatScreenState extends State<ChatScreen> {
-  final TextEditingController _messageController = TextEditingController();
-
-  List<Map<String, dynamic>> messages = [
-    {"text": "Hi Jos! How are you?", "isMe": false},
-    {"text": "Oh Hello Jacob! I'm fine. You?", "isMe": true},
-    {"text": "Send me the file please.", "isMe": false},
-    {"text": "Sure, I will.", "isMe": true},
-  ];
-
-  Map<String, dynamic>? replyToMessage;
-
-  void sendMessage() {
-    if (_messageController.text.trim().isEmpty) return;
-
-    messages.add({
-      "text": _messageController.text,
-      "isMe": true,
-      "reply": replyToMessage,
-    });
-
-    replyToMessage = null;
-    _messageController.clear();
-    setState(() {});
-  }
-
-  void openReplyBox(Map<String, dynamic> message) {
-    setState(() {
-      replyToMessage = message;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: widget.color,
-              child: Text(widget.avatar),
-            ),
-            SizedBox(width: 10),
-            Text(widget.name, style: TextStyle(color: Colors.black)),
-          ],
-        ),
-        elevation: 1,
-      ),
-
-      body: Column(
-        children: [
-          /// =============== REPLY PREVIEW BOX ============
-          if (replyToMessage != null)
-            Container(
-              padding: EdgeInsets.all(12),
-              margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 4,
-                    height: 40,
-                    color: Colors.blue,
-                  ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      replyToMessage!["text"],
-                      style: TextStyle(fontSize: 14, color: Colors.black87),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => setState(() => replyToMessage = null),
-                    child: Icon(Icons.close, color: Colors.black54),
-                  )
-                ],
-              ),
-            ),
-
-          /// ================= CHAT LIST ===================
-          Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.all(16),
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                var msg = messages[index];
-
-                return GestureDetector(
-                  onHorizontalDragEnd: (details) {
-                    if (details.primaryVelocity! > 0) {
-                      openReplyBox(msg); // RIGHT SWIPE
-                    }
-                  },
-                  child: Align(
-                    alignment:
-                    msg["isMe"] ? Alignment.centerRight : Alignment.centerLeft,
-                    child: Column(
-                      crossAxisAlignment: msg["isMe"]
-                          ? CrossAxisAlignment.end
-                          : CrossAxisAlignment.start,
-                      children: [
-                        if (msg["reply"] != null)
-                          Container(
-                            margin: EdgeInsets.only(bottom: 4),
-                            padding: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              msg["reply"]["text"],
-                              style: TextStyle(
-                                  fontSize: 12, color: Colors.grey.shade600),
-                            ),
-                          ),
-
-                        Container(
-                          padding: EdgeInsets.all(12),
-                          margin: EdgeInsets.symmetric(vertical: 6),
-                          decoration: BoxDecoration(
-                            color: msg["isMe"]
-                                ? Colors.cyan
-                                : Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            msg["text"],
-                            style: TextStyle(
-                              color: msg["isMe"] ? Colors.white : Colors.black,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-
-          /// =============== MESSAGE BOX ==================
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(color: Colors.white, boxShadow: [
-              BoxShadow(
-                color: Colors.grey.shade300,
-                offset: Offset(0, -1),
-                blurRadius: 4,
-              )
-            ]),
-            child: Row(
-              children: [
-                Icon(Icons.add, color: Colors.cyan, size: 26),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: TextField(
-                      controller: _messageController,
-                      decoration: InputDecoration(
-                        hintText: "Type a message",
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8),
-                CircleAvatar(
-                  backgroundColor: Colors.cyan,
-                  child: IconButton(
-                    icon: Icon(Icons.send, color: Colors.white),
-                    onPressed: sendMessage,
-                  ),
-                )
-              ],
+            style: TextStyle(
+              fontSize: 11,
+              color: AppColors.black,
             ),
           ),
         ],
       ),
     );
   }
-}*/
+}

@@ -4,8 +4,10 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:i_vatan_app/core/constants/app_sizer.dart';
 import 'package:i_vatan_app/core/helper/custom_image_view.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../core/helper/custom_buttons.dart';
+import '../../../core/helper/custom_dropdown.dart';
 import '../../../core/network/app_urls.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../db/shared_pref_manager.dart';
@@ -45,44 +47,96 @@ class SettingsScreen extends StatelessWidget {
             children: [
               // PROFILE IMAGE SECTION
               Center(
-                child: Stack(
+                child: Column(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.primary.withOpacity(0.2), width: 2),
-                      ),
-                      child: ClipOval(
-                        child: SizedBox(
-                          width: 100,
-                          height: 100,
-                          child: profileController.imageFile.value != null
-                              ? Image.file(profileController.imageFile.value!, fit: BoxFit.cover)
-                              : (userProfile?.profilePhotoPath != null && userProfile!.profilePhotoPath!.isNotEmpty)
-                                  ? CustomImageView(
-                                      url: "${AppUrls.imageurl}${userProfile!.profilePhotoPath}",
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Container(
-                                      color: Colors.grey.shade100,
-                                      child: Icon(Icons.person, size: 60, color: Colors.grey.shade400),
-                                    ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: () => profileController.showPickerOptions(),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: const BoxDecoration(
-                            color: AppColors.primary,
+                    Stack(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
                             shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.primary.withOpacity(0.1), width: 1),
                           ),
-                          child: const Icon(Icons.camera_alt, size: 18, color: Colors.white),
+                          child: ClipOval(
+                            child: Container(
+                              width: 120,
+                              height: 120,
+                              color: Colors.grey.shade50, // Subtle background for avatars
+                              child: Obx(() {
+                                Widget avatarChild;
+                                if (profileController.imageFile.value != null) {
+                                  avatarChild = Center(
+                                    key: ValueKey(profileController.imageFile.value!.path),
+                                    child: Image.file(
+                                      profileController.imageFile.value!,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  );
+                                } else if (userProfile?.profilePhotoPath != null && userProfile!.profilePhotoPath!.isNotEmpty) {
+                                  avatarChild = CustomImageView(
+                                    key: ValueKey(userProfile!.profilePhotoPath),
+                                    url: "${AppUrls.imageurl}${userProfile!.profilePhotoPath}",
+                                    fit: BoxFit.cover,
+                                  );
+                                } else {
+                                  avatarChild = const Center(
+                                    key: ValueKey("placeholder"),
+                                    child: Icon(Icons.person, size: 70, color: Colors.grey),
+                                  );
+                                }
+
+                                return AnimatedSwitcher(
+                                  duration: 400.ms,
+                                  transitionBuilder: (child, animation) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: ScaleTransition(scale: animation, child: child),
+                                    );
+                                  },
+                                  child: avatarChild
+                                      .animate(key: ValueKey(avatarChild.key))
+                                      .scale(duration: 400.ms, curve: Curves.easeOutBack)
+                                      .fadeIn(),
+                                ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+                                 .moveY(begin: 0, end: -5, duration: 1500.ms, curve: Curves.easeInOut);
+                              }),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 5,
+                          right: 5,
+                          child: GestureDetector(
+                            onTap: () => profileController.showPickerOptions(),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 2),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(Icons.camera_alt, size: 18, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    GestureDetector(
+                      onTap: () => profileController.showPickerOptions(),
+                      child: const Text(
+                        "Change Profile Photo",
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
                         ),
                       ),
                     ),
@@ -91,56 +145,64 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                userProfile?.username ?? "Username",
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                "@${userProfile?.username ?? "username"}",
+                style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
               ),
 
               const SizedBox(height: 30),
 
               // FIELDS
               _buildCleanField(
-                label: "Name",
                 child: AuthInputFieldsBorder(
-                  label: "Enter your name",
+                  label: "Name",
                   textInputType: TextInputType.text,
                   controller: profileController.nameController,
                 ),
               ),
 
               _buildCleanField(
-                label: "Username",
                 child: AuthInputFieldsBorder(
-                  label: "Enter username",
+                  label: "Username",
                   textInputType: TextInputType.text,
                   controller: profileController.usernameController,
                 ),
               ),
 
               _buildCleanField(
-                label: "Email",
                 child: AuthInputFieldsBorder(
-                  label: "Enter email",
+                  label: "Email",
                   textInputType: TextInputType.emailAddress,
                   controller: profileController.emailController,
                   readOnly: true, // Often email is not editable
                 ),
               ),
+
+              _buildCleanField(
+                child: AuthInputFieldsBorder(
+                  label: "Mobile Number",
+                  textInputType: TextInputType.phone,
+                  controller: profileController.phoneController,
+                  readOnly: true,
+                ),
+              ),
               
               _buildCleanField(
-                label: "Bio",
                 child: AuthInputFieldsBorder(
-                  label: "Write something about you...",
+                  label: "Bio",
                   textInputType: TextInputType.multiline,
                   controller: profileController.bioController,
                 ),
               ),
               
                _buildCleanField(
-                label: "Occupation",
-                child: AuthInputFieldsBorder(
-                  label: "What do you do?",
-                  textInputType: TextInputType.text,
+                child: CustomSearchableDropdown(
+                  label: "Occupation",
+                  items: profileController.occupationList,
                   controller: profileController.occupationController,
+                  onChanged: (value) {
+                    profileController.selectedOccupation.value = value;
+                  },
+                  validator: profileController.validateOccupation,
                 ),
               ),
 
@@ -198,17 +260,10 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCleanField({required String label, required Widget child}) {
+  Widget _buildCleanField({required Widget child}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87)),
-          const SizedBox(height: 8),
-          child,
-        ],
-      ),
+      child: child,
     );
   }
 }

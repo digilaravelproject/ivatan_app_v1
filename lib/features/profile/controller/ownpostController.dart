@@ -84,6 +84,10 @@ class OwnPostController extends GetxController {
   Future<void> fetchOwnPosts({bool loadMore = false, String? filterType, String? username}) async {
     if (isLoading.value) return;
 
+    // Use passed values or fallback to class variables
+    final String targetUser = username ?? UserName;
+    final String targetFilter = filterType ?? this.filterType;
+
     if (!loadMore) {
       currentPage = 1;
       posts.clear();
@@ -97,7 +101,7 @@ class OwnPostController extends GetxController {
       isLoading.value = true;
 
       final response = await api.callGet(
-          "api/v1/posts/user/$username?filter=$filterType&page=$currentPage"
+          "api/v1/posts/user/$targetUser?filter=$targetFilter&page=$currentPage"
       );
 
       print("POST API Response: $response");

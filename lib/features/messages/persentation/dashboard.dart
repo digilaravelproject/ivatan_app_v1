@@ -27,14 +27,14 @@ class dashboard extends StatefulWidget {
 }
 
 class _dashboardState extends State<dashboard> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1; // Default to Message (index 1)
 
   final List<Widget> _pages = [
-    MessageListScreen(),
-    ComingSoonScreen(),
-    ComingSoonScreen(),
-    ContactPerson(),
-    GroupScreen(),
+    ComingSoonScreen(), // Home/Back to Main
+    MessageListScreen(), // Message
+    ComingSoonScreen(), // Call
+    ContactPerson(), // Contact
+    GroupScreen(), // Group
   ];
 
   @override
@@ -42,115 +42,100 @@ class _dashboardState extends State<dashboard> {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: _pages[_selectedIndex],
-      bottomNavigationBar: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          // Image.asset(
-          //   AppImages.bottomnav,
-          //   fit: BoxFit.cover,
-          //   width: double.infinity,
-          //   height: 80,
-          // ),
-          SizedBox(
-            height: 85,
-            child: Container(
-              decoration: BoxDecoration(
-                //color: Colors.white.withOpacity(0.05),
-                boxShadow: [
-                  // BoxShadow(
-                  //   color: Colors.black.withOpacity(0.2),
-                  //   blurRadius: 5,
-                  //   spreadRadius: 2,
-                  //   offset: Offset(0, -1),
-                  // ),
-                ],
-              ),
-              child: BottomNavigationBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                selectedItemColor: AppColors.primary,
-                unselectedItemColor: AppColors.neutralGray,
-                type: BottomNavigationBarType.fixed,
-                currentIndex: _selectedIndex > 2 ? _selectedIndex : (_selectedIndex == 2 ? -1 : _selectedIndex),
-                onTap: (index) {
-                  if (index != 2) {
-                    setState(() {
-                      _selectedIndex = index;
-                    });
-                  }
-                },
-                items: [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.message),
-                    label: 'Message',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(CupertinoIcons.phone),
-                    label: 'Call',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SizedBox.shrink(),
-                    label: '',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(CupertinoIcons.person_crop_rectangle),
-                    label: 'Contact',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(CupertinoIcons.person_2_fill),
-                    label: 'Group',
-                  ),
-                ],
-              ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: Container(
+            height: 65,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildNavItem(
+                  icon: Icons.home_rounded,
+                  label: 'Back to Main',
+                  index: 0,
+                ),
+                _buildNavItem(
+                  icon: Icons.chat_bubble_rounded,
+                  label: 'Message',
+                  index: 1,
+                ),
+                _buildNavItem(
+                  icon: Icons.call_rounded,
+                  label: 'Call',
+                  index: 2,
+                ),
+                _buildNavItem(
+                  icon: Icons.contacts_rounded,
+                  label: 'Contact',
+                  index: 3,
+                ),
+                _buildNavItem(
+                  icon: Icons.group_rounded,
+                  label: 'Group',
+                  index: 4,
+                ),
+              ],
             ),
           ),
-          // Center GIF Button
-          Positioned(
-            bottom: 20,
-           // top: -1,
-            child: GestureDetector(
-              onTap: () {
-                Get.offAllNamed(AppRoutes.navigationScreen);
-              },
-              child:Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [AppColors.primaryDark, AppColors.primaryLight],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
-                child: const Icon(
-                  CupertinoIcons.house_fill,   // your icon here
-                  color: Colors.white,
-                  size: 30,
-                ),
-               ),
-              // Column(
-              //   mainAxisSize: MainAxisSize.min,
-              //   children: [
-              //     Image.asset(
-              //       "assets/images/spin.gif",
-              //       height: 70,
-              //       width: 80,
-              //     ),
-              //
-              //     // SizedBox(height: 2),
-              //     Text(
-              //       "Get₹500",
-              //       style: TextStyle(
-              //         color: _selectedIndex == 2 ? AppColors.primary : Colors.white,
-              //         fontWeight: FontWeight.bold,
-              //       ),
-              //     ),
-              //   ],
-              // ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required IconData icon,
+    required String label,
+    required int index,
+  }) {
+    final isSelected = _selectedIndex == index;
+    
+    return GestureDetector(
+      onTap: () {
+        if (index == 0) {
+          // Navigate to main screen
+          Get.offAllNamed(AppRoutes.navigationScreen);
+        } else {
+          setState(() {
+            _selectedIndex = index;
+          });
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? AppColors.primary : AppColors.lightTextSecondary,
+              size: 24,
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? AppColors.primary : AppColors.lightTextSecondary,
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }

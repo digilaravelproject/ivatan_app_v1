@@ -10,6 +10,7 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:i_vatan_app/features/profile/screen/profile_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import '../../profile/screen/avatar_customizer_screen.dart';
 
 /*
 class ProfileController extends GetxController {
@@ -310,6 +311,7 @@ import '../../../core/network/api_services.dart';
 import '../../../core/network/app_urls.dart';
 import '../../../db/shared_pref_manager.dart';
 import '../../auth/data/model/res/user_model.dart';
+import '../../search/controller/mixed_feed_controller.dart';
 import '../model/user_profile.dart';
 import 'follow_controller.dart';
 import 'homeController.dart';
@@ -343,6 +345,17 @@ class SettingsController extends GetxController {
   final ImagePicker _picker = ImagePicker();
   var imageFile = Rx<File?>(null);
 
+  RxList<String> occupationList = <String>[
+    "Student / Learner",
+    "Working Professional",
+    "Freelancer / Flexible Employee",
+    "Business Owner / Self-Employed",
+    "Looking for Opportunities",
+    "Others (Not Found! Any More creative.)",
+  ].obs;
+
+  RxString selectedOccupation = "".obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -354,7 +367,7 @@ class SettingsController extends GetxController {
   }
 
 
-  Future<void> updateProfile() async {
+  Future<void> updateProfile({bool shouldGoBack = true}) async {
     try {
       isLoading.value = true;
 
@@ -388,8 +401,8 @@ class SettingsController extends GetxController {
           ? usernameController.text
           : (userProfile?.value?.username ?? "");
 
-      request.fields["occupation"] = occupationController.text.isNotEmpty
-          ? occupationController.text
+      request.fields["occupation"] = selectedOccupation.value.isNotEmpty
+          ? selectedOccupation.value
           : (userProfile?.value?.occupation ?? "");
 
       request.fields["bio"] = bioController.text.isNotEmpty
@@ -463,7 +476,9 @@ class SettingsController extends GetxController {
         Get.find<HomeController>().refreshUser();
 
 
-        Get.back();
+        if (shouldGoBack) {
+          Get.back();
+        }
         Get.snackbar(
           "Success",
           responseData["message"] ?? "Profile Updated Successfully",
@@ -508,12 +523,47 @@ class SettingsController extends GetxController {
       // Toggle follow through FollowController
       await followController.toggleFollow(userId);
 
-      // ✅ Update ONLY posts where this user exists
-        if (userProfile.value?.id == userId) {
-          userProfile.value?.is_following = followController.isUserFollowing(userId).value;
+      // 1️⃣ Sync with current ProfileScreen user
+      if (userProfile.value?.id == userId) {
+        // Refetch to get new counts (Followers/Following)
+        await fetchUserDetails(userProfile.value?.username ?? "");
+      } else {
+        userProfile.value?.is_following = followController.isUserFollowing(userId).value;
+        userProfile.refresh();
+      }
+
+      // 2️⃣ Sync with HomeController (Home Feed)
+      if (Get.isRegistered<HomeController>()) {
+        final homeController = Get.find<HomeController>();
+        for (var post in homeController.posts) {
+          if (post.user.id == userId) {
+            post.is_following = followController.isUserFollowing(userId).value;
+          }
         }
-      // Refresh the posts list to update UI
-      userProfile.refresh();
+        homeController.posts.refresh();
+      }
+
+      // 3️⃣ Sync with PostController (Search/Trending Feed)
+      if (Get.isRegistered<PostController>()) {
+        final postController = Get.find<PostController>();
+        
+        // Sync trending posts
+        for (var post in postController.posts) {
+          if (post.user.id == userId) {
+            post.isFollowing = followController.isUserFollowing(userId).value;
+          }
+        }
+        postController.posts.refresh();
+
+        // Sync interested posts
+        for (var post in postController.intrestedPostList) {
+          if (post.user.id == userId) {
+            post.isFollowing = followController.isUserFollowing(userId).value;
+          }
+        }
+        postController.intrestedPostList.refresh();
+      }
+      
     } catch (e) {
       print("Follow Error: $e");
     }
@@ -546,27 +596,109 @@ class SettingsController extends GetxController {
   void showPickerOptions() {
     Get.bottomSheet(
       Container(
-        color: const Color(0xFFf9f9f9),
-        child: Wrap(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('Gallery'),
-              onTap: () {
-                pickImage(ImageSource.gallery);
-                Get.back();
-              },
+            // Handle for aesthetics
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('Camera'),
-              onTap: () {
-                pickImage(ImageSource.camera);
-                Get.back();
-              },
+            const Text(
+              "Select Profile Photo",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
+            const SizedBox(height: 25),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildPickerOption(
+                  icon: Icons.photo_library_outlined,
+                  label: "Gallery",
+                  color: Colors.blue,
+                  onTap: () async {
+                    print("📂 Picking from Gallery...");
+                    Get.back();
+                    await pickImage(ImageSource.gallery);
+                    if (imageFile.value != null) {
+                      print("✅ Photo picked, updating profile...");
+                      updateProfile(shouldGoBack: false);
+                    }
+                  },
+                ),
+                _buildPickerOption(
+                  icon: Icons.camera_alt_outlined,
+                  label: "Camera",
+                  color: Colors.green,
+                  onTap: () async {
+                    print("📸 Picking from Camera...");
+                    Get.back();
+                    await pickImage(ImageSource.camera);
+                    if (imageFile.value != null) {
+                      print("✅ Photo captured, updating profile...");
+                      updateProfile(shouldGoBack: false);
+                    }
+                  },
+                ),
+                _buildPickerOption(
+                  icon: Icons.face_retouching_natural,
+                  label: "Avatar",
+                  color: Colors.purple,
+                  onTap: () async {
+                    print("🚀 Opening Avatar Customizer...");
+                    Get.back();
+                    var result = await Get.to(() => const AvatarCustomizerScreen());
+                    print("📥 Avatar Customizer result: $result");
+                    if (result is File) {
+                      imageFile.value = result;
+                      print("✅ Avatar selected, updating profile...");
+                      updateProfile(shouldGoBack: false);
+                    }
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPickerOption({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 28),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+          ),
+        ],
       ),
     );
   }
@@ -581,11 +713,11 @@ class SettingsController extends GetxController {
 
       final result = await getUserDetails(userName);
       if (result == null) {
-        Get.snackbar(
-          "User Not Found",
-          "The user '$userName' does not exist or cannot be accessed.",
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        // Get.snackbar(
+        //   "User Not Found",
+        //   "The user '$userName' does not exist or cannot be accessed.",
+        //   snackPosition: SnackPosition.BOTTOM,
+        // );
         return;
       }
 
@@ -603,16 +735,28 @@ class SettingsController extends GetxController {
         phoneController.text = result.user!.phone ?? "";
         usernameController.text = result.user!.username ?? "";
         occupationController.text = result.user!.occupation ?? "";
+        selectedOccupation.value = result.user!.occupation ?? "";
         bioController.text = result.user!.bio ?? "";
         languageController.text = result.user!.languagePreference ?? "en";
         isPrivate.value = result.user!.accountPrivacy == "private";
-
+        
+        // SYNC FOLLOW STATUS
+        if (result.user?.id != null) {
+          followController.setInitialFollowStatus(result.user!.id!, result.user!.is_following ?? false);
+        }
       }
     } catch (e) {
       print("Error fetching user details: $e");
     } finally {
       isLoading.value = false;
     }
+  }
+
+  String? validateOccupation(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return "Please select occupation";
+    }
+    return null;
   }
 
   Future<File?> compressImage(File file) async {
@@ -663,7 +807,7 @@ class SettingsController extends GetxController {
   }
 
   Future<UserDetailsModel?> getUserDetails(String username) async {
-    final response = await api.callGet("api/v1/users/$username");
+    final response = await api.callGet("api/v1/users/$username", showErrorToast: false);
 
     print("getUserDetails : "+response!.values.toString());
     if (response == null) return null;

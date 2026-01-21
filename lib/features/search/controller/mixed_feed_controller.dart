@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 import '../../../core/network/api_services.dart';
+import '../../dashboard/controller/follow_controller.dart';
 import '../model/banner_model.dart';
 import '../model/mixed_feed_model.dart';  // your API service file
 
@@ -10,6 +11,7 @@ class PostController extends GetxController {
   RxList<BannerModel> bannersList = <BannerModel>[].obs;
   RxList<TrendingPost> intrestedPostList =<TrendingPost>[].obs;
   final ApiServices api = Get.put(ApiServices());
+  final FollowController followController = Get.find<FollowController>();
 
   @override
   void onInit() {
@@ -31,6 +33,11 @@ class PostController extends GetxController {
       if (response != null && response["data"] != null) {
         final model = TrendingResponse.fromJson(response);
         posts.value = model.data ?? [];
+
+        // ✅ Sync follow status
+        for (var post in posts) {
+          followController.setInitialFollowStatus(post.user.id, post.isFollowing);
+        }
       }
     } catch (e) {
       print("Fetch Posts Error: $e");
@@ -69,10 +76,15 @@ class PostController extends GetxController {
     try {
       isLoading.value = true;
       final response = await api.callGet("api/v1/posts/feed/trending/interests");
-      print("intrestedPost : "+response.toString());
+      print("intrestedPost : " + response.toString());
       if (response != null && response["data"] != null) {
         final model = TrendingResponse.fromJson(response);
         intrestedPostList.value = model.data ?? [];
+
+        // ✅ Sync follow status
+        for (var post in intrestedPostList) {
+          followController.setInitialFollowStatus(post.user.id, post.isFollowing);
+        }
       }
     } catch (e) {
       print("Fetch Posts Error: $e");

@@ -18,6 +18,7 @@ class ApiServices extends GetxService {
   Future<Map<String, dynamic>?> callGet(
     String endpoint, {
     Map<String, dynamic>? queryParams,
+    bool showErrorToast = true,
   }) async {
     final uri = Uri.parse(
       "${AppUrls.apiBaseUrl}$endpoint",
@@ -30,7 +31,7 @@ class ApiServices extends GetxService {
           .timeout(_timeout);
 
       print("getapiresponse : " + response.body);
-      return _parseResponse(response);
+      return _parseResponse(response, showErrorToast: showErrorToast);
     });
   }
 

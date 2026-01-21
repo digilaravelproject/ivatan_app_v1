@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide MultipartFile;
 import 'package:i_vatan_app/core/helper/custom_snack_bar.dart';
 import 'package:i_vatan_app/db/shared_pref_manager.dart';
 import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
@@ -579,6 +581,10 @@ class ChatMessagesController extends GetxController {
 
   var chatProfile = Rxn<ChatListModel>();
   final messageController = TextEditingController();
+  
+  // Emoji & Focus
+  final FocusNode focusNode = FocusNode();
+  RxBool isEmojiVisible = false.obs;
 
   // Pusher Instance
   PusherChannelsFlutter pusher = PusherChannelsFlutter.getInstance();
@@ -653,6 +659,11 @@ class ChatMessagesController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    focusNode.addListener(() {
+      if (focusNode.hasFocus) {
+        isEmojiVisible.value = false;
+      }
+    });
     _getData();
   }
 
@@ -729,6 +740,7 @@ class ChatMessagesController extends GetxController {
 
   @override
   void onClose() {
+    focusNode.dispose();
     if (chatProfile.value != null) {
       pusher.unsubscribe(channelName: "private-chat.${chatProfile.value!.id}");
     }
@@ -759,12 +771,44 @@ class ChatMessagesController extends GetxController {
         messages.add(ChatMessage.fromJson(response['data']));
         messageController.clear();
       }
-      if (response != null && response.containsKey("Message")) {
-        // Optional: Show snackbar
-        // CustomSnackBar.showSuccess(message: response['Message'].toString());
-      }
     } catch (e, stk) {
       print("sendMessage error: $e,\n$stk");
+    } finally {
+      isSendingMessage.value = false;
+    }
+  }
+
+  Future<void> sendFile(File file, String messageType) async {
+    try {
+      isSendingMessage.value = true;
+      var p = chatProfile.value;
+      if (p == null) return;
+
+      String fileName = file.path.split('/').last;
+      
+      // Prepare FormData
+      // distinct for file upload vs text
+      Map<String, dynamic> data = {
+        "message_type": messageType,
+        "file": await MultipartFile.fromFile(file.path, filename: fileName),
+      };
+
+      final response = await api.callPost(
+        "api/v1/chats/${p.id}/messages",
+        data: data,
+        isFormData: true,
+      );
+
+      log("sendFile response: $response");
+
+      if (response != null && response["status"] == true) {
+        messages.add(ChatMessage.fromJson(response['data']));
+      } else {
+         CustomSnackBar.showError(message: response?['message'] ?? "Failed to send file");
+      }
+    } catch (e, stk) {
+      print("sendFile error: $e,\n$stk");
+      CustomSnackBar.showError(message: "Error sending file");
     } finally {
       isSendingMessage.value = false;
     }

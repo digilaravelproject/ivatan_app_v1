@@ -6,10 +6,12 @@ import '../../../core/helper/custom_snack_bar.dart';
 import '../../../core/network/api_services.dart';
 import '../../../route/app_pages.dart';
 import '../../auth/data/model/res/user_model.dart';
+import '../../search/controller/mixed_feed_controller.dart';
 import '../model/post_model.dart';
 import '../model/story_model.dart';
 import '../persentation/greetingDialog.dart';
 import 'follow_controller.dart';
+import 'settings_controller.dart';
 
 class HomeController extends GetxController {
   RxBool isLoading = false.obs;
@@ -151,6 +153,11 @@ class HomeController extends GetxController {
               .map((e) => PostItem.fromJson(e))
               .toList();
 
+      // ✅ Sync follow status with FollowController map
+      for (var post in fetchedPosts) {
+        followController.setInitialFollowStatus(post.user.id, post.is_following);
+      }
+
       posts.addAll(fetchedPosts);
       posts.refresh();
 
@@ -227,14 +234,50 @@ class HomeController extends GetxController {
   Future<void> toggleFollowForPostUser(int userId) async {
     try {
       await followController.toggleFollow(userId);
+      
+      // 1️⃣ Sync with current Home feed posts
       for (var post in posts) {
         if (post.user.id == userId) {
           post.is_following = followController.isUserFollowing(userId).value;
         }
       }
-
-      // Refresh the posts list to update UI
       posts.refresh();
+
+      // 2️⃣ Sync with SettingsController (Profile screen)
+      // Check if SettingsController with this user's tag is registered
+      // Usually the user's username is the tag. In HomeController we might not 
+      // have the username easily for all tags, so we can iterate or check active ones.
+      // But typically, only ONE profile is open at a time.
+      if (Get.isRegistered<SettingsController>()) {
+         // Generic check (might need logic for tagged ones if multiple exist)
+         // For now, if any SettingsController exists and matches the ID, refresh it.
+         final settings = Get.find<SettingsController>();
+         if (settings.userProfile.value?.id == userId) {
+           await settings.fetchUserDetails(settings.userProfile.value?.username ?? "");
+         }
+      }
+
+      // 3️⃣ Sync with PostController (Search/Trending Feed)
+      if (Get.isRegistered<PostController>()) {
+        final postController = Get.find<PostController>();
+        
+        // Sync trending posts
+        for (var post in postController.posts) {
+          if (post.user.id == userId) {
+            post.isFollowing = followController.isUserFollowing(userId).value;
+          }
+        }
+        postController.posts.refresh();
+
+        // Sync interested posts
+        for (var post in postController.intrestedPostList) {
+          if (post.user.id == userId) {
+            post.isFollowing = followController.isUserFollowing(userId).value;
+          }
+        }
+        postController.intrestedPostList.refresh();
+      }
+      
     } catch (e) {
       print("Follow Error: $e");
     }
