@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:i_vatan_app/features/dashboard/persentation/comming_soon.dart';
-import 'package:i_vatan_app/features/dashboard/persentation/home_screen.dart';
+import 'package:i_vatan_app/features/dashboard/persentation/search_screen.dart'; // Import SearchScreen
 
 import '../../../core/constants/app_assets.dart';
 import '../../../core/helper/custom_snack_bar.dart';
@@ -30,7 +30,7 @@ class _dashboardState extends State<dashboard> {
   int _selectedIndex = 1; // Default to Message (index 1)
 
   final List<Widget> _pages = [
-    ComingSoonScreen(), // Home/Back to Main
+    ComingSoonScreen(), // Back to Main
     MessageListScreen(), // Message
     ComingSoonScreen(), // Call
     ContactPerson(), // Contact
@@ -61,7 +61,7 @@ class _dashboardState extends State<dashboard> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildNavItem(
-                  icon: Icons.home_rounded,
+                  icon: Icons.arrow_back_ios_rounded,
                   label: 'Back to Main',
                   index: 0,
                 ),
@@ -112,29 +112,32 @@ class _dashboardState extends State<dashboard> {
         }
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? AppColors.primary : AppColors.lightTextSecondary,
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0), // Reduced Padding
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
                 color: isSelected ? AppColors.primary : AppColors.lightTextSecondary,
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                size: 20,
               ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? AppColors.primary : AppColors.lightTextSecondary,
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );

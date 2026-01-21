@@ -17,49 +17,44 @@ class CustomSearchBar extends StatelessWidget {
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14),
-              height: 45,
+              height: 40, // Reduced height for compact look
               decoration: BoxDecoration(
-                color: AppColors.neutralGray,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                color: Colors.grey.shade100, // Flat Grey
+                borderRadius: BorderRadius.circular(12),
+                // Removed BoxShadow
               ),
               child: Row(
                 children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search videos, creators...',
-                        hintStyle: TextStyle(
-                          color: AppColors.lightTextSecondary,
-                          fontSize: 15,
-                        ),
-                        border: InputBorder.none,
-                      ),
-                      style: const TextStyle(
-                        fontSize: 15,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
                   Icon(
                     Icons.search,
                     color: AppColors.lightTextSecondary,
-                    size: 22,
+                    size: 20,
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search...',
+                        hintStyle: TextStyle(
+                          color: AppColors.lightTextSecondary,
+                          fontSize: 14,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.only(bottom: 10)
+                      ),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
 
-          const SizedBox(width: 10),
-
-          Icon(Icons.filter_list, color: AppColors.black, size: 28),
+          // const SizedBox(width: 10),
+          // Icon(Icons.filter_list, color: AppColors.black, size: 28),
         ],
       ),
     );

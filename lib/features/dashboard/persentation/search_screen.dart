@@ -14,37 +14,29 @@ import '../../post/presentation/image_post_screen.dart';
 import '../../videos/persentation/play_video_screen.dart';
 import 'comming_soon.dart';
 
-class SerachScreen extends StatefulWidget {
-  const SerachScreen({super.key});
+class SearchScreen extends StatefulWidget {
+  const SearchScreen({super.key});
 
   @override
-  State<SerachScreen> createState() => _SerachScreenState();
+  State<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SerachScreenState extends State<SerachScreen> {
-  List<String> sliderImages = [
-    "https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg",
-    "https://images.pexels.com/photos/34950/pexels-photo.jpg",
-    "https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg",
-  ];
+class _SearchScreenState extends State<SearchScreen> {
+  // Removed unused sliderImages list
   int selectedTab = 0;
+
   @override
   Widget build(BuildContext context) {
     final PostController controller = Get.put(PostController());
 
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors:AppColors.lightBackgroundGradient,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
+      color: Colors.white, // Plain White Background
       child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body:  Column(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Column(
             children: [
-              SizedBox(height: kToolbarHeight * 0.65),
+              // SizedBox(height: kToolbarHeight * 0.65), // Removed excessive top padding
               CustomSearchBar(),
               SizedBox(
                 height: 130,
@@ -79,46 +71,17 @@ class _SerachScreenState extends State<SerachScreen> {
                         //   controller: _tabController,
                         isScrollable: true,
                         dividerColor: Colors.transparent,
-                        indicator: BoxDecoration(),
-                        labelColor: Colors.blue,
+                        indicatorColor: Colors.black, // Minimal black indicator
+                        indicatorSize: TabBarIndicatorSize.label,
                         tabAlignment: TabAlignment.start,
-                        unselectedLabelColor: AppColors.black,
-                        labelPadding: EdgeInsets.symmetric(horizontal: 8),
+                        labelColor: Colors.black, // Selected Black
+                        unselectedLabelColor: Colors.grey, // Unselected Grey
+                        labelPadding: EdgeInsets.symmetric(horizontal: 16),
+                        labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         tabs: [
-                          Tab(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.trending_up_outlined),
-                                SizedBox(width: 5),
-                                Text("Trending",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                          ),
-                          Tab(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                CustomImageView(
-                                  imagePath: AppAssets.imgLive,
-                                  height: 30,
-                                  width: 30,
-                                ),
-                                SizedBox(width: 5),
-                                Text("Live",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                          ),
-                          Tab(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.favorite_border),
-                                SizedBox(width: 5),
-                                Text("For You",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                          ),
+                          Tab(text: "Trending"),
+                          Tab(text: "Live"),
+                          Tab(text: "For You"),
                         ],
                       ),
 
@@ -126,13 +89,21 @@ class _SerachScreenState extends State<SerachScreen> {
 
                       /// ---------- TAB BAR VIEW (DIFFERENT SCREENS) ----------
                       Expanded(
-                       // height: 500, // required
+                        // height: 500, // required
                         child: TabBarView(
                           children: [
                           //  LiveScreen(),
                            TrendingScreen(),
-                          Center(child: Text("Coming Soon",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),),
-                          Center(child: Text("Coming Soon",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),)
+                           CustomEmptyState(
+                             title: "Live Coming Soon",
+                             subTitle: "We are getting the stage ready for you!",
+                             icon: Icons.live_tv_rounded,
+                           ),
+                           CustomEmptyState(
+                             title: "For You Coming Soon",
+                             subTitle: "Personalized content is on its way!",
+                             icon: Icons.favorite_rounded,
+                           ),
                           // LiveScreen(),
                           // ForYouScreen(),
                            // ReelsScreen()
@@ -164,7 +135,7 @@ class _SerachScreenState extends State<SerachScreen> {
               )*/
             ],
           ),
-
+        ),
       ),
     );
   }
@@ -212,7 +183,14 @@ class TrendingScreen extends StatelessWidget {
                     return Center(child: CircularProgressIndicator());
                   }
                   if (controller.intrestedPostList.isEmpty) {
-                    return Center(child: Text("Trending not found"));
+                    return Center(
+                      child: CustomEmptyState(
+                        title: "No Trending",
+                        subTitle: "",
+                        icon: Icons.trending_up,
+                        isSmall: true,
+                      ),
+                    );
                   }
                   return ListView.builder(
                     scrollDirection: Axis.horizontal,
@@ -241,7 +219,14 @@ class TrendingScreen extends StatelessWidget {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (controller.posts.isEmpty) {
-                    return const Center(child: Text("No posts found"));
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 50),
+                      child: CustomEmptyState(
+                        title: "No Posts Yet",
+                        subTitle: "Be the first to create something amazing!",
+                        icon: Icons.post_add_rounded,
+                      ),
+                    );
                   }
                   return MasonryGridView.count(
                     shrinkWrap: true,

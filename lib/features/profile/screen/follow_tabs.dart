@@ -10,7 +10,58 @@ import '../../../core/helper/custom_image_view.dart';
 import '../../../core/helper/custom_snack_bar.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../dashboard/controller/follow_controller.dart';
+import '../../dashboard/persentation/comming_soon.dart';
 import '../controller/followListController.dart';
+
+// CustomEmptyState widget
+class CustomEmptyState extends StatelessWidget {
+  final String title;
+  final String subTitle;
+  final IconData icon;
+  final bool isSmall;
+
+  const CustomEmptyState({
+    Key? key,
+    required this.title,
+    required this.subTitle,
+    required this.icon,
+    this.isSmall = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: isSmall ? 48 : 64,
+            color: Colors.grey.shade400,
+          ),
+          SizedBox(height: isSmall ? 12 : 16),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: isSmall ? 16 : 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: isSmall ? 4 : 8),
+          Text(
+            subTitle,
+            style: TextStyle(
+              fontSize: isSmall ? 13 : 14,
+              color: Colors.grey.shade600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class FollowTabs extends StatelessWidget {
   final int initialTab;
@@ -18,43 +69,40 @@ class FollowTabs extends StatelessWidget {
   FollowTabs({super.key, required this.initialTab, required this.userId});
   @override
   Widget build(BuildContext context) {
-    print("userid access from tabs  : ${userId}");
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: AppColors.lightBackgroundGradient,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: DefaultTabController(
-        length: 2,
-        initialIndex: initialTab,
-        child: Scaffold(
-          backgroundColor: AppColors.transparent,
-          appBar: AppBar(
-            backgroundColor: AppColors.transparent,
-            title: Text("Connections"),
-            bottom: TabBar(
-              labelColor: Colors.black,
-              unselectedLabelColor: AppColors.darkTextPrimary,
-              indicatorWeight: 2, // line thickness
-              indicatorSize: TabBarIndicatorSize.tab,
-              // indicatorSize: TabBarIndicatorSize.label,
-              // indicator: UnderlineTabIndicator(
-              //   borderSide: BorderSide(width: 2, color: Colors.black),
-              //   insets: EdgeInsets.symmetric(horizontal: 80), // ⭐ half-half indicator
-              // ),
-              indicatorColor: Colors.black,
-              tabs: const [Tab(text: "Followers"), Tab(text: "Following")],
+    return DefaultTabController(
+      length: 2,
+      initialIndex: initialTab,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          title: const Text(
+            "Connections",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          body: TabBarView(
-            children: [
-              FollowerList(userId: userId),
-              FollowingList(userId: userId),
-            ],
+          iconTheme: const IconThemeData(color: Colors.black),
+          bottom: TabBar(
+            labelColor: Colors.black,
+            unselectedLabelColor: Colors.grey,
+            indicatorWeight: 2,
+            indicatorSize: TabBarIndicatorSize.tab,
+            indicatorColor: Colors.black,
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+            ),
+            tabs: const [Tab(text: "Followers"), Tab(text: "Following")],
           ),
+        ),
+        body: TabBarView(
+          children: [
+            FollowerList(userId: userId),
+            FollowingList(userId: userId),
+          ],
         ),
       ),
     );
@@ -77,51 +125,38 @@ class FollowingList extends StatelessWidget {
 
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Column(
           children: [
-            // ---------------- SEARCH BAR ----------------
+            // Search Bar
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              height: 35,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              height: 48,
               decoration: BoxDecoration(
-                color: AppColors.neutralGray,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: [
-                  Icon(
-                    CupertinoIcons.search,
-                    color: AppColors.lightTextSecondary,
-                    size: 22,
-                  ),
-                  SizedBox(width: 10),
+                  Icon(Icons.search, color: Colors.grey.shade600, size: 22),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: TextField(
                       onChanged: (value) {
-                        print("onchange value = "+value);
                         controller.filterFollowing(value);
                       },
-                      textAlignVertical: TextAlignVertical.center,
                       decoration: InputDecoration(
-                        hintText: 'Search',
+                        hintText: 'Search following...',
                         hintStyle: TextStyle(
-                          color: AppColors.lightTextSecondary,
-                          fontSize: 18,
+                          color: Colors.grey.shade500,
+                          fontSize: 15,
                         ),
                         border: InputBorder.none,
                       ),
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 15,
                         color: Colors.black87,
                       ),
                     ),
@@ -130,17 +165,21 @@ class FollowingList extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 15),
+            const SizedBox(height: 16),
 
-            // ---------------- LIST DATA ----------------
+            // List
             Expanded(
               child: Obx(() {
                 if (controller.followingsLoading.value &&
                     controller.followingList.isEmpty) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 }
                 if (controller.followingList.isEmpty) {
-                  return const Center(child: Text("No Following Found",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),));
+                  return const CustomEmptyState(
+                    title: "No Following",
+                    subTitle: "You're not following anyone yet",
+                    icon: Icons.people_outline_rounded,
+                  );
                 }
                 return NotificationListener<ScrollNotification>(
                   onNotification: (scroll) {
@@ -150,109 +189,94 @@ class FollowingList extends StatelessWidget {
                     }
                     return false;
                   },
-                  child: ListView.builder(
+                  child: ListView.separated(
                     itemCount: controller.filteredFollowingList.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final user = controller.filteredFollowingList[index];
+                      final followController = Get.find<FollowController>();
 
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 15),
-                        child: IntrinsicHeight(
-                          child: GestureDetector(
-                            onTap: () {
-                              // if (user.ac == "private" &&
-                              //     (user.isFollowedByAuthUser ?? false) == false) {
-                              //   CustomSnackBar.showSuccess(
-                              //     message: "First Follow User ",
-                              //   );
-                              //   return;
-                              // }
-                              Get.to(() => ProfileScreen(viewUserName: user.username,),
-                              );
-                            },
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                // ------------- USER IMAGE -------------
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(15),
-                                  child: (user.avatar != null && user.avatar!.isNotEmpty)
-                                      ? CustomImageView(
-                                    url: user.avatar!,
-                                    height: 50,
-                                    width: 50,
-                                    fit: BoxFit.cover,
-                                  )
-                                      : Image.asset(
-                                    AppAssets.imgAppLogo, // ✅ your asset path
-                                    height: 50,
-                                    width: 50,
-                                    fit: BoxFit.cover,
+                      return GestureDetector(
+                        onTap: () {
+                          Get.to(() => ProfileScreen(viewUserName: user.username));
+                        },
+                        child: Row(
+                          children: [
+                            // Avatar
+                            CircleAvatar(
+                              radius: 26,
+                              backgroundColor: Colors.grey.shade200,
+                              backgroundImage: (user.avatar != null && user.avatar!.isNotEmpty)
+                                  ? NetworkImage(user.avatar!)
+                                  : null,
+                              child: (user.avatar == null || user.avatar!.isEmpty)
+                                  ? const Icon(Icons.person, size: 26)
+                                  : null,
+                            ),
+
+                            const SizedBox(width: 12),
+
+                            // Name & Username
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    user.name,
+                                    style: const TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
-
-                                SizedBox(width: 20),
-
-                                // ------------- USER NAME + USERNAME -------------
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        user.name,
-                                        style: TextStyle(
-                                          color: AppColors.black,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      Text(
-                                        "${user.username}",
-                                        style: TextStyle(
-                                          color: AppColors.darkTextPrimary,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    "@${user.username}",
+                                    style: TextStyle(
+                                      color: Colors.grey.shade600,
+                                      fontSize: 13,
+                                    ),
                                   ),
-                                ),
+                                ],
+                              ),
+                            ),
 
-                                if (!user.isAuthUser)
-                                  Align(
-                                    alignment: Alignment.topRight,
-                                    child: InkWell(
-                                      onTap: () {
-                                        if (user.id != null) {
-                                          controller.toggleFollowUser(user.id!,);
-                                        }
-                                      },
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: AppColors.primaryDark,
-                                          borderRadius: BorderRadius.circular(5),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 5,
-                                            horizontal: 20,
-                                          ),
-                                          child: Text(
-                                            user.isFollowedByAuthUser
-                                                ? "Following"
-                                                : "Follow",
-                                            style: TextStyle(
-                                              color: AppColors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
+                            // Follow Button
+                            if (!user.isAuthUser)
+                              Obx(() {
+                                final isFollowing = followController
+                                    .isUserFollowing(user.id!, initialValue: user.isFollowedByAuthUser)
+                                    .value;
+
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (isFollowing) {
+                                      _showUnfollowBottomSheet(context, user, controller);
+                                    } else {
+                                      controller.toggleFollowUser(user.id!);
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isFollowing ? Colors.grey.shade200 : AppColors.primaryDark,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      isFollowing ? "Following" : "Follow",
+                                      style: TextStyle(
+                                        color: isFollowing ? Colors.black87 : Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
                                       ),
                                     ),
                                   ),
-                              ],
-                            ),
-                          ),
+                                );
+                              }),
+                          ],
                         ),
                       );
                     },
@@ -274,58 +298,44 @@ class FollowerList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  //  final controller = Get.put(FollowListController(userId: userId));
     final controller = Get.put(
       FollowListController(userId: userId),
       tag: userId.toString(),
     );
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Column(
           children: [
-            // ---------------- SEARCH BAR ----------------
+            // Search Bar
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              height: 35,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              height: 48,
               decoration: BoxDecoration(
-                color: AppColors.neutralGray,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: [
-                  Icon(
-                    CupertinoIcons.search,
-                    color: AppColors.lightTextSecondary,
-                    size: 22,
-                  ),
-                  SizedBox(width: 10),
+                  Icon(Icons.search, color: Colors.grey.shade600, size: 22),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: TextField(
                       onChanged: (value) {
-                        print("onchange value = "+value);
                         controller.filterFollowerSearch(value);
                       },
-                      textAlignVertical: TextAlignVertical.center,
                       decoration: InputDecoration(
-                        hintText: 'Search',
+                        hintText: 'Search followers...',
                         hintStyle: TextStyle(
-                          color: AppColors.lightTextSecondary,
-                          fontSize: 18,
+                          color: Colors.grey.shade500,
+                          fontSize: 15,
                         ),
                         border: InputBorder.none,
                       ),
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 15,
                         color: Colors.black87,
                       ),
                     ),
@@ -334,17 +344,21 @@ class FollowerList extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 15),
+            const SizedBox(height: 16),
 
-            // ---------------- LIST DATA ----------------
+            // List
             Expanded(
               child: Obx(() {
                 if (controller.followersLoading.value &&
                     controller.followerList.isEmpty) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 }
-                if (controller.followingList.isEmpty) {
-                  return const Center(child: Text("No Follower Found",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),));
+                if (controller.followerList.isEmpty) {
+                  return const CustomEmptyState(
+                    title: "No Followers",
+                    subTitle: "No one is following you yet",
+                    icon: Icons.people_outline_rounded,
+                  );
                 }
                 return NotificationListener<ScrollNotification>(
                   onNotification: (scroll) {
@@ -354,114 +368,94 @@ class FollowerList extends StatelessWidget {
                     }
                     return false;
                   },
-                  child: ListView.builder(
+                  child: ListView.separated(
                     itemCount: controller.filteredFollowerList.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final user = controller.filteredFollowerList[index];
+                      final followController = Get.find<FollowController>();
 
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 15),
-                        child: IntrinsicHeight(
-                          child: GestureDetector(
-                            onTap: (){
-                              Get.to(() => ProfileScreen(viewUserName: user.username,),);
-                            },
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                // ------------- USER IMAGE -------------
-                                // ClipRRect(
-                                //   borderRadius: BorderRadius.circular(15),
-                                //   child: CustomImageView(
-                                //     url:
-                                //         user.avatar ??
-                                //         "https://dummyimage.com/200x200/cccccc/000000&text=User",
-                                //     height: 50,
-                                //     width: 50,
-                                //     fit: BoxFit.cover,
-                                //   ),
-                                // ),
+                      return GestureDetector(
+                        onTap: () {
+                          Get.to(() => ProfileScreen(viewUserName: user.username));
+                        },
+                        child: Row(
+                          children: [
+                            // Avatar
+                            CircleAvatar(
+                              radius: 26,
+                              backgroundColor: Colors.grey.shade200,
+                              backgroundImage: (user.avatar != null && user.avatar!.isNotEmpty)
+                                  ? NetworkImage(user.avatar!)
+                                  : null,
+                              child: (user.avatar == null || user.avatar!.isEmpty)
+                                  ? const Icon(Icons.person, size: 26)
+                                  : null,
+                            ),
 
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(15),
-                                  child: (user.avatar != null && user.avatar!.isNotEmpty)
-                                      ? CustomImageView(
-                                    url: user.avatar!,
-                                    height: 50,
-                                    width: 50,
-                                    fit: BoxFit.cover,
-                                  )
-                                      : Image.asset(
-                                    AppAssets.imgAppLogo, // ✅ your asset path
-                                    height: 50,
-                                    width: 50,
-                                    fit: BoxFit.cover,
+                            const SizedBox(width: 12),
+
+                            // Name & Username
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    user.name,
+                                    style: const TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
-
-                                SizedBox(width: 20),
-
-                                // ------------- USER NAME + USERNAME -------------
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        user.name,
-                                        style: TextStyle(
-                                          color: AppColors.black,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      Text(
-                                        "${user.username}",
-                                        style: TextStyle(
-                                          color: AppColors.darkTextPrimary,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    "@${user.username}",
+                                    style: TextStyle(
+                                      color: Colors.grey.shade600,
+                                      fontSize: 13,
+                                    ),
                                   ),
-                                ),
+                                ],
+                              ),
+                            ),
 
-                                if (!user.isAuthUser)
-                                  Align(
-                                    alignment: Alignment.topRight,
-                                    child: InkWell(
-                                      onTap: () {
-                                        if (user.id != null) {
-                                          controller.toggleFollowUser(
-                                            user.id!,
-                                          );
-                                        }
-                                      },
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: AppColors.primaryDark,
-                                          borderRadius: BorderRadius.circular(5),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 5,
-                                            horizontal: 20,
-                                          ),
-                                          child: Text(
-                                            user.isFollowedByAuthUser
-                                                ? "Following"
-                                                : "Follow",
-                                            style: TextStyle(
-                                              color: AppColors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
+                            // Follow Button
+                            if (!user.isAuthUser)
+                              Obx(() {
+                                final isFollowing = followController
+                                    .isUserFollowing(user.id!, initialValue: user.isFollowedByAuthUser)
+                                    .value;
+
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (isFollowing) {
+                                      _showUnfollowBottomSheet(context, user, controller);
+                                    } else {
+                                      controller.toggleFollowUser(user.id!);
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isFollowing ? Colors.grey.shade200 : AppColors.primaryDark,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      isFollowing ? "Following" : "Follow",
+                                      style: TextStyle(
+                                        color: isFollowing ? Colors.black87 : Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
                                       ),
                                     ),
                                   ),
-                              ],
-                            ),
-                          ),
+                                );
+                              }),
+                          ],
                         ),
                       );
                     },
@@ -474,6 +468,57 @@ class FollowerList extends StatelessWidget {
       ),
     );
   }
+}
+
+// Unfollow Confirmation Bottom Sheet
+void _showUnfollowBottomSheet(BuildContext context, dynamic user, dynamic controller) {
+  Get.bottomSheet(
+    Container(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircleAvatar(
+            radius: 40,
+            backgroundColor: Colors.grey.shade200,
+            backgroundImage: user.avatar != null && user.avatar!.isNotEmpty
+                ? NetworkImage(user.avatar!)
+                : null,
+            child: (user.avatar == null || user.avatar!.isEmpty)
+                ? const Icon(Icons.person, size: 40)
+                : null,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            "Unfollow @${user.username}?",
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const Divider(height: 32),
+          ListTile(
+            title: const Center(
+              child: Text(
+                "Unfollow",
+                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              ),
+            ),
+            onTap: () {
+              Get.back();
+              controller.toggleFollowUser(user.id!);
+            },
+          ),
+          const Divider(),
+          ListTile(
+            title: const Center(child: Text("Cancel")),
+            onTap: () => Get.back(),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 

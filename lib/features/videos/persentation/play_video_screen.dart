@@ -13,6 +13,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/app_icons.dart';
 import '../../dashboard/model/post_model.dart';
 import '../../dashboard/persentation/home_screen.dart';
+import '../../dashboard/persentation/comming_soon.dart'; // For CustomEmptyState
 import '../../reels_screen/persentation/reels_view.dart';
 import '../controller/video_controller.dart';
 
@@ -406,22 +407,31 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
 
               Positioned(
-                top: 40,
+                top: 50,
                 left: 16,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white,
-                      size: 22,
+                child: SafeArea(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.6),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ),
@@ -669,11 +679,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     // }
 
                     if (controller.relatedVideoList.isEmpty) {
-                      return const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Text(
-                          "No related videos found",
-                          style: TextStyle(color: Colors.grey),
+                      return Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: CustomEmptyState(
+                          title: "No Related Videos",
+                          subTitle: "Check back later for more content",
+                          icon: Icons.video_library_rounded,
+                          isSmall: true,
                         ),
                       );
                     }
@@ -884,9 +896,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     return Obx(() {
       final video = controller.currentVideo.value;
 
-
       if (controller.isLoading.value || video == null) {
-        return Center(child: CircularProgressIndicator());
+        return const Center(child: CircularProgressIndicator());
       }
 
       return Column(
@@ -894,40 +905,46 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         children: [
           // Profile Header
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
             child: Row(
               children: [
                 CircleAvatar(
-                  radius: 24,
+                  radius: 22,
+                  backgroundColor: Colors.grey.shade200,
                   backgroundImage: NetworkImage(
                     video.user.avatar.isNotEmpty
                         ? video.user.avatar
                         : 'https://i.pravatar.cc/100?img=5',
                   ),
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        video.caption,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                        video.user.name,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
                         ),
                       ),
+                      const SizedBox(height: 2),
                       Row(
                         children: [
                           Icon(
-                            Icons.remove_red_eye,
-                            size: 14,
-                            color: Colors.grey,
+                            Icons.remove_red_eye_rounded,
+                            size: 13,
+                            color: Colors.grey.shade600,
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
-                            '${video.stats.viewCount}  ${video.createdHuman}',
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                            '${video.stats.viewCount} views • ${video.createdHuman}',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),
@@ -935,72 +952,83 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   ),
                 ),
 
-                if (!video.is_mine) ...[
+                if (!video.is_mine) ...{
                   const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {
-                      if (video.user.id != null) {
-                        controller.toggleFollowForPostUser(video.user.id!);
-                      }
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.cyan,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        video.is_following ? 'Followed' : 'Follow',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                  Obx(() {
+                    final isFollowing = controller.followController
+                        .isUserFollowing(video.user.id!, initialValue: video.is_following)
+                        .value;
+                    
+                    return GestureDetector(
+                      onTap: () {
+                        if (isFollowing) {
+                          _showUnfollowBottomSheet(video.user);
+                        } else {
+                          controller.toggleFollowForPostUser(video.user.id!);
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isFollowing ? Colors.grey.shade200 : Colors.black,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          isFollowing ? 'Following' : 'Follow',
+                          style: TextStyle(
+                            color: isFollowing ? Colors.black87 : Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ],
+                    );
+                  }),
+                },
               ],
             ),
           ),
 
+          // Video Title
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              video.caption,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+                height: 1.4,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          
+          const SizedBox(height: 16),
+
           // Engagement Row
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: Colors.cyan,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    children: [
-                      Text('💖', style: TextStyle(fontSize: 20)),
-                      SizedBox(width: 8),
-                      Text(
-                        video.stats.likeCount.toString(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
+                // Like Button
+                _buildActionButton(
+                  icon: Icons.favorite_rounded,
+                  label: _formatCount(video.stats.likeCount),
+                  isActive: true,
+                  onTap: () {},
                 ),
-                Spacer(),
-                IconButton(
-                  icon: CustomIcon(
-                    svgString: AppIcons.ic_comments,
-                    color: Colors.black,
-                    size: 20,
-                    removeColor: false,
-                  ),
-                  onPressed: () {
+                const SizedBox(width: 12),
+                // Comment Button
+                _buildActionButton(
+                  icon: Icons.chat_bubble_rounded,
+                  label: _formatCount(video.stats.commentCount),
+                  isActive: false,
+                  onTap: () {
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
@@ -1009,43 +1037,142 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     );
                   },
                 ),
-                SizedBox(width: 5),
+                const Spacer(),
+                // Share Button
                 IconButton(
-                  icon: const Icon(IconlyLight.send, color: Colors.black, size: 26),
+                  icon: const Icon(Icons.share_rounded, size: 24),
+                  color: Colors.grey.shade700,
                   onPressed: () {},
                 ),
-                SizedBox(width: 5),
+                // Save Button
                 IconButton(
-                  icon: Icon(Icons.playlist_add, size: 28),
+                  icon: const Icon(Icons.bookmark_border_rounded, size: 24),
+                  color: Colors.grey.shade700,
                   onPressed: () {},
                 ),
               ],
             ),
           ),
-          SizedBox(height: 5),
 
-          // Description
+          const SizedBox(height: 16),
+          
+          // Divider
+          Divider(height: 1, color: Colors.grey.shade200),
+          
+          const SizedBox(height: 16),
+
+          // Related Videos Header
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              video.caption ?? '', // make sure your PostData has description
-              style: TextStyle(fontSize: 14),
+              'Related Videos',
+              style: TextStyle(
+                color: Colors.grey.shade800,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-          SizedBox(height: 6),
-
-          // Maybe you like this / suggestions (optional)
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              'Maybe you like that',
-              style: TextStyle(color: Colors.grey, fontSize: 14),
-            ),
-          ),
-         // SizedBox(height: 5),
+          const SizedBox(height: 8),
         ],
       );
     });
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive ? Colors.black : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: isActive ? Colors.white : Colors.grey.shade700,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: isActive ? Colors.white : Colors.grey.shade700,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showUnfollowBottomSheet(dynamic user) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: Colors.grey.shade200,
+              backgroundImage: user.avatar != null && user.avatar!.isNotEmpty
+                  ? NetworkImage(user.avatar!)
+                  : null,
+              child: (user.avatar == null || user.avatar!.isEmpty)
+                  ? const Icon(Icons.person, size: 40)
+                  : null,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "Unfollow @${user.username}?",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const Divider(height: 32),
+            ListTile(
+              title: const Center(
+                child: Text(
+                  "Unfollow",
+                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                ),
+              ),
+              onTap: () {
+                Get.back();
+                controller.toggleFollowForPostUser(user.id!);
+              },
+            ),
+            const Divider(),
+            ListTile(
+              title: const Center(child: Text("Cancel")),
+              onTap: () => Get.back(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatCount(int count) {
+    if (count >= 1000000) {
+      return '${(count / 1000000).toStringAsFixed(1)}M';
+    } else if (count >= 1000) {
+      return '${(count / 1000).toStringAsFixed(1)}K';
+    }
+    return count.toString();
   }
 }
 

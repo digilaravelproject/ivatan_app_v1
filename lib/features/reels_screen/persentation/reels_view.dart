@@ -13,6 +13,7 @@ import '../../dashboard/controller/navigationController.dart';
 import '../../dashboard/persentation/home_screen.dart';
 import '../controller/short_play_controller.dart';
 import '../model/reel_model.dart';
+import 'package:share_plus/share_plus.dart';
 typedef LikeCallback = void Function(String reelId);
 typedef CommentCallback = void Function(String reelId);
 typedef ShareCallback = void Function(String reelId);
@@ -985,14 +986,24 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
           ),
         ),
 
-        // const SizedBox(height: 16),
-        // _buildIconButton(
-        //   icon: const Icon(IconlyLight.send, color: Colors.white, size: 30),
-        //   label: "Share",
-        //   onPressed: () {
-        //     //controller.shareReels(context, item),
-        //   },
-        // ),
+        const SizedBox(height: 16),
+        _buildIconButton(
+          icon: CustomIcon(
+            svgString: AppIcons.ic_share,
+            color: Colors.white,
+            size: 30,
+            removeColor: false,
+          ),
+          label: "Share",
+          onPressed: () {
+            // Create shareable link
+            final String reelUrl = "https://ivatan.in/post/${item.id}";
+            final String shareText = "${item.caption ?? 'Check out this reel!'}\n\n$reelUrl";
+            
+            // Use share_plus to share
+            Share.share(shareText);
+          },
+        ),
 
       ],
     );

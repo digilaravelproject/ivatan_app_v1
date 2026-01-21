@@ -553,7 +553,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return InkWell(
           onTap: () {
                if (isPrivateHidden) return;
-               Get.to(() => FollowTabs(initialTab: index, userId: user.id!));
+               Get.to(() => FollowTabs(initialTab: index, userId: user.id!))?.then((_) {
+                 // Refresh profile data when coming back
+                 profileController.fetchUserDetails(finalUserName);
+               });
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

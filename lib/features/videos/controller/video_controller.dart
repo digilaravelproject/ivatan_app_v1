@@ -24,6 +24,9 @@ class VideoController extends GetxController {
   RxBool isMoreLoading = false.obs;
 
   Rx<PostItem?> currentVideo = Rx<PostItem?>(null);
+  
+  // Track selected filter
+  RxString selectedFilter = 'none'.obs;
 
   @override
   void onInit() {
@@ -118,16 +121,60 @@ class VideoController extends GetxController {
   }
 
   void filterSearch(String query) {
-    if (query.isEmpty) {
-      filteredList.assignAll(posts); // agar search empty hai, pura data wapas aa jaye
+    print("🔍 Search query: '$query'");
+    print("📊 Total posts: ${posts.length}");
+    
+    if (query.isEmpty || query.trim().isEmpty) {
+      filteredList.value = List.from(posts); // Create new list to trigger update
+      print("✅ Showing all ${filteredList.length} videos");
     } else {
-      filteredList.assignAll(
-        posts.where((post) =>
-        post.user.name.toLowerCase().contains(query.toLowerCase()) ||
-            post.user.username.toLowerCase().contains(query.toLowerCase())
-        ).toList(),
-      );
+      final results = posts.where((post) {
+        final searchQuery = query.toLowerCase();
+        final userName = post.user.name.toLowerCase();
+        final username = post.user.username.toLowerCase();
+        final caption = (post.caption ?? '').toLowerCase();
+        
+        return userName.contains(searchQuery) ||
+               username.contains(searchQuery) ||
+               caption.contains(searchQuery);
+      }).toList();
+      
+      filteredList.value = results;
+      print("🔎 Found ${filteredList.length} matching videos");
     }
+    
+    filteredList.refresh(); // Force UI update
+  }
+
+  void sortByViews() {
+    print("📊 Sorting by views");
+    selectedFilter.value = 'views';
+    filteredList.value = List.from(filteredList)
+      ..sort((a, b) => b.stats.viewCount.compareTo(a.stats.viewCount));
+    filteredList.refresh();
+  }
+
+  void sortByRecent() {
+    print("🕐 Sorting by recent");
+    selectedFilter.value = 'recent';
+    filteredList.value = List.from(filteredList)
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    filteredList.refresh();
+  }
+
+  void sortByLikes() {
+    print("❤️ Sorting by likes");
+    selectedFilter.value = 'likes';
+    filteredList.value = List.from(filteredList)
+      ..sort((a, b) => b.stats.likeCount.compareTo(a.stats.likeCount));
+    filteredList.refresh();
+  }
+
+  void resetSort() {
+    print("🔄 Resetting sort");
+    selectedFilter.value = 'none';
+    filteredList.value = List.from(posts);
+    filteredList.refresh();
   }
 
 }

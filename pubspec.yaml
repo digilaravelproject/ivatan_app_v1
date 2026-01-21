@@ -83,6 +83,7 @@ dependencies:
   iconify_flutter: ^0.0.7
   intl_phone_field: ^3.2.0
   image_cropper: ^11.0.0
+  slide_to_act: ^2.0.2
 
 dev_dependencies:
   flutter_test:

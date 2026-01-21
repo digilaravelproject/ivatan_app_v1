@@ -7,6 +7,7 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/constants/app_assets.dart';
+import '../../dashboard/persentation/comming_soon.dart'; // For CustomEmptyState
 import '../../../core/helper/custom_image_view.dart';
 import '../../../core/helper/custom_snack_bar.dart';
 import '../../../core/network/app_urls.dart';
@@ -28,169 +29,204 @@ class ContactPerson extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: AppColors.lightBackgroundGradient,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
+      color: Colors.white,
       child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: AppColors.transparent,
-          elevation: 0,
-          centerTitle: true,
-          leading: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GestureDetector(
-              onTap: (){
-                Get.to(ProfileScreen());
-              },
-              child: CircleAvatar(
-                //  backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=1'),
-                backgroundImage: NetworkImage(AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString()),
-              ),
-            ),
-          ),
-          title: const Text(
-            'i-contact',
-            style: TextStyle(
-              color: Colors.black87,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        body:
-
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 1),
+        backgroundColor: Colors.white,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(70),
+          child: AppBar(
+            backgroundColor: AppColors.primary,
+            elevation: 0,
+            centerTitle: true,
+            leading: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: GestureDetector(
+                onTap: (){
+                  Get.to(ProfileScreen());
+                },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: AppColors.neutralGray,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        CupertinoIcons.search,
-                        color: AppColors.lightTextSecondary,
-                        size: 22,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextField(
-                          onChanged: (value) {
-                            print("onchange value = "+value);
-                            contactController.searchedPerson(value);
-                          },
-                          textAlignVertical: TextAlignVertical.center,
-                          decoration: const InputDecoration(
-                            hintText: 'Search',
-                            isDense: true,              // 🔥 key point
-                            contentPadding: EdgeInsets.zero, // 🔥 removes extra height
-                            border: InputBorder.none,
-                          ),
-                          style: const TextStyle(
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: CircleAvatar(
+                    backgroundImage: NetworkImage(AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString()),
                   ),
                 ),
               ),
-              SizedBox(height: 10),
-              Expanded(
-                child: Obx(() {
-                  if (contactController.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (contactController.filteredContactList.isEmpty) {
-                    return const Center(child: Text("No Contacts Found"));
-                  }
-
-                  return ListView.builder(
-                    itemCount: contactController.filteredContactList.length,
-                    itemBuilder: (context, index) {
-                      final contact = contactController.filteredContactList[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: Row(
-                          children: [
-                            // Avatar
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(15),
-                              child: Container(
-                                height: 50,
-                                width: 50,
-                                color: Colors.grey.shade300,
-                                child: contact.avatar != null && contact.avatar!.isNotEmpty
-                                    ? Image.network(
-                                  contact.avatar!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return  Image.asset(AppAssets.imgAppLogo);
-                                  },
-                                )
-                                    : const Icon(Icons.person),
-                              ),
-                            ),
-                            const SizedBox(width: 20),
-
-                            // Contact name and phone
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    contact.name ?? "Unknown",
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  if (contact.username != null && contact.username!.isNotEmpty)
-                                    Text(
-                                      contact.username!,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                            buildActionButton(contact)
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                }),
+            ),
+            title: const Text(
+              'Contacts', // Changed from i-contact
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                letterSpacing: 0.5,
               ),
-
-
-
-
-            ],
+            ),
+            // actions: [
+            //    IconButton(
+            //       icon: const Icon(
+            //         Icons.search,
+            //         color: Colors.white,
+            //         size: 26,
+            //       ),
+            //       onPressed: () {},
+            //     ),
+            //   Container(
+            //     margin: const EdgeInsets.only(right: 12),
+            //     child: IconButton(
+            //       icon: const Icon(
+            //         Icons.more_vert,
+            //         color: Colors.white,
+            //         size: 26,
+            //       ),
+            //       onPressed: () {},
+            //     ),
+            //   ),
+            // ],
           ),
         ),
-        //  ),
+        body: Column(
+          children: [
+            const SizedBox(height: 16),
+            
+            // Search Bar
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                height: 48,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      CupertinoIcons.search,
+                      color: Colors.grey.shade500,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        onChanged: (value) {
+                          print("onchange value = "+value);
+                          contactController.searchedPerson(value);
+                        },
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 15,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Search contacts...',
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade500,
+                            fontSize: 14,
+                          ),
+                          isDense: true,
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 10),
+            
+            Expanded(
+              child: Obx(() {
+                if (contactController.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                }
+
+                if (contactController.filteredContactList.isEmpty) {
+                   return Center(
+                    child: CustomEmptyState(
+                      title: "No Contacts Found",
+                      subTitle: "Try searching for someone else",
+                      icon: Icons.person_off_rounded,
+                      isSmall: true,
+                    ),
+                  );
+                }
+
+                return ListView.separated(
+                  padding: const EdgeInsets.only(top: 8, bottom: 20),
+                  itemCount: contactController.filteredContactList.length,
+                  separatorBuilder: (ctx, i) => Divider(height: 1, indent: 80, color: Colors.grey.shade100),
+                  itemBuilder: (context, index) {
+                    final contact = contactController.filteredContactList[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Row(
+                        children: [
+                          // Avatar
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.grey.shade200,
+                            ),
+                            child: ClipOval(
+                              child: contact.avatar != null && contact.avatar!.isNotEmpty
+                                  ? Image.network(
+                                      contact.avatar!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Image.asset(AppAssets.imgAppLogo),
+                                        );
+                                      },
+                                    )
+                                  : const Icon(Icons.person, color: Colors.grey),
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+
+                          // Contact name and phone
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  contact.name ?? "Unknown",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                if (contact.username != null && contact.username!.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 2),
+                                    child: Text(
+                                      "@${contact.username!}", // Added @ for style
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          buildActionButton(contact)
+                        ],
+                      ),
+                    );
+                  },
+                );
+              }),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -200,42 +236,23 @@ class ContactPerson extends StatelessWidget {
       // Hide button if it's your own contact
       if (contact.is_mine.value) return SizedBox.shrink();
 
-      // Invite button
-      if (contact.is_invite.value) {
-        return GestureDetector(
-          onTap: () {
-            final link = "https://ivatan.app/post";
-            Share.share("Check this post 👇\n$link");
-            // Action for Invite button
-            //  contactController.sendInvite(contact.id);
-            // You can also update is_invite after sending
-            contact.is_invite.value = false;
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(5),
-              border: Border.all(color: Colors.blue),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
-              child: Text(
-                "Invite",
-                style: TextStyle(color: Colors.blue),
-              ),
-            ),
-          ),
-        );
-      }
-
       // Determine button text and color
       String buttonText;
       Color backgroundColor;
       Color textColor = Colors.white;
-
       VoidCallback? onTapAction;
 
-      if (contact.isFollowing.value) {
+      // Invite button
+      if (contact.is_invite.value) {
+        buttonText = "Invite";
+        backgroundColor = Colors.transparent; // Transparent for Outline
+        textColor = Colors.blue;
+        onTapAction = () {
+             final link = "https://ivatan.app/post";
+            Share.share("Check this post 👇\n$link");
+             // contact.is_invite.value = false;
+        };
+      } else if (contact.isFollowing.value) {
         buttonText = "Message";
         backgroundColor = Colors.grey;
         textColor = Colors.white;
@@ -291,13 +308,16 @@ class ContactPerson extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: backgroundColor,
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(20), // More rounded (Stadium like)
+            border: buttonText == "Invite" ? Border.all(color: Colors.blue) : null,
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
-            child: Text(
-              buttonText,
-              style: TextStyle(color: textColor),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          child: Text(
+            buttonText,
+            style: TextStyle(
+              color: textColor,
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
             ),
           ),
         ),

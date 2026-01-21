@@ -95,7 +95,7 @@ class NavigationController extends GetxController {
       case 0:
         return HomePage();
       case 1:
-        return const SerachScreen();
+        return  SearchScreen();
       case 2:
         return Obx(() {
           final validReels =
@@ -148,7 +148,7 @@ class DashboardController extends GetxController {
 
     screenList = [
       HomePage(),              // 0
-      const SerachScreen(),    // 1
+      const SearchScreen(),    // 1
       _reelsPage(),            // 2 (FAB)
       VideosScreen(),          // 3
       _profilePage(),          // 4

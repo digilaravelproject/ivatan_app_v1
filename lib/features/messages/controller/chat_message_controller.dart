@@ -12,6 +12,7 @@ import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 import '../../../core/network/api_services.dart';
 import '../model/chat_data_model.dart';
 import '../model/individualChatModel.dart';
+import 'chatt_controller.dart';
 
 
 /*
@@ -633,9 +634,8 @@ class ChatMessagesController extends GetxController {
 
 
               if (!messages.any((m) => m.id == newMessage.id)) {
-                messages.add(newMessage);
-
-                // Optional: Scroll to bottom logic here if needed
+                // Insert at BOTTOM (Index 0) for ListView(reverse:true)
+                messages.insert(0, newMessage);
               }
             }
           },
@@ -690,9 +690,10 @@ class ChatMessagesController extends GetxController {
         var apiList = response['data'] as List;
         List<ChatMessage> fetchedMessages = apiList.map((e) => ChatMessage.fromJson(e)).toList();
 
-        // Laravel usually returns 'latest' (newest first).
-        // We reverse it so oldest is at top, new messages append at bottom.
-        messages.assignAll(fetchedMessages.reversed.toList());
+        // API returns Newest First (Index 0).
+        // ListView(reverse: true) puts Index 0 at Bottom.
+        // So we keep the order as is (Newest First).
+        messages.assignAll(fetchedMessages);
       }
     } catch (e, stk) {
       print("fetchMessages error: $e,\n$stk");
@@ -767,9 +768,54 @@ class ChatMessagesController extends GetxController {
       log("sendMessage : " + response.toString());
 
       if (response != null && response["status"] == true) {
-        // Add sent message locally immediately
-        messages.add(ChatMessage.fromJson(response['data']));
+        // Add sent message locally immediately at the BOTTOM (Index 0)
+        final newMessage = ChatMessage.fromJson(response['data']);
+        messages.insert(0, newMessage);
         messageController.clear();
+
+        // 🔥 CRITICAL: Update Dashboard List "Last Message"
+        try {
+          if (Get.isRegistered<ChattController>()) {
+            final chattController = Get.find<ChattController>();
+            
+            // Find this chat in the main list
+            final index = chattController.chatList.indexWhere((e) => e.id == p.id);
+            if (index != -1) {
+              var chatItem = chattController.chatList[index];
+              
+              // Create LastMessage from response data
+              // We use the response map directly since fields are compatible
+              final newLastMessage = LastMessage.fromJson(response['data']);
+              
+              // Create NEW ChatListModel with updated lastMessage (Immutability pattern)
+              final updatedChatItem = ChatListModel(
+                id: chatItem.id,
+                uuid: chatItem.uuid,
+                type: chatItem.type,
+                name: chatItem.name,
+                avatar: chatItem.avatar,
+                isOnline: chatItem.isOnline,
+                isAdmin: chatItem.isAdmin,
+                unreadCount: chatItem.unreadCount, // keeping unread count same
+                lastMessage: newLastMessage, // <--- UPDATE THIS
+                updatedAt: DateTime.now(), // Update timestamp
+                participantsCount: chatItem.participantsCount,
+                participants: chatItem.participants,
+              );
+
+              // Update List and Refresh
+              chattController.chatList[index] = updatedChatItem;
+              
+              // Optional: Move to top
+              chattController.chatList.removeAt(index);
+              chattController.chatList.insert(0, updatedChatItem);
+              
+              chattController.chatList.refresh();
+            }
+          }
+        } catch (e) {
+          print("Error updating chat list: $e");
+        }
       }
     } catch (e, stk) {
       print("sendMessage error: $e,\n$stk");
@@ -802,7 +848,47 @@ class ChatMessagesController extends GetxController {
       log("sendFile response: $response");
 
       if (response != null && response["status"] == true) {
-        messages.add(ChatMessage.fromJson(response['data']));
+        final newMessage = ChatMessage.fromJson(response['data']);
+        messages.insert(0, newMessage);
+
+        // 🔥 CRITICAL: Update Dashboard List "Last Message" for Files too
+        try {
+          if (Get.isRegistered<ChattController>()) {
+            final chattController = Get.find<ChattController>();
+            
+            final index = chattController.chatList.indexWhere((e) => e.id == p.id);
+            if (index != -1) {
+              var chatItem = chattController.chatList[index];
+              final newLastMessage = LastMessage.fromJson(response['data']);
+              
+              final updatedChatItem = ChatListModel(
+                id: chatItem.id,
+                uuid: chatItem.uuid,
+                type: chatItem.type,
+                name: chatItem.name,
+                avatar: chatItem.avatar,
+                isOnline: chatItem.isOnline,
+                isAdmin: chatItem.isAdmin,
+                unreadCount: chatItem.unreadCount, 
+                lastMessage: newLastMessage, 
+                updatedAt: DateTime.now(), 
+                participantsCount: chatItem.participantsCount,
+                participants: chatItem.participants,
+              );
+
+              // Update List and Refresh
+              chattController.chatList[index] = updatedChatItem;
+              
+              // Move to top
+              chattController.chatList.removeAt(index);
+              chattController.chatList.insert(0, updatedChatItem);
+              
+              chattController.chatList.refresh();
+            }
+          }
+        } catch (e) {
+          print("Error updating chat list (file): $e");
+        }
       } else {
          CustomSnackBar.showError(message: response?['message'] ?? "Failed to send file");
       }

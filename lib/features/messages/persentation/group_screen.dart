@@ -21,88 +21,102 @@ class GroupScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ChattController controller = Get.put(ChattController());
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: AppColors.lightBackgroundGradient,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
+      color: Colors.white, // Clean White Background
       child: Scaffold(
-        backgroundColor: AppColors.transparent,
-        appBar: AppBar(
-          backgroundColor: AppColors.transparent,
-          elevation: 0,
-          centerTitle: true,
-          leading: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GestureDetector(
-              onTap: (){
-                Get.to(ProfileScreen());
-              },
-              child: CircleAvatar(
-                //  backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=1'),
-                backgroundImage: NetworkImage(AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString()),
+        backgroundColor: Colors.white,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(70),
+          child: AppBar(
+            backgroundColor: AppColors.primary,
+            elevation: 0,
+            centerTitle: true,
+            leading: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: GestureDetector(
+                onTap: (){
+                  Get.to(ProfileScreen());
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: CircleAvatar(
+                    backgroundImage: NetworkImage(AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString()),
+                  ),
+                ),
               ),
             ),
-          ),
-          title: const Text(
-            'i-group',
-            style: TextStyle(
-              color: Colors.black87,
-              fontWeight: FontWeight.w600,
+            title: const Text(
+              'Groups', // Changed from i-group for consistency
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                letterSpacing: 0.5,
+              ),
             ),
+            // actions: [
+            //    IconButton(
+            //       icon: const Icon(
+            //         Icons.search,
+            //         color: Colors.white,
+            //         size: 26,
+            //       ),
+            //       onPressed: () {},
+            //     ),
+            //   Container(
+            //     margin: const EdgeInsets.only(right: 12),
+            //     child: IconButton(
+            //       icon: const Icon(
+            //         Icons.more_vert,
+            //         color: Colors.white,
+            //         size: 26,
+            //       ),
+            //       onPressed: () {},
+            //     ),
+            //   ),
+            // ],
           ),
-          // actions: [
-          //   IconButton(
-          //     icon: const Icon(Icons.search, color: Colors.black87),
-          //     onPressed: () {},
-          //   ),
-          //   IconButton(
-          //     icon: const Icon(Icons.more_vert_sharp, color: Colors.black87),
-          //     onPressed: () {},
-          //   ),
-          // ],
         ),
-        body:  Column(
+        body: Column(
           children: [
-
+            const SizedBox(height: 16),
+            
+            // Search Bar
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                height: 48,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: AppColors.neutralGray,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
                       CupertinoIcons.search,
-                      color: AppColors.lightTextSecondary,
-                      size: 22,
+                      color: Colors.grey.shade500,
+                      size: 20,
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: TextField(
                         onChanged: controller.searchedGroup,
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: const InputDecoration(
-                          hintText: 'Search',
-                          isDense: true,              // 🔥 key point
-                          contentPadding: EdgeInsets.zero, // 🔥 removes extra height
-                          border: InputBorder.none,
-                        ),
                         style: const TextStyle(
-                          color: Colors.black87,
+                          color: Colors.black,
+                          fontSize: 15,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Search groups...',
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade500,
+                            fontSize: 14,
+                          ),
+                          isDense: true,
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
                         ),
                       ),
                     ),
@@ -111,18 +125,31 @@ class GroupScreen extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
+            
             Obx(() {
               if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
+                return const Expanded(child: Center(child: CircularProgressIndicator(color: AppColors.primary)));
               }
               if (controller.groupChatList.isEmpty) {
-                return const Center(child: Text("No Chats Found"));
+                 return Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.group_outlined, size: 48, color: Colors.grey.shade300),
+                        const SizedBox(height: 12),
+                        Text("No groups found", style: TextStyle(color: Colors.grey.shade400)),
+                      ],
+                    ),
+                  ),
+                );
               }
               return Expanded(
-                child: ListView.builder(
+                child: ListView.separated(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   itemCount: controller.filteredGroupList.length,
+                  separatorBuilder: (ctx, i) => Divider(height: 1, indent: 80, color: Colors.grey.shade100),
                   itemBuilder: (context, index) {
                     final message = controller.filteredGroupList[index];
                     return InkWell(
@@ -132,97 +159,95 @@ class GroupScreen extends StatelessWidget {
                           arguments: message,
                         );
                       },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          // color: Colors.white,
-                          border: Border(
-                            bottom: BorderSide(color: AppColors.black),
-                          ),
-                        ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         child: Row(
                           children: [
-                            CircleAvatar(
-                              radius: 28,
-                              backgroundColor: Colors.grey.shade300,
-                              child:
-                              message.type == "group"
-                                  ? const Icon(
-                                Icons.group,
-                                color: Colors.black,
-                              )
-                                  : Text(
-                                message.name
-                                    .substring(0, 1)
-                                    .toUpperCase(),
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            // Avatar
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.grey.shade200,
+                              ),
+                              child: ClipOval(
+                                child: message.type == "group"
+                                    ? const Icon(Icons.group, color: Colors.grey)
+                                    : Center(
+                                        child: Text(
+                                          message.name.isNotEmpty ? message.name[0].toUpperCase() : "?",
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
+                                        ),
+                                      ),
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 14),
+                            
+                            // Content
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    message.name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          message.name,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600, // Slightly less bold than unread message
+                                            fontSize: 16,
+                                            color: Colors.black,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                       Text(
+                                        formatChatDate(message.updatedAt.toString()),
+                                        style: TextStyle(
+                                          color: Colors.grey.shade500,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   const SizedBox(height: 4),
-                                  Text(
-                                    message.lastMessage?.content ??
-                                        "click here to chat",
-                                    style: TextStyle(
-                                      color: Colors.grey.shade600,
-                                      fontSize: 13,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          message.lastMessage?.content ?? "No messages",
+                                          style: TextStyle(
+                                            color: Colors.black87, // Stronger color for readability
+                                            fontSize: 14,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      if (message.unreadCount! > 0)
+                                        Container(
+                                          margin: const EdgeInsets.only(left: 8),
+                                          padding: const EdgeInsets.all(6),
+                                          decoration: const BoxDecoration(
+                                            color: AppColors.primary,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Text(
+                                            message.unreadCount.toString(),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  formatChatDate(message.updatedAt.toString()),
-                                  style: TextStyle(
-                                    color: Colors.grey.shade500,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                if (message.unreadCount! > 0) ...[
-                                  const SizedBox(height: 4),
-                                  Container(
-                                    width: 20,
-                                    height: 20,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.red,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        message.unreadCount.toString(),
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ],
                             ),
                           ],
                         ),

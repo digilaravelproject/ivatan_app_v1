@@ -4,6 +4,7 @@ import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
 import '../../../core/network/api_services.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../search/model/mixed_feed_model.dart';
 
 /*
@@ -144,6 +145,16 @@ class ImagePostController extends GetxController {
 
 
   void share() {
-    // Implement share functionality
+    if (post.value == null) return;
+    
+    // Create shareable link
+    final String postUrl = "https://ivatan.in/post/${post.value!.id}";
+    final String shareText = "${post.value!.caption ?? 'Check out this post'}\n\n$postUrl";
+    
+    // Use share_plus to share
+    Share.share(shareText);
+    
+    // Optionally increment share count locally
+    shareCount.value++;
   }
 }
