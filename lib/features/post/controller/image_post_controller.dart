@@ -120,6 +120,10 @@ class ImagePostController extends GetxController {
         post.value!.stats.isLiked = newLikeStatus;
         post.value!.stats.likeCount = newCount;
 
+        // Update top-level reactive variables for UI binding
+        isLiked.value = newLikeStatus;
+        likeCount.value = newCount;
+
         // 🔄 Refresh only that post
         post.refresh();
       }

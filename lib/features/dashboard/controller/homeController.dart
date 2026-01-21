@@ -11,6 +11,7 @@ import '../model/post_model.dart';
 import '../model/story_model.dart';
 import '../persentation/greetingDialog.dart';
 import 'follow_controller.dart';
+import '../../reels_screen/controller/short_play_controller.dart';
 import 'settings_controller.dart';
 
 class HomeController extends GetxController {
@@ -276,6 +277,19 @@ class HomeController extends GetxController {
           }
         }
         postController.intrestedPostList.refresh();
+      }
+
+      // 4️⃣ Sync with ShortPlayController (Reels)
+      if (Get.isRegistered<ShortPlayController>()) {
+        final shortPlayController = Get.find<ShortPlayController>();
+        for (var reel in shortPlayController.reelsList) {
+          if (reel.user.id == userId) {
+            // we don't have a direct is_following reactive field in ReelModel 
+            // but the UI uses FollowController.isUserFollowing map which IS reactive.
+            // Still, refreshing the list can help if anything else depends on it.
+          }
+        }
+        shortPlayController.reelsList.refresh();
       }
       
     } catch (e) {

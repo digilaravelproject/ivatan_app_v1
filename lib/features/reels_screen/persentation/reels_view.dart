@@ -9,8 +9,13 @@ import 'package:iconly/iconly.dart';
 import 'package:video_player/video_player.dart';
 import '../../../core/helper/custom_image_view.dart';
 import '../../../core/utils/app_icons.dart';
+import '../../../../core/network/app_urls.dart';
+import '../../dashboard/controller/follow_controller.dart';
+import '../../dashboard/controller/homeController.dart';
 import '../../dashboard/controller/navigationController.dart';
 import '../../dashboard/persentation/home_screen.dart';
+import '../../dashboard/persentation/widgets/feed_media_widget.dart';
+import '../../post/presentation/image_post_screen.dart';
 import '../controller/short_play_controller.dart';
 import '../model/reel_model.dart';
 import 'package:share_plus/share_plus.dart';
@@ -809,7 +814,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
   final PageController pageViewController;
   final int index;
 
-  const ScreenOptions({
+  ScreenOptions({
     super.key,
     required this.item,
     required this.pageViewController,
@@ -861,8 +866,8 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
   Widget _buildUserInfo() {
     return InkWell(
       onTap: () {
-        final nav = Get.find<NavigationController>();
-        nav.changePage(4, username: item.user.username);
+        final nav = Get.find<DashboardController>();
+        nav.changeIndex(4, username: item.user.username);
       },
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -875,7 +880,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
             ),
             child: item.user.avatar.isNotEmpty
                 ? CustomImageView(
-                    url: item.user.avatar,
+                    url: AppUrls.getFullImageUrl(item.user.avatar),
                     height: 38,
                     width: 38,
                     radius: BorderRadius.circular(19),
@@ -906,14 +911,33 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                   ),
                    const SizedBox(width: 8),
                    // Simple Follow Button (Visual)
-                   Container(
-                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                     decoration: BoxDecoration(
-                       border: Border.all(color: Colors.white, width: 1),
-                       borderRadius: BorderRadius.circular(6),
-                     ),
-                     child: const Text("Follow", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-                   ),
+                   Obx(() {
+                     final homeController = Get.find<HomeController>();
+                     final isFollowing = homeController.followController.isUserFollowing(item.user.id, initialValue: item.isFollowing).value;
+                     
+                     // Hide follow button if it's my own reel
+                     if (item.isMine) return const SizedBox.shrink();
+
+                     return GestureDetector(
+                       onTap: () => homeController.toggleFollowForPostUser(item.user.id),
+                       child: Container(
+                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                         decoration: BoxDecoration(
+                           color: isFollowing ? Colors.white.withOpacity(0.2) : Colors.transparent,
+                           border: Border.all(color: Colors.white, width: 1),
+                           borderRadius: BorderRadius.circular(6),
+                         ),
+                         child: Text(
+                           isFollowing ? "Following" : "Follow",
+                           style: const TextStyle(
+                             color: Colors.white,
+                             fontSize: 10,
+                             fontWeight: FontWeight.bold,
+                           ),
+                         ),
+                       ),
+                     );
+                   }),
                 ],
               ),
             ],
@@ -1251,8 +1275,8 @@ class VideoProgressBar extends GetWidget<ShortPlayController> {
                 thumbShape: SliderComponentShape.noThumb, // Provide no thumb options
                 overlayShape: SliderComponentShape.noOverlay,
                 trackHeight: 2.0,
-                activeTrackColor: AppColors.secondary, // Using Secondary (Cyan) as Primary is Black
-                inactiveTrackColor: AppColors.secondary.withValues(alpha: 0.3),
+                activeTrackColor: Colors.black, // Changed from Cyan to Black
+                inactiveTrackColor: Colors.black.withOpacity(0.3),
                 trackShape: const RectangularSliderTrackShape(), // Full width
               ),
               child: Slider(

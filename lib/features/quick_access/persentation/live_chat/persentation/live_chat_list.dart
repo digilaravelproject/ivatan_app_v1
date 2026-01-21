@@ -11,15 +11,9 @@ class LiveChatList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: AppColors.lightBackgroundGradient,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
+      color: Colors.white,
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: AppColors.transparent,
           leading: GestureDetector(
@@ -29,6 +23,7 @@ class LiveChatList extends StatelessWidget {
             child: Icon(
               Icons.arrow_back_ios_new_rounded,
               color: AppColors.black,
+              size: 20,
             ),
           ),
           actions: [
@@ -57,15 +52,8 @@ class LiveChatList extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   height: 45,
                   decoration: BoxDecoration(
-                    color: AppColors. neutralGray,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     children: [
@@ -102,29 +90,33 @@ class LiveChatList extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "i-live chat",
+                          "Live Chat",
                           style: TextStyle(
                             color: AppColors.black,
-                            fontSize: 28,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          "120 Friends",
+                          "120 Friends Online",
                           style: TextStyle(
-                            color: AppColors.darkTextPrimary,
-                            fontSize: 16,
+                            color: Colors.grey.shade600,
+                            fontSize: 14,
                           ),
                         ),
                       ],
                     ),
                     Text(
                       "See All",
-                      style: TextStyle(color: AppColors.darkTextPrimary, fontSize: 16),
+                      style: TextStyle(
+                        color: AppColors.primary, 
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 16),
 
                 Expanded(
                   child: ListView.builder(
@@ -132,87 +124,121 @@ class LiveChatList extends StatelessWidget {
                     shrinkWrap: true,
                    // physics: NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.transparent,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AppColors.black),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 8,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
-
-                          child: IntrinsicHeight(
-                            child: Row(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment
-                                      .stretch,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: CustomImageView(
-                                    url:
-                                        "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp",
-                                    height: 60,
-                                    width: 60,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-
-                                SizedBox(width: 20),
-
-                                Expanded(
-                                  child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "National News",
-                                          style: TextStyle(
-                                            color: AppColors.black,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
+                      return Column(
+                        children: [
+                          InkWell(
+                            onTap: () {},
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              child: Row(
+                                children: [
+                                  Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: CustomImageView(
+                                          url: "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp",
+                                          height: 60,
+                                          width: 60,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(2),
+                                          decoration: const BoxDecoration(
+                                            color: Colors.white,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Container(
+                                            width: 12,
+                                            height: 12,
+                                            decoration: const BoxDecoration(
+                                              color: Colors.green,
+                                              shape: BoxShape.circle,
+                                            ),
                                           ),
                                         ),
-                                        Image.asset(
-                                          "assets/images/live.png",
-                                          height: 28,
-                                          width: 28,
-                                        ),
-                                      ],
-                                    ),
-                                ),
-
-                                // RIGHT → Bottom alignment works now
-                                Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.person_outlined,
-                                        color: AppColors.darkTextPrimary,
-                                      ),
-                                      Text(
-                                        "126K",
-                                        style: TextStyle(color: AppColors.darkTextPrimary),
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "National News Channel",
+                                          style: TextStyle(
+                                            color: AppColors.black,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 0.2,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: Colors.red.shade50,
+                                                borderRadius: BorderRadius.circular(4),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    width: 6,
+                                                    height: 6,
+                                                    decoration: const BoxDecoration(
+                                                      color: Colors.red,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  const Text(
+                                                    "LIVE",
+                                                    style: TextStyle(
+                                                      color: Colors.red,
+                                                      fontSize: 10,
+                                                      fontWeight: FontWeight.w800,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Icon(
+                                              Icons.remove_red_eye_outlined,
+                                              color: Colors.grey.shade600,
+                                              size: 14,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              "126K watching",
+                                              style: TextStyle(
+                                                color: Colors.grey.shade600,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 14,
+                                    color: Colors.grey.shade300,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
+                          Divider(height: 1, color: Colors.grey.shade50, indent: 76),
+                        ],
                       );
                     },
                   ),

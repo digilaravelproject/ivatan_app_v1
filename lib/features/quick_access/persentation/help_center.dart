@@ -15,15 +15,9 @@ class HelpCenter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: AppColors.lightBackgroundGradient,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
+        color: Colors.white,
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         appBar: AppBar(
           leadingWidth: 40, // 👈 default padding kam karega
           titleSpacing: 0,
@@ -45,208 +39,171 @@ class HelpCenter extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "i-live chat",
-                          style: TextStyle(
-                            color: AppColors.black,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  height: 45,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        CupertinoIcons.search,
+                        color: AppColors.lightTextSecondary,
+                        size: 22,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Search FAQs',
+                            hintStyle: TextStyle(
+                              color: AppColors.lightTextSecondary,
+                              fontSize: 16,
+                            ),
+                            border: InputBorder.none,
                           ),
-                        ),
-                        Text(
-                          "120 Friends",
-                          style: TextStyle(
-                            color: AppColors.darkTextPrimary,
+                          style: const TextStyle(
                             fontSize: 16,
+                            color: Colors.black87,
                           ),
                         ),
-                      ],
-                    ),
-                    Text(
-                      "See All",
-                      style: TextStyle(color: AppColors.darkTextPrimary, fontSize: 16),
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
-               // SizedBox(height: 20),
+                const SizedBox(height: 24),
+                const Text(
+                  "Frequently Asked Questions",
+                  style: TextStyle(
+                    color: AppColors.black,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  "Find quick answers to common questions",
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 20),
                 buildFAQList(),
                 SizedBox(height: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Chat with Agent",
-                      style: TextStyle(
-                        color: AppColors.black,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      "120 Friends",
-                      style: TextStyle(
-                        color: AppColors.darkTextPrimary,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
+                const Text(
+                  "Contact Support",
+                  style: TextStyle(
+                    color: AppColors.black,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  "Our team is here to help you 24/7",
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 14,
+                  ),
                 ),
                 SizedBox(height: 15),
-                Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: CustomImageView(
-                        url:
-                        "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp",
-                        height: 50,
-                        width: 50,
-                        fit: BoxFit.cover,
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: AppColors.black,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
-                    ),
-                    SizedBox(width: 10,),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
                         children: [
-                          Text(
-                            "Unknown",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.support_agent_rounded, color: Colors.white, size: 30),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Live Agent Chat",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  "Available 24/7 for you",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.white.withOpacity(0.7),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                            Text(
-                              "There are many variations of passages of Lorem I psum available",
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: AppColors.primaryDark,
-                              ),
-                            ),
                         ],
                       ),
-                    ),
-
-                    const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 5, horizontal: 0),
-                        child: Text(
-                          "10:20 AM",
-                          style: TextStyle(color: AppColors.darkTextPrimary),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColors.black,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            "Start Chat",
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
                         ),
                       ),
-
-                  ],
+                    ],
+                  ),
                 ),
-                SizedBox(height: 20,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Contact Number",
-                      style: TextStyle(
-                        color: AppColors.black,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      "See All",
-                      style: TextStyle(
-                        color: AppColors.darkTextPrimary,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 24),
+                const Text(
+                  "Direct Contact",
+                  style: TextStyle(
+                    color: AppColors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                SizedBox(height: 15,),
-                Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryDark,
-                        borderRadius: BorderRadius.all(Radius.circular(8),)
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 3),
-                        child: Icon(CupertinoIcons.phone_down_fill,color: AppColors.white,size: 20,),
-                      ),
-                    ),
-                    SizedBox(width: 10,),
-                    GestureDetector(
-                      onTap: (){
-                        faqController.makePhoneCall("9594885335");
-                      },
-                        child: Text("+91 9594885335",style: TextStyle(color: AppColors.black,fontSize: 22, fontWeight: FontWeight.w500),))
-                  ],
+                const SizedBox(height: 16),
+                _buildContactTile(
+                  icon: CupertinoIcons.phone_fill,
+                  title: "Call Us",
+                  subtitle: "+91 9594885335",
+                  onTap: () => faqController.makePhoneCall("9594885335"),
                 ),
-                SizedBox(height: 10,),
-                Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                          color: AppColors.primaryDark,
-                          borderRadius: BorderRadius.all(Radius.circular(8),)
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 3),
-                        child: Icon(CupertinoIcons.phone_down_fill,color: AppColors.white,size: 20,),
-                      ),
-                    ),
-                    SizedBox(width: 10,),
-                    GestureDetector(
-                      onTap: (){
-                        faqController.makePhoneCall("9594885335");
-                      },
-                        child: Text("+91 9594885335",style: TextStyle(color: AppColors.black,fontSize: 22,fontWeight:  FontWeight.w500),))
-                  ],
-                ),
-                SizedBox(height: 20,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Email ID",
-                      style: TextStyle(
-                        color: AppColors.black,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      "See All",
-                      style: TextStyle(
-                        color: AppColors.darkTextPrimary,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 10,),
-                Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                          color: AppColors.primaryDark,
-                          borderRadius: BorderRadius.all(Radius.circular(8),)
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 3),
-                        child: Icon(Icons.mail,color: AppColors.white,size: 20,),
-                      ),
-                    ),
-                    SizedBox(width: 10,),
-                    GestureDetector(
-                      onTap: (){
-                        faqController.openEmail("info@ivatan.com");
-                      },
-                        child: Text("info@ivatan.com",style: TextStyle(color: AppColors.black,fontSize: 22,fontWeight:  FontWeight.w500),))
-                  ],
+                const SizedBox(height: 12),
+                _buildContactTile(
+                  icon: Icons.mail_rounded,
+                  title: "Email Support",
+                  subtitle: "info@ivatan.com",
+                  onTap: () => faqController.openEmail("info@ivatan.com"),
                 ),
 
 
@@ -280,10 +237,10 @@ class HelpCenter extends StatelessWidget {
                       Expanded(
                         child: Text(
                           item.question,
-                          style: TextStyle(
-                            fontSize: 20,
+                          style: const TextStyle(
+                            fontSize: 16,
                             color: Colors.black,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
@@ -308,14 +265,15 @@ class HelpCenter extends StatelessWidget {
                 child: Text(
                   item.answer,
                   style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey.shade700,
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                    height: 1.5,
                   ),
                 ),
               )
                   : SizedBox()),
 
-              Divider(color: AppColors.black),
+              Divider(color: Colors.grey.shade100, height: 24),
             ],
           );
         },
@@ -324,4 +282,39 @@ class HelpCenter extends StatelessWidget {
   }
 
 
+  Widget _buildContactTile({required IconData icon, required String title, required String subtitle, required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade100),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.primary, size: 24),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 16, color: Colors.grey.shade800, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey.shade300),
+          ],
+        ),
+      ),
+    );
+  }
 }

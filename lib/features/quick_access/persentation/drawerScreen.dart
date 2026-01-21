@@ -10,7 +10,7 @@ import '../../../route/app_pages.dart';
 import '../../dashboard/controller/homeController.dart';
 import '../../dashboard/persentation/comming_soon.dart';
 import '../../dashboard/persentation/settings_page.dart';
-import 'contacts.dart';
+import '../../messages/persentation/contact_screen.dart';
 import 'help_center.dart';
 import 'history/historyScreen.dart';
 import 'live_chat/persentation/live_chat_list.dart';
@@ -28,150 +28,153 @@ class DrawerScreen extends StatelessWidget {
       ),
       width: MediaQuery.of(context).size.width * 0.75, // Slightly wider for better layout
       child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // --- HEADER ---
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.lightBackground,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.keyboard_arrow_left_rounded,
-                            color: AppColors.black,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      const Text(
-                        "Quick Access",
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: AppColors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  
-                  // --- SOS & BELL ROW ---
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildQuickActionButton(
-                        icon: CupertinoIcons.bell,
-                        label: null,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildQuickActionButton(
-                          icon: CupertinoIcons.exclamationmark_triangle,
-                          label: "SOS",
-                          isAlert: true,
-                        ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            
-            const Divider(height: 1, color: AppColors.lightDivider),
-            const SizedBox(height: 10),
-
-            // --- MENU ITEMS ---
-            Expanded(
-              child: SingleChildScrollView(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // --- HEADER ---
+              Padding(
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    drawerItem(Icons.live_help_outlined, "Live Chat", () {
-                      Get.to(LiveChatList());
-                    }),
-                    drawerItem(Icons.perm_contact_calendar_outlined, "Contact", () {
-                      Get.to(ContactScreen());
-                    }),
-                    drawerItem(Icons.format_list_numbered, "Playlist", () {
-                      Get.to(ComingSoonScreen());
-                    }),
-                    drawerItem(Icons.history, "History", () {
-                      Get.to(HistoryScreen());
-                    }),
-                    drawerItem(CupertinoIcons.home, "Banking", () {
-                      Get.to(ComingSoonScreen());
-                    }),
-                    drawerItem(Icons.settings_outlined, "Settings", () {
-                      Get.to(SettingsScreen());
-                    }),
-                    const SizedBox(height: 10),
-                    const Divider(height: 1, color: AppColors.lightDivider, indent: 20, endIndent: 20),
-                    drawerItem(Icons.logout, "Logout", () {
-                      _showLogoutDialog(context);
-                    }, isDestructive: true),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppColors.lightBackground,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.keyboard_arrow_left_rounded,
+                              color: AppColors.black,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        const Text(
+                          "Quick Access",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: AppColors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    
+                    // --- SOS & BELL ROW ---
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildQuickActionButton(
+                          context: context,
+                          icon: CupertinoIcons.bell_fill,
+                          label: null,
+                          onTap: () => showComingSoonDialog(context, title: "Notifications", message: "Your notification center is being redesigned for a better experience."),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildQuickActionButton(
+                            context: context,
+                            icon: CupertinoIcons.exclamationmark_shield_fill,
+                            label: "SOS HELP",
+                            isAlert: true,
+                            onTap: () => showComingSoonDialog(context, title: "Emergency SOS", message: "Emergency services integration is coming soon to your region."),
+                          ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),
-            ),
+              
+              const Divider(height: 1, color: AppColors.lightDivider),
+              const SizedBox(height: 10),
 
-            // --- BOTTOM SECTION ---
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.lightBackground,
-                border: const Border(top: BorderSide(color: AppColors.lightDivider)),
-              ),
-              child: Column(
+              // --- MENU ITEMS ---
+              Column(
                 children: [
-                   Row(
-                    children: [
-                      Expanded(child: _buildBottomCard("i-QuickHire", CupertinoIcons.briefcase)),
-                      const SizedBox(width: 12),
-                      Expanded(child: _buildBottomCard("Universal App", CupertinoIcons.app_badge)),
-                    ],
-                   ),
-                   const SizedBox(height: 16),
-                   GestureDetector(
-                    onTap: () => Get.to(HelpCenter()),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color: AppColors.black,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.support_agent_rounded, color: Colors.white, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            "Help Center",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                   ),
+                  drawerItem(Icons.live_help_outlined, "Live Chat", () {
+                    Get.to(LiveChatList());
+                  }),
+                  drawerItem(Icons.perm_contact_calendar_rounded, "Contact", () {
+                    Get.to(ContactPerson());
+                  }),
+                  drawerItem(Icons.format_list_numbered_rounded, "Playlist", () {
+                    showComingSoonDialog(context, title: "Playlist", message: "Create and manage your favorite video playlists soon.");
+                  }),
+                  drawerItem(Icons.history_rounded, "History", () {
+                    Get.to(HistoryScreen());
+                  }),
+                  drawerItem(Icons.account_balance_rounded, "Banking", () {
+                    showComingSoonDialog(context, title: "Banking", message: "Secure digital banking and wallet features are under development.");
+                  }),
+                  drawerItem(Icons.settings_outlined, "Settings", () {
+                    Get.to(SettingsScreen());
+                  }),
+                  const SizedBox(height: 10),
+                  const Divider(height: 1, color: AppColors.lightDivider, indent: 20, endIndent: 20),
+                  drawerItem(Icons.logout, "Logout", () {
+                    _showLogoutDialog(context);
+                  }, isDestructive: true),
                 ],
               ),
-            ),
-          ],
+
+              // --- BOTTOM SECTION ---
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.lightBackground,
+                  border: const Border(top: BorderSide(color: AppColors.lightDivider)),
+                ),
+                child: Column(
+                  children: [
+                      Row(
+                      children: [
+                        Expanded(child: _buildBottomCard(context, "i-QuickHire", CupertinoIcons.briefcase_fill, "Job Board")),
+                        const SizedBox(width: 12),
+                        Expanded(child: _buildBottomCard(context, "Universal App", CupertinoIcons.app_badge_fill, "Mini Apps")),
+                      ],
+                     ),
+                     const SizedBox(height: 16),
+                     GestureDetector(
+                      onTap: () => Get.to(HelpCenter()),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: AppColors.black,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.support_agent_rounded, color: Colors.white, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              "Help Center",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                     ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -180,92 +183,122 @@ class DrawerScreen extends StatelessWidget {
   Widget drawerItem(IconData icon, String title, VoidCallback onTap, {bool isDestructive = false}) {
     return InkWell(
       onTap: onTap,
+      splashColor: (isDestructive ? AppColors.error : AppColors.black).withOpacity(0.05),
+      highlightColor: Colors.transparent,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Row(
           children: [
-            Icon(icon, size: 24, color: isDestructive ? AppColors.error : AppColors.lightTextSecondary),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isDestructive ? AppColors.error.withOpacity(0.1) : Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                icon, 
+                size: 20, 
+                color: isDestructive ? AppColors.error : AppColors.black.withOpacity(0.7),
+              ),
+            ),
             const SizedBox(width: 16),
             Text(
               title,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 15,
                 color: isDestructive ? AppColors.error : AppColors.black,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
               ),
             ),
             const Spacer(),
-            Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey.shade300),
+            Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Colors.grey.shade300),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildQuickActionButton({required IconData icon, String? label, bool isAlert = false}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: isAlert ? AppColors.error.withOpacity(0.1) : AppColors.lightBackground,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isAlert ? AppColors.error : AppColors.lightBorder,
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: isAlert ? AppColors.error : AppColors.black,
-            size: 24,
-          ),
-          if (label != null) ...[
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: isAlert ? AppColors.error : AppColors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-              ),
+  Widget _buildQuickActionButton({required BuildContext context, required IconData icon, String? label, bool isAlert = false, VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isAlert ? AppColors.error : AppColors.black,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: (isAlert ? AppColors.error : AppColors.black).withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-          ]
-        ],
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: Colors.white,
+              size: 22,
+            ),
+            if (label != null) ...[
+              const SizedBox(width: 10),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ]
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildBottomCard(String title, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.lightBorder),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: AppColors.black, size: 22),
-          const SizedBox(height: 6),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: AppColors.black,
+  Widget _buildBottomCard(BuildContext context, String title, IconData icon, String subtitle) {
+    return GestureDetector(
+      onTap: () => showComingSoonDialog(context, title: title, message: "We're building a unique $subtitle experience for you. Stay tuned!"),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.lightDivider.withOpacity(0.5)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.lightBackground,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: AppColors.black, size: 20),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: AppColors.black,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -6,6 +6,7 @@ import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../dashboard/persentation/home_screen.dart';
 import '../controller/image_post_controller.dart';
+import '../../../core/network/app_urls.dart';
 
 // Controller
 class JobPostController extends GetxController {
@@ -263,13 +264,48 @@ class JobPostController extends GetxController {
   }
 }*/
 
-class ImagePostScreen extends StatelessWidget {
+class ImagePostScreen extends StatefulWidget {
   final int postId;
   ImagePostScreen({required this.postId});
 
   @override
+  State<ImagePostScreen> createState() => _ImagePostScreenState();
+}
+
+class _ImagePostScreenState extends State<ImagePostScreen> {
+  // Animation State
+  bool _showHeartAnimation = false;
+  Color _heartColor = Colors.white;
+
+  void _handleDoubleTap(ImagePostController controller, int postId) {
+    // 1. Toggle Like via Controller
+    controller.likePost(postId, 1);
+
+    // 2. Trigger HEART Animation in overlay
+    setState(() {
+      _showHeartAnimation = true;
+      // If we just liked it (was false, now true), red heart.
+      // If unliked (was true, now false), white broken heart or just white.
+      // Logic: controller.isLiked is ALREADY toggled by likePost?
+      // Actually likePost is async, but we want instant feedback.
+      // Ideally we assume success.
+      _heartColor = Colors.white; 
+    });
+
+    // 3. Hide animation after delay
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        setState(() {
+          _showHeartAnimation = false;
+        });
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ImagePostController(postId: postId));
+    // Put controller with unique tag to avoid singleton method sharing across different posts
+    final controller = Get.put(ImagePostController(postId: widget.postId), tag: widget.postId.toString());
 
     return Container(
       decoration: BoxDecoration(
@@ -299,6 +335,7 @@ class ImagePostScreen extends StatelessWidget {
 
           return Stack(
             children: [
+              // Main Image Area
               Positioned(
                 top: 20,
                 left: 12,
@@ -308,27 +345,61 @@ class ImagePostScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
                     color: Colors.transparent,
-                    child: InteractiveViewer(
-                      child: SizedBox.expand(
-                        child:
-                            post.media.isNotEmpty
-                                ? Image.network(
-                                  post.media.first.url,
-                                  fit: BoxFit.cover,
-                                )
-                                : Center(
-                                  child: Text(
-                                    "No Media",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
+                    child: GestureDetector(
+                      onDoubleTap: () => _handleDoubleTap(controller, widget.postId),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          
+                          // The Image
+                          InteractiveViewer(
+                            child: SizedBox.expand(
+                              child: post.media.isNotEmpty
+                                  ? Image.network(
+                                      AppUrls.getFullImageUrl(post.media.first.url),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Center(
+                                      child: Text(
+                                        "No Media",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                            ),
+                          ),
+
+                          // Heart Animation Overlay
+                           if (_showHeartAnimation)
+                             TweenAnimationBuilder<double>(
+                               tween: Tween(begin: 0.5, end: 1.2),
+                               duration: const Duration(milliseconds: 400),
+                               curve: Curves.elasticOut,
+                               builder: (context, value, child) {
+                                  return Transform.scale(
+                                    scale: value,
+                                    child: Icon(
+                                      Icons.favorite,
+                                      color: _heartColor,
+                                      size: 110,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black26,
+                                          blurRadius: 10,
+                                          offset: Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                               },
+                             ),
+                        ],
                       ),
                     ),
                   ),
                 ),
               ),
 
-              // User info at bottom
+              // User Info (Bottom)
               Positioned(
                 left: 0,
                 right: 0,
@@ -343,7 +414,7 @@ class ImagePostScreen extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 22,
-                        backgroundImage: NetworkImage(post.user.avatar),
+                        backgroundImage: NetworkImage(AppUrls.getFullImageUrl(post.user.avatar)),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -376,7 +447,7 @@ class ImagePostScreen extends StatelessWidget {
               ),
 
               // Side Actions
-              _buildSideActions(context,controller),
+              _buildSideActions(context, controller),
             ],
           );
         }),
@@ -384,29 +455,48 @@ class ImagePostScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSideActions(BuildContext context,ImagePostController controller) {
+  Widget _buildSideActions(BuildContext context, ImagePostController controller) {
     return Positioned(
       right: 12,
       bottom: 120,
       child: Column(
         children: [
-          Obx(
-            () => _actionButton(
-              icon:
-                  controller.post.value!.stats.isLiked == true
-                      ? Icons.favorite
-                      : Icons.favorite_border,
-              color:
-                  controller.post.value!.stats.isLiked == true
-                      ? Colors.red
-                      : Colors.grey,
-
-              count: controller.post.value!.stats.likeCount,
-              // color: controller.isLiked.value ? Colors.red : Colors.white,
-              onTap: () => controller.likePost(postId, 1),
-            ),
-          ),
+          // Like Button with Animation
+          Obx(() {
+            final isLiked = controller.isLiked.value;
+            return Column(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                     // manual toggle
+                     controller.likePost(widget.postId, 1);
+                  },
+                  child: CircleAvatar(
+                    radius: 22,
+                    backgroundColor: Colors.black.withOpacity(0.6),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                      child: Icon(
+                        isLiked ? Icons.favorite : Icons.favorite_border,
+                        key: ValueKey(isLiked),
+                        color: isLiked ? Colors.red : Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${controller.likeCount.value}',
+                  style: const TextStyle(color: Colors.white, fontSize: 11),
+                ),
+              ],
+            );
+          }),
           const SizedBox(height: 18),
+          
+          // Comment Button
           Obx(
             () => _actionButton(
               icon: Icons.chat_bubble_outline,
@@ -425,6 +515,8 @@ class ImagePostScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 18),
+          
+          // Share Button
           Obx(
             () => _actionButton(
               icon: Icons.share,

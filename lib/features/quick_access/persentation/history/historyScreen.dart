@@ -9,15 +9,9 @@ class HistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: AppColors.lightBackgroundGradient,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
+      color: Colors.white,
       child: Scaffold(
-          backgroundColor: Colors.transparent,
+          backgroundColor: Colors.white,
           appBar: AppBar(
             leadingWidth: 40, // 👈 default padding kam karega
             titleSpacing: 0,
@@ -31,7 +25,27 @@ class HistoryScreen extends StatelessWidget {
                 color: AppColors.black,
               ),
             ),
-            title: Text("History"),
+            title: Text(
+              "History",
+              style: TextStyle(
+                color: AppColors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {},
+                child: Text(
+                  "Clear",
+                  style: TextStyle(
+                    color: AppColors.error,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
           ),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
@@ -42,15 +56,8 @@ class HistoryScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     height: 45,
                     decoration: BoxDecoration(
-                      color: AppColors.neutralGray,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
@@ -90,159 +97,94 @@ class HistoryScreen extends StatelessWidget {
                             "Long Video",
                             style: TextStyle(
                               color: AppColors.black,
-                              fontSize: 26,
+                              fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            "120 Friends",
+                            "Watch history",
                             style: TextStyle(
-                              color: AppColors.darkTextPrimary,
-                              fontSize: 16,
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
                             ),
                           ),
                         ],
                       ),
                       Text(
                         "See All",
-                        style: TextStyle(color: AppColors.darkTextPrimary, fontSize: 16),
+                        style: TextStyle(
+                          color: AppColors.primary, 
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 1),
-                    height: AppSizer.deviceHeight38,
-                    // decoration: BoxDecoration(
-                    //   color: AppColors.gray,
-                    //   borderRadius: BorderRadius.circular(10),
-                    //   boxShadow: [
-                    //     BoxShadow(
-                    //       color: Colors.black.withOpacity(0.05),
-                    //       blurRadius: 8,
-                    //       offset: const Offset(0, 2),
-                    //     ),
-                    //   ],
-                    // ),
-                    child:SizedBox(
-                      height: 300, // set card height as needed
+                  const SizedBox(height: 16),
+                    SizedBox(
+                      height: 250,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: 10, // your dynamic count
-                        padding: EdgeInsets.only(left: 16),
+                        itemCount: 10,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemBuilder: (context, index) {
                           return Container(
-                            width: 250, // card width
-                            margin: EdgeInsets.only(right: 16),
-                            child: Stack(
+                            width: 200,
+                            margin: const EdgeInsets.only(right: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Background Image
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: Image.network(
-                                    "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp",
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-
-                                // Gradient Overlay
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Colors.transparent,
-                                        Colors.black.withOpacity(0.7)
-                                      ],
-                                    ),
-                                  ),
-                                ),
-
-                                // Views Counter (Top Left)
-                                Positioned(
-                                  top: 16,
-                                  left: 16,
-                                  child: Row(
+                                Expanded(
+                                  child: Stack(
                                     children: [
-                                      Icon(Icons.remove_red_eye, color: Colors.white, size: 16),
-                                      SizedBox(width: 6),
-                                      Text(
-                                        "views",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: Image.network(
+                                          "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp",
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: 10,
+                                        right: 10,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.black.withOpacity(0.7),
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: const Text(
+                                            "10:45",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-
-                                // Bookmark Icon (Top Right)
-                                Positioned(
-                                  top: 10,
-                                  right: 10,
-                                  child: Icon(
-                                    Icons.subscriptions,
-                                    color: Colors.white,
-                                    size: 28,
+                                const SizedBox(height: 8),
+                                const Text(
+                                  "The Best Nature Scenes in 4K Ultra HD",
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
                                   ),
                                 ),
-
-                                // Bottom Icons (Likes, Comments, Share)
-                                Positioned(
-                                  bottom: 0,
-                                  left: 0,
-                                  right: 0,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Column(
-                                          children: [
-                                            Icon(Icons.favorite,
-                                                color: Colors.red, size: 32),
-                                            Text(
-                                              "12.3K",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold),
-                                            )
-                                          ],
-                                        ),
-                                        Column(
-                                          children: [
-                                            Icon(Icons.comment,
-                                                color: Colors.white, size: 32),
-                                            Text(
-                                              "12.3K",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold),
-                                            )
-                                          ],
-                                        ),
-                                        Column(
-                                          children: [
-                                            Icon(Icons.share,
-                                                color: Colors.white, size: 32),
-                                            Text(
-                                              "12.3K",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold),
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  "12.3K views • 2 days ago",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey.shade600,
                                   ),
                                 ),
                               ],
@@ -252,114 +194,76 @@ class HistoryScreen extends StatelessWidget {
                       ),
                     ),
 
-                    /* Stack(
-                        children: [
-                          // Background Image
-
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Image.network(
-                              "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp",
-                              width: double.infinity,
-                              height: double.infinity,
-                              fit: BoxFit.cover,
-
-                            ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Recent Activity",
+                          style: TextStyle(
+                            color: AppColors.black,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
                           ),
-
-
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                        ),
+                        Icon(Icons.tune_rounded, color: Colors.grey.shade400, size: 20),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: 5,
+                      padding: EdgeInsets.zero,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp",
+                                  width: 120,
+                                  height: 70,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                            ),
-                          ),
-
-                          // Views Counter (Top Left)
-                          Positioned(
-                            top: 16,
-                            left: 16,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              // decoration: BoxDecoration(
-                              //   color: Colors.black.withOpacity(0.5),
-                              //   borderRadius: BorderRadius.circular(20),
-                              // ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.remove_red_eye, color: Colors.white, size: 16),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    "views",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Top 10 Cities to Visit in 2024",
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.black,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      "Travel Guide • 45K views",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey.shade500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ),
-
-                          // Bookmark Icon (Top Right)
-                          Positioned(
-                            top: 10,
-                            right: 10,
-                            child: Container(
-                              padding: EdgeInsets.all(8),
-                              // decoration: BoxDecoration(
-                              //   color: Colors.white,
-                              //   borderRadius: BorderRadius.circular(10),
-                              // ),
-                              child: Icon(
-                                Icons.subscriptions,
-                                color: AppColors.white,
-                                size: 28,
+                              IconButton(
+                                icon: Icon(Icons.more_vert, color: Colors.grey.shade400, size: 18),
+                                onPressed: () {},
                               ),
-                            ),
+                            ],
                           ),
-
-                          // Bottom Content
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    children: [
-                                      Icon(Icons.favorite,color: Colors.red,size: 32,),
-                                      Text("12.3K",style: TextStyle(color: AppColors.white,fontSize: 18,fontWeight: FontWeight.bold),)
-                                    ],
-                                  ),
-                                  Column(
-                                    children: [
-                                      Icon(Icons.comment,color: Colors.white,size: 32,),
-                                      Text("12.3K",style: TextStyle(color: AppColors.white,fontSize: 18,fontWeight: FontWeight.bold),)
-                                    ],
-                                  ),
-                                  Column(
-                                    children: [
-                                      Icon(Icons.share,color: Colors.white,size: 32,),
-                                      Text("12.3K",style: TextStyle(color: AppColors.white,fontWeight: FontWeight.bold),)
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),*/
-                  ),
+                        );
+                      },
+                    ),
                 ],
               ),
             ),

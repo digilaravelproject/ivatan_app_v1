@@ -18,10 +18,9 @@ import 'feed_media_widget.dart';
 class FeedPostWidget extends StatelessWidget {
   final PostItem post;
   final int index;
-  final HomeController controller; 
-  // We use HomeController for like/follow logic. 
-  // If we want to support other controllers, we might need an abstract interface or pass callbacks.
-  // Given the current architecture, passing HomeController (or finding it) is easiest.
+  final dynamic controller; 
+  // We use dynamic to support HomeController and OwnPostController.
+  // Both must implement likePost(int, int) and followController access.
 
   const FeedPostWidget({
     Key? key, 
