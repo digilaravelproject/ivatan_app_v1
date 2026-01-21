@@ -6,20 +6,18 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../core/constants/app_assets.dart';
 import '../../../core/helper/expandable_text.dart';
-import '../../../core/network/app_urls.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../db/shared_pref_manager.dart';
 import '../../../core/helper/date_helper.dart';
 import '../../messages/persentation/dashboard.dart';
-import '../../post/presentation/image_post_screen.dart';
 import '../../profile/screen/profile_screen.dart';
 import '../../quick_access/persentation/drawerScreen.dart';
 import '../../story/persentation/storyfullview.dart';
-import '../../videos/persentation/play_video_screen.dart';
 import '../controller/comment_controller.dart';
 import '../controller/homeController.dart';
 import '../controller/create_story_controller.dart';
 import '../model/post_model.dart';
+import '../model/story_model.dart';
 import 'widgets/feed_media_widget.dart';
 
 class HomePage extends StatelessWidget {
@@ -120,22 +118,43 @@ class HomePage extends StatelessWidget {
                       child: Center(child: CircularProgressIndicator()),
                     );
                   }
+
+                 // Identify My Story vs Others
+                 final currentUserId = controller.currentUser.value?.id;
+                 UserStoryGroup? myStoryGroup;
+                 List<UserStoryGroup> otherStories = [];
+
+                 if (currentUserId != null) {
+                   // Split existing stories
+                   for (var group in controller.storyData) {
+                     if (group.user.id == currentUserId) {
+                       myStoryGroup = group;
+                     } else {
+                       otherStories.add(group);
+                     }
+                   }
+                 } else {
+                   otherStories = List.from(controller.storyData);
+                 }
                   
                 return Container(
-                  height: 160, // Rectangular Cards
+                  height: 160, // Restored height for Rectangular Cards
                   color: Colors.white,
                   padding: EdgeInsets.only(top: 12, bottom: 8),
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: controller.storyData.length + 1,
+                    itemCount: otherStories.length + 1, // +1 for "Your Story"
                     itemBuilder: (context, index) {
                       if (index == 0) {
-                        return _buildAddStoryButton(imageUrl);
+                        return _buildMyStoryItem(imageUrl, myStoryGroup);
                       }
 
-                      final storyIndex = index - 1;
-                      final story = controller.storyData[storyIndex];
+                      final story = otherStories[index - 1];
+                      
+                      // Safety check: If for some reason my story ends up here, label it correctly
+                      bool isMine = story.user.id == currentUserId || (story.stories.isNotEmpty && story.stories.first.is_mine);
+                      String displayName = isMine ? "Your Story" : story.user.name;
 
                       return GestureDetector(
                         onTap: () {
@@ -145,8 +164,7 @@ class HomePage extends StatelessWidget {
                           ));
                         },
                         child: _buildStoryCard(
-                          story.user.name,
-                          story.user.avatar ?? "",
+                          story, // Pass full story object
                         ),
                       );
                     },
@@ -213,33 +231,52 @@ class HomePage extends StatelessWidget {
   }
 
   // ============= ADD STORY BUTTON =============
-  // ============= ADD STORY BUTTON (RECTANGULAR) =============
-  Widget _buildAddStoryButton(String imageUrl) {
+  // ============= MY STORY ITEM (Index 0) =============
+  // ============= MY STORY ITEM (Index 0) =============
+  // ============= MY STORY ITEM (Index 0) =============
+  Widget _buildMyStoryItem(String userAvatar, UserStoryGroup? myStoryGroup) {
+    bool hasStory = myStoryGroup != null && myStoryGroup.stories.isNotEmpty;
+
     return GestureDetector(
       onTap: () {
-        final storyController = Get.put(StoryController());
-        storyController.showPickerOptions();
+        if (hasStory) {
+          Get.to(() => FullScreenStoryViewer(
+            stories: myStoryGroup!.stories,
+            initialIndex: 0,
+          ));
+        } else {
+          final storyController = Get.put(StoryController());
+          storyController.showPickerOptions();
+        }
       },
       child: Container(
         width: 85,
         margin: EdgeInsets.only(right: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: imageUrl.isNotEmpty ? Colors.black : null,
-          gradient: imageUrl.isEmpty 
-              ? LinearGradient(
-                  colors: [
-                    Color(0xFFFBAA47), 
-                    Color(0xFFD91A46), 
-                    Color(0xFFA60F93)
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
-          image: imageUrl.isNotEmpty
+          color: hasStory ? null : (userAvatar.isNotEmpty ? Colors.black : null),
+          gradient: hasStory 
+              ? (myStoryGroup!.hasUnseen 
+                  ? LinearGradient(
+                      colors: [Color(0xFFFBAA47), Color(0xFFD91A46), Color(0xFFA60F93)],
+                      begin: Alignment.bottomLeft,
+                      end: Alignment.topRight,
+                    )
+                  : LinearGradient( // Seen Gradient (Grey)
+                      colors: [Colors.grey.shade400, Colors.grey.shade600],
+                      begin: Alignment.bottomLeft,
+                      end: Alignment.topRight,
+                    ))
+              : (userAvatar.isEmpty 
+                  ? LinearGradient(
+                      colors: [Color(0xFFFBAA47), Color(0xFFD91A46), Color(0xFFA60F93)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : null),
+          image: (!hasStory && userAvatar.isNotEmpty)
               ? DecorationImage(
-                  image: NetworkImage(AppUrls.imageurl + imageUrl),
+                  image: NetworkImage(userAvatar), // Use user avatar for background if no story
                   fit: BoxFit.cover,
                   colorFilter: ColorFilter.mode(
                     Colors.black.withOpacity(0.5), 
@@ -248,34 +285,113 @@ class HomePage extends StatelessWidget {
                 )
               : null,
         ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Plus Icon
-            Icon(Icons.add_circle, color: Colors.white, size: 40),
-          ],
-        ),
+        padding: EdgeInsets.all(hasStory ? 2 : 0), 
+        child: hasStory
+            ? Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  color: Colors.white,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Stack(
+                     fit: StackFit.expand,
+                     children: [
+                        // Story Thumbnail / Media
+                        _buildStoryMedia(myStoryGroup!.stories.last),
+                        
+                        // Gradient Overlay
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            height: 40,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // Text Inside
+                        Positioned(
+                          bottom: 8,
+                          left: 4,
+                          right: 4,
+                          child: Text(
+                            "Your Story",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              shadows: [
+                                Shadow(color: Colors.black45, blurRadius: 2),
+                              ],
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                     ],
+                  ),
+                ),
+              )
+            : Stack(
+                alignment: Alignment.center,
+                children: [
+                  Icon(Icons.add_circle, color: Colors.white, size: 40),
+                  Positioned(
+                    bottom: 8,
+                    child: Text(
+                      "Add Story", // Updated from "Your Story" as requested
+                       style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  )
+                ],
+              ),
       ),
     );
   }
 
-  // ============= STORY CARD (RECTANGULAR) =============
-  Widget _buildStoryCard(String name, String imageUrl) {
+  // ============= STORY CARD (OTHERS) =============
+  Widget _buildStoryCard(UserStoryGroup story) {
+    bool hasUnseen = story.hasUnseen;
+    String name = story.user.name;
+    // Safety check for name
+    if (story.user.id == controller.currentUser.value?.id || (story.stories.isNotEmpty && story.stories.first.is_mine)) {
+        name = "Your Story";
+    }
+
     return Container(
       width: 85,
       margin: EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          colors: [Color(0xFFFBAA47), Color(0xFFD91A46), Color(0xFFA60F93)],
-          begin: Alignment.bottomLeft,
-          end: Alignment.topRight,
-        ),
+        gradient: hasUnseen 
+            ? LinearGradient(
+                colors: [Color(0xFFFBAA47), Color(0xFFD91A46), Color(0xFFA60F93)],
+                begin: Alignment.bottomLeft,
+                end: Alignment.topRight,
+              )
+            : LinearGradient( // Seen Gradient (Grey)
+                colors: [Colors.grey.shade400, Colors.grey.shade600],
+                begin: Alignment.bottomLeft,
+                end: Alignment.topRight,
+              ),
       ),
-      padding: EdgeInsets.all(2), // Generic border width
+      padding: EdgeInsets.all(2), 
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14), // Inner radius
+          borderRadius: BorderRadius.circular(14), 
           color: Colors.white,
         ),
         child: ClipRRect(
@@ -283,24 +399,13 @@ class HomePage extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // User Image
-              imageUrl.isNotEmpty 
-                  ? Image.network(
-                      imageUrl, 
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey.shade200,
-                          child: Icon(Icons.person, color: Colors.grey),
-                        );
-                      },
-                    )
-                  : Container(
-                      color: Colors.grey.shade200,
-                      child: Icon(Icons.person, color: Colors.grey),
-                    ),
+              // User Image / Story Media
+              if (story.stories.isNotEmpty)
+                 _buildStoryMedia(story.stories.last)
+              else 
+                 _buildUserAvatar(story.user.avatar),
               
-              // Gradient Overlay for Text Readability
+              // Gradient Overlay
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -317,7 +422,7 @@ class HomePage extends StatelessWidget {
                 ),
               ),
 
-              // Username Text
+              // Username Text Inside
               Positioned(
                 bottom: 8,
                 left: 4,
@@ -339,6 +444,54 @@ class HomePage extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  // Helper to build robust media preview
+  Widget _buildStoryMedia(StoryModel story) {
+    // 1. Try Thumbnail
+    if (story.thumbnailUrl.isNotEmpty) {
+      return Image.network(
+        story.thumbnailUrl, 
+        fit: BoxFit.cover,
+        errorBuilder: (ctx, err, stack) => _buildErrorFallback(story.type),
+      );
+    }
+    
+    // 2. Try Media URL if Image
+    if (story.type == 'image' && story.mediaUrl.isNotEmpty) {
+      return Image.network(
+        story.mediaUrl, 
+        fit: BoxFit.cover,
+        errorBuilder: (ctx, err, stack) => _buildErrorFallback(story.type),
+      );
+    }
+
+    // 3. Fallback for Video without thumbnail or Error
+    return _buildErrorFallback(story.type);
+  }
+
+  Widget _buildUserAvatar(String? avatarUrl) {
+    if (avatarUrl != null && avatarUrl.isNotEmpty) {
+       return Image.network(
+          avatarUrl,
+          fit: BoxFit.cover,
+          errorBuilder: (ctx, err, stack) => Container(color: Colors.grey.shade200, child: Icon(Icons.person, color: Colors.grey)),
+       );
+    }
+    return Container(color: Colors.grey.shade200, child: Icon(Icons.person, color: Colors.grey));
+  }
+
+  Widget _buildErrorFallback(String type) {
+    return Container(
+      color: Colors.grey.shade900,
+      child: Center(
+        child: Icon(
+          type == 'video' ? Icons.videocam : Icons.broken_image,
+          color: Colors.white54,
+          size: 24
         ),
       ),
     );
