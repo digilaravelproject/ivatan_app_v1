@@ -14,86 +14,126 @@ class OnboardingPage extends StatelessWidget {
     final pageController = PageController();
 
     return Scaffold(
-      body: SafeArea(
-        child: PageView.builder(
-          controller: pageController,
-          onPageChanged: controller.updatePage,
-          itemCount: controller.onboardingList.length,
-          itemBuilder: (context, index) {
-            final item = controller.onboardingList[index];
-            return Stack(
-              fit: StackFit.expand,
-              children: [
-                // 🖼 Fullscreen background image
-                Image.asset(item.image, fit: BoxFit.fill),
-
-                // 🌫 Dark overlay for text contrast
-                Container(color: Colors.black.withOpacity(0.3)),
-
-                Positioned(
-                  bottom: 120,
-                  left: 24,
-                  right: 24,
-                  child: Column(
-                    children: [
-                      Text(
-                        item.title,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        item.description,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.white70,
-                        ),
-                      ),
-                    ],
+      body: Stack(
+        children: [
+          PageView.builder(
+            controller: pageController,
+            onPageChanged: controller.updatePage,
+            itemCount: controller.onboardingList.length,
+            itemBuilder: (context, index) {
+              final item = controller.onboardingList[index];
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  // 🖼 Fullscreen background image
+                  Image.asset(
+                    item.image,
+                    fit: BoxFit.cover,
                   ),
-                ),
-                Positioned(
-                  bottom: 90,
-                  left: 0,
-                  right: 0,
-                  child: Obx(
-                    () => Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        controller.onboardingList.length,
-                        (index) => AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          height: controller.currentPage.value == index ? 8 : 8,
-                          width: controller.currentPage.value == index ? 8 : 8,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color:
-                                controller.currentPage.value == index
-                                    ? AppColors.primary
-                                    : Colors.white54,
+
+                  // 🌫 Gradient Overlay (Better than flat opacity)
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.2), // Light top
+                          Colors.black.withValues(alpha: 0.8), // Dark bottom
+                        ],
+                        stops: const [0.5, 0.7, 1.0],
+                      ),
+                    ),
+                  ),
+
+                  Positioned(
+                    bottom: 150,
+                    left: 24,
+                    right: 24,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          item.title,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
                           ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          item.description,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white70,
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          
+          // Skip Button
+          Positioned(
+            top: 50,
+            right: 20,
+            child: TextButton(
+              onPressed: controller.goToNextPage, // Functionally skips to login/home
+              style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  backgroundColor: Colors.black12,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
+              ),
+              child: const Text("Skip"),
+            ),
+          ),
+
+          // Indicators & Button
+          Positioned(
+            bottom: 40,
+            left: 24,
+            right: 24,
+            child: Column(
+              children: [
+                // Indicators
+                Obx(
+                  () => Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      controller.onboardingList.length,
+                      (index) => AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        height: 6, // Slightly clearer dots
+                        width: controller.currentPage.value == index ? 24 : 6, // Dash effect
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(3),
+                          color: controller.currentPage.value == index
+                              ? AppColors.secondary // Cyan/Secondary stands out more
+                              : Colors.white38,
                         ),
                       ),
                     ),
                   ),
                 ),
-
-                Positioned(
-                  bottom: 30,
-                  left: 24,
-                  right: 24,
-                  child: MyButton(
-                    title:
-                        controller.currentPage.value ==
-                                controller.onboardingList.length - 1
-                            ? 'Get Started'
-                            : 'Next',
+                const SizedBox(height: 30),
+                
+                // Button
+                Obx(() => MyButton(
+                    title: controller.currentPage.value ==
+                            controller.onboardingList.length - 1
+                        ? 'Get Started'
+                        : 'Next',
                     onPressed: () {
                       if (controller.currentPage.value <
                           controller.onboardingList.length - 1) {
@@ -106,18 +146,18 @@ class OnboardingPage extends StatelessWidget {
                       }
                     },
                     gradient: const LinearGradient(
-                      colors: [AppColors.primaryDark, AppColors.primaryLight],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
+                      colors: [AppColors.secondary, AppColors.secondaryDark],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                    height: 40,
-                    borderRadius: 10,
+                    height: 50, // Slightly taller
+                    borderRadius: 25, // More rounded
                   ),
                 ),
               ],
-            );
-          },
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
