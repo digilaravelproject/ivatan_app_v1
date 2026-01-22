@@ -103,7 +103,8 @@ class DrawerScreen extends StatelessWidget {
               Column(
                 children: [
                   drawerItem(Icons.live_help_outlined, "Live Chat", () {
-                    Get.to(LiveChatList());
+                    // Get.to(LiveChatList());
+                    showComingSoonDialog(context, title: "Live Chat", message: "Connect with community members in real-time. Feature launching soon.");
                   }),
                   drawerItem(Icons.perm_contact_calendar_rounded, "Contact", () {
                     Get.to(ContactPerson());
@@ -112,7 +113,8 @@ class DrawerScreen extends StatelessWidget {
                     showComingSoonDialog(context, title: "Playlist", message: "Create and manage your favorite video playlists soon.");
                   }),
                   drawerItem(Icons.history_rounded, "History", () {
-                    Get.to(HistoryScreen());
+                    // Get.to(HistoryScreen());
+                    showComingSoonDialog(context, title: "History", message: "View your browsing and activity history. Feature coming soon.");
                   }),
                   drawerItem(Icons.account_balance_rounded, "Banking", () {
                     showComingSoonDialog(context, title: "Banking", message: "Secure digital banking and wallet features are under development.");

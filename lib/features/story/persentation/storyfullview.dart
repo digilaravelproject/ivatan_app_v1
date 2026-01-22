@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:better_player_plus/better_player_plus.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
@@ -40,7 +41,7 @@ class _FullScreenStoryViewerState extends State<FullScreenStoryViewer> {
   final TextEditingController messageController = TextEditingController();
   bool showSend = false;
   final FocusNode commentFocus = FocusNode();
-
+  bool imageLoaded = false; // Track if current image is loaded
 
   @override
   void initState() {
@@ -64,6 +65,7 @@ class _FullScreenStoryViewerState extends State<FullScreenStoryViewer> {
   void _loadStory(int index) async {
     _progressTimer?.cancel();
     progress = 0;
+    imageLoaded = false; // Reset for new story
 
     final story = widget.stories[index];
 
@@ -106,7 +108,8 @@ class _FullScreenStoryViewerState extends State<FullScreenStoryViewer> {
 
       setState(() {});
     } else {
-      _startProgress(duration: 4000); // image 4 sec
+      // For images, timer will start when image loads (via CachedNetworkImage callback)
+      setState(() {});
     }
   }
 
@@ -197,9 +200,29 @@ class _FullScreenStoryViewerState extends State<FullScreenStoryViewer> {
               }
 
               return Center(
-                child: Image.network(
-                  story.mediaUrl,
+                child: CachedNetworkImage(
+                  imageUrl: story.mediaUrl,
                   fit: BoxFit.cover,
+                  imageBuilder: (context, imageProvider) {
+                    // Image loaded successfully, start timer if not already started
+                    if (!imageLoaded) {
+                      imageLoaded = true;
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _startProgress(duration: 4000);
+                      });
+                    }
+                    return Image(image: imageProvider, fit: BoxFit.cover);
+                  },
+                  placeholder: (context, url) => Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Icon(
+                    Icons.error,
+                    color: Colors.white,
+                    size: 50,
+                  ),
                 ),
               );
 

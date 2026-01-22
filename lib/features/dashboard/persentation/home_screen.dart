@@ -65,17 +65,44 @@ class HomePage extends StatelessWidget {
               elevation: 0,
               automaticallyImplyLeading: false,
               toolbarHeight: 60,
-              title: Padding(
-                padding: const EdgeInsets.only(top: 8.0, left: 4),
-                child: Text(
-                  "iVatan", 
-                  style: TextStyle(
-                    fontFamily: 'Billabong', 
-                    fontSize: 32,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500,
+              title: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // App Logo - Clean Circular
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 4,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        AppAssets.imgAppLogo,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(width: 2),
+                  // Vatan Text
+                  Text(
+                    "-Vatan",
+                    style: TextStyle(
+                      fontFamily: 'Billabong',
+                      fontSize: 24,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
               ),
               actions: [
                 Stack(
@@ -128,7 +155,7 @@ class HomePage extends StatelessWidget {
                  if (currentUserId != null) {
                    // Split existing stories
                    for (var group in controller.storyData) {
-                     if (group.user.id == currentUserId) {
+                     if (group.user.id == currentUserId || (group.stories.isNotEmpty && group.stories.first.is_mine)) {
                        myStoryGroup = group;
                      } else {
                        otherStories.add(group);
@@ -139,7 +166,7 @@ class HomePage extends StatelessWidget {
                  }
                   
                 return Container(
-                  height: 160, // Restored height for Rectangular Cards
+                  height: 110, // Increased height to accommodate circular design with text below
                   color: Colors.white,
                   padding: EdgeInsets.only(top: 12, bottom: 8),
                   child: ListView.builder(
@@ -153,9 +180,10 @@ class HomePage extends StatelessWidget {
 
                       final story = otherStories[index - 1];
                       
-                      // Safety check: If for some reason my story ends up here, label it correctly
-                      bool isMine = story.user.id == currentUserId || (story.stories.isNotEmpty && story.stories.first.is_mine);
-                      String displayName = isMine ? "Your Story" : story.user.name;
+                      // Double-check: Skip if this is somehow the current user's story
+                      if (story.user.id == currentUserId || (story.stories.isNotEmpty && story.stories.first.is_mine)) {
+                        return SizedBox.shrink(); // Don't show duplicate
+                      }
 
                       return GestureDetector(
                         onTap: () {
@@ -238,127 +266,110 @@ class HomePage extends StatelessWidget {
   Widget _buildMyStoryItem(String userAvatar, UserStoryGroup? myStoryGroup) {
     bool hasStory = myStoryGroup != null && myStoryGroup.stories.isNotEmpty;
 
+
     return GestureDetector(
       onTap: () {
-        if (hasStory) {
+        if (myStoryGroup != null && myStoryGroup.stories.isNotEmpty) {
+          // View own story
           Get.to(() => FullScreenStoryViewer(
-            stories: myStoryGroup!.stories,
+            stories: myStoryGroup.stories,
             initialIndex: 0,
           ));
         } else {
+          // Add new story
           final storyController = Get.put(StoryController());
           storyController.showPickerOptions();
         }
       },
       child: Container(
-        width: 85,
+        width: 70,
         margin: EdgeInsets.only(right: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: hasStory ? null : (userAvatar.isNotEmpty ? Colors.black : null),
-          gradient: hasStory 
-              ? (myStoryGroup!.hasUnseen 
-                  ? LinearGradient(
+        child: Column(
+          children: [
+            // Circular Avatar with Gradient Border
+            Stack(
+              children: [
+                Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
                       colors: [Color(0xFFFBAA47), Color(0xFFD91A46), Color(0xFFA60F93)],
                       begin: Alignment.bottomLeft,
                       end: Alignment.topRight,
-                    )
-                  : LinearGradient( // Seen Gradient (Grey)
-                      colors: [Colors.grey.shade400, Colors.grey.shade600],
-                      begin: Alignment.bottomLeft,
-                      end: Alignment.topRight,
-                    ))
-              : (userAvatar.isEmpty 
-                  ? LinearGradient(
-                      colors: [Color(0xFFFBAA47), Color(0xFFD91A46), Color(0xFFA60F93)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : null),
-          image: (!hasStory && userAvatar.isNotEmpty)
-              ? DecorationImage(
-                  image: NetworkImage(AppUrls.getFullImageUrl(userAvatar)), // Use user avatar for background if no story
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                    Colors.black.withOpacity(0.5), 
-                    BlendMode.darken
+                    ),
                   ),
-                )
-              : null,
-        ),
-        padding: EdgeInsets.all(hasStory ? 2 : 0), 
-        child: hasStory
-            ? Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  color: Colors.white,
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: Stack(
-                     fit: StackFit.expand,
-                     children: [
-                        // Story Thumbnail / Media
-                        _buildStoryMedia(myStoryGroup!.stories.last),
-                        
-                        // Gradient Overlay
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          child: Container(
-                            height: 40,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ),
-                            ),
+                  padding: EdgeInsets.all(2),
+                  child: myStoryGroup != null && myStoryGroup.stories.isNotEmpty
+                    ? Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                        padding: EdgeInsets.all(2),
+                        child: ClipOval(
+                          child: _buildStoryMedia(myStoryGroup.stories.last),
+                        ),
+                      )
+                    : Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                        child: Center(
+                          child: Icon(
+                            Icons.add_circle,
+                            color: Color(0xFFD91A46),
+                            size: 35,
                           ),
                         ),
-
-                        // Text Inside
-                        Positioned(
-                          bottom: 8,
-                          left: 4,
-                          right: 4,
-                          child: Text(
-                            "Your Story",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              shadows: [
-                                Shadow(color: Colors.black45, blurRadius: 2),
-                              ],
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                     ],
-                  ),
+                      ),
                 ),
-              )
-            : Stack(
-                alignment: Alignment.center,
-                children: [
-                  Icon(Icons.add_circle, color: Colors.white, size: 40),
+                // Small plus icon on bottom-right when user has a story
+                if (myStoryGroup != null && myStoryGroup.stories.isNotEmpty)
                   Positioned(
-                    bottom: 8,
-                    child: Text(
-                      "Add Story", // Updated from "Your Story" as requested
-                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
+                    bottom: 0,
+                    right: 0,
+                    child: GestureDetector(
+                      onTap: () {
+                        // Add new story
+                        final storyController = Get.put(StoryController());
+                        storyController.showPickerOptions();
+                      },
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.blue,
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 14,
+                        ),
                       ),
                     ),
-                  )
-                ],
+                  ),
+              ],
+            ),
+            SizedBox(height: 2),
+            // Name below circle
+            Text(
+              myStoryGroup != null && myStoryGroup.stories.isNotEmpty ? "Your Story" : "Add Story",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black87,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -372,79 +383,62 @@ class HomePage extends StatelessWidget {
         name = "Your Story";
     }
 
-    return Container(
-      width: 85,
-      margin: EdgeInsets.only(right: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: hasUnseen 
-            ? LinearGradient(
-                colors: [Color(0xFFFBAA47), Color(0xFFD91A46), Color(0xFFA60F93)],
-                begin: Alignment.bottomLeft,
-                end: Alignment.topRight,
-              )
-            : LinearGradient( // Seen Gradient (Grey)
-                colors: [Colors.grey.shade400, Colors.grey.shade600],
-                begin: Alignment.bottomLeft,
-                end: Alignment.topRight,
-              ),
-      ),
-      padding: EdgeInsets.all(2), 
+    return GestureDetector(
+      onTap: () => Get.to(() => FullScreenStoryViewer(
+        stories: story.stories,
+        initialIndex: 0,
+      )),
       child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14), 
-          color: Colors.white,
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(14),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // User Image / Story Media
-              if (story.stories.isNotEmpty)
-                 _buildStoryMedia(story.stories.last)
-              else 
-                 _buildUserAvatar(story.user.avatar),
-              
-              // Gradient Overlay
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                  ),
+        width: 70,
+        margin: EdgeInsets.only(right: 12),
+        child: Column(
+          children: [
+            // Circular Avatar with Gradient Border
+            Container(
+              width: 70,
+              height: 70,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: hasUnseen 
+                    ? LinearGradient(
+                        colors: [Color(0xFFFBAA47), Color(0xFFD91A46), Color(0xFFA60F93)],
+                        begin: Alignment.bottomLeft,
+                        end: Alignment.topRight,
+                      )
+                    : LinearGradient( // Seen Gradient (Grey)
+                        colors: [Colors.grey.shade400, Colors.grey.shade600],
+                        begin: Alignment.bottomLeft,
+                        end: Alignment.topRight,
+                      ),
+              ),
+              padding: EdgeInsets.all(2),
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                ),
+                padding: EdgeInsets.all(2),
+                child: ClipOval(
+                  child: story.stories.isNotEmpty
+                      ? _buildStoryMedia(story.stories.last)
+                      : _buildUserAvatar(story.user.avatar),
                 ),
               ),
-
-              // Username Text Inside
-              Positioned(
-                bottom: 8,
-                left: 4,
-                right: 4,
-                child: Text(
-                  name,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    shadows: [
-                      Shadow(color: Colors.black45, blurRadius: 2),
-                    ],
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+            ),
+            SizedBox(height: 2),
+            // Name below circle
+            Text(
+              name,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black87,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
               ),
-            ],
-          ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
     );

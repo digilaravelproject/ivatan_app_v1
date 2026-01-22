@@ -336,13 +336,52 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
     );
   }
 
-  void _toggleLike() {
+  void _toggleLike() async {
+    final currentReel = widget.reels[_currentPage];
+    final homeController = Get.find<HomeController>();
+    final shortPlayController = Get.find<ShortPlayController>();
+    
+    // Optimistic UI update
+    final wasLiked = _isLiked.value;
     _isLiked.value = !_isLiked.value;
-    // widget.onLike?.call(widget.reels[_currentPage].id ?? "");
+    
+    // Update controller maps for UI button sync
+    if (shortPlayController.isLikedMap[_currentPage] != null) {
+      shortPlayController.isLikedMap[_currentPage]!.value = _isLiked.value;
+    }
+    
+    // Trigger animation only when liking
     if (_isLiked.value && widget.showLikeAnimation) {
       _likeAnimationController.forward().then((_) {
         _likeAnimationController.reverse();
       });
+    }
+    
+    // Call API (reels are always 'reel' type)
+    try {
+      await homeController.likePost(currentReel.id, _currentPage);
+      
+      // Update like count in the reel stats
+      if (_isLiked.value) {
+        currentReel.stats.likeCount = (currentReel.stats.likeCount) + 1;
+      } else {
+        currentReel.stats.likeCount = (currentReel.stats.likeCount) - 1;
+      }
+      currentReel.stats.isLiked = _isLiked.value;
+      
+      // Update controller like count for UI button
+      if (shortPlayController.likeCounts[_currentPage] != null) {
+        shortPlayController.likeCounts[_currentPage]!.value = currentReel.stats.likeCount;
+      }
+      
+      setState(() {}); // Refresh UI with new count
+    } catch (e) {
+      // Revert on error
+      _isLiked.value = wasLiked;
+      if (shortPlayController.isLikedMap[_currentPage] != null) {
+        shortPlayController.isLikedMap[_currentPage]!.value = wasLiked;
+      }
+      setState(() {});
     }
   }
 
@@ -599,7 +638,10 @@ class VideoReel extends StatelessWidget {
   //  final appBarHeight = AppBar().preferredSize.height + MediaQuery.of(context).padding.top;
     final bottomNavHeight = kBottomNavigationBarHeight;
     return GestureDetector(
-      onDoubleTap: allowDoubleTapToLike ? onLike : null,
+      onDoubleTap: allowDoubleTapToLike ? () {
+        // Simply call the like callback which will handle animation
+        onLike();
+      } : null,
       onLongPressStart: (_) => controller.pause(),
       onLongPressEnd: (_) => controller.play(),
       onTap: onToggleSound, // Use the callback
@@ -964,25 +1006,30 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
             onTap: () {
               controller.updateShortVideoLike(item.id, index);
             },
-            child: Column(
-              children: [
-                CustomIcon(
-                  svgString:
-                      controller.isLikedMap[index]?.value == true
-                          ? AppIcons.ic_heart_solid
-                          : AppIcons.ic_heart_outline,
-                  color:
-                      controller.isLikedMap[index]?.value == true
-                          ? Colors.red
-                          : Colors.white,
-                  removeColor: controller.isLikedMap[index]?.value == true,
-                  size: 30,
-                ),
-                Text(
-                  controller.likeCounts[index]?.value.toString() ?? "0",
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
+            child: AnimatedScale(
+              scale: controller.isLikedMap[index]?.value == true ? 1.0 : 0.95,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutBack,
+              child: Column(
+                children: [
+                  CustomIcon(
+                    svgString:
+                        controller.isLikedMap[index]?.value == true
+                            ? AppIcons.ic_heart_solid
+                            : AppIcons.ic_heart_outline,
+                    color:
+                        controller.isLikedMap[index]?.value == true
+                            ? Colors.red
+                            : Colors.white,
+                    removeColor: controller.isLikedMap[index]?.value == true,
+                    size: 30,
+                  ),
+                  Text(
+                    controller.likeCounts[index]?.value.toString() ?? "0",
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

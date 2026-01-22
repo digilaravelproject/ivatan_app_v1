@@ -31,7 +31,7 @@ import '../../messages/controller/chatt_controller.dart';
 import '../../messages/persentation/chatting_screen.dart';
 import '../../story/persentation/storyfullview.dart';
 import '../controller/profile_controller.dart';
-import 'follow_tabs.dart';
+import 'follow_tabs.dart' hide CustomEmptyState;
 import 'my_post.dart';
 import 'my_video_screen.dart';
 import 'profile_shop_screen.dart';
@@ -457,7 +457,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               scrollDirection: Axis.horizontal,
                                               itemCount: controller.highlights.length + 1,
                                               itemBuilder: (context, index) {
-                                                if (index == 0) return GestureDetector(onTap: (){}, child: _buildAddStory());
+                                                if (index == 0) return GestureDetector(
+                                                  onTap: (){
+                                                    showComingSoonDialog(context, 
+                                                      title: "Highlights", 
+                                                      message: "Create and manage your story highlights. Feature coming soon.");
+                                                  }, 
+                                                  child: _buildAddStory()
+                                                );
                                                 final story = controller.highlights[index - 1];
                                                 return GestureDetector(
                                                     onTap: () => Get.to(() => HighlightScreenStoryViewer(stories: story.stories, highlightId: story.id, initialIndex: 0)),
@@ -537,8 +544,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       MyPostScreen(username: finalUserName),
                       MyVideoScreen(username: finalUserName),
-                      const ProfileShopScreen(),
-                      ProfileLivePostsScreen(username: finalUserName),
+                      // const ProfileShopScreen(),
+                      CustomEmptyState(
+                        icon: Icons.shopping_bag_outlined,
+                        title: "Shop",
+                        subTitle: "Browse and sell products. Feature coming soon.",
+                      ),
+                      // ProfileLivePostsScreen(username: finalUserName),
+                      CustomEmptyState(
+                        icon: Icons.person_add_alt_1_outlined,
+                        title: "Tagged Posts",
+                        subTitle: "View posts where you're tagged. Feature coming soon.",
+                      ),
                     ],
                   ),
                 ),
