@@ -9,7 +9,9 @@ import '../controller/create_story_controller.dart';
 import 'createStoryScreen.dart';
 
 class StoryCameraScreen extends StatelessWidget {
-  const StoryCameraScreen({Key? key}) : super(key: key);
+  final Function(File file)? onMediaCaptured;
+
+  const StoryCameraScreen({Key? key, this.onMediaCaptured}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +67,14 @@ class StoryCameraScreen extends StatelessWidget {
                 if (single.file != null) {
                   final file = single.file!;
                   print('📁 File saved: ${file.path}');
+
+                  // If custom callback is provided, use it and avoid story logic
+                  if (onMediaCaptured != null) {
+                    onMediaCaptured!(File(file.path));
+                    return;
+                  }
                   
+                  // Default behavior (Story)
                   if (event.isPicture) {
                     controller.imageFile.value = File(file.path);
                     controller.videoFile.value = null;

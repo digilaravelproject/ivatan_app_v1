@@ -380,7 +380,33 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
   }
 
   void _showCameraOptions() {
-    // Navigate to custom camera screen
-    Get.to(() => const StoryCameraScreen());
+    Get.to(() => StoryCameraScreen(
+      onMediaCaptured: (File file) async {
+        Get.back(); // Close camera screen
+        
+        // Determine file type (simple check by extension or assumption based on capture mode)
+        // Since we don't have easy mime check here, we can infer or check extension
+        final isVideo = file.path.toLowerCase().endsWith('.mp4');
+        
+        if (isVideo) {
+          controller.videoFile.value = file;
+          controller.imageFile.value = null;
+          
+          final videoController = VideoPlayerController.file(file);
+          await videoController.initialize();
+          controller.videoController = videoController;
+          controller.isVideoInitialized.value = true;
+        } else {
+          controller.imageFile.value = file;
+          controller.videoFile.value = null;
+        }
+
+        controller.selectedType.value = 'post';
+        controller.selectedVisibility.value = 'public';
+        
+        Get.back(); // Close picker bottom sheet if still open (not needed if we navigated away)
+        Get.to(() => PreviewScreen(userName: currentUserName ?? ""));
+      },
+    ));
   }
 }

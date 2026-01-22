@@ -380,7 +380,46 @@ class _ReelMediaPickerScreenState extends State<ReelMediaPickerScreen> {
   }
 
   void _showCameraOptions() {
-    // Navigate to custom camera screen
-    Get.to(() => const StoryCameraScreen());
+    Get.to(() => StoryCameraScreen(
+      onMediaCaptured: (File file) async {
+        Get.back(); // Close camera screen
+        
+        // Reels are video only, but camera might capture photo if not restricted.
+        // Assuming video for now as per previous logic, or handling both.
+        // Ideally camera mode should be video-only for reels, but StoryCameraScreen handles both.
+        
+        // Determine file type
+        final isVideo = file.path.toLowerCase().endsWith('.mp4');
+        
+        if (isVideo) {
+          controller.videoFile.value = file;
+          controller.imageFile.value = null;
+          
+          final videoController = VideoPlayerController.file(file);
+          await videoController.initialize();
+          controller.videoController = videoController;
+          controller.isVideoInitialized.value = true;
+          
+          controller.selectedType.value = 'reel';
+          controller.selectedVisibility.value = 'public';
+          
+          Get.back(); // Close picker bottom sheet
+          Get.to(() => PreviewScreen(userName: currentUserName ?? ""));
+        } else {
+           // If photo captured for reel, maybe show error or treat as post?
+           // For now, let's allow it but it might not be a "reel" effectively.
+           // Or just treat as reel with image (slideshow potential).
+           Get.snackbar("Notice", "Reels are typically videos. Photo captured.");
+           
+           controller.imageFile.value = file;
+           controller.videoFile.value = null;
+           controller.selectedType.value = 'reel'; 
+           controller.selectedVisibility.value = 'public';
+           
+           Get.back();
+           Get.to(() => PreviewScreen(userName: currentUserName ?? ""));
+        }
+      },
+    ));
   }
 }
