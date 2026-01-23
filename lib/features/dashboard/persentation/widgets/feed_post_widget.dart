@@ -7,6 +7,8 @@ import '../../../../core/helper/date_helper.dart';
 import '../../../../core/helper/expandable_text.dart';
 import '../../../profile/screen/profile_screen.dart';
 import '../../controller/homeController.dart';
+import '../../../reels_screen/persentation/reels_view.dart';
+import '../../../reels_screen/model/reel_model.dart' as rm;
 import '../../model/post_model.dart';
 import '../home_screen.dart'; // For CommentsBottomSheet and _showSideMenu
 import 'feed_media_widget.dart';
@@ -183,6 +185,73 @@ class FeedPostWidget extends StatelessWidget {
               type: post.type,
               isLiked: post.stats.isLiked ?? false,
               onDoubleTap: () => controller.likePost(post.id, index),
+              onVideoTap: () {
+                // Navigate to ReelsView
+                // 1. Get all posts from controller
+                List<PostItem> allPosts = [];
+                try {
+                  allPosts = controller.posts; // Assuming controller has 'posts' list
+                } catch (e) {
+                   // Fallback if controller doesn't support it
+                   print("Error accessing controller.posts: $e");
+                   return;
+                }
+
+                // 2. Filter only videos/reels
+                final videoPosts = allPosts.where((p) {
+                   bool hasVideo = p.type == 'reel' || 
+                                   p.type == 'video' || 
+                                   (p.media.isNotEmpty && p.media.first.type == 'video');
+                   return hasVideo;
+                }).toList();
+
+                // 3. Find index of current post in video list
+                final reelIndex = videoPosts.indexWhere((p) => p.id == post.id);
+
+                if (reelIndex != -1) {
+                  // 4. Map to ReelModel
+                  List<rm.ReelModel> reelsList = videoPosts.map((item) {
+                     return rm.ReelModel(
+                      id: item.id,
+                      uuid: item.uuid, // Pass uuid if available
+                      caption: item.caption ?? "",
+                      isMine: item.is_mine,
+                      isFollowing: item.is_following,
+                      user: rm.UserModel(
+                         id: item.user.id,
+                         name: item.user.name,
+                         username: item.user.username,
+                         avatar: item.user.avatar,
+                         isVerified: item.user.isVerified,
+                         interests: item.user.interests // Add interests if required
+                      ),
+                      media: item.media.map((m) => rm.MediaModel(
+                          id: m.id,
+                          type: m.type,
+                          url: m.url,
+                          thumbnail: m.thumbnail,
+                          mimeType: m.mimeType
+                      )).toList(),
+                       // Helper or default stats
+                       stats: rm.ReelStats(
+                         likeCount: item.stats.likeCount,
+                         commentCount: item.stats.commentCount,
+                         shareCount: item.stats.shareCount,
+                         viewCount: item.stats.viewCount,
+                         isLiked: item.stats.isLiked,
+                         isSaved: item.stats.isSaved,
+                       ),
+                       createdAt: item.createdAt,
+                       createdHuman: item.createdHuman,
+                    );
+                  }).toList();
+                  
+                  Get.to(() => ReelsView(
+                    reels: reelsList,
+                    initialIndex: reelIndex,
+                  ));
+                }
+              },
             ),
 
           // ========== POST ACTIONS ==========

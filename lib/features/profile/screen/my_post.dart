@@ -8,6 +8,8 @@ import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../search/controller/mixed_feed_controller.dart';
 import '../../videos/persentation/play_video_screen.dart';
+import '../../reels_screen/persentation/reels_view.dart';
+import '../../reels_screen/model/reel_model.dart';
 import '../controller/ownpostController.dart';
 import 'profile_feed_screen.dart';
 
@@ -66,10 +68,59 @@ class MyPostScreen extends StatelessWidget {
 
                 return GestureDetector(
                   onTap: () {
-                    Get.to(() => ProfileFeedScreen(
-                      posts: controller.posts,
-                      initialIndex: index,
-                    ));
+                    if (item.type == 'reel') {
+                       // Filter only reels
+                       final reelsList = controller.posts.where((p) => p.type == 'reel').toList();
+                       // Find index in the new list
+                       final reelIndex = reelsList.indexWhere((r) => r.id == item.id);
+                       
+                       if (reelIndex != -1) {
+                         // Map to ReelModel
+                         final mappedReels = reelsList.map((p) => ReelModel(
+                           id: p.id,
+                           uuid: p.uuid,
+                           caption: p.caption,
+                           isMine: p.is_mine,
+                           isFollowing: p.is_following,
+                           user: UserModel(
+                             id: p.user.id,
+                             name: p.user.name,
+                             username: p.user.username,
+                             avatar: p.user.avatar ?? "",
+                             isVerified: p.user.isVerified,
+                             interests: "", // Default empty
+                           ),
+                           media: p.media.map((m) => MediaModel(
+                             id: m.id,
+                             type: m.type,
+                             url: m.url,
+                             thumbnail: m.thumbnail,
+                             mimeType: "", // Default empty if not available
+                           )).toList(),
+                           stats: ReelStats(
+                             likeCount: p.stats.likeCount ?? 0,
+                             isLiked: p.stats.isLiked ?? false,
+                             commentCount: p.stats.commentCount ?? 0,
+                             shareCount: p.stats.shareCount ?? 0,
+                             viewCount: p.stats.viewCount ?? 0,
+                             isSaved: p.stats.isSaved ?? false,
+                           ),
+                           createdAt: p.createdAt,
+                           createdHuman: p.createdHuman,
+                         )).toList();
+
+                         Get.to(() => ReelsView(
+                           reels: mappedReels,
+                           initialIndex: reelIndex,
+                         ));
+                       }
+                    } else {
+                      Get.to(() => ProfileFeedScreen(
+                        posts: controller.posts,
+                        initialIndex: index,
+                        controller: controller, // Pass the OwnPostController
+                      ));
+                    }
                   },
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),

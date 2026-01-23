@@ -8,11 +8,13 @@ import '../../dashboard/persentation/widgets/feed_post_widget.dart';
 class ProfileFeedScreen extends StatefulWidget {
   final List<PostItem> posts;
   final int initialIndex;
+  final dynamic controller; // Can be OwnPostController or HomeController
 
   const ProfileFeedScreen({
     Key? key,
     required this.posts,
     required this.initialIndex,
+    this.controller,
   }) : super(key: key);
 
   @override
@@ -20,24 +22,19 @@ class ProfileFeedScreen extends StatefulWidget {
 }
 
 class _ProfileFeedScreenState extends State<ProfileFeedScreen> {
-  // Using autoscroll to index is hard without fixed heights or a package.
-  // We will try a best-effort approach or just standard list.
   late ScrollController _scrollController;
-  final HomeController homeController = Get.find<HomeController>();
+  late dynamic finalController;
 
   @override
   void initState() {
     super.initState();
-    // Use a unique key for each item context? No.
-    // We'll just define the controller.
     _scrollController = ScrollController();
     
-    // Attempt to scroll to index using estimated height (e.g., 400px per post).
-    // This is not perfect but better than top.
+    // Fallback to HomeController if no controller passed
+    finalController = widget.controller ?? Get.find<HomeController>();
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
        if (widget.initialIndex > 0 && _scrollController.hasClients) {
-         // This is a rough estimate. 
-         // post height = header(60) + image(300-400) + actions(50) + text(~50) ~= 500
          double estimatedOffset = widget.initialIndex * 500.0; 
          _scrollController.jumpTo(estimatedOffset);
        }
@@ -71,20 +68,39 @@ class _ProfileFeedScreenState extends State<ProfileFeedScreen> {
         ),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        controller: _scrollController,
-        itemCount: widget.posts.length,
-        padding: const EdgeInsets.only(bottom: 20),
-        itemBuilder: (context, index) {
-          final post = widget.posts[index];
-          // Pass formatted index if needed, or just actual index
-          return FeedPostWidget(
-            post: post,
-            index: index,
-            controller: homeController,
-          );
-        },
-      ),
+      body: Obx(() {
+        // If the controller has a 'posts' observable list, utilize it.
+        // Otherwise, fallback to the initial list passed (non-reactive).
+        // Check if finalController has 'posts' property and if it is RxList?
+        // Dart dynamic dispatch handles property access. 
+        // We assume OwnPostController/HomeController has 'posts' which is RxList.
+        
+        List<PostItem> displayPosts = [];
+        try {
+          displayPosts = finalController.posts;
+        } catch (e) {
+          displayPosts = widget.posts;
+        }
+        
+        // If empty from controller, maybe use widget.posts as fallback or show empty
+        if (displayPosts.isEmpty && widget.posts.isNotEmpty) {
+           displayPosts = widget.posts;
+        }
+
+        return ListView.builder(
+          controller: _scrollController,
+          itemCount: displayPosts.length,
+          padding: const EdgeInsets.only(bottom: 20),
+          itemBuilder: (context, index) {
+            final post = displayPosts[index];
+            return FeedPostWidget(
+              post: post,
+              index: index,
+              controller: finalController,
+            );
+          },
+        );
+      }),
     );
   }
 }

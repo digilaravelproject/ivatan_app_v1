@@ -58,6 +58,7 @@ class ReelsView extends StatefulWidget {
   final bool showSettings;
   final bool showVolumeControl;
   final bool showPlayPause;
+  final int initialIndex;
   final bool showBuffering;
   final bool showReplay;
   final bool showGradient;
@@ -82,6 +83,7 @@ class ReelsView extends StatefulWidget {
   const ReelsView({
     super.key,
     required this.reels,
+    this.initialIndex = 0,
     this.onLike,
     this.onComment,
     this.onShare,
@@ -170,11 +172,15 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
         systemNavigationBarIconBrightness: Brightness.light,
       ),
     );
-    _pageController = PageController(initialPage: _currentPage);
+    _currentPage = widget.initialIndex;
+    _pageController = PageController(initialPage: widget.initialIndex);
     _videoControllers = List<VideoPlayerController?>.filled(
       widget.reels.length,
       null,
     );
+    
+    // Initialize the first batch of controllers
+    _initializeControllersForPage(_currentPage);
 
     _likeAnimationController = AnimationController(
       vsync: this,

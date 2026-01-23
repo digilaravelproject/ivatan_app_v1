@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
     return ResponsiveSizer(
       builder: (context, orientation, screen) {
         return GetMaterialApp(
-          title: 'i VatanApp-iApp',
+          title: 'iVatan',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

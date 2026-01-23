@@ -8,6 +8,7 @@ class FeedMediaWidget extends StatefulWidget {
   final List<PostMedia> media;
   final String type; // "image" or "video"
   final VoidCallback onDoubleTap;
+  final VoidCallback? onVideoTap;
   final bool isLiked;
 
   const FeedMediaWidget({
@@ -15,6 +16,7 @@ class FeedMediaWidget extends StatefulWidget {
     required this.media,
     required this.type,
     required this.onDoubleTap,
+    this.onVideoTap,
     required this.isLiked,
   }) : super(key: key);
 
@@ -30,7 +32,7 @@ class _FeedMediaWidgetState extends State<FeedMediaWidget> {
   Color _heartColor = Colors.red;
 
   void _handleDoubleTap() {
-    // 1. Always toggle (Like/Unlike) on double tap
+    // 1. Always toggle (Like/Unlike) on double tap for images AND videos
     widget.onDoubleTap();
     
     // 2. Determine color and show animation
@@ -52,8 +54,18 @@ class _FeedMediaWidgetState extends State<FeedMediaWidget> {
   Widget build(BuildContext context) {
     if (widget.media.isEmpty) return const SizedBox.shrink();
 
+    // Check if it's a video (either explicitly typed or first media item is video)
+    bool isVideo = widget.type == "video" || 
+                   (widget.media.isNotEmpty && widget.media.first.type == "video");
+
     return GestureDetector(
-      onDoubleTap: _handleDoubleTap,
+      onDoubleTap: _handleDoubleTap, // Restore double tap for ALL types
+      onTap: () {
+        // Handle single tap for video navigation
+        if (isVideo && widget.onVideoTap != null) {
+          widget.onVideoTap!();
+        }
+      },
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -137,8 +149,11 @@ class _FeedMediaWidgetState extends State<FeedMediaWidget> {
   }
 
   Widget _buildContent() {
-    // Single Video
-    if (widget.type == "video") {
+    // Check if it's a video (either explicitly typed or first media item is video)
+    bool isVideo = widget.type == "video" || 
+                   (widget.media.isNotEmpty && widget.media.first.type == "video");
+
+    if (isVideo && widget.media.isNotEmpty) {
       return FeedVideoPlayer(videoUrl: widget.media.first.url);
     }
 

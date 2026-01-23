@@ -1,11 +1,11 @@
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:i_vatan_app/db/shared_pref_manager.dart';
 
 import '../../../core/network/api_services.dart';
+import '../../dashboard/controller/follow_controller.dart';
+import '../../dashboard/controller/homeController.dart';
 import '../../dashboard/model/post_model.dart';
+import 'package:i_vatan_app/features/dashboard/controller/homeController.dart'; // Ensure absolute path if needed, or rely on relative.
 
 class OwnPostController extends GetxController {
 
@@ -135,5 +135,39 @@ class OwnPostController extends GetxController {
     }
   }
 
+  // Interaction Methods for FeedPostWidget
+  
+  // Getter for FollowController to support FeedPostWidget
+  FollowController get followController => Get.find<HomeController>().followController;
 
+  Future<void> likePost(int postId, int index) async {
+    // 1. Optimistic Update
+    final post = posts[index];
+    final bool currentLiked = post.stats.isLiked ?? false;
+    final int currentCount = post.stats.likeCount ?? 0;
+
+    post.stats.isLiked = !currentLiked;
+    post.stats.likeCount = currentLiked ? (currentCount - 1) : (currentCount + 1);
+    posts.refresh(); // Trigger GetX update
+
+    try {
+      // 2. API Call
+      await api.callPost("api/v1/posts/$postId/like", data: {});
+    } catch (e) {
+      // Revert if failed
+      post.stats.isLiked = currentLiked;
+      post.stats.likeCount = currentCount;
+      posts.refresh();
+      print("Error liking post: $e");
+    }
+  }
+
+  Future<void> toggleFollowForPostUser(int userId, int index) async {
+    // Implement follow logic or proxy to HomeController if feasible
+  }
+
+  void openReportBottomSheet({required int postId}) {
+     final HomeController homeController = Get.find<HomeController>();
+     homeController.openReportBottomSheet(postId: postId);
+  }
 }
