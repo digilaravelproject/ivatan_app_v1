@@ -294,6 +294,8 @@ class AppIcons {
 </svg>
 ''';
 
+  static const String ic_share ='''<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M494.533 172.016 378.634 56.117c-9.563-9.563-19.263-14.412-28.829-14.412-13.135 0-28.472 9.99-28.472 38.146v39.457c-84.204 3.67-162.839 38.203-222.815 98.176C34.994 281.004.006 365.459 0 455.293a15 15 0 0 0 26.992 9.01c70.819-94.266 177.439-149.975 294.341-154.373v38.85c0 28.154 15.337 38.146 28.471 38.146h.003c9.565 0 19.265-4.849 28.827-14.411l115.898-115.901C505.797 245.353 512 230.331 512 214.315c0-16.013-6.203-31.036-17.467-42.299z" fill="#000000" opacity="1" data-original="#000000" class=""></path></g></svg>''';
+
   static const String ic_expired_event =
   '''<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 24 24" style="enable-background:new 0 0 512 512" xml:space="preserve" class="">
   <g>
@@ -309,12 +311,12 @@ class AppIcons {
   </g>
 </svg>''';
 
-  static const String ic_share =
-      '''<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512" xml:space="preserve">
-  <g>
-    <path d="M406 332c-29.641 0-55.761 14.581-72.167 36.755L191.99 296.124c2.355-8.027 4.01-16.346 4.01-25.124 0-11.906-2.441-23.225-6.658-33.636l148.445-89.328C354.307 167.424 378.589 180 406 180c49.629 0 90-40.371 90-90S455.629 0 406 0s-90 40.371-90 90c0 11.437 2.355 22.286 6.262 32.358l-148.887 89.59C156.869 193.136 132.937 181 106 181c-49.629 0-90 40.371-90 90s40.371 90 90 90c30.13 0 56.691-15.009 73.035-37.806l141.376 72.395C317.807 403.995 316 412.75 316 422c0 49.629 40.371 90 90 90s90-40.371 90-90-40.371-90-90-90z" fill="#000000" opacity="1" data-original="#000000"></path>
-  </g>
-</svg>''';
+//   static const String ic_share =
+//       '''<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512" xml:space="preserve">
+//   <g>
+//     <path d="M406 332c-29.641 0-55.761 14.581-72.167 36.755L191.99 296.124c2.355-8.027 4.01-16.346 4.01-25.124 0-11.906-2.441-23.225-6.658-33.636l148.445-89.328C354.307 167.424 378.589 180 406 180c49.629 0 90-40.371 90-90S455.629 0 406 0s-90 40.371-90 90c0 11.437 2.355 22.286 6.262 32.358l-148.887 89.59C156.869 193.136 132.937 181 106 181c-49.629 0-90 40.371-90 90s40.371 90 90 90c30.13 0 56.691-15.009 73.035-37.806l141.376 72.395C317.807 403.995 316 412.75 316 422c0 49.629 40.371 90 90 90s90-40.371 90-90-40.371-90-90-90z" fill="#000000" opacity="1" data-original="#000000"></path>
+//   </g>
+// </svg>''';
 
   static const String ic_terms_and_condition =
       '''<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512" xml:space="preserve" class="">

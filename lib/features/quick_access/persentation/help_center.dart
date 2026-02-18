@@ -39,42 +39,42 @@ class HelpCenter extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  height: 45,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        CupertinoIcons.search,
-                        color: AppColors.lightTextSecondary,
-                        size: 22,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Search FAQs',
-                            hintStyle: TextStyle(
-                              color: AppColors.lightTextSecondary,
-                              fontSize: 16,
-                            ),
-                            border: InputBorder.none,
-                          ),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
+                // const SizedBox(height: 16),
+                // Container(
+                //   padding: const EdgeInsets.symmetric(horizontal: 14),
+                //   height: 45,
+                //   decoration: BoxDecoration(
+                //     color: Colors.grey.shade100,
+                //     borderRadius: BorderRadius.circular(12),
+                //   ),
+                //   child: Row(
+                //     children: [
+                //       Icon(
+                //         CupertinoIcons.search,
+                //         color: AppColors.lightTextSecondary,
+                //         size: 22,
+                //       ),
+                //       const SizedBox(width: 10),
+                //       Expanded(
+                //         child: TextField(
+                //           decoration: InputDecoration(
+                //             hintText: 'Search FAQs',
+                //             hintStyle: TextStyle(
+                //               color: AppColors.lightTextSecondary,
+                //               fontSize: 16,
+                //             ),
+                //             border: InputBorder.none,
+                //           ),
+                //           style: const TextStyle(
+                //             fontSize: 16,
+                //             color: Colors.black87,
+                //           ),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
+              //  const SizedBox(height: 24),
                 const Text(
                   "Frequently Asked Questions",
                   style: TextStyle(

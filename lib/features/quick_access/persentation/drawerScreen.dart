@@ -10,6 +10,7 @@ import '../../../route/app_pages.dart';
 import '../../dashboard/controller/homeController.dart';
 import '../../dashboard/persentation/comming_soon.dart';
 import '../../dashboard/persentation/settings_page.dart';
+import '../../job_portal/persentation/pages/job_portal_page.dart';
 import '../../messages/persentation/contact_screen.dart';
 import 'help_center.dart';
 import 'history/historyScreen.dart';
@@ -103,8 +104,8 @@ class DrawerScreen extends StatelessWidget {
               Column(
                 children: [
                   drawerItem(Icons.live_help_outlined, "Live Chat", () {
-                    // Get.to(LiveChatList());
-                    showComingSoonDialog(context, title: "Live Chat", message: "Connect with community members in real-time. Feature launching soon.");
+                     Get.to(LiveChatList());
+                   // showComingSoonDialog(context, title: "Live Chat", message: "Connect with community members in real-time. Feature launching soon.");
                   }),
                   drawerItem(Icons.perm_contact_calendar_rounded, "Contact", () {
                     Get.to(ContactPerson());
@@ -113,8 +114,8 @@ class DrawerScreen extends StatelessWidget {
                     showComingSoonDialog(context, title: "Playlist", message: "Create and manage your favorite video playlists soon.");
                   }),
                   drawerItem(Icons.history_rounded, "History", () {
-                    // Get.to(HistoryScreen());
-                    showComingSoonDialog(context, title: "History", message: "View your browsing and activity history. Feature coming soon.");
+                     Get.to(HistoryScreen());
+                   // showComingSoonDialog(context, title: "History", message: "View your browsing and activity history. Feature coming soon.");
                   }),
                   drawerItem(Icons.account_balance_rounded, "Banking", () {
                     showComingSoonDialog(context, title: "Banking", message: "Secure digital banking and wallet features are under development.");
@@ -141,7 +142,7 @@ class DrawerScreen extends StatelessWidget {
                   children: [
                       Row(
                       children: [
-                        Expanded(child: _buildBottomCard(context, "i-QuickHire", CupertinoIcons.briefcase_fill, "Job Board")),
+                       Expanded(child:_buildBottomCard(context, "i-QuickHire", CupertinoIcons.briefcase_fill, "Job Board")),
                         const SizedBox(width: 12),
                         Expanded(child: _buildBottomCard(context, "Universal App", CupertinoIcons.app_badge_fill, "Mini Apps")),
                       ],
@@ -264,7 +265,10 @@ class DrawerScreen extends StatelessWidget {
 
   Widget _buildBottomCard(BuildContext context, String title, IconData icon, String subtitle) {
     return GestureDetector(
-      onTap: () => showComingSoonDialog(context, title: title, message: "We're building a unique $subtitle experience for you. Stay tuned!"),
+      onTap: () {
+        Get.to(() => JobSearchScreen());
+        //showComingSoonDialog(context, title: title, message: "We're building a unique $subtitle experience for you. Stay tuned!"),
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(

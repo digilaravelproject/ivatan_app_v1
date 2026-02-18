@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -19,6 +20,7 @@ import '../../post/presentation/image_post_screen.dart';
 import '../controller/short_play_controller.dart';
 import '../model/reel_model.dart';
 import 'package:share_plus/share_plus.dart';
+
 typedef LikeCallback = void Function(String reelId);
 typedef CommentCallback = void Function(String reelId);
 typedef ShareCallback = void Function(String reelId);
@@ -158,10 +160,7 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.immersive,
-      overlays: [],
-    );
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: []);
 
     // ✅ Status bar color transparent
     SystemChrome.setSystemUIOverlayStyle(
@@ -178,7 +177,7 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
       widget.reels.length,
       null,
     );
-    
+
     // Initialize the first batch of controllers
     _initializeControllersForPage(_currentPage);
 
@@ -196,10 +195,12 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    _volumeAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(parent: _volumeAnimationController, curve: Curves.easeOut));
+    _volumeAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _volumeAnimationController,
+        curve: Curves.easeOut,
+      ),
+    );
 
     _dismissAnimationController = AnimationController(
       vsync: this,
@@ -245,7 +246,7 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
 
   void _toggleSound() {
     if (_videoControllers[_currentPage] == null) return;
-    
+
     final controller = _videoControllers[_currentPage]!;
     if (controller.value.volume > 0) {
       controller.setVolume(0.0);
@@ -257,9 +258,9 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
 
     _volumeAnimationController.reset();
     _volumeAnimationController.forward().then((_) {
-        Future.delayed(const Duration(milliseconds: 600), () {
-             if(mounted) _volumeAnimationController.reverse();
-        });
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if (mounted) _volumeAnimationController.reverse();
+      });
     });
   }
 
@@ -346,27 +347,27 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
     final currentReel = widget.reels[_currentPage];
     final homeController = Get.find<HomeController>();
     final shortPlayController = Get.find<ShortPlayController>();
-    
+
     // Optimistic UI update
     final wasLiked = _isLiked.value;
     _isLiked.value = !_isLiked.value;
-    
+
     // Update controller maps for UI button sync
     if (shortPlayController.isLikedMap[_currentPage] != null) {
       shortPlayController.isLikedMap[_currentPage]!.value = _isLiked.value;
     }
-    
+
     // Trigger animation only when liking
     if (_isLiked.value && widget.showLikeAnimation) {
       _likeAnimationController.forward().then((_) {
         _likeAnimationController.reverse();
       });
     }
-    
+
     // Call API (reels are always 'reel' type)
     try {
       await homeController.likePost(currentReel.id, _currentPage);
-      
+
       // Update like count in the reel stats
       if (_isLiked.value) {
         currentReel.stats.likeCount = (currentReel.stats.likeCount) + 1;
@@ -374,12 +375,13 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
         currentReel.stats.likeCount = (currentReel.stats.likeCount) - 1;
       }
       currentReel.stats.isLiked = _isLiked.value;
-      
+
       // Update controller like count for UI button
       if (shortPlayController.likeCounts[_currentPage] != null) {
-        shortPlayController.likeCounts[_currentPage]!.value = currentReel.stats.likeCount;
+        shortPlayController.likeCounts[_currentPage]!.value =
+            currentReel.stats.likeCount;
       }
-      
+
       setState(() {}); // Refresh UI with new count
     } catch (e) {
       // Revert on error
@@ -482,7 +484,7 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
                 isMuted: _isMuted,
                 onToggleSound: _toggleSound,
                 volumeAnimation: _volumeAnimation,
-                
+
                 allowDoubleTapToLike: widget.allowDoubleTapToLike,
                 allowTapToPause: widget.allowTapToPause,
                 commentIcon: widget.commentIcon,
@@ -539,7 +541,7 @@ class VideoReel extends StatelessWidget {
   final VoidCallback onFollow;
   final Animation<double> likeAnimation;
   final ValueNotifier<bool> isLiked;
-  
+
   // New Volume Props
   final ValueNotifier<bool> isMuted;
   final VoidCallback onToggleSound;
@@ -641,16 +643,20 @@ class VideoReel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  //  final appBarHeight = AppBar().preferredSize.height + MediaQuery.of(context).padding.top;
+    //  final appBarHeight = AppBar().preferredSize.height + MediaQuery.of(context).padding.top;
     final bottomNavHeight = kBottomNavigationBarHeight;
     return GestureDetector(
-      onDoubleTap: allowDoubleTapToLike ? () {
-        // Simply call the like callback which will handle animation
-        onLike();
-      } : null,
+      onDoubleTap:
+          allowDoubleTapToLike
+              ? () {
+                // Simply call the like callback which will handle animation
+                onLike();
+              }
+              : null,
       onLongPressStart: (_) => controller.pause(),
       onLongPressEnd: (_) => controller.play(),
-      onTap: onToggleSound, // Use the callback
+      onTap: onToggleSound,
+      // Use the callback
       child: Container(
         // margin: EdgeInsets.only(
         //   //top: appBarHeight,
@@ -673,7 +679,10 @@ class VideoReel extends StatelessWidget {
             ValueListenableBuilder<bool>(
               valueListenable: isMuted,
               builder: (context, muted, child) {
-                return VolumeAnimation(volumeAnimation: volumeAnimation, isMuted: muted);
+                return VolumeAnimation(
+                  volumeAnimation: volumeAnimation,
+                  isMuted: muted,
+                );
               },
             ),
             if (showGradient) const VideoGradient(),
@@ -717,42 +726,55 @@ class CustomReelPlayer extends StatelessWidget {
         valueListenable: controller,
         builder: (context, value, child) {
           if (value.isInitialized) {
-             // 1. Calculate aspect ratios
+            // 1. Calculate aspect ratios
             final videoAspectRatio = value.size.width / value.size.height;
             // Use MediaQuery to get screen aspect ratio, but here we are in a PageView likely full screen
-            // For Reels, we generally want cover. 
+            // For Reels, we generally want cover.
             // However, creating a truly custom layout:
             return SizedBox.expand(
               child: FittedBox(
                 fit: BoxFit.cover, // FORCE FILL SCREEN like TikTok
                 child: SizedBox(
-                   width: value.size.width,
-                   height: value.size.height,
-                   child: VideoPlayer(controller),
+                  width: value.size.width,
+                  height: value.size.height,
+                  child: VideoPlayer(controller),
                 ),
               ),
             );
           } else if (value.hasError) {
-             return errorWidget ??
-              Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.error_outline, color: Colors.white, size: 40),
-                    const SizedBox(height: 8),
-                    const Text('Failed to load', style: TextStyle(color: Colors.white)),
-                  ],
-                ),
-              );
+            return errorWidget ??
+                Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Failed to load',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                );
           } else {
             // Loading State: Show Thumbnail
             return SizedBox.expand(
               child: CachedNetworkImage(
                 imageUrl: thumbnailUrl,
                 fit: BoxFit.cover,
-                placeholder: (context, url) =>
-                    loadingWidget ??
-                    const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
+                placeholder:
+                    (context, url) =>
+                        loadingWidget ??
+                        const Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        ),
                 errorWidget: (context, url, error) => const SizedBox(),
               ),
             );
@@ -802,7 +824,11 @@ class LikeAnimation extends StatelessWidget {
     return FadeTransition(
       opacity: likeAnimation,
       child: const Center(
-        child: Icon(Icons.favorite, size: 80, color: Colors.red), // Increased size
+        child: Icon(
+          Icons.favorite,
+          size: 80,
+          color: Colors.red,
+        ), // Increased size
       ),
     );
   }
@@ -812,7 +838,11 @@ class VolumeAnimation extends StatelessWidget {
   final Animation<double> volumeAnimation;
   final bool isMuted;
 
-  const VolumeAnimation({super.key, required this.volumeAnimation, required this.isMuted});
+  const VolumeAnimation({
+    super.key,
+    required this.volumeAnimation,
+    required this.isMuted,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -926,18 +956,19 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
               color: Colors.white,
               shape: BoxShape.circle,
             ),
-            child: item.user.avatar.isNotEmpty
-                ? CustomImageView(
-                    url: AppUrls.getFullImageUrl(item.user.avatar),
-                    height: 38,
-                    width: 38,
-                    radius: BorderRadius.circular(19),
-                  )
-                : const CircleAvatar(
-                    radius: 19,
-                    backgroundColor: Colors.grey,
-                    child: Icon(Icons.person, size: 24, color: Colors.white),
-                  ),
+            child:
+                item.user.avatar.isNotEmpty
+                    ? CustomImageView(
+                      url: AppUrls.getFullImageUrl(item.user.avatar),
+                      height: 38,
+                      width: 38,
+                      radius: BorderRadius.circular(19),
+                    )
+                    : const CircleAvatar(
+                      radius: 19,
+                      backgroundColor: Colors.grey,
+                      child: Icon(Icons.person, size: 24, color: Colors.white),
+                    ),
           ),
           const SizedBox(width: 12),
           Column(
@@ -953,39 +984,58 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       shadows: [
-                        Shadow(color: Colors.black, offset: Offset(0, 1), blurRadius: 4),
+                        Shadow(
+                          color: Colors.black,
+                          offset: Offset(0, 1),
+                          blurRadius: 4,
+                        ),
                       ],
                     ),
                   ),
-                   const SizedBox(width: 8),
-                   // Simple Follow Button (Visual)
-                   Obx(() {
-                     final homeController = Get.find<HomeController>();
-                     final isFollowing = homeController.followController.isUserFollowing(item.user.id, initialValue: item.isFollowing).value;
-                     
-                     // Hide follow button if it's my own reel
-                     if (item.isMine) return const SizedBox.shrink();
+                  const SizedBox(width: 8),
+                  // Simple Follow Button (Visual)
+                  Obx(() {
+                    final homeController = Get.find<HomeController>();
+                    final isFollowing =
+                        homeController.followController
+                            .isUserFollowing(
+                              item.user.id,
+                              initialValue: item.isFollowing,
+                            )
+                            .value;
 
-                     return GestureDetector(
-                       onTap: () => homeController.toggleFollowForPostUser(item.user.id),
-                       child: Container(
-                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                         decoration: BoxDecoration(
-                           color: isFollowing ? Colors.white.withOpacity(0.2) : Colors.transparent,
-                           border: Border.all(color: Colors.white, width: 1),
-                           borderRadius: BorderRadius.circular(6),
-                         ),
-                         child: Text(
-                           isFollowing ? "Following" : "Follow",
-                           style: const TextStyle(
-                             color: Colors.white,
-                             fontSize: 10,
-                             fontWeight: FontWeight.bold,
-                           ),
-                         ),
-                       ),
-                     );
-                   }),
+                    // Hide follow button if it's my own reel
+                    if (item.isMine) return const SizedBox.shrink();
+
+                    return GestureDetector(
+                      onTap:
+                          () => homeController.toggleFollowForPostUser(
+                            item.user.id,
+                          ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color:
+                              isFollowing
+                                  ? Colors.white.withOpacity(0.2)
+                                  : Colors.transparent,
+                          border: Border.all(color: Colors.white, width: 1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          isFollowing ? "Following" : "Follow",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
                 ],
               ),
             ],
@@ -999,13 +1049,6 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // _buildIconButton(
-        //   icon: const Icon(IconlyLight.send, color: Colors.white, size: 30),
-        //   label: "Share",
-        //   onPressed: () {
-        //     //controller.shareReels(context, item),
-        //   },
-        // ),
         const SizedBox(height: 16),
         Obx(
           () => GestureDetector(
@@ -1018,18 +1061,28 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
               curve: Curves.easeOutBack,
               child: Column(
                 children: [
-                  CustomIcon(
+                  if (!item.isLiked.value) ...[
+                    Image.asset(
+                      "assets/icon/ic_liked.png",
+                      height: 40,
+                      width: 40,
+                    ),
+                  ] else ...[
+                    Icon(CupertinoIcons.heart,size: 28,color: Colors.white,),
+                  ],
+
+                  /*CustomIcon(
                     svgString:
                         controller.isLikedMap[index]?.value == true
                             ? AppIcons.ic_heart_solid
                             : AppIcons.ic_heart_outline,
                     color:
                         controller.isLikedMap[index]?.value == true
-                            ? Colors.red
+                            ? Colors.white
                             : Colors.white,
                     removeColor: controller.isLikedMap[index]?.value == true,
-                    size: 30,
-                  ),
+                    size: 28,
+                  ),*/
                   Text(
                     controller.likeCounts[index]?.value.toString() ?? "0",
                     style: const TextStyle(color: Colors.white),
@@ -1048,7 +1101,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
             CustomIcon(
               svgString: AppIcons.ic_comments,
               color: Colors.white,
-              size: 30,
+              size: 28,
               removeColor: false,
             ),
             label: controller.commentCounts[index]?.value.toString() ?? "0",
@@ -1068,20 +1121,20 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
           icon: CustomIcon(
             svgString: AppIcons.ic_share,
             color: Colors.white,
-            size: 30,
+            size: 28,
             removeColor: false,
           ),
           label: "Share",
           onPressed: () {
             // Create shareable link
             final String reelUrl = "https://ivatan.in/post/${item.id}";
-            final String shareText = "${item.caption ?? 'Check out this reel!'}\n\n$reelUrl";
-            
+            final String shareText =
+                "${item.caption ?? 'Check out this reel!'}\n\n$reelUrl";
+
             // Use share_plus to share
             Share.share(shareText);
           },
         ),
-
       ],
     );
   }
@@ -1101,8 +1154,8 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
             // Removed background circle for cleaner look
             padding: const EdgeInsets.all(10), // slight padding for touch area
             decoration: BoxDecoration(
-               shape: BoxShape.circle,
-               // color: Colors.black.withOpacity(0.1), // Optional: very subtle
+              shape: BoxShape.circle,
+              // color: Colors.black.withOpacity(0.1), // Optional: very subtle
             ),
             child: icon,
           ),
@@ -1117,7 +1170,11 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
               fontSize: 13,
               fontWeight: FontWeight.w600,
               shadows: [
-                Shadow(color: Colors.black45, offset: Offset(0, 1), blurRadius: 4),
+                Shadow(
+                  color: Colors.black45,
+                  offset: Offset(0, 1),
+                  blurRadius: 4,
+                ),
               ],
             ),
           ),
@@ -1316,26 +1373,34 @@ class VideoProgressBar extends GetWidget<ShortPlayController> {
         builder: (context, value, child) {
           // View Count Logic preserved
           if (value.isInitialized && !_hasCalledApi) {
-             final halfDuration = value.duration.inSeconds / 2;
-             if (value.position.inSeconds >= halfDuration) {
-               _hasCalledApi = true;
-             }
+            final halfDuration = value.duration.inSeconds / 2;
+            if (value.position.inSeconds >= halfDuration) {
+              _hasCalledApi = true;
+            }
           }
           return SizedBox(
             height: 4, // Very thin container
             child: SliderTheme(
               data: SliderTheme.of(context).copyWith(
-                thumbShape: SliderComponentShape.noThumb, // Provide no thumb options
+                thumbShape: SliderComponentShape.noThumb,
+                // Provide no thumb options
                 overlayShape: SliderComponentShape.noOverlay,
                 trackHeight: 2.0,
-                activeTrackColor: Colors.black, // Changed from Cyan to Black
+                activeTrackColor: Colors.black,
+                // Changed from Cyan to Black
                 inactiveTrackColor: Colors.black.withOpacity(0.3),
                 trackShape: const RectangularSliderTrackShape(), // Full width
               ),
               child: Slider(
-                value: value.position.inSeconds.toDouble().clamp(0.0, value.duration.inSeconds.toDouble()),
+                value: value.position.inSeconds.toDouble().clamp(
+                  0.0,
+                  value.duration.inSeconds.toDouble(),
+                ),
                 min: 0.0,
-                max: value.duration.inSeconds.toDouble() > 0 ? value.duration.inSeconds.toDouble() : 1.0,
+                max:
+                    value.duration.inSeconds.toDouble() > 0
+                        ? value.duration.inSeconds.toDouble()
+                        : 1.0,
                 onChanged: (value) {
                   videoController.seekTo(Duration(seconds: value.toInt()));
                 },

@@ -91,6 +91,7 @@ class ReelModel {
   final ReelStats stats;
   final String createdAt;
   final String createdHuman;
+  final RxBool isLiked = false.obs;
 
   ReelModel({
     required this.id,
@@ -103,6 +104,7 @@ class ReelModel {
     required this.stats,
     required this.createdAt,
     required this.createdHuman,
+    bool? likeStatus
   });
 
   /// 🔥 SAFE video url getter
@@ -111,6 +113,8 @@ class ReelModel {
 
   String? get thumbnail =>
       media.isNotEmpty ? media.first.thumbnail : null;
+
+
 
   factory ReelModel.fromJson(Map<String, dynamic> json) {
     return ReelModel(
@@ -126,8 +130,13 @@ class ReelModel {
       stats: ReelStats.fromJson(json["stats"] ?? {}),
       createdAt: json["created_at"] ?? "",
       createdHuman: json["created_human"] ?? "",
+      likeStatus: json["is_liked"] ?? false,
+
     );
   }
+
+
+
 }
 
 
