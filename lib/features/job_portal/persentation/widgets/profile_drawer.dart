@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:i_vatan_app/route/app_pages.dart';
 
 import '../pages/applicant_list.dart';
 import '../pages/create_job_page.dart';
 import '../pages/delete_account_page.dart';
 import '../pages/help_privacy_page.dart';
 import '../pages/job_history_page.dart';
+import '../pages/my_applications.dart';
 import '../pages/occupation_form_page.dart';
 
 class ProfileDrawer extends StatelessWidget {
@@ -173,7 +175,7 @@ class ProfileDrawer extends StatelessWidget {
                 children: [
                   _buildDrawerItem(
                     icon: Icons.bookmark_outline,
-                    title: 'Create',
+                    title: 'Job Create',
                    // badge: '12',
                     onTap: () {
                       Get.to(JobCreateScreen());
@@ -189,10 +191,11 @@ class ProfileDrawer extends StatelessWidget {
                   ),
                   _buildDrawerItem(
                     icon: Icons.local_activity,
-                    title: 'Applicant',
+                    title: 'My Jobs',
                   //  badge: '8',
                     onTap: () {
-                      Get.to(ApplicantList());
+                      Get.toNamed(AppRoutes.myCreatedJobScreen);
+                     // Get.to(MyAppliedJobScreen());
                     },
                   ),
                   _buildDrawerItem(

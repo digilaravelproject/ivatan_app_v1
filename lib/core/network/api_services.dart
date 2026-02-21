@@ -26,13 +26,63 @@ class ApiServices extends GetxService {
 
     print("authnticationtoken : " + SharedPrefManager().token.toString());
     return _safeCall(() async {
+      _logRequest(
+        method: "GET",
+        uri: uri,
+        headers: _defaultHeaders(),
+        body: queryParams,
+      );
+
       final response = await http
           .get(uri, headers: _defaultHeaders())
           .timeout(_timeout);
 
+      _logResponse(response);
+
+
       print("getapiresponse : " + response.body);
       return _parseResponse(response, showErrorToast: showErrorToast);
     });
+  }
+
+  /// Common GET method for downloading binary data
+  Future<http.Response?> callDownload(
+    String endpoint, {
+    Map<String, dynamic>? queryParams,
+    bool showErrorToast = true,
+  }) async {
+    final uri = Uri.parse(
+      "${AppUrls.apiBaseUrl}$endpoint",
+    ).replace(queryParameters: queryParams);
+
+    return _safeCallBytes(() async {
+      final response = await http
+          .get(uri, headers: _defaultHeaders())
+          .timeout(_timeout);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return response;
+      } else {
+        _parseResponse(response, showErrorToast: showErrorToast);
+        return null;
+      }
+    });
+  }
+
+  Future<http.Response?> _safeCallBytes(
+    Future<http.Response?> Function() call,
+  ) async {
+    try {
+      return await call();
+    } on SocketException catch (e) {
+      _handleError("Network error: $e");
+    } on TimeoutException catch (e) {
+      _handleError("Request timed out: $e");
+    } catch (e, stackTrace) {
+      printMessage("Unexpected error: $e\n$stackTrace");
+      CustomSnackBar.showError(message: "An unexpected error occurred.");
+    }
+    return null;
   }
 
   /// Common POST method
@@ -66,6 +116,12 @@ class ApiServices extends GetxService {
         });
 
         logApiMessage("Request --> ${uri.toString()}");
+        _logRequest(
+          method: "POST (Multipart)",
+          uri: uri,
+          headers: request.headers,
+          body: data,
+        );
 
         for (final entry in data.entries) {
           if (entry.value is File) {
@@ -84,11 +140,19 @@ class ApiServices extends GetxService {
 
         final streamedResponse = await request.send().timeout(_timeout);
         final response = await http.Response.fromStream(streamedResponse);
+        _logResponse(response);
         return _parseResponse(response, showErrorToast: showErrorToast);
       } else {
+        _logRequest(
+          method: "POST",
+          uri: uri,
+          headers: _defaultHeaders(),
+          body: data,
+        );
         final response = await http
             .post(uri, headers: _defaultHeaders(), body: jsonEncode(data))
             .timeout(_timeout);
+        _logResponse(response);
         return _parseResponse(response, showErrorToast: showErrorToast);
       }
     });
@@ -115,6 +179,14 @@ class ApiServices extends GetxService {
       logApiMessage("DELETE BODY --> ${jsonEncode(bodyData)}");
     }
 
+
+    _logRequest(
+      method: "DELETE",
+      uri: uri,
+      headers: _defaultHeaders(),
+      body: bodyData,
+    );
+
     return _safeCall(() async {
       http.Response response;
 
@@ -128,11 +200,83 @@ class ApiServices extends GetxService {
         response = await http
             .delete(uri, headers: _defaultHeaders())
             .timeout(_timeout);
+
+        _logResponse(response);
+
       }
 
       return _parseResponse(response);
     });
   }
+
+
+
+  /// Common PUT method
+  Future<Map<String, dynamic>?> callPut(
+      String endpoint, {
+        required Map<String, dynamic> data,
+        bool isUserRequired = false,
+        bool isFormData = false,
+        bool showErrorToast = true,
+      }) async {
+    if (isUserRequired) {
+      final userId = {
+        ApiKeys.userId: (SharedPrefManager().user?.id ?? "").toString(),
+      };
+      data.addAll(userId);
+    }
+
+    final uri = Uri.parse("${AppUrls.apiBaseUrl}$endpoint");
+    logApiMessage("PUT Request --> ${uri.toString()}");
+
+    return _safeCall(() async {
+      if (isFormData) {
+        // Multipart PUT request
+        final request = http.MultipartRequest("PUT", uri);
+        request.headers.addAll(_defaultHeaders());
+
+        data.forEach((key, value) {
+          if (value is String) {
+            request.fields[key] = value;
+          }
+        });
+
+        for (final entry in data.entries) {
+          if (entry.value is File) {
+            final file = entry.value as File;
+            final fileStream = http.ByteStream(file.openRead());
+            final length = await file.length();
+            final multipartFile = http.MultipartFile(
+              entry.key,
+              fileStream,
+              length,
+              filename: file.path.split("/").last,
+            );
+            request.files.add(multipartFile);
+          }
+        }
+
+        _logRequest(
+          method: "PUT",
+          uri: uri,
+          headers: _defaultHeaders(),
+          body: data,
+        );
+
+        final streamedResponse = await request.send().timeout(_timeout);
+        final response = await http.Response.fromStream(streamedResponse);
+        _logResponse(response);
+        return _parseResponse(response, showErrorToast: showErrorToast);
+      } else {
+        // Normal JSON PUT
+        final response = await http
+            .put(uri, headers: _defaultHeaders(), body: jsonEncode(data))
+            .timeout(_timeout);
+        return _parseResponse(response, showErrorToast: showErrorToast);
+      }
+    });
+  }
+
 
   /// Default headers
   Map<String, String> _defaultHeaders() => {
@@ -200,6 +344,42 @@ class ApiServices extends GetxService {
   void logApiError(String message) => printMessage("⚠️ $message");
 
   void logApiMessage(String message) => printMessage("📡 $message");
+
+
+
+
+
+  void _logRequest({
+    required String method,
+    required Uri uri,
+    Map<String, String>? headers,
+    dynamic body,
+  }) {
+    printMessage("""
+================= 📤 API REQUEST =================
+METHOD: $method
+URL: ${uri.toString()}
+HEADERS: ${headers ?? {}}
+BODY: ${body ?? "No Body"}
+==================================================
+""");
+  }
+
+
+
+
+  void _logResponse(http.Response response) {
+    printMessage("""
+================= 📥 API RESPONSE =================
+STATUS CODE: ${response.statusCode}
+REASON: ${response.reasonPhrase}
+BODY: ${response.body}
+===================================================
+""");
+  }
+
+
+
 }
 
 extension DeleteRequestWithBody on http.Request {
@@ -214,3 +394,6 @@ extension DeleteRequestWithBody on http.Request {
     return http.Response.fromStream(streamedResponse);
   }
 }
+
+
+

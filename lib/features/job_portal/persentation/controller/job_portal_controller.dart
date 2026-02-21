@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class JobController extends GetxController with GetSingleTickerProviderStateMixin {
+class JobController1 extends GetxController with GetSingleTickerProviderStateMixin {
   final TextEditingController searchController = TextEditingController();
   late final TabController tabController;
 

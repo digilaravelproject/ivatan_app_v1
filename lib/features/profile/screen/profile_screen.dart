@@ -24,8 +24,11 @@ import '../../dashboard/controller/navigationController.dart';
 import '../../dashboard/controller/settings_controller.dart';
 import '../../dashboard/model/user_profile.dart';
 import '../../dashboard/persentation/comming_soon.dart';
+import '../../dashboard/persentation/creater_analysis_screen.dart';
 import '../../dashboard/persentation/post_media_picker_screen.dart';
+import '../../dashboard/persentation/product_screen.dart';
 import '../../dashboard/persentation/reel_media_picker_screen.dart';
+import '../../dashboard/persentation/service_screen.dart';
 import '../../dashboard/persentation/settings_page.dart';
 import '../../messages/controller/chatt_controller.dart';
 import '../../messages/persentation/chatting_screen.dart';
@@ -106,17 +109,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
           final bool isPrivateHidden = isOtherProfile && 
                                      user.accountPrivacy == "private" && 
                                      !isFollowing;
-          return DefaultTabController(
-            length: 4,
-            child: Stack(
-              children: [
-                NestedScrollView(
-                  headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                    return <Widget>[
-                      SliverToBoxAdapter(
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
+          return Obx(() {
+            final userType = AppUrls.selectedUserType.value;
+            
+            // Build dynamic tabs and views
+            List<Tab> tabs = [
+              Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 
+              Tab(child: Image.asset(AppAssets.icVideo, width: 24, height: 24)),
+            ];
+            
+            List<Widget> tabViews = [
+              MyPostScreen(username: finalUserName),
+              MyVideoScreen(username: finalUserName),
+            ];
+            
+            if (userType == AppUrls.creator) {
+              tabs.add(Tab(child: Icon(Icons.person_add_alt_1_outlined, color: Colors.black, size: 26)));
+              tabViews.add(CreatorAnalysisScreen());
+            } else if (userType == AppUrls.businessService) {
+              tabs.add(Tab(child: Icon(Icons.room_service_outlined, color: Colors.black, size: 26)));
+              tabViews.add(const DigitalProductListScreen());
+            } else if (userType == AppUrls.businessProduct) {
+              tabs.add(Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)));
+              tabViews.add(ProductGridScreen());
+            }
+
+            return DefaultTabController(
+              key: ValueKey(userType), // Force recreate when type changes
+              length: tabs.length,
+              child: Stack(
+                children: [
+                  NestedScrollView(
+                    headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                      return <Widget>[
+                        SliverToBoxAdapter(
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              // ... existing cover and info container code ...
+                              // (I will keep the existing code here by using the multi_replace_file_content if needed, 
+                              // but since this is a continuous block I'll use it carefully)
                             // 1. Cover Image & Info Container
                             Column(
                               children: [
@@ -516,47 +548,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         SliverToBoxAdapter(child: const SizedBox.shrink()),
                       
                       if (!isPrivateHidden)
-                      SliverPersistentHeader(
-                        pinned: true,
-                        delegate: _SliverAppBarDelegate(
-                          TabBar(
+                        SliverAppBar(
+                          pinned: true,
+                          floating: false,
+                          backgroundColor: AppColors.white,
+                          automaticallyImplyLeading: false,
+                          toolbarHeight: 0,
+                          elevation: 0,
+                          bottom: TabBar(
                             isScrollable: false,
                             dividerColor: Colors.grey.shade200,
                             labelColor: Colors.black,
                             unselectedLabelColor: Colors.grey,
                             indicatorColor: Colors.blue,
                             indicatorWeight: 2,
-                            labelPadding: EdgeInsets.symmetric(horizontal: 12),
-                            tabs: [
-                              Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 
-                              Tab(child: Image.asset(AppAssets.icVideo, width: 24, height: 24)),
-                              Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)),
-                              Tab(child: Icon(Icons.person_add_alt_1_outlined, color: Colors.black, size: 26)), 
-                            ],
+                            labelPadding: const EdgeInsets.symmetric(horizontal: 12),
+                            tabs: tabs,
                           ),
                         ),
-                      ),
                     ];
                   },
                   body: isPrivateHidden 
                     ? _buildPrivatePlaceholder()
                     : TabBarView(
-                    children: [
-                      MyPostScreen(username: finalUserName),
-                      MyVideoScreen(username: finalUserName),
-                      // const ProfileShopScreen(),
-                      CustomEmptyState(
-                        icon: Icons.shopping_bag_outlined,
-                        title: "Shop",
-                        subTitle: "Browse and sell products. Feature coming soon.",
-                      ),
-                      // ProfileLivePostsScreen(username: finalUserName),
-                      CustomEmptyState(
-                        icon: Icons.person_add_alt_1_outlined,
-                        title: "Tagged Posts",
-                        subTitle: "View posts where you're tagged. Feature coming soon.",
-                      ),
-                    ],
+                    children: tabViews,
                   ),
                 ),
 
@@ -565,6 +580,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           );
+        });
         }),
       ),
     );
@@ -1716,31 +1732,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  final TabBar _tabBar;
-
-  _SliverAppBarDelegate(this._tabBar);
-
-  @override
-  double get minExtent => _tabBar.preferredSize.height;
-
-  @override
-  double get maxExtent => _tabBar.preferredSize.height;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: AppColors.white,
-      child: _tabBar,
-    );
-  }
-
-  @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return false;
-  }
-}
 
 
 

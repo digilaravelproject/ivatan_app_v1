@@ -8,6 +8,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../../../core/network/api_services.dart';
 import '../../../db/shared_pref_manager.dart';
+import '../../dashboard/model/comment_model.dart';
 import '../model/reel_model.dart';
 
 /*class ShortPlayController extends GetxController {
@@ -465,7 +466,11 @@ class ShortPlayController extends GetxController {
   // We create maps for per-reel reactive stats
   final Map<int, RxInt> likeCounts = {};
   final Map<int, RxInt> commentCounts = {};
+  final Map<int, RxInt> shareCounts = {};
   final Map<int, RxBool> isLikedMap = {};
+
+  // Per-reel comments cache for instant preview
+  final Map<int, RxList<CommentModel>> reelComments = {};
 
   @override
   void onInit() {
@@ -496,15 +501,36 @@ class ShortPlayController extends GetxController {
         for (var i = 0; i < fetchedReels.length; i++) {
           likeCounts[i] = (fetchedReels[i].stats.likeCount).obs;
           commentCounts[i] = (fetchedReels[i].stats.commentCount).obs;
+          shareCounts[i] = (fetchedReels[i].stats.shareCount).obs;
           isLikedMap[i] = (fetchedReels[i].stats.isLiked).obs;
         }
 
         reelsList.value = fetchedReels;
+
+        // Pre-fetch comments for all reels
+        for (var i = 0; i < fetchedReels.length; i++) {
+          _fetchCommentsForReel(fetchedReels[i].id, i);
+        }
       }
     } catch (e) {
       print("Error fetching reels: $e");
     } finally {
       reelsLoading.value = false;
+    }
+  }
+
+  Future<void> _fetchCommentsForReel(int postId, int index) async {
+    try {
+      final response = await ApiServices().callGet("api/v1/comments/post/$postId");
+      if (response != null && response["data"] != null) {
+        final commentResponse = CommentResponse.fromJson(response);
+        reelComments[index] = commentResponse.data.obs;
+      } else {
+        reelComments[index] = <CommentModel>[].obs;
+      }
+    } catch (e) {
+      reelComments[index] = <CommentModel>[].obs;
+      print("Error fetching comments for reel $postId: $e");
     }
   }
 

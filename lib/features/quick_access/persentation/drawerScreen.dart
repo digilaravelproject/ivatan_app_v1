@@ -10,6 +10,7 @@ import '../../../route/app_pages.dart';
 import '../../dashboard/controller/homeController.dart';
 import '../../dashboard/persentation/comming_soon.dart';
 import '../../dashboard/persentation/settings_page.dart';
+import '../../../core/network/app_urls.dart';
 import '../../job_portal/persentation/pages/job_portal_page.dart';
 import '../../messages/persentation/contact_screen.dart';
 import 'help_center.dart';
@@ -142,7 +143,22 @@ class DrawerScreen extends StatelessWidget {
                   children: [
                       Row(
                       children: [
-                       Expanded(child:_buildBottomCard(context, "i-QuickHire", CupertinoIcons.briefcase_fill, "Job Board")),
+                       Expanded(child:_buildBottomCard(context, "i-QuickHire", CupertinoIcons.briefcase_fill, "Job Board", onTap: () {
+                         final type = AppUrls.selectedUserType.value;
+                         Get.offAllNamed(AppRoutes.jobSearchScreen);
+                         if (type == AppUrls.recruiter || type == AppUrls.applier) {
+                          // Get.to(() => JobSearchScreen());
+                           //Get.offAllNamed(AppRoutes.jobSearchScreen);
+                         } else {
+                           Get.snackbar(
+                             "Access Restricted",
+                             "Please switch to Recruiter or Applier account first.",
+                             snackPosition: SnackPosition.BOTTOM,
+                             backgroundColor: Colors.red.withOpacity(0.1),
+                             colorText: Colors.red,
+                           );
+                         }
+                       })),
                         const SizedBox(width: 12),
                         Expanded(child: _buildBottomCard(context, "Universal App", CupertinoIcons.app_badge_fill, "Mini Apps")),
                       ],
@@ -263,9 +279,9 @@ class DrawerScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomCard(BuildContext context, String title, IconData icon, String subtitle) {
+  Widget _buildBottomCard(BuildContext context, String title, IconData icon, String subtitle, {VoidCallback? onTap}) {
     return GestureDetector(
-      onTap: () {
+      onTap: onTap ?? () {
         Get.to(() => JobSearchScreen());
         //showComingSoonDialog(context, title: title, message: "We're building a unique $subtitle experience for you. Stay tuned!"),
       },

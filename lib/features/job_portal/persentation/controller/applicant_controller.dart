@@ -1,78 +1,102 @@
-import '../../data/model/applicant_model.dart';
+import 'package:get/get.dart';
+import '../../data/model/job_model.dart';
+import '../../repository/job_repository.dart';
 
-class ApplicantController {
-  // Private constructor
-  ApplicantController._privateConstructor();
-  static final ApplicantController _instance = ApplicantController._privateConstructor();
-  factory ApplicantController() => _instance;
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import '../../../../core/helper/custom_snack_bar.dart';
 
-  // Dummy data - replace with actual API calls
-  final List<Applicant> _applicants = [
-    Applicant(
-      id: '1',
-      name: 'Aarav Sharma',
-      position: 'Senior Flutter Developer',
-      experience: '5 years',
-      location: 'Mumbai, India',
-      email: 'aarav.sharma@email.com',
-      phone: '+91 98765 43210',
-      education: 'B.Tech Computer Science, IIT Bombay',
-      skills: ['Flutter', 'Dart', 'Firebase', 'REST API', 'Git'],
-      cvSummary: 'Experienced Flutter developer with 5+ years in mobile app development. Led 3 major app launches with 100K+ downloads.',
-      appliedDate: '2024-03-15',
-    ),
-    Applicant(
-      id: '2',
-      name: 'Priya Patel',
-      position: 'UX Designer',
-      experience: '3 years',
-      location: 'Bangalore, India',
-      email: 'priya.patel@email.com',
-      phone: '+91 87654 32109',
-      education: 'M.Des Interaction Design, NID',
-      skills: ['Figma', 'Adobe XD', 'User Research', 'Wireframing', 'Prototyping'],
-      cvSummary: 'Creative UX designer with 3 years of experience in fintech and e-commerce. Created designs that increased user engagement by 40%.',
-      appliedDate: '2024-03-14',
-    ),
-    Applicant(
-      id: '3',
-      name: 'Rahul Verma',
-      position: 'Backend Engineer',
-      experience: '4 years',
-      location: 'Delhi, India',
-      email: 'rahul.verma@email.com',
-      phone: '+91 76543 21098',
-      education: 'B.E. Computer Science, DTU',
-      skills: ['Node.js', 'Python', 'MongoDB', 'AWS', 'Docker'],
-      cvSummary: 'Backend specialist with experience in building scalable microservices. Reduced API response time by 60%.',
-      appliedDate: '2024-03-13',
-    ),
-    Applicant(
-      id: '4',
-      name: 'Ananya Singh',
-      position: 'Product Manager',
-      experience: '6 years',
-      location: 'Pune, India',
-      email: 'ananya.singh@email.com',
-      phone: '+91 65432 10987',
-      education: 'MBA, IIM Ahmedabad',
-      skills: ['Product Strategy', 'Agile', 'Roadmapping', 'Data Analysis', 'Team Leadership'],
-      cvSummary: 'Results-driven Product Manager with 6 years of experience. Launched 5 successful B2B SaaS products.',
-      appliedDate: '2024-03-12',
-    ),
-  ];
+class ApplicantController extends GetxController {
+  final JobRepository repository;
 
-  // Get all applicants
-  List<Applicant> getAllApplicants() {
-    return _applicants;
+  ApplicantController(this.repository);
+
+  var applicants = <JobApplication>[].obs;
+  var isLoading = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    // Job ID should be passed when navigating to the list
+    if (Get.arguments is int) {
+      fetchApplicants(Get.arguments as int);
+    }
   }
 
-  // Get single applicant by ID
-  Applicant? getApplicantById(String id) {
+  Future<void> fetchApplicants(int jobId) async {
     try {
-      return _applicants.firstWhere((applicant) => applicant.id == id);
+      isLoading.value = true;
+      final result = await repository.getJobApplications(jobId);
+      applicants.value = result;
     } catch (e) {
-      return null;
+      Get.snackbar(
+        'Error',
+        'Failed to fetch applicants: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  JobApplication? getApplicantById(int id) {
+    return applicants.firstWhereOrNull((a) => a.id == id);
+  }
+
+  Future<void> downloadResume(int applicationId, String? fileName) async {
+    try {
+      isLoading.value = true;
+      final response = await repository.downloadResume(applicationId);
+
+      if (response != null && response.bodyBytes.isNotEmpty) {
+        final directory = await getTemporaryDirectory();
+        final name = fileName ?? "resume_$applicationId.pdf";
+        final filePath = "${directory.path}/$name";
+        final file = File(filePath);
+
+        await file.writeAsBytes(response.bodyBytes);
+
+        await Share.shareXFiles(
+            [XFile(filePath)], text: 'Applicant Resume: $name');
+
+        CustomSnackBar.showSuccess(message: "Resume downloaded successfully");
+      } else {
+        CustomSnackBar.showError(message: "Failed to download resume");
+      }
+    } catch (e) {
+      CustomSnackBar.showError(message: "Error downloading resume: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> updateStatus(int applicationId, String status) async {
+    try {
+      isLoading.value = true;
+      final success = await repository.updateApplicationStatus(
+          applicationId, status);
+
+      print("updateStatus : "+status);
+      if (success) {
+        // Update local state reactively
+        final index = applicants.indexWhere((element) =>
+        element.id == applicationId);
+        if (index != -1) {
+          final updatedApplicant = applicants[index].copyWith(status: status);
+          applicants[index] = updatedApplicant;
+          applicants.refresh();
+        }
+        CustomSnackBar.showSuccess(
+            message: "Status updated to $status successfully");
+      } else {
+        CustomSnackBar.showError(message: "Failed to update status");
+      }
+    } catch (e) {
+      CustomSnackBar.showError(message: "Error updating status: $e");
+    } finally {
+      isLoading.value = false;
     }
   }
 }
