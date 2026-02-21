@@ -40,14 +40,17 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
             onPressed: () => Get.back(),
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.edit, color: Colors.black),
-              onPressed: () => controller.editJob(),
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () => controller.deleteJob(),
-            ),
+            // Only show edit/delete for recruiters
+            if (_isRecruiter()) ...[
+              IconButton(
+                icon: const Icon(Icons.edit, color: Colors.black),
+                onPressed: () => controller.editJob(),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: () => controller.deleteJob(),
+              ),
+            ],
             const SizedBox(width: 8),
           ],
           title:  Column(
@@ -515,6 +518,8 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
   }
 
   Widget _buildApplyButton(JobModel job) {
+    final isRecruiter = _isRecruiter();
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
@@ -554,9 +559,13 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
           ),
           ElevatedButton(
             onPressed: (){
-              Get.toNamed(AppRoutes.applicantListScreen, arguments: job.id);
+              if (isRecruiter) {
+                Get.toNamed(AppRoutes.applicantListScreen, arguments: job.id);
+              } else {
+                // Handle apply for applier
+                controller.applyForJob();
+              }
             },
-            //controller.applyForJob,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
               foregroundColor: Colors.white,
@@ -567,7 +576,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
               elevation: 0,
             ),
             child: Text(
-              'Applicant',
+              isRecruiter ? 'View Applicant' : 'Apply Now',
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -577,5 +586,10 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
         ],
       ),
     );
+  }
+
+  bool _isRecruiter() {
+    final type = AppUrls.selectedUserType.value;
+    return type == 'recruiter';
   }
 }

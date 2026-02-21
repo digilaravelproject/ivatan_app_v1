@@ -145,10 +145,10 @@ class DrawerScreen extends StatelessWidget {
                       children: [
                        Expanded(child:_buildBottomCard(context, "i-QuickHire", CupertinoIcons.briefcase_fill, "Job Board", onTap: () {
                          final type = AppUrls.selectedUserType.value;
-                         Get.offAllNamed(AppRoutes.jobSearchScreen);
+                         //Get.offAllNamed(AppRoutes.jobSearchScreen);
                          if (type == AppUrls.recruiter || type == AppUrls.applier) {
                           // Get.to(() => JobSearchScreen());
-                           //Get.offAllNamed(AppRoutes.jobSearchScreen);
+                           Get.toNamed(AppRoutes.jobSearchScreen);
                          } else {
                            Get.snackbar(
                              "Access Restricted",

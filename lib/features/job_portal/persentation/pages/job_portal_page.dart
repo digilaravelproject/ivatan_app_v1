@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:i_vatan_app/core/network/app_urls.dart';
 import 'package:i_vatan_app/features/job_portal/data/model/job_model.dart';
 import 'package:i_vatan_app/route/app_pages.dart';
 
+import '../../../../db/shared_pref_manager.dart';
 import '../controller/job_controller.dart';
 import '../controller/job_portal_controller.dart';
 import '../widgets/profile_drawer.dart';
@@ -77,6 +79,7 @@ class JobSearchScreen extends GetView<JobController> {
           // Profile Section - Clickable
           GestureDetector(
             onTap: () {
+              print("profilePhotoPath : "+AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString());
               _scaffoldKey.currentState?.openDrawer();
             },
             child: Container(
@@ -85,8 +88,8 @@ class JobSearchScreen extends GetView<JobController> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.black, width: 2),
-                image: const DecorationImage(
-                  image: NetworkImage('https://i.pravatar.cc/300'),
+                image: DecorationImage(
+                  image: NetworkImage(AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString()),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -97,7 +100,7 @@ class JobSearchScreen extends GetView<JobController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Alex Johnson',
+                SharedPrefManager().user!.name.toString(),
                 style: GoogleFonts.poppins(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -105,7 +108,7 @@ class JobSearchScreen extends GetView<JobController> {
                 ),
               ),
               Text(
-                'Senior UI/UX Designer',
+                SharedPrefManager().user!.occupation.toString(),
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   color: Colors.grey[600],
@@ -407,7 +410,7 @@ class JobSearchScreen extends GetView<JobController> {
     return
       InkWell(
       onTap: (){
-        Get.toNamed(AppRoutes.jobDescriptionScreen, arguments: job.slug);
+        Get.to(() => JobDescriptionScreen(), arguments: job.slug);
       },
       child:
       Container(
