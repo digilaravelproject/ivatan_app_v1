@@ -1,9 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:i_vatan_app/core/helper/custom_image_view.dart';
 
 import '../../../../../core/helper/custom_serchbar.dart';
 import '../../../../../core/theme/app_colors.dart';
+import 'live_straem_screen.dart';
 
 class LiveChatList extends StatelessWidget {
   const LiveChatList({super.key});
@@ -26,6 +31,14 @@ class LiveChatList extends StatelessWidget {
               size: 20,
             ),
           ),
+          title: Text(
+            "Live Chat",
+            style: TextStyle(
+              color: AppColors.black,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 10),
@@ -45,77 +58,80 @@ class LiveChatList extends StatelessWidget {
         // SingleChildScrollView(
         //   child:
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
             child: Column(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  height: 45,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
+            Container(
+              height: 45,
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(color: Colors.grey[300]!),
+              ),
+              child: Row(
+                children: [
+                  const SizedBox(width: 16),
+                  SvgPicture.string(
+                    '''<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M21 21L16.65 16.65" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>''',
+                    width: 20,
+                    height: 20,
                   ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        CupertinoIcons.search,
-                        color: AppColors.lightTextSecondary,
-                        size: 22,
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Search',
-                            hintStyle: TextStyle(
-                              color: AppColors.lightTextSecondary,
-                              fontSize: 18,
-                            ),
-                            border: InputBorder.none,
-                          ),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.black87,
-                          ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      //controller: controller.searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search name ...',
+                        hintStyle: GoogleFonts.poppins(
+                          color: Colors.grey[500],
+                          fontSize: 14,
                         ),
+                        border: InputBorder.none,
                       ),
-                    ],
+                      style: GoogleFonts.poppins(color: Colors.black, fontSize: 14),
+                    ),
                   ),
-                ),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Live Chat",
-                          style: TextStyle(
-                            color: AppColors.black,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "120 Friends Online",
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      "See All",
-                      style: TextStyle(
-                        color: AppColors.primary, 
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
+                  const SizedBox(width: 16),
+                ],
+              ),
+            ),
+                // SizedBox(height: 10),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: [
+                //     Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         Text(
+                //           "Live Chat",
+                //           style: TextStyle(
+                //             color: AppColors.black,
+                //             fontSize: 24,
+                //             fontWeight: FontWeight.bold,
+                //           ),
+                //         ),
+                //         Text(
+                //           "120 Friends Online",
+                //           style: TextStyle(
+                //             color: Colors.grey.shade600,
+                //             fontSize: 14,
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //     Text(
+                //       "See All",
+                //       style: TextStyle(
+                //         color: AppColors.primary,
+                //         fontSize: 14,
+                //         fontWeight: FontWeight.w600,
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 const SizedBox(height: 16),
 
                 Expanded(
@@ -127,7 +143,9 @@ class LiveChatList extends StatelessWidget {
                       return Column(
                         children: [
                           InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              Get.to(LiveStreamScreen());
+                            },
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               child: Row(
@@ -231,13 +249,13 @@ class LiveChatList extends StatelessWidget {
                                   Icon(
                                     Icons.arrow_forward_ios_rounded,
                                     size: 14,
-                                    color: Colors.grey.shade300,
+                                    color: Colors.grey.shade500,
                                   ),
                                 ],
                               ),
                             ),
                           ),
-                          Divider(height: 1, color: Colors.grey.shade50, indent: 76),
+                          Divider(height: 1, color: Colors.grey.shade300, ),
                         ],
                       );
                     },
