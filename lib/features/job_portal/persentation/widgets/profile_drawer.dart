@@ -7,12 +7,14 @@ import 'package:get/get.dart';
 
 import '../../../../core/network/app_urls.dart';
 import '../../../../db/shared_pref_manager.dart';
+import '../../../dashboard/persentation/settings_page.dart';
+import '../../../profile/screen/profile_screen.dart';
 import '../pages/applicant_list.dart';
 import '../pages/create_job_page.dart';
 import '../pages/delete_account_page.dart';
 import '../pages/help_privacy_page.dart';
 import '../pages/job_history_page.dart';
-import '../pages/my_applications.dart';
+import '../pages/my_jobs.dart';
 import '../pages/occupation_form_page.dart';
 
 class ProfileDrawer extends StatelessWidget {
@@ -36,15 +38,18 @@ class ProfileDrawer extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.black, width: 2),
-                              image: DecorationImage(
-                                image: NetworkImage(AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString()),
-                                fit: BoxFit.cover,
+                          GestureDetector(
+                            onTap: () =>  Get.to(ProfileScreen(viewUserName: SharedPrefManager().user!.username.toString(),)),
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.black, width: 2),
+                                image: DecorationImage(
+                                  image: NetworkImage(AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString()),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                           ),
@@ -96,7 +101,9 @@ class ProfileDrawer extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.to(() => SettingsScreen());
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
                         foregroundColor: Colors.white,

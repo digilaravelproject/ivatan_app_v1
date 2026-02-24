@@ -1,0 +1,364 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+
+import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/custom_buttons.dart';
+import 'controller/add_address_controller.dart';
+
+class AddAddressScreen extends GetWidget<AddAddressController> {
+  const AddAddressScreen({Key? key}) : super(key: key);
+
+
+  @override
+  Widget build(BuildContext context) {
+    //final AddAddressController controller = Get.put(AddAddressController());
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Add Address',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Form Title
+              const Text(
+                'Shipping Address',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Please enter your delivery address',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              const SizedBox(height: 30),
+
+              // Form Fields
+              _buildTextField(
+                label: 'Full Name',
+                hint: 'Enter your full name',
+                icon: Icons.person_outline,
+              ),
+              const SizedBox(height: 20),
+
+              _buildTextField(
+                label: 'Phone Number',
+                hint: 'Enter your phone number',
+                icon: Icons.phone_outlined,
+                keyboardType: TextInputType.phone,
+              ),
+              const SizedBox(height: 20),
+
+              _buildTextField(
+                label: 'Address Line 1',
+                hint: 'House/Flat No., Building Name',
+                icon: Icons.home_outlined,
+              ),
+              const SizedBox(height: 20),
+
+              _buildTextField(
+                label: 'Address Line 2',
+                hint: 'Street, Area (Optional)',
+                icon: Icons.location_on_outlined,
+              ),
+              const SizedBox(height: 20),
+
+              // City and State Row
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextField(
+                      label: 'City',
+                      hint: 'Enter city',
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildTextField(
+                      label: 'State',
+                      hint: 'Enter state',
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // Zip and Country Row
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextField(
+                      label: 'PIN Code',
+                      hint: 'Enter PIN code',
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildDropdownField(
+                      label: 'Country',
+                      value: 'India',
+                      items: ['India', 'USA', 'UK', 'Canada'],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
+
+              // Address Type Selection
+              const Text(
+                'Address Type',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  _buildAddressTypeChip('Home', Icons.home),
+                  const SizedBox(width: 16),
+                  _buildAddressTypeChip('Office', Icons.work),
+                  const SizedBox(width: 16),
+                  _buildAddressTypeChip('Other', Icons.location_on),
+                ],
+              ),
+              const SizedBox(height: 30),
+
+              // Save as Default Checkbox
+              // Row(
+              //   children: [
+              //     SizedBox(
+              //       height: 24,
+              //       width: 24,
+              //       child: Checkbox(
+              //         value: true,
+              //         onChanged: (value) {},
+              //         activeColor: Colors.black,
+              //         side: const BorderSide(color: Colors.grey),
+              //         shape: RoundedRectangleBorder(
+              //           borderRadius: BorderRadius.circular(4),
+              //         ),
+              //       ),
+              //     ),
+              //     const SizedBox(width: 12),
+              //     const Text(
+              //       'Set as default address',
+              //       style: TextStyle(
+              //         fontSize: 14,
+              //         color: Colors.black87,
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 30),
+
+              // Save Address Button
+
+              CustomButton(
+                  backgroundColor: AppColors.primary,
+                  borderRadius: 16,
+                  title: "Save Address", onPressed: (){
+
+              }),
+
+              const SizedBox(height: 16),
+
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildTextField({
+    required String label,
+    required String hint,
+    IconData? icon,
+    TextInputType? keyboardType,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: TextFormField(
+            keyboardType: keyboardType,
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+              prefixIcon: icon != null
+                  ? Icon(icon, color: Colors.grey.shade600, size: 20)
+                  : null,
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.black, width: 2),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdownField({
+    required String label,
+    required String value,
+    required List<String> items,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade300),
+            color: Colors.white,
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: value,
+              isExpanded: true,
+              icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey.shade600),
+              items: items.map((String item) {
+                return DropdownMenuItem<String>(
+                  value: item,
+                  child: Text(
+                    item,
+                    style: const TextStyle(fontSize: 14, color: Colors.black87),
+                  ),
+                );
+              }).toList(),
+              onChanged: (newValue) {},
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAddressTypeChip(String label, IconData icon) {
+    return Expanded(
+      child: Obx(() {
+        final isSelected = controller.selectedType.value == label;
+
+        return Container(
+          height: 35,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(
+              color: isSelected ? Colors.black : Colors.grey.shade300,
+            ),
+            color:
+            isSelected ? Colors.black.withOpacity(0.05) : Colors.transparent,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(25),
+              onTap: () {
+                controller.selectType(label);
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    icon,
+                    size: 20,
+                    color:
+                    isSelected ? Colors.black : Colors.grey.shade600,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                      color: isSelected
+                          ? Colors.black
+                          : Colors.grey.shade700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }),
+    );
+  }
+}

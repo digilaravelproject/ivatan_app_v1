@@ -410,7 +410,9 @@ class JobSearchScreen extends GetView<JobController> {
     return
       InkWell(
       onTap: (){
-        Get.to(() => JobDescriptionScreen(), arguments: job.slug);
+        Get.toNamed(AppRoutes.jobDescriptionScreen, arguments: job.slug);
+
+       // Get.toNamed(() => JobDescriptionScreen(), arguments: job.slug);
       },
       child:
       Container(

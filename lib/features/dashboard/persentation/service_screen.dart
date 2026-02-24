@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../service/persentation/service_enquire_form.dart' hide AppColors;
 
 
 
@@ -17,6 +18,17 @@ class DigitalProductListScreen extends StatelessWidget {
       },
     );
   }
+}
+
+void _showEnquiryBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true, // For full keyboard support
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) => const EnquiryForm(),
+  );
 }
 
 class DigitalProductListItem extends StatelessWidget {
@@ -138,23 +150,28 @@ class DigitalProductListItem extends StatelessWidget {
                         ),
                       ),
 
-                      Container(
-                       // width: double.infinity,
-                        height: 25,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          border: Border.all(color: Colors.black),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Center(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: Text(
-                              'VIEW NOW',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                      InkWell(
+                        onTap: (){
+                          _showEnquiryBottomSheet(context);
+                        },
+                        child: Container(
+                         // width: double.infinity,
+                          height: 25,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            border: Border.all(color: Colors.black),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Center(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: Text(
+                                'Enquiry',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
                               ),
                             ),
                           ),

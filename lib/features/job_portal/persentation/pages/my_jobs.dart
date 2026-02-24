@@ -20,7 +20,7 @@ class MyCreatedJobScreen extends GetWidget<JobController> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
         title: Text(
-          'Application History',
+          'My Jobs',
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             color: Colors.black,
