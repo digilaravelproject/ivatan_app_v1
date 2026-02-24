@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:i_vatan_app/route/app_pages.dart';
+import 'package:get/get.dart';
 
+import '../../../../core/network/app_urls.dart';
+import '../../../../db/shared_pref_manager.dart';
+import '../../../dashboard/persentation/settings_page.dart';
+import '../../../profile/screen/profile_screen.dart';
 import '../pages/applicant_list.dart';
 import '../pages/create_job_page.dart';
 import '../pages/delete_account_page.dart';
 import '../pages/help_privacy_page.dart';
 import '../pages/job_history_page.dart';
+import '../pages/my_jobs.dart';
 import '../pages/occupation_form_page.dart';
 
 class ProfileDrawer extends StatelessWidget {
@@ -29,38 +36,46 @@ class ProfileDrawer extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.black, width: 2),
-                          image: const DecorationImage(
-                            image: NetworkImage('https://i.pravatar.cc/300'),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
                         children: [
-                          // Name
-                          Text(
-                            'Alex Johnson',
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.black,
+                          GestureDetector(
+                            onTap: () =>  Get.to(ProfileScreen(viewUserName: SharedPrefManager().user!.username.toString(),)),
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.black, width: 2),
+                                image: DecorationImage(
+                                  image: NetworkImage(AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString()),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
                           ),
+                          SizedBox(width: 10,),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Name
+                              Text(
+                                SharedPrefManager().user!.name.toString(),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.black,
+                                ),
+                              ),
 
-                          // Title
-                          Text(
-                            'Senior UI/UX Designer',
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
+                              // Title
+                              Text(
+                                SharedPrefManager().user!.occupation.toString(),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -86,7 +101,9 @@ class ProfileDrawer extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.to(() => SettingsScreen());
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
                         foregroundColor: Colors.white,
@@ -171,38 +188,40 @@ class ProfileDrawer extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 1),
                 children: [
-                  _buildDrawerItem(
-                    icon: Icons.bookmark_outline,
-                    title: 'Create',
-                   // badge: '12',
-                    onTap: () {
-                      Get.to(JobCreateScreen());
-                    },
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.sensor_occupied,
-                    title: 'Occupation',
-                  //  badge: '5',
-                    onTap: () {
-                      Get.to(ResumeFormScreen());
-                    },
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.local_activity,
-                    title: 'Applicant',
-                  //  badge: '8',
-                    onTap: () {
-                      Get.to(ApplicantList());
-                    },
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.history,
-                    title: 'History',
-                  //  badge: '3',
-                    onTap: () {
-                      Get.to(JobHistoryScreen());
-                    },
-                  ),
+                  // Recruiter only items
+                  if (_isRecruiter())
+                    _buildDrawerItem(
+                      icon: Icons.bookmark_outline,
+                      title: 'Job Create',
+                      onTap: () {
+                        Get.to(JobCreateScreen());
+                      },
+                    ),
+                  if (_isRecruiter())
+                    _buildDrawerItem(
+                      icon: Icons.sensor_occupied,
+                      title: 'Occupation',
+                      onTap: () {
+                        Get.to(ResumeFormScreen());
+                      },
+                    ),
+                  if (_isRecruiter())
+                    _buildDrawerItem(
+                      icon: Icons.local_activity,
+                      title: 'My Jobs',
+                      onTap: () {
+                        Get.toNamed(AppRoutes.myCreatedJobScreen);
+                      },
+                    ),
+                  // Applier only items
+                  if (!_isRecruiter())
+                    _buildDrawerItem(
+                      icon: Icons.history,
+                      title: 'Application History',
+                      onTap: () {
+                        Get.to(JobHistoryScreen());
+                      },
+                    ),
                   const Divider(color: Colors.grey),
                   _buildDrawerItem(
                     icon: Icons.help_outline,
@@ -218,7 +237,6 @@ class ProfileDrawer extends StatelessWidget {
                       Get.to(AccountDeleteReasonScreen());
                     },
                   ),
-
                 ],
               ),
             ),
@@ -276,8 +294,8 @@ class ProfileDrawer extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      dense: true, // makes the ListTile more compact vertically
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4), // adjust vertical space
+      dense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       leading: Icon(icon, color: Colors.black, size: 24),
       title: Text(
         title,
@@ -306,6 +324,11 @@ class ProfileDrawer extends StatelessWidget {
           : null,
       onTap: onTap,
     );
+  }
+
+  bool _isRecruiter() {
+    final type = AppUrls.selectedUserType.value;
+    return type == 'recruiter';
   }
 
 }

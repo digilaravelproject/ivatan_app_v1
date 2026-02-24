@@ -17,10 +17,12 @@ class CommentController extends GetxController {
   // UI reactive lists
   RxList<CommentModel> commentsList = <CommentModel>[].obs;
   RxBool isLoading = false.obs;
+  RxInt currentPostId = 0.obs;
 
   Future<void> fetchComments(int postId) async {
     try {
       isLoading.value = true;
+      currentPostId.value = postId;
 
       final response =
       await api.callGet("api/v1/comments/post/$postId");

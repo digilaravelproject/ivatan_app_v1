@@ -2,19 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:i_vatan_app/core/network/app_urls.dart';
+import 'package:i_vatan_app/features/job_portal/data/model/job_model.dart';
+import 'package:i_vatan_app/route/app_pages.dart';
 
+import '../../../../db/shared_pref_manager.dart';
+import '../controller/job_controller.dart';
 import '../controller/job_portal_controller.dart';
 import '../widgets/profile_drawer.dart';
 import 'job_description_page.dart';
+import 'create_job_page.dart';
 
-class JobSearchScreen extends StatelessWidget {
+class JobSearchScreen extends GetView<JobController> {
   JobSearchScreen({super.key});
 
   final GlobalKey<ScaffoldState> _scaffoldKey =  GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
-    final JobController controller = Get.put(JobController());
+    //final JobController1 controller1 = Get.put(JobController1());
 
     return Scaffold(
       key: _scaffoldKey,
@@ -27,19 +33,19 @@ class JobSearchScreen extends StatelessWidget {
             _buildAppBar(),
 
             // Search Bar
-            _buildSearchBar(controller),
+            _buildSearchBar(),
 
             // Company Logos Horizontal List
-            Padding(
-              padding: const EdgeInsets.only(left: 16,top: 16),
-              child: Align(
-                alignment: Alignment.topLeft,
-                  child: Text("Recruiter Connection",style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.w700),)),
-            ),
-            _buildCompanyLogos(controller),
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 16,top: 16),
+            //   child: Align(
+            //     alignment: Alignment.topLeft,
+            //       child: Text("Recruiter Connection",style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.w700),)),
+            // ),
+            // _buildCompanyLogos(),
 
             // Tab Bar for Urgent/Recent
-            _buildTabBar(controller),
+            _buildTabBar(),
 
             // Tab View Content
             Expanded(
@@ -47,16 +53,21 @@ class JobSearchScreen extends StatelessWidget {
                 controller: controller.tabController,
                 children: [
                   // Urgent Needed Tab
-                  _buildUrgentJobsTab(controller),
+                  _buildUrgentJobsTab(),
 
                   // Recent Jobs Tab
-                  _buildRecentJobsTab(controller),
+                  _buildRecentJobsTab(),
                 ],
               ),
             ),
           ],
         ),
       ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => Get.toNamed(AppRoutes.jobCreateScreen),
+      //   backgroundColor: Colors.black,
+      //   child: const Icon(Icons.add, color: Colors.white),
+      // ),
     );
   }
 
@@ -68,6 +79,7 @@ class JobSearchScreen extends StatelessWidget {
           // Profile Section - Clickable
           GestureDetector(
             onTap: () {
+              print("profilePhotoPath : "+AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString());
               _scaffoldKey.currentState?.openDrawer();
             },
             child: Container(
@@ -76,8 +88,8 @@ class JobSearchScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.black, width: 2),
-                image: const DecorationImage(
-                  image: NetworkImage('https://i.pravatar.cc/300'),
+                image: DecorationImage(
+                  image: NetworkImage(AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString()),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -88,7 +100,7 @@ class JobSearchScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Alex Johnson',
+                SharedPrefManager().user!.name.toString(),
                 style: GoogleFonts.poppins(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -96,7 +108,7 @@ class JobSearchScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                'Senior UI/UX Designer',
+                SharedPrefManager().user!.occupation.toString(),
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   color: Colors.grey[600],
@@ -144,7 +156,7 @@ class JobSearchScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchBar(JobController controller) {
+  Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Container(
@@ -168,7 +180,7 @@ class JobSearchScreen extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: TextField(
-                controller: controller.searchController,
+               // controller: controller.searchController,
                 decoration: InputDecoration(
                   hintText: 'Search jobs, companies, keywords...',
                   hintStyle: GoogleFonts.poppins(
@@ -187,7 +199,7 @@ class JobSearchScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCompanyLogos(JobController controller) {
+  Widget _buildCompanyLogos() {
     return SizedBox(
       height: 90,
       child: ListView.builder(
@@ -258,7 +270,6 @@ class JobSearchScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-
               ),
            // ),
           );
@@ -267,7 +278,7 @@ class JobSearchScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTabBar(JobController controller) {
+  Widget _buildTabBar() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: TabBar(
@@ -295,18 +306,29 @@ class JobSearchScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildUrgentJobsTab(JobController controller) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: controller.urgentJobs.length,
-      itemBuilder: (context, index) {
-        final job = controller.urgentJobs[index];
-        return _buildJobCard(job, true);
-      },
-    );
+  Widget _buildUrgentJobsTab() {
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      if (controller.jobList.isEmpty) {
+        return const Center(child: Text("No jobs found"));
+      }
+
+      return ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: controller.jobList.length,
+        itemBuilder: (context, index) {
+          final job = controller.jobList[index];
+          return _buildJobCard(job, true);
+        },
+      );
+    });
   }
 
-  Widget _buildRecentJobsTab(JobController controller) {
+
+  Widget _buildRecentJobsTab() {
     return Column(
       children: [
         // Filter Chips
@@ -340,16 +362,16 @@ class JobSearchScreen extends StatelessWidget {
         ),
 
         // Job List
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: controller.recentJobs.length,
-            itemBuilder: (context, index) {
-              final job = controller.recentJobs[index];
-              return _buildJobCard(job, false);
-            },
-          ),
-        ),
+        // Expanded(
+        //   child: ListView.builder(
+        //     padding: const EdgeInsets.symmetric(horizontal: 16),
+        //     itemCount: controller.recentJobs.length,
+        //     itemBuilder: (context, index) {
+        //       final job = controller.recentJobs[index];
+        //       return _buildJobCard(job, false);
+        //     },
+        //   ),
+        // ),
       ],
     );
   }
@@ -369,8 +391,8 @@ class JobSearchScreen extends StatelessWidget {
         ),
         selected: isSelected,
         onSelected: (selected) {
-          final controller = Get.find<JobController>();
-          controller.selectedFilter.value = selected ? label : 'All';
+          final controller1 = Get.find<JobController1>();
+          controller1.selectedFilter.value = selected ? label : 'All';
         },
         backgroundColor: Colors.white,
         selectedColor: Colors.black,
@@ -384,11 +406,13 @@ class JobSearchScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildJobCard(Job job, bool isUrgent) {
+  Widget _buildJobCard(JobModel job, bool isUrgent) {
     return
       InkWell(
       onTap: (){
-        Get.to(() => JobDescriptionScreen());
+        Get.toNamed(AppRoutes.jobDescriptionScreen, arguments: job.slug);
+
+       // Get.toNamed(() => JobDescriptionScreen(), arguments: job.slug);
       },
       child:
       Container(
@@ -420,7 +444,7 @@ class JobSearchScreen extends StatelessWidget {
                       shape: BoxShape.circle,
                      // border: Border.all(color: Colors.grey[300]!),
                       image: DecorationImage(
-                        image: NetworkImage(job.companyLogo),
+                        image: NetworkImage("https://cdn-icons-png.flaticon.com/512/731/731985.png"),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -440,7 +464,7 @@ class JobSearchScreen extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          job.position,
+                          job.title,
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -467,7 +491,7 @@ class JobSearchScreen extends StatelessWidget {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              '💼 ${job.type}',
+                              '💼 ${job.employmentType}',
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 color: Colors.grey[600],
@@ -543,7 +567,7 @@ class JobSearchScreen extends StatelessWidget {
                         Text('⏳', style: GoogleFonts.poppins(fontSize: 12)),
                         const SizedBox(width: 4),
                         Text(
-                          '${job.daysLeft} days left',
+                          '${7} days left',
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -558,7 +582,7 @@ class JobSearchScreen extends StatelessWidget {
       
                   // Salary
                   Text(
-                    '💰 \$${job.salary}k/yr',
+                    '💰 \$${job.salaryMax}k/yr',
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -566,27 +590,32 @@ class JobSearchScreen extends StatelessWidget {
                     ),
                   ),
       
-                  const SizedBox(width: 12),
+                /*  const SizedBox(width: 12),
       
                   // Apply Button
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      'Apply',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                  InkWell(
+                    onTap: () {
+                      Get.toNamed(AppRoutes.applicantListScreen, arguments: job.id);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        'Apply',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                  ),
+                  ),*/
                 ],
               ),
             ],
@@ -596,5 +625,3 @@ class JobSearchScreen extends StatelessWidget {
     );
   }
 }
-
-

@@ -1,5 +1,20 @@
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
+
+import '../helper/extensions.dart';
+
 class AppUrls {
   AppUrls._();
+
+  // User Types for account switching
+  static const String creator = "creator";
+  static const String music = "music";
+  static const String businessService = "business_service";
+  static const String businessProduct = "business_product";
+  static const String recruiter = "recruiter";
+  static const String applier = "applier";
+
+  // Current selected user type (Reactive)
+  static RxString selectedUserType = creator.obs;
 
   static const String baseUrl =
     //  "https://darkorange-baboon-922736.hostingersite.com";
@@ -25,6 +40,10 @@ class AppUrls {
   static const verifyForgetPassword  ="api/forgot-password/verify";
   static const changePassword  ="api/forgot-password/reset";
   static const interests  ="api/interests";
+
+
+
+  static const allJobs  ="api/v1/jobs";
 
 
 

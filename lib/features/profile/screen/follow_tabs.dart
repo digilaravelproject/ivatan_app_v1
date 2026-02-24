@@ -195,7 +195,6 @@ class FollowingList extends StatelessWidget {
                     separatorBuilder: (context, index) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final user = controller.filteredFollowingList[index];
-                      final followController = Get.find<FollowController>();
 
                       return GestureDetector(
                         onTap: () {
@@ -244,39 +243,33 @@ class FollowingList extends StatelessWidget {
 
                             // Follow Button
                             if (!user.isAuthUser)
-                              Obx(() {
-                                final isFollowing = followController
-                                    .isUserFollowing(user.id!, initialValue: user.isFollowedByAuthUser)
-                                    .value;
-
-                                return GestureDetector(
-                                  onTap: () {
-                                    if (isFollowing) {
-                                      _showUnfollowBottomSheet(context, user, controller);
-                                    } else {
-                                      controller.toggleFollowUser(user.id!);
-                                    }
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                      vertical: 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: isFollowing ? Colors.grey.shade200 : AppColors.primaryDark,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      isFollowing ? "Following" : "Follow",
-                                      style: TextStyle(
-                                        color: isFollowing ? Colors.black87 : Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 13,
-                                      ),
+                              GestureDetector(
+                                onTap: () {
+                                  if (user.isFollowedByAuthUser) {
+                                    _showUnfollowBottomSheet(context, user, controller);
+                                  } else {
+                                    controller.toggleFollowUser(user.id!);
+                                  }
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: user.isFollowedByAuthUser ? Colors.grey.shade200 : AppColors.primaryDark,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    user.isFollowedByAuthUser ? "Following" : "Follow",
+                                    style: TextStyle(
+                                      color: user.isFollowedByAuthUser ? Colors.black87 : Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13,
                                     ),
                                   ),
-                                );
-                              }),
+                                ),
+                              ),
                           ],
                         ),
                       );
@@ -374,7 +367,6 @@ class FollowerList extends StatelessWidget {
                     separatorBuilder: (context, index) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final user = controller.filteredFollowerList[index];
-                      final followController = Get.find<FollowController>();
 
                       return GestureDetector(
                         onTap: () {
@@ -423,39 +415,33 @@ class FollowerList extends StatelessWidget {
 
                             // Follow Button
                             if (!user.isAuthUser)
-                              Obx(() {
-                                final isFollowing = followController
-                                    .isUserFollowing(user.id!, initialValue: user.isFollowedByAuthUser)
-                                    .value;
-
-                                return GestureDetector(
-                                  onTap: () {
-                                    if (isFollowing) {
-                                      _showUnfollowBottomSheet(context, user, controller);
-                                    } else {
-                                      controller.toggleFollowUser(user.id!);
-                                    }
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                      vertical: 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: isFollowing ? Colors.grey.shade200 : AppColors.primaryDark,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      isFollowing ? "Following" : "Follow",
-                                      style: TextStyle(
-                                        color: isFollowing ? Colors.black87 : Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 13,
-                                      ),
+                              GestureDetector(
+                                onTap: () {
+                                  if (user.isFollowedByAuthUser) {
+                                    _showUnfollowBottomSheet(context, user, controller);
+                                  } else {
+                                    controller.toggleFollowUser(user.id!);
+                                  }
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: user.isFollowedByAuthUser ? Colors.grey.shade200 : AppColors.primaryDark,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    user.isFollowedByAuthUser ? "Following" : "Follow",
+                                    style: TextStyle(
+                                      color: user.isFollowedByAuthUser ? Colors.black87 : Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13,
                                     ),
                                   ),
-                                );
-                              }),
+                                ),
+                              ),
                           ],
                         ),
                       );

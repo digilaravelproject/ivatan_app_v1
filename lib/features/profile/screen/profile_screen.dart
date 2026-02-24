@@ -24,11 +24,17 @@ import '../../dashboard/controller/navigationController.dart';
 import '../../dashboard/controller/settings_controller.dart';
 import '../../dashboard/model/user_profile.dart';
 import '../../dashboard/persentation/comming_soon.dart';
+import '../../dashboard/persentation/creater_analysis_screen.dart';
 import '../../dashboard/persentation/post_media_picker_screen.dart';
+import '../../dashboard/persentation/product_screen.dart';
 import '../../dashboard/persentation/reel_media_picker_screen.dart';
+import '../../dashboard/persentation/service_screen.dart';
 import '../../dashboard/persentation/settings_page.dart';
 import '../../messages/controller/chatt_controller.dart';
 import '../../messages/persentation/chatting_screen.dart';
+import '../../product/persentation/cart_screen.dart';
+import '../../service/persentation/create_service_screen.dart';
+import '../../service/persentation/service_enquire_form.dart';
 import '../../story/persentation/storyfullview.dart';
 import '../controller/profile_controller.dart';
 import 'follow_tabs.dart' hide CustomEmptyState;
@@ -106,17 +112,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
           final bool isPrivateHidden = isOtherProfile && 
                                      user.accountPrivacy == "private" && 
                                      !isFollowing;
-          return DefaultTabController(
-            length: 4,
-            child: Stack(
-              children: [
-                NestedScrollView(
-                  headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                    return <Widget>[
-                      SliverToBoxAdapter(
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
+          return Obx(() {
+            final userType = AppUrls.selectedUserType.value;
+            
+            // Build dynamic tabs and views
+            List<Tab> tabs = [
+              Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 
+              Tab(child: Image.asset(AppAssets.icVideo, width: 24, height: 24)),
+            ];
+            
+            List<Widget> tabViews = [
+              MyPostScreen(username: finalUserName),
+              MyVideoScreen(username: finalUserName),
+            ];
+            
+            if (userType == AppUrls.creator) {
+              tabs.add(Tab(child: Icon(Icons.person_add_alt_1_outlined, color: Colors.black, size: 26)));
+              tabViews.add(CreatorAnalysisScreen());
+            } else if (userType == AppUrls.businessService) {
+              tabs.add(Tab(child: Icon(Icons.room_service_outlined, color: Colors.black, size: 26)));
+              tabViews.add(const DigitalProductListScreen());
+            } else if (userType == AppUrls.businessProduct) {
+              tabs.add(Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)));
+              tabViews.add(ProductGridScreen());
+            }
+
+            return DefaultTabController(
+              key: ValueKey(userType), // Force recreate when type changes
+              length: tabs.length,
+              child: Stack(
+                children: [
+                  NestedScrollView(
+                    headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                      return <Widget>[
+                        SliverToBoxAdapter(
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              // ... existing cover and info container code ...
+                              // (I will keep the existing code here by using the multi_replace_file_content if needed, 
+                              // but since this is a continuous block I'll use it carefully)
                             // 1. Cover Image & Info Container
                             Column(
                               children: [
@@ -168,18 +203,82 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                                        // Icons
                                       if (!isOtherProfile)
+                                        // Positioned(
+                                        //   top: 40,
+                                        //   right: 10,
+                                        //   child: IconButton(
+                                        //     icon: Container(
+                                        //       padding: const EdgeInsets.all(6),
+                                        //       decoration: BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
+                                        //       child: const Icon(Icons.settings, color: Colors.white, size: 20),
+                                        //     ),
+                                        //     onPressed: () => Get.to(() => SettingsScreen()),
+                                        //   ),
+                                        // ),
+
+
                                         Positioned(
                                           top: 40,
                                           right: 10,
-                                          child: IconButton(
-                                            icon: Container(
+                                          child: PopupMenuButton<String>(
+                                            onSelected: (value) {
+                                              if (value == 'profile') {
+                                                Get.to(() => SettingsScreen());
+                                              } else if (value == 'cart') {
+                                               Get.to(() => CartScreen());
+                                              } else if (value == 'enquiry') {
+                                                Get.to(() => EnquiriesListScreen());
+                                              }
+                                            },
+                                            itemBuilder: (context) => [
+                                              const PopupMenuItem(
+                                                value: 'profile',
+                                                child: Row(
+                                                  children: [
+                                                    Icon(CupertinoIcons.person_add, size: 20),
+                                                    SizedBox(width: 10),
+                                                    Text("Profile Settings"),
+                                                  ],
+                                                ),
+                                              ),
+                                              const PopupMenuItem(
+                                                value: 'cart',
+                                                child: Row(
+                                                  children: [
+                                                    Icon(CupertinoIcons.cart, size: 20),
+                                                    SizedBox(width: 10),
+                                                    Text("Cart"),
+                                                  ],
+                                                ),
+                                              ),
+                                              const PopupMenuItem(
+                                                value: 'enquiry',
+                                                child: Row(
+                                                  children: [
+                                                    Icon(CupertinoIcons.chat_bubble_text, size: 20),
+                                                    SizedBox(width: 10),
+                                                    Text("Enquiry"),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                            child: Container(
                                               padding: const EdgeInsets.all(6),
-                                              decoration: BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
-                                              child: const Icon(Icons.settings, color: Colors.white, size: 20),
+                                              decoration: const BoxDecoration(
+                                                color: Colors.black26,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(
+                                                Icons.more_vert,
+                                                color: Colors.white,
+                                                size: 22,
+                                              ),
                                             ),
-                                            onPressed: () => Get.to(() => SettingsScreen()),
                                           ),
                                         ),
+
+
+
                                       // Stats Pill
                                       Positioned(
                                         top: 0,
@@ -321,7 +420,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         ),
                                                         const SizedBox(height: 20),
                                                         const Text("Create New", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                                                        const SizedBox(height: 25),
+                                                        const SizedBox(height: 20),
                                                         
                                                         // Options
                                                         _buildCreateOption(
@@ -335,7 +434,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             Get.to(() => const PostMediaPickerScreen());
                                                           },
                                                         ),
-                                                        const SizedBox(height: 16),
+                                                        const SizedBox(height: 10),
                                                         _buildCreateOption(
                                                           icon: Icons.movie_creation_outlined,
                                                           color: Colors.pink,
@@ -347,7 +446,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             Get.to(() => const ReelMediaPickerScreen());
                                                           },
                                                         ),
-                                                        const SizedBox(height: 16),
+                                                        const SizedBox(height: 10),
                                                         _buildCreateOption(
                                                           icon: Icons.live_tv_rounded,
                                                           color: Colors.redAccent,
@@ -362,7 +461,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             );
                                                           },
                                                         ),
-                                                        const SizedBox(height: 16),
+                                                        const SizedBox(height: 10),
                                                         _buildCreateOption(
                                                           icon: Icons.camera_alt_rounded,
                                                           color: Colors.orange,
@@ -372,6 +471,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             Get.back(); 
                                                             // Use same logic as home screen add story
                                                             storyController.showPickerOptions();
+                                                          },
+                                                        ),
+                                                        const SizedBox(height: 10),
+                                                        _buildCreateOption(
+                                                          icon: Icons.shopping_bag,
+                                                          color: Colors.orange,
+                                                          title: "Product",
+                                                          subtitle: "Add your product",
+                                                          onTap: () {
+                                                            Get.back();
+
+                                                            // Use same logic as home screen add story
+                                                            //storyController.showPickerOptions();
+                                                          },
+                                                        ),
+                                                        const SizedBox(height: 10),
+                                                        _buildCreateOption(
+                                                          icon: Icons.miscellaneous_services,
+                                                          color: Colors.orange,
+                                                          title: "Service",
+                                                          subtitle: "Add your service",
+                                                          onTap: () {
+                                                            Get.back();
+                                                            Get.to(CreateServiceScreen());
+                                                            // Use same logic as home screen add story
+                                                           // storyController.showPickerOptions();
                                                           },
                                                         ),
                                                       ],
@@ -516,47 +641,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         SliverToBoxAdapter(child: const SizedBox.shrink()),
                       
                       if (!isPrivateHidden)
-                      SliverPersistentHeader(
-                        pinned: true,
-                        delegate: _SliverAppBarDelegate(
-                          TabBar(
+                        SliverAppBar(
+                          pinned: true,
+                          floating: false,
+                          backgroundColor: AppColors.white,
+                          automaticallyImplyLeading: false,
+                          toolbarHeight: 0,
+                          elevation: 0,
+                          bottom: TabBar(
                             isScrollable: false,
                             dividerColor: Colors.grey.shade200,
                             labelColor: Colors.black,
                             unselectedLabelColor: Colors.grey,
                             indicatorColor: Colors.blue,
                             indicatorWeight: 2,
-                            labelPadding: EdgeInsets.symmetric(horizontal: 12),
-                            tabs: [
-                              Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 
-                              Tab(child: Image.asset(AppAssets.icVideo, width: 24, height: 24)),
-                              Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)),
-                              Tab(child: Icon(Icons.person_add_alt_1_outlined, color: Colors.black, size: 26)), 
-                            ],
+                            labelPadding: const EdgeInsets.symmetric(horizontal: 12),
+                            tabs: tabs,
                           ),
                         ),
-                      ),
                     ];
                   },
                   body: isPrivateHidden 
                     ? _buildPrivatePlaceholder()
                     : TabBarView(
-                    children: [
-                      MyPostScreen(username: finalUserName),
-                      MyVideoScreen(username: finalUserName),
-                      // const ProfileShopScreen(),
-                      CustomEmptyState(
-                        icon: Icons.shopping_bag_outlined,
-                        title: "Shop",
-                        subTitle: "Browse and sell products. Feature coming soon.",
-                      ),
-                      // ProfileLivePostsScreen(username: finalUserName),
-                      CustomEmptyState(
-                        icon: Icons.person_add_alt_1_outlined,
-                        title: "Tagged Posts",
-                        subTitle: "View posts where you're tagged. Feature coming soon.",
-                      ),
-                    ],
+                    children: tabViews,
                   ),
                 ),
 
@@ -565,6 +673,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           );
+        });
         }),
       ),
     );
@@ -1683,7 +1792,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: Colors.grey.shade50,
           borderRadius: BorderRadius.circular(12),
@@ -1697,7 +1806,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: color.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: color, size: 24),
+              child: Icon(icon, color: color, size: 20),
             ),
             const SizedBox(width: 16),
             Column(
@@ -1716,31 +1825,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  final TabBar _tabBar;
-
-  _SliverAppBarDelegate(this._tabBar);
-
-  @override
-  double get minExtent => _tabBar.preferredSize.height;
-
-  @override
-  double get maxExtent => _tabBar.preferredSize.height;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: AppColors.white,
-      child: _tabBar,
-    );
-  }
-
-  @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return false;
-  }
-}
 
 
 

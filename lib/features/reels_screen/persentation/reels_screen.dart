@@ -272,9 +272,9 @@ class _ReelsScreenState extends State<ReelsScreen> {
                   bottom: 120,
                   child: Column(
                     children: [
-                     // _iconWithText(Icons.favorite, reel.likeCount.toString()),
+                      // _iconWithText(Icons.favorite, reel.likeCount.toString()),
                       const SizedBox(height: 20),
-                     // _iconWithText(Icons.comment, reel.commentCount.toString()),
+                      // _iconWithText(Icons.comment, reel.commentCount.toString()),
                     ],
                   ),
                 ),

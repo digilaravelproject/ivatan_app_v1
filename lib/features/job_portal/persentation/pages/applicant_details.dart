@@ -1,40 +1,42 @@
 import 'package:flutter/material.dart';
-
-import '../../data/model/applicant_model.dart';
+import 'package:get/get.dart';
+import '../../data/model/job_model.dart';
 import '../controller/applicant_controller.dart';
 
-
-
-
-class ApplicantDetail extends StatelessWidget {
-  final String applicantId;
+class ApplicantDetail extends GetView<ApplicantController> {
+  final int applicationId;
 
   const ApplicantDetail({
     super.key,
-    required this.applicantId,
+    required this.applicationId,
   });
 
   @override
   Widget build(BuildContext context) {
-    final ApplicantController _controller = ApplicantController();
-    final Applicant? applicant = _controller.getApplicantById(applicantId);
+    final application = controller.getApplicantById(applicationId);
 
-    if (applicant == null) {
+    if (application == null) {
       return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
           iconTheme: const IconThemeData(color: Color(0xFF1A2E3F)),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Get.back(),
+          ),
         ),
         body: const Center(
           child: Text(
-            'Applicant not found',
+            'Application not found',
             style: TextStyle(color: Color(0xFF1A2E3F)),
           ),
         ),
       );
     }
+
+    final applicant = application.applicant;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
@@ -50,6 +52,10 @@ class ApplicantDetail extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0.5,
         iconTheme: const IconThemeData(color: Color(0xFF1A2E3F)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Get.back(),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -68,19 +74,24 @@ class ApplicantDetail extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 45,
-                    backgroundColor: Colors.grey.shade200,
-                    child: Text(
-                      applicant.name
-                          .split(' ')
-                          .map((e) => e[0])
-                          .take(2)
-                          .join(),
-                      style: const TextStyle(
-                        color: Color(0xFF1A2E3F),
-                        fontSize: 28,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    backgroundColor: Colors.grey.shade100,
+                    backgroundImage: applicant.profilePhotoPath != null 
+                      ? NetworkImage(applicant.profilePhotoPath!) 
+                      : null,
+                    child: applicant.profilePhotoPath == null
+                      ? Text(
+                          applicant.name
+                              .split(' ')
+                              .map((e) => e[0])
+                              .take(2)
+                              .join(),
+                          style: const TextStyle(
+                            color: Color(0xFF1A2E3F),
+                            fontSize: 28,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        )
+                      : null,
                   ),
                   const SizedBox(height: 14),
                   Text(
@@ -93,7 +104,7 @@ class ApplicantDetail extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    applicant.position,
+                    applicant.occupation ?? 'Applicant',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey.shade600,
@@ -111,7 +122,7 @@ class ApplicantDetail extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      'Applied on ${_formatDate(applicant.appliedDate)}',
+                      'Applied on ${_formatDate(application.createdAt)}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -132,195 +143,171 @@ class ApplicantDetail extends StatelessWidget {
               children: [
                 _buildDetailRow(Icons.email_outlined, 'Email', applicant.email),
                 _buildDetailRow(Icons.phone_outlined, 'Phone', applicant.phone),
-                _buildDetailRow(Icons.location_on_outlined, 'Location', applicant.location),
-                _buildDetailRow(Icons.cake_outlined, 'Applied For', applicant.position),
+                _buildDetailRow(Icons.location_on_outlined, 'Location', applicant.countryCode),
+                _buildDetailRow(Icons.work_outline, 'Occupation', applicant.occupation ?? 'N/A'),
               ],
             ),
 
-            _buildSection(
-              title: 'Education',
-              icon: Icons.school_outlined,
-              children: [
-                _buildDetailRow(Icons.bolt_outlined, 'Degree', applicant.education),
-              ],
-            ),
-
-            _buildSection(
-              title: 'Experience & Skills',
-              icon: Icons.work_outline,
-              children: [
-                _buildDetailRow(Icons.timeline_outlined, 'Experience', applicant.experience),
-                const SizedBox(height: 12),
-                const Text(
-                  'Skills',
-                  style: TextStyle(
-                    color: Color(0xFF1A2E3F),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+            if (applicant.bio != null && applicant.bio!.isNotEmpty)
+              _buildSection(
+                title: 'About Applicant',
+                icon: Icons.info_outline,
+                children: [
+                  Text(
+                    applicant.bio!,
+                    style: TextStyle(
+                      color: Colors.grey.shade700,
+                      fontSize: 14,
+                      height: 1.5,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: applicant.skills.map((skill) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF0F4F8),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: const Color(0xFFE1E8ED),
-                        ),
-                      ),
-                      child: Text(
-                        skill,
-                        style: const TextStyle(
-                          color: Color(0xFF1A2E3F),
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
+                ],
+              ),
 
             _buildSection(
-              title: 'CV & Documents',
+              title: 'Application Details',
               icon: Icons.description_outlined,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                _buildDetailRow(Icons.stars_outlined, 'Status', application.status.toUpperCase()),
+                const SizedBox(height: 12),
+                if (application.coverMessage != null && application.coverMessage!.isNotEmpty) ...[
+                  const Text(
+                    'Cover Letter',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1A2E3F),
+                    ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.format_quote_outlined, size: 20, color: Colors.grey.shade500),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Cover Letter',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1A2E3F),
-                            ),
-                          ),
-                        ],
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: Text(
+                      application.coverMessage!,
+                      style: TextStyle(
+                        color: Colors.grey.shade700,
+                        fontSize: 14,
+                        height: 1.4,
                       ),
-                      const SizedBox(height: 10),
-                      Text(
-                        applicant.cvSummary,
-                        style: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontSize: 14,
-                          height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                if (application.resumePath != null)
+                  Row(
+                    children: [
+                      Icon(Icons.picture_as_pdf, size: 24, color: Colors.red.shade700),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'Resume.pdf',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF1A2E3F),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Icon(Icons.picture_as_pdf, size: 24, color: Colors.red.shade700),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              '${applicant.name.replaceAll(' ', '_')}_CV.pdf',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF1A2E3F),
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          /// View Button
-                          _cvIconButton(
-                            icon: Icons.visibility_outlined,
-                            color: Colors.white,
-                            background: Colors.grey.shade200,
-                            onPressed: () => _showCVPreview(context, applicant),
-                          ),
-                          const SizedBox(width: 8),
-                          /// Download Button
-                          _cvIconButton(
-                            icon: Icons.download_outlined,
-                            color: Colors.white,
-                            background: const Color(0xFF1A2E3F),
-                            onPressed: () => _showDownloadDialog(context, applicant),
-                          ),
-                        ],
+                     // _cvIconButton(
+                      //   icon: Icons.visibility_outlined,
+                      //   color: Colors.white,
+                      //   background: Colors.grey.shade300,
+                      //   onPressed: () {},
+                      // ),
+                      const SizedBox(width: 8),
+                      _cvIconButton(
+                        icon: Icons.download_outlined,
+                        color: Colors.white,
+                        background: const Color(0xFF1A2E3F),
+                        onPressed: () {
+                          controller.downloadResume(
+                            application.id, 
+                            "resume_${applicant.name.replaceAll(' ', '_')}.pdf"
+                          );
+                        },
                       ),
                     ],
                   ),
-                ),
               ],
             ),
+
+            /// 🔹 Status Badge (Reactive)
+            Obx(() {
+              final currentApp = controller.getApplicantById(applicationId);
+              if (currentApp == null) return const SizedBox.shrink();
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: _getStatusColor(currentApp.status),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  currentApp.status.toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              );
+            }),
 
             const SizedBox(height: 20),
 
-            /// 🔹 Accept / Reject Buttons
+            /// 🔹 Status Action Buttons
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              child: Row(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1A2E3F),
-                        foregroundColor: Colors.white,
-                        elevation: 2,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: const Text(
-                        'Accept',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                  const Text(
+                    'Change Application Status',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1A2E3F),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {},
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.grey.shade400),
-                        foregroundColor: Colors.grey.shade800,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                  const SizedBox(height: 12),
+                  Obx(() => controller.isLoading.value 
+                    ? const Center(child: CircularProgressIndicator())
+                    : Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _statusActionButton(
+                        context, 
+                        'shortlisted', 
+                        Colors.blue.shade700,
+                        Icons.star_outline,
                       ),
-                      child: const Text(
-                        'Reject',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      _statusActionButton(
+                        context, 
+                        'accepted', 
+                        Colors.green.shade700,
+                        Icons.check_circle_outline,
                       ),
-                    ),
+                      _statusActionButton(
+                        context, 
+                        'rejected', 
+                        Colors.red.shade700,
+                        Icons.cancel_outlined,
+                      ),
+                      _statusActionButton(
+                        context, 
+                        'viewed', 
+                        Colors.orange.shade700,
+                        Icons.remove_red_eye_outlined,
+                      ),
+                    ],
+                  ),
                   ),
                 ],
               ),
@@ -428,151 +415,66 @@ class ApplicantDetail extends StatelessWidget {
     );
   }
 
-  String _formatDate(String dateStr) {
-    final date = DateTime.parse(dateStr);
-    final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
-  }
-
-// TODO: Implement _showCVPreview & _showDownloadDialog as needed
-
-
-
-  void _showCVPreview(BuildContext context, Applicant applicant) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Container(
-          width: double.infinity,
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.8,
-          ),
-          child: Column(
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A2E3F),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.picture_as_pdf, color: Colors.white),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        '${applicant.name}_CV.pdf',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Preview
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  color: Colors.grey.shade50,
-                  child: Image.network(
-                    'https://via.placeholder.com/600x800/E1E8ED/1A2E3F?text=CV+Preview',
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.picture_as_pdf, size: 64, color: Colors.grey.shade400),
-                            const SizedBox(height: 12),
-                            const Text('CV Preview', style: TextStyle(fontSize: 18)),
-                            const SizedBox(height: 4),
-                            Text(applicant.name, style: const TextStyle(fontSize: 14)),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-
-              // Download Button
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _showDownloadDialog(context, applicant);
-                  },
-                  icon: const Icon(Icons.download),
-                  label: const Text('Download CV'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1A2E3F),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                ),
-              ),
-            ],
-          ),
+  Widget _statusActionButton(
+    BuildContext context, 
+    String status, 
+    Color color,
+    IconData icon,
+  ) {
+    return InkWell(
+      onTap: () => controller.updateStatus(applicationId, status),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withOpacity(0.3)),
         ),
-      ),
-    );
-  }
-
-  void _showDownloadDialog(BuildContext context, Applicant applicant) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: const Text(
-          'Download CV',
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
-        content: Text('Do you want to download ${applicant.name}\'s CV?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Downloading ${applicant.name}\'s CV...'),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  backgroundColor: const Color(0xFF1A2E3F),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1A2E3F),
-              foregroundColor: Colors.white,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: color),
+            const SizedBox(width: 6),
+            Text(
+              status.toUpperCase(),
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            child: const Text('Download'),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'accepted':
+        return Colors.green.shade600;
+      case 'rejected':
+        return Colors.red.shade600;
+      case 'shortlisted':
+        return Colors.blue.shade600;
+      case 'viewed':
+        return Colors.orange.shade600;
+      default:
+        return const Color(0xFF1A2E3F);
+    }
+  }
 
+  String _formatDate(String dateStr) {
+    try {
+      final date = DateTime.parse(dateStr);
+      final months = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      ];
+      return '${date.day} ${months[date.month - 1]} ${date.year}';
+    } catch (e) {
+      return 'N/A';
+    }
+  }
 }
