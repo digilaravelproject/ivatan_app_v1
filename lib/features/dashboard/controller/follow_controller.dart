@@ -15,7 +15,8 @@ class FollowController extends GetxController {
 
   RxBool isUserFollowing(int userId, {bool? initialValue}) {
     if (!followStatus.containsKey(userId)) {
-      followStatus[userId] = (initialValue ?? false).obs;
+      // Return a dummy RxBool if not found, but DON'T add to map during build phase
+      return (initialValue ?? false).obs;
     }
     return followStatus[userId]!;
   }

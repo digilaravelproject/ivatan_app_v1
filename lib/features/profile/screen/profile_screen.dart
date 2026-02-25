@@ -28,6 +28,11 @@ import '../../dashboard/persentation/creater_analysis_screen.dart';
 import '../../dashboard/persentation/post_media_picker_screen.dart';
 import '../../dashboard/persentation/product_screen.dart';
 import '../../dashboard/persentation/reel_media_picker_screen.dart';
+import '../../product/persentation/create_product_screen.dart';
+import '../../product/persentation/my_orders_screen.dart';
+import '../../product/persentation/my_products_screen.dart';
+import '../../service/persentation/my_services_screen.dart';
+import '../../service/persentation/create_service_screen.dart';
 import '../../dashboard/persentation/service_screen.dart';
 import '../../dashboard/persentation/settings_page.dart';
 import '../../messages/controller/chatt_controller.dart';
@@ -119,22 +124,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
             List<Tab> tabs = [
               Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 
               Tab(child: Image.asset(AppAssets.icVideo, width: 24, height: 24)),
+              Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)), // Products
+              Tab(child: Icon(Icons.room_service_outlined, color: Colors.black, size: 26)), // Services
             ];
             
             List<Widget> tabViews = [
               MyPostScreen(username: finalUserName),
               MyVideoScreen(username: finalUserName),
+              ProductGridScreen(isOwnProfile: !isOtherProfile), // Products tab
+              DigitalProductListScreen(isOwnProfile: !isOtherProfile), // Services tab
             ];
             
+            // Add Creator Analysis tab only for creators
             if (userType == AppUrls.creator) {
               tabs.add(Tab(child: Icon(Icons.person_add_alt_1_outlined, color: Colors.black, size: 26)));
               tabViews.add(CreatorAnalysisScreen());
-            } else if (userType == AppUrls.businessService) {
-              tabs.add(Tab(child: Icon(Icons.room_service_outlined, color: Colors.black, size: 26)));
-              tabViews.add(const DigitalProductListScreen());
-            } else if (userType == AppUrls.businessProduct) {
-              tabs.add(Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)));
-              tabViews.add(ProductGridScreen());
             }
 
             return DefaultTabController(
@@ -217,6 +221,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         // ),
 
 
+                                        // Cart Icon (Left of 3 dot menu)
+                                        Positioned(
+                                          top: 40,
+                                          right: 60,
+                                          child: GestureDetector(
+                                            onTap: () => Get.to(() => CartScreen()),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(6),
+                                              decoration: const BoxDecoration(
+                                                color: Colors.black26,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(
+                                                Icons.shopping_cart_outlined,
+                                                color: Colors.white,
+                                                size: 22,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+
+                                        // 3 Dot Menu
                                         Positioned(
                                           top: 40,
                                           right: 10,
@@ -224,10 +250,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             onSelected: (value) {
                                               if (value == 'profile') {
                                                 Get.to(() => SettingsScreen());
-                                              } else if (value == 'cart') {
-                                               Get.to(() => CartScreen());
                                               } else if (value == 'enquiry') {
                                                 Get.to(() => EnquiriesListScreen());
+                                              } else if (value == 'orders') {
+                                                Get.to(() => MyOrdersScreen());
+                                              } else if (value == 'products') {
+                                                Get.to(() => MyProductsScreen());
+                                              } else if (value == 'services') {
+                                                Get.to(() => MyServicesScreen());
                                               }
                                             },
                                             itemBuilder: (context) => [
@@ -242,12 +272,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 ),
                                               ),
                                               const PopupMenuItem(
-                                                value: 'cart',
+                                                value: 'orders',
                                                 child: Row(
                                                   children: [
-                                                    Icon(CupertinoIcons.cart, size: 20),
+                                                    Icon(CupertinoIcons.bag, size: 20),
                                                     SizedBox(width: 10),
-                                                    Text("Cart"),
+                                                    Text("My Orders"),
+                                                  ],
+                                                ),
+                                              ),
+                                              const PopupMenuItem(
+                                                value: 'products',
+                                                child: Row(
+                                                  children: [
+                                                    Icon(CupertinoIcons.cube_box, size: 20),
+                                                    SizedBox(width: 10),
+                                                    Text("Your Products"),
+                                                  ],
+                                                ),
+                                              ),
+                                              const PopupMenuItem(
+                                                value: 'services',
+                                                child: Row(
+                                                  children: [
+                                                    Icon(Icons.room_service_outlined, size: 20),
+                                                    SizedBox(width: 10),
+                                                    Text("Your Services"),
                                                   ],
                                                 ),
                                               ),
@@ -481,9 +531,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           subtitle: "Add your product",
                                                           onTap: () {
                                                             Get.back();
-
-                                                            // Use same logic as home screen add story
-                                                            //storyController.showPickerOptions();
+                                                            Get.to(() => CreateProductScreen());
                                                           },
                                                         ),
                                                         const SizedBox(height: 10),

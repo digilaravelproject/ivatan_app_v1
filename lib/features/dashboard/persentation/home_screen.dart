@@ -874,6 +874,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         initialChildSize: 0.75,
         minChildSize: 0.5,
         maxChildSize: 0.95,
+        expand: false, // Allows clicks outside the sheet to dismiss it
         builder: (_, scrollController) {
           return ClipRRect(
             borderRadius: const BorderRadius.only(

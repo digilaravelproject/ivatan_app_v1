@@ -8,6 +8,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../../../core/network/api_services.dart';
 import '../../../db/shared_pref_manager.dart';
+import '../../dashboard/controller/follow_controller.dart';
 import '../../dashboard/model/comment_model.dart';
 import '../model/reel_model.dart';
 
@@ -468,6 +469,7 @@ class ShortPlayController extends GetxController {
   final Map<int, RxInt> commentCounts = {};
   final Map<int, RxInt> shareCounts = {};
   final Map<int, RxBool> isLikedMap = {};
+  final isMuted = false.obs; // Global mute state
 
   // Per-reel comments cache for instant preview
   final Map<int, RxList<CommentModel>> reelComments = {};
@@ -507,9 +509,14 @@ class ShortPlayController extends GetxController {
 
         reelsList.value = fetchedReels;
 
-        // Pre-fetch comments for all reels
+        // Initialize follow status and fetch comments for all reels
+        final followController = Get.find<FollowController>();
         for (var i = 0; i < fetchedReels.length; i++) {
-          _fetchCommentsForReel(fetchedReels[i].id, i);
+          final reel = fetchedReels[i];
+          // Pre-initialize follow status to avoid build-time creation
+          followController.setInitialFollowStatus(reel.user.id, reel.isFollowing);
+          // Pre-fetch/initialize comments map
+          _fetchCommentsForReel(reel.id, i);
         }
       }
     } catch (e) {

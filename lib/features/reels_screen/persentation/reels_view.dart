@@ -149,7 +149,7 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
   // Volume Animation
   late AnimationController _volumeAnimationController;
   late Animation<double> _volumeAnimation;
-  final ValueNotifier<bool> _isMuted = ValueNotifier(false);
+  final ValueNotifier<bool> _isMuted = ValueNotifier(false); // Global sync notifier
 
   int _currentPage = 0;
 
@@ -247,15 +247,14 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
   }
 
   void _toggleSound() {
-    if (_videoControllers[_currentPage] == null) return;
+    final shortPlayController = Get.find<ShortPlayController>();
+    final newMuteStatus = !shortPlayController.isMuted.value;
+    shortPlayController.isMuted.value = newMuteStatus;
+    _isMuted.value = newMuteStatus;
 
-    final controller = _videoControllers[_currentPage]!;
-    if (controller.value.volume > 0) {
-      controller.setVolume(0.0);
-      _isMuted.value = true;
-    } else {
-      controller.setVolume(1.0);
-      _isMuted.value = false;
+    // Apply to ALL active video controllers
+    for (var controller in _videoControllers) {
+      controller?.setVolume(newMuteStatus ? 0.0 : 1.0);
     }
 
     _volumeAnimationController.reset();
@@ -264,6 +263,20 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
         if (mounted) _volumeAnimationController.reverse();
       });
     });
+  }
+
+  VideoPlayerController _createVideoPlayerController(ReelModel reel) {
+    if (reel.media.isEmpty) {
+      debugPrint("⚠️ Skipping reel with empty media: ${reel.id}");
+      // Dummy controller (never plays)
+      return VideoPlayerController.asset("assets/empty.mp4");
+    }
+
+    return VideoPlayerController.networkUrl(
+      Uri.parse(reel.media.first.url),
+      // Removed PlatformView as it causes lag during scrolling
+      videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+    );
   }
 
   void _initializeControllersForPage(int page) {
@@ -275,8 +288,11 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
     _currentPage = page;
     widget.onIndexChanged?.call(page);
 
+    // Optimized Disposal: Only clean up a small window around the current page
+    // instead of iterating through the entire list every time.
+    final cleanupWindow = widget.preloadCount + 2;
     for (int i = 0; i < _videoControllers.length; i++) {
-      if (i < page - widget.preloadCount || i > page + widget.preloadCount) {
+      if (i < page - cleanupWindow || i > page + cleanupWindow) {
         if (_videoControllers[i] != null) {
           _videoControllers[i]!.dispose();
           _videoControllers[i] = null;
@@ -284,21 +300,17 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
       }
     }
 
-    for (
-    int i = page - widget.preloadCount;
-    i <= page + widget.preloadCount;
-    i++
-    ) {
+    for (int i = page - widget.preloadCount; i <= page + widget.preloadCount; i++) {
       if (i >= 0 && i < widget.reels.length) {
         if (_videoControllers[i] == null) {
           _videoControllers[i] = _createVideoPlayerController(widget.reels[i]);
+          final currentMute = Get.find<ShortPlayController>().isMuted.value;
           _videoControllers[i]!.initialize().then((_) {
             _videoControllers[i]!.setLooping(widget.loop);
+            _videoControllers[i]!.setVolume(currentMute ? 0.0 : 1.0);
             if (i == _currentPage) {
               _videoControllers[i]!.play();
-            }
-            if (mounted) {
-              setState(() {});
+              if (mounted) setState(() {});
             }
           });
         }
@@ -331,19 +343,6 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
       );
    // }
   }*/
-
-  VideoPlayerController _createVideoPlayerController(ReelModel reel) {
-    if (reel.media.isEmpty) {
-      debugPrint("⚠️ Skipping reel with empty media: ${reel.id}");
-      // Dummy controller (never plays)
-      return VideoPlayerController.asset("assets/empty.mp4");
-    }
-
-    return VideoPlayerController.networkUrl(
-      Uri.parse(reel.media.first.url),
-      viewType: VideoViewType.platformView,
-    );
-  }
 
   void _toggleLike() async {
     final currentReel = widget.reels[_currentPage];
@@ -931,11 +930,17 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [_buildBottomSection(context).marginOnly(bottom: 30)],
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Flexible(child: _buildBottomSection(context)),
+            const SizedBox(height: 20), // Bottom spacing for navigation bar
+          ],
+        ),
       ),
     );
   }
@@ -956,15 +961,27 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
       padding: const EdgeInsets.only(left: 10, bottom: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min, // Ensures it sits at the bottom
         children: [
           _buildCommentsPreview(context),
+          const SizedBox(height: 8),
           _buildUserInfo(),
-          if (item.caption != null)
+          if (item.caption != null && item.caption!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Text(
                 item.caption!,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black,
+                      offset: Offset(0, 1),
+                      blurRadius: 4,
+                    ),
+                  ],
+                ),
               ),
             ),
         ],
@@ -996,15 +1013,19 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
               ...commentsToShow.map((comment) => Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Container(
-                  padding: const EdgeInsets.only(top: 4,bottom: 4,left: 8,right: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(16),),
+                    color: Colors.black.withOpacity(0.35),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '${comment.user?.username ?? 'User'} ',
+                        '${comment.user?.username ?? 'User'}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -1018,8 +1039,11 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 2),
                       Text(
                         comment.body,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.9),
                           fontSize: 12,
@@ -1033,45 +1057,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                         ),
                       ),
                     ],
-                  )
-
-                  // RichText(
-                  //   maxLines: 1,
-                  //   overflow: TextOverflow.ellipsis,
-                  //   text: TextSpan(
-                  //     children: [
-                  //       TextSpan(
-                  //         text: '${comment.user?.username ?? 'User'} ',
-                  //         style: const TextStyle(
-                  //           color: Colors.white,
-                  //           fontWeight: FontWeight.bold,
-                  //           fontSize: 12,
-                  //           shadows: [
-                  //             Shadow(
-                  //               color: Colors.black54,
-                  //               offset: Offset(0, 1),
-                  //               blurRadius: 4,
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       ),
-                  //       TextSpan(
-                  //         text: comment.body,
-                  //         style: TextStyle(
-                  //           color: Colors.white.withOpacity(0.9),
-                  //           fontSize: 12,
-                  //           shadows: const [
-                  //             Shadow(
-                  //               color: Colors.black54,
-                  //               offset: Offset(0, 1),
-                  //               blurRadius: 4,
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
+                  ),
                 ),
               )),
               if (comments.length > 3)
@@ -1080,8 +1066,9 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                   child: Text(
                     'View all ${comments.length} comments',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
+                      color: Colors.white.withOpacity(0.8),
                       fontSize: 12,
+                      fontWeight: FontWeight.w500,
                       shadows: const [
                         Shadow(
                           color: Colors.black54,
@@ -1107,6 +1094,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
       },
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             padding: const EdgeInsets.all(1.5),
@@ -1114,89 +1102,81 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
               color: Colors.white,
               shape: BoxShape.circle,
             ),
-            child:
-            item.user.avatar.isNotEmpty
+            child: item.user.avatar.isNotEmpty
                 ? CustomImageView(
-              url: AppUrls.getFullImageUrl(item.user.avatar),
-              height: 38,
-              width: 38,
-              radius: BorderRadius.circular(19),
-            )
+                    url: AppUrls.getFullImageUrl(item.user.avatar),
+                    height: 38,
+                    width: 38,
+                    radius: BorderRadius.circular(19),
+                  )
                 : const CircleAvatar(
-              radius: 19,
-              backgroundColor: Colors.grey,
-              child: Icon(Icons.person, size: 24, color: Colors.white),
-            ),
+                    radius: 19,
+                    backgroundColor: Colors.grey,
+                    child: Icon(Icons.person, size: 24, color: Colors.white),
+                  ),
           ),
           const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    item.user.username,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black,
-                          offset: Offset(0, 1),
-                          blurRadius: 4,
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        item.user.username,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black,
+                              offset: Offset(0, 1),
+                              blurRadius: 4,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  // Simple Follow Button (Visual)
-                  Obx(() {
-                    final homeController = Get.find<HomeController>();
-                    final isFollowing =
-                        homeController.followController
-                            .isUserFollowing(
-                          item.user.id,
-                          initialValue: item.isFollowing,
-                        )
-                            .value;
-
-                    // Hide follow button if it's my own reel
-                    if (item.isMine) return const SizedBox.shrink();
-
-                    return GestureDetector(
-                      onTap:
-                          () => homeController.toggleFollowForPostUser(
-                        item.user.id,
                       ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color:
-                          isFollowing
-                              ? Colors.white.withOpacity(0.2)
-                              : Colors.transparent,
-                          border: Border.all(color: Colors.white, width: 1),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          isFollowing ? "Following" : "Follow",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+                    ),
+                    const SizedBox(width: 8),
+                    // Simple Follow Button (Visual)
+                    Obx(() {
+                      final isFollowing = Get.find<FollowController>()
+                          .isUserFollowing(item.user.id, initialValue: item.isFollowing)
+                          .value;
+
+                      // Hide follow button if it's my own reel
+                      if (item.isMine) return const SizedBox.shrink();
+
+                      return GestureDetector(
+                        onTap: () => Get.find<HomeController>().toggleFollowForPostUser(item.user.id),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isFollowing ? Colors.white.withOpacity(0.15) : Colors.transparent,
+                            border: Border.all(color: Colors.white, width: 1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            isFollowing ? "Following" : "Follow",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  }),
-                ],
-              ),
-            ],
+                      );
+                    }),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -1209,43 +1189,44 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
       children: [
         const SizedBox(height: 16),
         Obx(
-              () => GestureDetector(
+          () => GestureDetector(
             onTap: () {
               controller.updateShortVideoLike(item.id, index);
             },
-            child: AnimatedScale(
-              scale: controller.isLikedMap[index]?.value == true ? 1.0 : 0.95,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOutBack,
-              child: Column(
-                children: [
-                  if (controller.isLikedMap[index]?.value == true) ...[
-                    Image.asset(
-                      "assets/icon/ic_liked.png",
-                      height: 50,
-                      width: 50,
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              child: AnimatedScale(
+                scale: 1.0, // Keeping scale consistent to prevent visual shifting
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOutBack,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: Center(
+                        child: controller.isLikedMap[index]?.value == true
+                            ? const Icon(
+                                CupertinoIcons.heart_fill,
+                                size: 34,
+                                color: Colors.red,
+                              )
+                            : const Icon(
+                                CupertinoIcons.heart,
+                                size: 34,
+                                color: Colors.white,
+                              ),
+                      ),
                     ),
-                  ] else ...[
-                    Icon(CupertinoIcons.heart,size: 20,color: Colors.white,),
+                    const SizedBox(height: 4),
+                    Text(
+                      controller.likeCounts[index]?.value.toString() ?? "0",
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
                   ],
-
-                 /* CustomIcon(
-                    svgString:
-                        controller.isLikedMap[index]?.value == true
-                            ? AppIcons.ic_heart_solid
-                            : AppIcons.ic_heart_outline,
-                    color:
-                        controller.isLikedMap[index]?.value == true
-                            ? Colors.white
-                            : Colors.white,
-                    removeColor: controller.isLikedMap[index]?.value == true,
-                    size: 28,
-                  ),*/
-                  Text(
-                    controller.likeCounts[index]?.value.toString() ?? "0",
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -1259,7 +1240,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
             CustomIcon(
               svgString: AppIcons.ic_comments,
               color: Colors.white,
-              size: 20,
+              size: 28,
               removeColor: false,
             ),
             label: controller.commentCounts[index]?.value.toString() ?? "0",
@@ -1279,7 +1260,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
           icon: CustomIcon(
             svgString: AppIcons.ic_share,
             color: Colors.white,
-            size: 20,
+            size: 28,
             removeColor: false,
           ),
           label: controller.shareCounts[index]?.value.toString() ?? "0",
@@ -1302,42 +1283,40 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
     String? label,
     required VoidCallback onPressed,
   }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        GestureDetector(
-          onTap: onPressed,
-          behavior: HitTestBehavior.translucent,
-          child: Container(
-            // Removed background circle for cleaner look
-            padding: const EdgeInsets.all(8), // slight padding for touch area
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              // color: Colors.black.withOpacity(0.1), // Optional: very subtle
+    return GestureDetector(
+      onTap: onPressed,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 40,
+              height: 40,
+              child: Center(child: icon),
             ),
-            child: icon,
-          ),
-        ),
-        if (label != null) ...[
-         // const SizedBox(height: 4),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              shadows: [
-                Shadow(
-                  color: Colors.black45,
-                  offset: Offset(0, 1),
-                  blurRadius: 4,
+            if (label != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black45,
+                      offset: Offset(0, 1),
+                      blurRadius: 4,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ],
-      ],
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 

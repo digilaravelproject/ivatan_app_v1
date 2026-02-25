@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../service/persentation/service_enquire_form.dart' hide AppColors;
+import '../../service/persentation/my_services_screen.dart';
+import '../../service/controller/service_controller.dart';
+import '../../service/model/service_model.dart';
 
 
 
 class DigitalProductListScreen extends StatelessWidget {
-  const DigitalProductListScreen({super.key});
+  final bool isOwnProfile;
+  
+  const DigitalProductListScreen({super.key, this.isOwnProfile = false});
 
   @override
   Widget build(BuildContext context) {
+    // If it's own profile, show management view (without AppBar)
+    if (isOwnProfile) {
+      return _MyServicesTabView();
+    }
+    
+    // Otherwise show services with Enquiry buttons
     return ListView.builder(
       padding: const EdgeInsets.all(12),
       itemCount: digitalProductList.length,
@@ -243,3 +255,163 @@ final List<DigitalProduct> digitalProductList = [
     imagePath: 'https://m.media-amazon.com/images/I/610ub5kytVL.jpg',
   ),
 ];
+
+
+// Wrapper widget for tab view (without AppBar)
+class _MyServicesTabView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.put(ServiceController());
+    
+    return Obx(() {
+      if (controller.services.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.room_service_outlined, size: 80, color: Colors.grey.shade300),
+              const SizedBox(height: 16),
+              Text(
+                'No services yet',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.8,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+        ),
+        itemCount: controller.services.length,
+        itemBuilder: (context, index) {
+          final service = controller.services[index];
+          return _buildServiceCard(service, controller);
+        },
+      );
+    });
+  }
+
+  Widget _buildServiceCard(ServiceModel service, ServiceController controller) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Service Image
+          Expanded(
+            flex: 3,
+            child: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                  child: Image.network(
+                    service.images.isNotEmpty ? service.images[0] : '',
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      color: Colors.grey.shade200,
+                      child: const Icon(Icons.room_service, size: 40, color: Colors.grey),
+                    ),
+                  ),
+                ),
+                // Status Badge
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: service.isActive ? Colors.green : Colors.red,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      service.isActive ? 'Active' : 'Inactive',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Service Info
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        service.title,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          service.category,
+                          style: TextStyle(
+                            color: Colors.blue.shade700,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    '₹${service.price.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

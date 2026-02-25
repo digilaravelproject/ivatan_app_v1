@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:i_vatan_app/core/utils/custom_buttons.dart';
+import 'package:i_vatan_app/core/widgets/custom_dialog.dart';
 import 'package:i_vatan_app/route/app_pages.dart';
 
 import 'add_address_screen.dart';
@@ -17,21 +18,28 @@ class CartController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Sample data
+    // Sample data with proper product images
     cartItems.addAll([
       CartItem(
-        name: 'Head Phone',
-        originalPrice: 160,
-        discountedPrice: 140,
-        quantity: 3,
-        image: 'mutton_thali',
+        name: 'Wireless Headphones',
+        originalPrice: 2999,
+        discountedPrice: 2499,
+        quantity: 1,
+        image: 'https://m.media-amazon.com/images/I/610ub5kytVL.jpg',
       ),
       CartItem(
-        name: 'Head Phone',
-        originalPrice: 120,
-        discountedPrice: 110,
+        name: 'Smart Watch',
+        originalPrice: 4999,
+        discountedPrice: 3999,
         quantity: 1,
-        image: 'indian_thali',
+        image: 'https://m.media-amazon.com/images/I/61ZjlBOp+rL._AC_UL320_.jpg',
+      ),
+      CartItem(
+        name: 'Phone Case',
+        originalPrice: 499,
+        discountedPrice: 399,
+        quantity: 2,
+        image: 'https://m.media-amazon.com/images/I/71e+R8mQcvL._AC_UL320_.jpg',
       ),
     ]);
 
@@ -88,13 +96,15 @@ class CartController extends GetxController {
   }
 
   void removeItem(int index) {
+    final itemName = cartItems[index].name;
     cartItems.removeAt(index);
     Get.snackbar(
       'Item Removed',
-      '${cartItems[index].name} has been removed from cart',
+      '$itemName has been removed from cart',
       snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.error,
       colorText: Colors.white,
+      duration: const Duration(seconds: 2),
     );
   }
 
@@ -235,11 +245,6 @@ class CartScreen extends StatelessWidget {
 
                 SizedBox(height: 12),
 
-                // Add More Items Button
-                _buildAddMoreItemsButton(),
-
-                SizedBox(height: 16),
-
                 // Address Section
                 _buildAddressSection(context),
 
@@ -279,15 +284,26 @@ class CartScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Product Image Placeholder
-          Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(8),
+          // Product Image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.network(
+              item.image,
+              width: 70,
+              height: 70,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Icons.image_not_supported, color: Colors.grey),
+                );
+              },
             ),
-            child: Image.network("https://m.media-amazon.com/images/I/610ub5kytVL.jpg"),
           ),
           SizedBox(width: 12),
 
@@ -413,24 +429,6 @@ class CartScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Widget _buildAddMoreItemsButton() {
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.add_circle_outline, color: Colors.black, size: 16),
-          Text(
-            '  Add More Items',
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w600,
-              fontSize: 16,
-            ),
-          ),
-         // Icon(Icons.arrow_forward, color: Colors.black54, size: 20),
-        ],
-      );
   }
 
   Widget _buildAddressSection(BuildContext context) {
@@ -612,8 +610,27 @@ class CartScreen extends StatelessWidget {
       child: SafeArea(
         child: ElevatedButton(
           onPressed: () {
-            // Navigate to confirm delivery details
-           // Get.to(() => ConfirmDeliveryScreen());
+            // Show order confirmation
+            CustomDialog.showConfirmation(
+              title: "Confirm Order",
+              message: "Total Amount: ₹${controller.subtotal}\n\nProceed with this order?",
+              confirmText: "Place Order",
+              cancelText: "Cancel",
+              confirmColor: AppColors.black,
+              icon: Icons.shopping_bag_outlined,
+              onConfirm: () {
+                Get.snackbar(
+                  "Order Placed",
+                  "Your order has been placed successfully!",
+                  backgroundColor: AppColors.success,
+                  colorText: Colors.white,
+                  snackPosition: SnackPosition.BOTTOM,
+                  duration: const Duration(seconds: 3),
+                );
+                // Clear cart after order
+                controller.cartItems.clear();
+              },
+            );
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.black,
@@ -703,80 +720,85 @@ class CartScreen extends StatelessWidget {
   }
 
   Widget _buildAddressCard(Address address, bool isSelected) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.black.withOpacity(0.05) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isSelected ? Colors.black54 : Colors.black12,
-          width: isSelected ? 1.5 : 1,
+    return GestureDetector(
+      onTap: () {
+        controller.selectAddress(address);
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: 12),
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.black.withOpacity(0.05) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? Colors.black54 : Colors.black12,
+            width: isSelected ? 1.5 : 1,
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: isSelected ? Colors.black : Colors.black.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        address.type,
-                        style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.black54,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.black : Colors.black.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          address.type,
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : Colors.black54,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        address.fullName,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          address.fullName,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
                         ),
                       ),
+                    ],
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    address.fullAddress,
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 13,
                     ),
-                  ],
-                ),
-                SizedBox(height: 6),
-                Text(
-                  address.fullAddress,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 13,
                   ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Phone: ${address.phone}',
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 12,
+                  SizedBox(height: 4),
+                  Text(
+                    'Phone: ${address.phone}',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 12,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Radio(
-            value: address.id,
-            groupValue: controller.selectedAddress.value?.id,
-            onChanged: (value) {
-              controller.selectAddress(address);
-            },
-            activeColor: Colors.black,
-          ),
-        ],
+            Radio(
+              value: address.id,
+              groupValue: controller.selectedAddress.value?.id,
+              onChanged: (value) {
+                controller.selectAddress(address);
+              },
+              activeColor: Colors.black,
+            ),
+          ],
+        ),
       ),
     );
   }
