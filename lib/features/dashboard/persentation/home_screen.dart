@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
@@ -39,14 +40,20 @@ class HomePage extends StatelessWidget {
       // ============= MODERN APP BAR =============
       body: NotificationListener<ScrollNotification>(
         onNotification: (notification) {
+          if (notification.metrics.pixels > 20 &&
+              !controller.showStories.value) {
+            controller.showStories.value = true;
+          }
+
           // Pagination Logic only
-           if (notification is ScrollEndNotification &&
+          if (notification is ScrollEndNotification &&
               !controller.isLoading.value &&
               controller.isMoreDataAvailable.value &&
-              notification.metrics.pixels >= notification.metrics.maxScrollExtent * 0.8) {
+              notification.metrics.pixels >=
+                  notification.metrics.maxScrollExtent * 0.8) {
             controller.fetchPosts(loadMore: true);
           }
-           return false;
+          return false;
         },
         child: RefreshIndicator(
           onRefresh: () async {
@@ -54,153 +61,178 @@ class HomePage extends StatelessWidget {
             await controller.fetchStories();
           },
           child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: [
-            // ============= SLIVER APP BAR (Hide/Show on Scroll) =============
-            SliverAppBar(
-              floating: true,
-              snap: true,
-              pinned: false,
-              backgroundColor: Colors.white,
-              elevation: 0,
-              automaticallyImplyLeading: false,
-              toolbarHeight: 60,
-              title: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // App Logo - Clean Circular
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 4,
-                          offset: Offset(0, 1),
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              // ============= SLIVER APP BAR (Hide/Show on Scroll) =============
+              SliverAppBar(
+                floating: true,
+                snap: true,
+                pinned: false,
+                backgroundColor: Colors.white,
+                elevation: 0,
+                automaticallyImplyLeading: false,
+                toolbarHeight: 60,
+                title: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // App Logo - Clean Circular
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 4,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: ClipOval(
+                        child: Image.asset(
+                          AppAssets.imgAppLogo,
+                          fit: BoxFit.cover,
                         ),
-                      ],
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        AppAssets.imgAppLogo,
-                        fit: BoxFit.cover,
                       ),
                     ),
+                    SizedBox(width: 2),
+                    // Vatan Text
+                    Text(
+                      "-Vatan",
+                      style: TextStyle(
+                        fontFamily: 'Billabong',
+                        fontSize: 24,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ],
+                ),
+                actions: [
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.chat_bubble_outline,
+                          color: Colors.black87,
+                          size: 26,
+                        ),
+                        onPressed: () => Get.to(dashboard()),
+                      ),
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 1.5),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(width: 2),
-                  // Vatan Text
-                  Text(
-                    "-Vatan",
-                    style: TextStyle(
-                      fontFamily: 'Billabong',
-                      fontSize: 24,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.3,
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12.0),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.menu_rounded,
+                        color: Colors.black87,
+                        size: 28,
+                      ),
+                      onPressed: () => controller.openDrawer(),
                     ),
                   ),
                 ],
               ),
-              actions: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.chat_bubble_outline, color: Colors.black87, size: 26),
-                      onPressed: () => Get.to(dashboard()),
-                    ),
-                    Positioned(
-                      top: 10,
-                      right: 10,
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 1.5),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 12.0),
-                  child: IconButton(
-                    icon: Icon(Icons.menu_rounded, color: Colors.black87, size: 28),
-                    onPressed: () => controller.openDrawer(),
-                  ),
-                ),
-              ],
-            ),
 
-            // ============= STORIES SECTION (Always Visible) =============
-            SliverToBoxAdapter(
-              child: Obx(() {
-                 if (controller.isStoryLoading.value) {
+              // ============= STORIES SECTION (Always Visible) =============
+              SliverToBoxAdapter(
+                child: Obx(() {
+                  if (controller.isStoryLoading.value) {
                     return SizedBox(
                       height: 100,
                       child: Center(child: CircularProgressIndicator()),
                     );
                   }
 
-                 // Identify My Story vs Others
-                 final currentUserId = controller.currentUser.value?.id;
-                 UserStoryGroup? myStoryGroup;
-                 List<UserStoryGroup> otherStories = [];
+                  // Identify My Story vs Others
+                  final currentUserId = controller.currentUser.value?.id;
+                  UserStoryGroup? myStoryGroup;
+                  List<UserStoryGroup> otherStories = [];
 
-                 if (currentUserId != null) {
-                   // Split existing stories
-                   for (var group in controller.storyData) {
-                     if (group.user.id == currentUserId || (group.stories.isNotEmpty && group.stories.first.is_mine)) {
-                       myStoryGroup = group;
-                     } else {
-                       otherStories.add(group);
-                     }
-                   }
-                 } else {
-                   otherStories = List.from(controller.storyData);
-                 }
-                  
-                return Container(
-                  height: 110, // Increased height to accommodate circular design with text below
-                  color: Colors.white,
-                  padding: EdgeInsets.only(top: 12, bottom: 8),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: otherStories.length + 1, // +1 for "Your Story"
-                    itemBuilder: (context, index) {
-                      if (index == 0) {
-                        return _buildMyStoryItem(imageUrl, myStoryGroup);
+                  if (currentUserId != null) {
+                    // Split existing stories
+                    for (var group in controller.storyData) {
+                      if (group.user.id == currentUserId ||
+                          (group.stories.isNotEmpty &&
+                              group.stories.first.is_mine)) {
+                        myStoryGroup = group;
+                      } else {
+                        otherStories.add(group);
                       }
+                    }
+                  } else {
+                    otherStories = List.from(controller.storyData);
+                  }
 
-                      final story = otherStories[index - 1];
-                      
-                      // Double-check: Skip if this is somehow the current user's story
-                      if (story.user.id == currentUserId || (story.stories.isNotEmpty && story.stories.first.is_mine)) {
-                        return SizedBox.shrink(); // Don't show duplicate
-                      }
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 500),
+                    height: controller.showStories.value ? 110 : 0,
+                    curve: Curves.easeInOut,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 500),
+                      opacity: controller.showStories.value ? 1.0 : 0.0,
+                      child: Container(
+                        height:
+                            110, // Increased height to accommodate circular design with text below
+                        color: Colors.white,
+                        padding: EdgeInsets.only(top: 12, bottom: 8),
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          itemCount:
+                              otherStories.length + 1, // +1 for "Your Story"
+                          itemBuilder: (context, index) {
+                            if (index == 0) {
+                              return _buildMyStoryItem(imageUrl, myStoryGroup);
+                            }
 
-                      return GestureDetector(
-                        onTap: () {
-                          Get.to(() => FullScreenStoryViewer(
-                            stories: story.stories,
-                            initialIndex: 0,
-                          ));
-                        },
-                        child: _buildStoryCard(
-                          story, // Pass full story object
+                            final story = otherStories[index - 1];
+
+                            // Double-check: Skip if this is somehow the current user's story
+                            if (story.user.id == currentUserId ||
+                                (story.stories.isNotEmpty &&
+                                    story.stories.first.is_mine)) {
+                              return SizedBox.shrink(); // Don't show duplicate
+                            }
+
+                            return GestureDetector(
+                              onTap: () {
+                                Get.to(
+                                  () => FullScreenStoryViewer(
+                                    stories: story.stories,
+                                    initialIndex: 0,
+                                  ),
+                                );
+                              },
+                              child: _buildStoryCard(
+                                story, // Pass full story object
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
-                );
-              }),
-            ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
 
               // ============= POSTS SECTION =============
               Obx(() {
@@ -216,7 +248,11 @@ class HomePage extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.image_outlined, size: 80, color: Colors.grey.shade300),
+                          Icon(
+                            Icons.image_outlined,
+                            size: 80,
+                            color: Colors.grey.shade300,
+                          ),
                           SizedBox(height: 16),
                           Text(
                             "No Posts Available",
@@ -232,13 +268,10 @@ class HomePage extends StatelessWidget {
                 }
 
                 return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                      final post = controller.posts[index];
-                      return _buildModernPostCard(post, index,context);
-                    },
-                    childCount: controller.posts.length,
-                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final post = controller.posts[index];
+                    return _buildModernPostCard(post, index, context);
+                  }, childCount: controller.posts.length),
                 );
               }),
 
@@ -246,17 +279,18 @@ class HomePage extends StatelessWidget {
               Obx(() {
                 return controller.isMoreDataAvailable.value
                     ? SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                )
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    )
                     : SliverToBoxAdapter(child: SizedBox.shrink());
               }),
             ],
           ),
         ),
-      ));
+      ),
+    );
   }
 
   // ============= ADD STORY BUTTON =============
@@ -266,15 +300,16 @@ class HomePage extends StatelessWidget {
   Widget _buildMyStoryItem(String userAvatar, UserStoryGroup? myStoryGroup) {
     bool hasStory = myStoryGroup != null && myStoryGroup.stories.isNotEmpty;
 
-
     return GestureDetector(
       onTap: () {
         if (myStoryGroup != null && myStoryGroup.stories.isNotEmpty) {
           // View own story
-          Get.to(() => FullScreenStoryViewer(
-            stories: myStoryGroup.stories,
-            initialIndex: 0,
-          ));
+          Get.to(
+            () => FullScreenStoryViewer(
+              stories: myStoryGroup.stories,
+              initialIndex: 0,
+            ),
+          );
         } else {
           // Add new story
           final storyController = Get.put(StoryController());
@@ -295,36 +330,43 @@ class HomePage extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
-                      colors: [Color(0xFFFBAA47), Color(0xFFD91A46), Color(0xFFA60F93)],
+                      colors: [
+                        Color(0xFFFBAA47),
+                        Color(0xFFD91A46),
+                        Color(0xFFA60F93),
+                      ],
                       begin: Alignment.bottomLeft,
                       end: Alignment.topRight,
                     ),
                   ),
                   padding: EdgeInsets.all(2),
-                  child: myStoryGroup != null && myStoryGroup.stories.isNotEmpty
-                    ? Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                        ),
-                        padding: EdgeInsets.all(2),
-                        child: ClipOval(
-                          child: _buildStoryMedia(myStoryGroup.stories.last),
-                        ),
-                      )
-                    : Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.add_circle,
-                            color: Color(0xFFD91A46),
-                            size: 35,
+                  child:
+                      myStoryGroup != null && myStoryGroup.stories.isNotEmpty
+                          ? Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white,
+                            ),
+                            padding: EdgeInsets.all(2),
+                            child: ClipOval(
+                              child: _buildStoryMedia(
+                                myStoryGroup.stories.last,
+                              ),
+                            ),
+                          )
+                          : Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white,
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.add_circle,
+                                color: Color(0xFFD91A46),
+                                size: 35,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
                 ),
                 // Small plus icon on bottom-right when user has a story
                 if (myStoryGroup != null && myStoryGroup.stories.isNotEmpty)
@@ -345,11 +387,7 @@ class HomePage extends StatelessWidget {
                           color: Colors.blue,
                           border: Border.all(color: Colors.white, width: 2),
                         ),
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.white,
-                          size: 14,
-                        ),
+                        child: Icon(Icons.add, color: Colors.white, size: 14),
                       ),
                     ),
                   ),
@@ -358,7 +396,9 @@ class HomePage extends StatelessWidget {
             SizedBox(height: 2),
             // Name below circle
             Text(
-              myStoryGroup != null && myStoryGroup.stories.isNotEmpty ? "Your Story" : "Add Story",
+              myStoryGroup != null && myStoryGroup.stories.isNotEmpty
+                  ? "Your Story"
+                  : "Add Story",
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.black87,
@@ -379,15 +419,17 @@ class HomePage extends StatelessWidget {
     bool hasUnseen = story.hasUnseen;
     String name = story.user.name;
     // Safety check for name
-    if (story.user.id == controller.currentUser.value?.id || (story.stories.isNotEmpty && story.stories.first.is_mine)) {
-        name = "Your Story";
+    if (story.user.id == controller.currentUser.value?.id ||
+        (story.stories.isNotEmpty && story.stories.first.is_mine)) {
+      name = "Your Story";
     }
 
     return GestureDetector(
-      onTap: () => Get.to(() => FullScreenStoryViewer(
-        stories: story.stories,
-        initialIndex: 0,
-      )),
+      onTap:
+          () => Get.to(
+            () =>
+                FullScreenStoryViewer(stories: story.stories, initialIndex: 0),
+          ),
       child: Container(
         width: 70,
         margin: EdgeInsets.only(right: 12),
@@ -399,17 +441,23 @@ class HomePage extends StatelessWidget {
               height: 70,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: hasUnseen 
-                    ? LinearGradient(
-                        colors: [Color(0xFFFBAA47), Color(0xFFD91A46), Color(0xFFA60F93)],
-                        begin: Alignment.bottomLeft,
-                        end: Alignment.topRight,
-                      )
-                    : LinearGradient( // Seen Gradient (Grey)
-                        colors: [Colors.grey.shade400, Colors.grey.shade600],
-                        begin: Alignment.bottomLeft,
-                        end: Alignment.topRight,
-                      ),
+                gradient:
+                    hasUnseen
+                        ? LinearGradient(
+                          colors: [
+                            Color(0xFFFBAA47),
+                            Color(0xFFD91A46),
+                            Color(0xFFA60F93),
+                          ],
+                          begin: Alignment.bottomLeft,
+                          end: Alignment.topRight,
+                        )
+                        : LinearGradient(
+                          // Seen Gradient (Grey)
+                          colors: [Colors.grey.shade400, Colors.grey.shade600],
+                          begin: Alignment.bottomLeft,
+                          end: Alignment.topRight,
+                        ),
               ),
               padding: EdgeInsets.all(2),
               child: Container(
@@ -419,9 +467,10 @@ class HomePage extends StatelessWidget {
                 ),
                 padding: EdgeInsets.all(2),
                 child: ClipOval(
-                  child: story.stories.isNotEmpty
-                      ? _buildStoryMedia(story.stories.last)
-                      : _buildUserAvatar(story.user.avatar),
+                  child:
+                      story.stories.isNotEmpty
+                          ? _buildStoryMedia(story.stories.last)
+                          : _buildUserAvatar(story.user.avatar),
                 ),
               ),
             ),
@@ -449,16 +498,16 @@ class HomePage extends StatelessWidget {
     // 1. Try Thumbnail
     if (story.thumbnailUrl.isNotEmpty) {
       return Image.network(
-        story.thumbnailUrl, 
+        story.thumbnailUrl,
         fit: BoxFit.cover,
         errorBuilder: (ctx, err, stack) => _buildErrorFallback(story.type),
       );
     }
-    
+
     // 2. Try Media URL if Image
     if (story.type == 'image' && story.mediaUrl.isNotEmpty) {
       return Image.network(
-        story.mediaUrl, 
+        story.mediaUrl,
         fit: BoxFit.cover,
         errorBuilder: (ctx, err, stack) => _buildErrorFallback(story.type),
       );
@@ -470,13 +519,20 @@ class HomePage extends StatelessWidget {
 
   Widget _buildUserAvatar(String? avatarUrl) {
     if (avatarUrl != null && avatarUrl.isNotEmpty) {
-       return Image.network(
-          avatarUrl,
-          fit: BoxFit.cover,
-          errorBuilder: (ctx, err, stack) => Container(color: Colors.grey.shade200, child: Icon(Icons.person, color: Colors.grey)),
-       );
+      return Image.network(
+        avatarUrl,
+        fit: BoxFit.cover,
+        errorBuilder:
+            (ctx, err, stack) => Container(
+              color: Colors.grey.shade200,
+              child: Icon(Icons.person, color: Colors.grey),
+            ),
+      );
     }
-    return Container(color: Colors.grey.shade200, child: Icon(Icons.person, color: Colors.grey));
+    return Container(
+      color: Colors.grey.shade200,
+      child: Icon(Icons.person, color: Colors.grey),
+    );
   }
 
   Widget _buildErrorFallback(String type) {
@@ -486,14 +542,14 @@ class HomePage extends StatelessWidget {
         child: Icon(
           type == 'video' ? Icons.videocam : Icons.broken_image,
           color: Colors.white54,
-          size: 24
+          size: 24,
         ),
       ),
     );
   }
 
   // ============= MODERN POST CARD =============
-  Widget _buildModernPostCard(PostItem post, int index,BuildContext context) {
+  Widget _buildModernPostCard(PostItem post, int index, BuildContext context) {
     return Container(
       color: Colors.white,
       margin: EdgeInsets.only(bottom: 8),
@@ -507,18 +563,29 @@ class HomePage extends StatelessWidget {
               children: [
                 // Avatar
                 GestureDetector(
-                  onTap: () => Get.to(ProfileScreen(viewUserName: post.user.username)),
+                  onTap:
+                      () => Get.to(
+                        ProfileScreen(viewUserName: post.user.username),
+                      ),
                   child: Container(
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.grey.shade100
+                      shape: BoxShape.circle,
+                      color: Colors.grey.shade100,
                     ),
                     child: ClipOval(
-                      child: post.user.avatar != null && post.user.avatar!.isNotEmpty
-                          ? Image.network(AppUrls.getFullImageUrl(post.user.avatar!), fit: BoxFit.cover)
-                          : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                      child:
+                          post.user.avatar != null &&
+                                  post.user.avatar!.isNotEmpty
+                              ? Image.network(
+                                AppUrls.getFullImageUrl(post.user.avatar!),
+                                fit: BoxFit.cover,
+                              )
+                              : Image.asset(
+                                AppAssets.imgAppLogo,
+                                fit: BoxFit.cover,
+                              ),
                     ),
                   ),
                 ),
@@ -534,9 +601,16 @@ class HomePage extends StatelessWidget {
                         children: [
                           Flexible(
                             child: GestureDetector(
-                              onTap: () => Get.to(ProfileScreen(viewUserName: post.user.username)),
+                              onTap:
+                                  () => Get.to(
+                                    ProfileScreen(
+                                      viewUserName: post.user.username,
+                                    ),
+                                  ),
                               child: Text(
-                                post.user.username.isNotEmpty ? post.user.username : post.user.name,
+                                post.user.username.isNotEmpty
+                                    ? post.user.username
+                                    : post.user.name,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
@@ -551,7 +625,7 @@ class HomePage extends StatelessWidget {
                             SizedBox(width: 4),
                             Icon(Icons.verified, color: Colors.blue, size: 14),
                           ],
-                          
+
                           // Date / Time
                           Text(
                             " • ${DateHelper.formatPostDate(post.createdAt)}",
@@ -562,20 +636,26 @@ class HomePage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      
+
                       // Song Info / Location / Occupation
                       Padding(
                         padding: const EdgeInsets.only(top: 1),
                         child: Row(
                           children: [
                             if (post.type == 'video') ...[
-                               Icon(Icons.music_note, size: 12, color: Colors.black87),
-                               SizedBox(width: 4),
+                              Icon(
+                                Icons.music_note,
+                                size: 12,
+                                color: Colors.black87,
+                              ),
+                              SizedBox(width: 4),
                             ],
-                            
+
                             Flexible(
                               child: Text(
-                                post.type == 'video' ? "Original Audio" : post.user.occupation,
+                                post.type == 'video'
+                                    ? "Original Audio"
+                                    : post.user.occupation,
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: Colors.black87,
@@ -595,14 +675,20 @@ class HomePage extends StatelessWidget {
                 if (!post.is_mine) ...[
                   SizedBox(width: 8),
                   Obx(() {
-                    final isFollowing = controller.followController.isUserFollowing(post.user.id, initialValue: post.is_following).value;
-                    
+                    final isFollowing =
+                        controller.followController
+                            .isUserFollowing(
+                              post.user.id,
+                              initialValue: post.is_following,
+                            )
+                            .value;
+
                     // If following, you can choose to hide it or show "Following"
                     // User said "update nhi ho rhi", implying they want to see the change.
                     // Let's show "Following" in a subtle way or allow hiding if intended.
-                    // Given previous logic was hiding it (line 445), let's keep it visible 
+                    // Given previous logic was hiding it (line 445), let's keep it visible
                     // but reactive so it can vanish/change smoothly.
-                    
+
                     final bool following = isFollowing;
 
                     return GestureDetector(
@@ -612,19 +698,31 @@ class HomePage extends StatelessWidget {
                         }
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
-                          color: following ? Colors.grey.shade100 : Colors.transparent,
+                          color:
+                              following
+                                  ? Colors.grey.shade100
+                                  : Colors.transparent,
                           border: Border.all(
-                              color: following ? Colors.grey.shade300 : Colors.blue.shade600,
-                              width: 1
+                            color:
+                                following
+                                    ? Colors.grey.shade300
+                                    : Colors.blue.shade600,
+                            width: 1,
                           ),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           following ? "Following" : "Follow",
                           style: TextStyle(
-                            color: following ? Colors.black87 : Colors.blue.shade600,
+                            color:
+                                following
+                                    ? Colors.black87
+                                    : Colors.blue.shade600,
                             fontWeight: FontWeight.w600,
                             fontSize: 12,
                           ),
@@ -636,11 +734,12 @@ class HomePage extends StatelessWidget {
 
                 // More Menu
                 IconButton(
-                   icon: Icon(Icons.more_horiz, color: Colors.black87),
-                   onPressed: () => _showSideMenu(context, post.id, post.user.username),
-                   padding: EdgeInsets.zero,
-                   constraints: BoxConstraints(),
-                   splashRadius: 20,
+                  icon: Icon(Icons.more_horiz, color: Colors.black87),
+                  onPressed:
+                      () => _showSideMenu(context, post.id, post.user.username),
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(),
+                  splashRadius: 20,
                 ),
               ],
             ),
@@ -668,20 +767,32 @@ class HomePage extends StatelessWidget {
                       onTap: () => controller.likePost(post.id, index),
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 300),
-                        transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                        transitionBuilder:
+                            (child, anim) =>
+                                ScaleTransition(scale: anim, child: child),
                         child: Icon(
                           post.stats.isLiked == true
                               ? Icons.favorite
                               : Icons.favorite_border,
                           key: ValueKey(post.stats.isLiked),
-                          color: post.stats.isLiked == true
-                              ? Colors.red
-                              : Colors.black87,
+                          color:
+                              post.stats.isLiked == true
+                                  ? Colors.red
+                                  : Colors.black87,
                           size: 28,
                         ),
                       ),
                     ),
-                    
+                    SizedBox(width: 4),
+                    if ((post.stats.likeCount ?? 0) > 0)
+                      Text(
+                        "${post.stats.likeCount}",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+
                     SizedBox(width: 16),
 
                     // Comment
@@ -694,52 +805,89 @@ class HomePage extends StatelessWidget {
                           builder: (_) => CommentsBottomSheet(postId: post.id),
                         );
                       },
-                      child: Icon(Icons.chat_bubble_outline, color: Colors.black87, size: 24),
+                      child: Icon(
+                        Icons.comment,
+                        color: Colors.black87,
+                        size: 24,
+                      ),
                     ),
+                    SizedBox(width: 4),
+                    if ((post.stats.commentCount ?? 0) > 0)
+                      Text(
+                        "${post.stats.commentCount}",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
 
                     SizedBox(width: 16),
 
                     // Share
                     GestureDetector(
                       onTap: () {
-                        final link = "https://ivatan.in/post/${post.id}?type=${post.media.first.type}";
+                        final link =
+                            "https://ivatan.in/post/${post.id}?type=${post.media.first.type}";
                         Share.share("Check this post 👇\n$link");
                       },
-                      child: Icon(Icons.send_outlined, color: Colors.black87, size: 24),
+                      child: Icon(
+                        CupertinoIcons.arrowshape_turn_up_right,
+                        color: Colors.black87,
+                        size: 24,
+                      ),
                     ),
+                    SizedBox(width: 4),
+                    if ((post.stats.shareCount ?? 0) > 0)
+                      Text(
+                        "${post.stats.shareCount}",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
 
                     Spacer(),
 
-                    Icon(Icons.bookmark_border, color: Colors.black87, size: 26),
+                    Icon(
+                      Icons.bookmark_border,
+                      color: Colors.black87,
+                      size: 26,
+                    ),
                   ],
                 ),
-                
+
                 // Like Count
                 if ((post.stats.likeCount ?? 0) > 0)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Text(
-                    "${post.stats.likeCount} likes",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      "${post.stats.likeCount} likes",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
                     ),
                   ),
-                ),
 
                 // Caption with Username + Rich Text
                 if (post.caption != null && post.caption!.isNotEmpty) ...[
-                   SizedBox(height: 6),
-                   ExpandableCaption(
-                      text: post.caption!,
-                      username: post.user.username.isNotEmpty ? post.user.username : post.user.name,
-                      onUsernameTap: () => Get.to(ProfileScreen(viewUserName: post.user.username)),
-                   ),
-                ]
+                  SizedBox(height: 6),
+                  ExpandableCaption(
+                    text: post.caption!,
+                    username:
+                        post.user.username.isNotEmpty
+                            ? post.user.username
+                            : post.user.name,
+                    onUsernameTap:
+                        () => Get.to(
+                          ProfileScreen(viewUserName: post.user.username),
+                        ),
+                  ),
+                ],
               ],
             ),
           ),
-          
+
           Divider(height: 1, thickness: 0.5, color: Colors.grey.shade200),
         ],
       ),
@@ -750,87 +898,131 @@ class HomePage extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle
-            Center(
-              child: Container(
-                margin: EdgeInsets.only(top: 10, bottom: 6),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
+      builder:
+          (context) => Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Handle
+                Center(
+                  child: Container(
+                    margin: EdgeInsets.only(top: 10, bottom: 6),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
                 ),
-              ),
+
+                // 1. Report
+                ListTile(
+                  leading: Icon(
+                    Icons.report_gmailerrorred_outlined,
+                    color: Colors.redAccent,
+                  ),
+                  title: Text(
+                    "Report",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    controller.openReportBottomSheet(postId: postId);
+                  },
+                ),
+                Divider(
+                  height: 1,
+                  thickness: 0.5,
+                  color: Colors.grey.shade100,
+                  indent: 16,
+                  endIndent: 16,
+                ),
+
+                // 2. About this profile
+                ListTile(
+                  leading: Icon(
+                    Icons.info_outline_rounded,
+                    color: Colors.black87,
+                  ),
+                  title: Text(
+                    "About this profile",
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    if (username.isNotEmpty) {
+                      Get.to(ProfileScreen(viewUserName: username));
+                    }
+                  },
+                ),
+
+                // 3. Block
+                ListTile(
+                  leading: Icon(Icons.block, color: Colors.redAccent),
+                  title: Text(
+                    "Block",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    // Action
+                  },
+                ),
+                Divider(
+                  height: 1,
+                  thickness: 0.5,
+                  color: Colors.grey.shade100,
+                  indent: 16,
+                  endIndent: 16,
+                ),
+
+                // 4. Interested
+                ListTile(
+                  leading: Icon(
+                    Icons.star_border_rounded,
+                    color: Colors.black87,
+                  ),
+                  title: Text(
+                    "Interested",
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    // Action
+                  },
+                ),
+
+                // 5. Not Interested
+                ListTile(
+                  leading: Icon(
+                    Icons.visibility_off_outlined,
+                    color: Colors.black87,
+                  ),
+                  title: Text(
+                    "Not interested",
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    // Action
+                  },
+                ),
+
+                SizedBox(height: 20),
+              ],
             ),
-            
-            // 1. Report
-            ListTile(
-              leading: Icon(Icons.report_gmailerrorred_outlined, color: Colors.redAccent),
-              title: Text("Report", style: TextStyle(fontWeight: FontWeight.w500, color: Colors.redAccent)),
-              onTap: () {
-                Navigator.pop(context);
-                controller.openReportBottomSheet(postId: postId);
-              },
-            ),
-             Divider(height: 1, thickness: 0.5, color: Colors.grey.shade100, indent: 16, endIndent: 16),
-
-
-            // 2. About this profile
-            ListTile(
-              leading: Icon(Icons.info_outline_rounded, color: Colors.black87),
-              title: Text("About this profile", style: TextStyle(fontWeight: FontWeight.w500)),
-              onTap: () {
-                Navigator.pop(context);
-                if (username.isNotEmpty) {
-                  Get.to(ProfileScreen(viewUserName: username));
-                }
-              },
-            ),
-
-            // 3. Block
-             ListTile(
-              leading: Icon(Icons.block, color: Colors.redAccent),
-              title: Text("Block", style: TextStyle(fontWeight: FontWeight.w500, color: Colors.redAccent)),
-              onTap: () {
-                Navigator.pop(context);
-                // Action
-              },
-            ),
-            Divider(height: 1, thickness: 0.5, color: Colors.grey.shade100, indent: 16, endIndent: 16),
-
-
-            // 4. Interested
-            ListTile(
-              leading: Icon(Icons.star_border_rounded, color: Colors.black87),
-              title: Text("Interested", style: TextStyle(fontWeight: FontWeight.w500)),
-              onTap: () {
-                Navigator.pop(context);
-                // Action
-              },
-            ),
-
-            // 5. Not Interested
-             ListTile(
-              leading: Icon(Icons.visibility_off_outlined, color: Colors.black87),
-              title: Text("Not interested", style: TextStyle(fontWeight: FontWeight.w500)),
-              onTap: () {
-                Navigator.pop(context);
-                // Action
-              },
-            ),
-
-            SizedBox(height: 20),
-          ],
-        ),
-      ),
+          ),
     );
   }
 }
@@ -890,40 +1082,44 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                 ),
               ),
 
-                child: Column(
-                  children: [
-                    /// --- HEADER ----
-                    _buildHeader(),
+              child: Column(
+                children: [
+                  /// --- HEADER ----
+                  _buildHeader(),
 
-                    Divider(height: 1, color: Colors.grey.shade100),
+                  Divider(height: 1, color: Colors.grey.shade100),
 
-                    /// --- COMMENT LIST ----
-                    Expanded(
-                      child: Obx(() {
-                        if (commentController.isLoading.value) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-                        if (commentController.commentsList.isEmpty) {
-                          return _buildEmptyState();
-                        }
+                  /// --- COMMENT LIST ----
+                  Expanded(
+                    child: Obx(() {
+                      if (commentController.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (commentController.commentsList.isEmpty) {
+                        return _buildEmptyState();
+                      }
 
-                        return ListView.builder(
-                          controller: scrollController,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          itemCount: commentController.commentsList.length,
-                          itemBuilder: (_, index) {
-                            final comment = commentController.commentsList[index];
-                            return _buildMainComment(comment, index, widget.postId);
-                          },
-                        );
-                      }),
-                    ),
+                      return ListView.builder(
+                        controller: scrollController,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        itemCount: commentController.commentsList.length,
+                        itemBuilder: (_, index) {
+                          final comment = commentController.commentsList[index];
+                          return _buildMainComment(
+                            comment,
+                            index,
+                            widget.postId,
+                          );
+                        },
+                      );
+                    }),
+                  ),
 
-                    /// --- COMMENT INPUT FIELD ----
-                    _buildInputField(),
-                  ],
-                ),
+                  /// --- COMMENT INPUT FIELD ----
+                  _buildInputField(),
+                ],
               ),
+            ),
           );
         },
       ),
@@ -972,13 +1168,15 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                         color: Colors.black87,
                       ),
                     ),
-                    Obx(() => Text(
-                      "${commentController.commentsList.length} ${commentController.commentsList.length == 1 ? 'comment' : 'comments'}",
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
+                    Obx(
+                      () => Text(
+                        "${commentController.commentsList.length} ${commentController.commentsList.length == 1 ? 'comment' : 'comments'}",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
-                    )),
+                    ),
                   ],
                 ),
               ),
@@ -1018,10 +1216,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
           const SizedBox(height: 8),
           Text(
             "Be the first to share your thoughts!",
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
           ),
         ],
       ),
@@ -1058,20 +1253,23 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                       CircleAvatar(
                         radius: 20,
                         backgroundColor: Colors.grey.shade100,
-                        backgroundImage: (comment.user?.avtar != null &&
-                            comment.user?.avtar != "")
-                            ? NetworkImage(AppUrls.getFullImageUrl(comment.user!.avtar!))
-                            : null,
-                        child: (comment.user?.avtar == null ||
-                            comment.user?.avtar == "")
-                            ? Icon(
-                          Icons.person,
-                          color: Colors.grey.shade700,
-                          size: 24,
-                        )
-                            : null,
+                        backgroundImage:
+                            (comment.user?.avtar != null &&
+                                    comment.user?.avtar != "")
+                                ? NetworkImage(
+                                  AppUrls.getFullImageUrl(comment.user!.avtar!),
+                                )
+                                : null,
+                        child:
+                            (comment.user?.avtar == null ||
+                                    comment.user?.avtar == "")
+                                ? Icon(
+                                  Icons.person,
+                                  color: Colors.grey.shade700,
+                                  size: 24,
+                                )
+                                : null,
                       ),
-
                     ],
                   ),
                   const SizedBox(width: 12),
@@ -1111,13 +1309,20 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                         Row(
                           children: [
                             _buildActionButton(
-                              icon: comment.hasLiked
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
+                              icon:
+                                  comment.hasLiked
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
                               label: "${comment.likesCount}",
-                              color: comment.hasLiked ? Colors.red : Colors.grey.shade700,
+                              color:
+                                  comment.hasLiked
+                                      ? Colors.red
+                                      : Colors.grey.shade700,
                               onTap: () {
-                                commentController.likeComment(comment.id, index);
+                                commentController.likeComment(
+                                  comment.id,
+                                  index,
+                                );
                               },
                             ),
                             const SizedBox(width: 20),
@@ -1130,7 +1335,9 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                                   replyingToCommentId = comment.id;
                                   replyingToUsername = comment.user?.username;
                                 });
-                                FocusScope.of(context).requestFocus(FocusNode());
+                                FocusScope.of(
+                                  context,
+                                ).requestFocus(FocusNode());
                               },
                             ),
                             if (comment.replies.isNotEmpty) ...[
@@ -1159,11 +1366,17 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             Container(
               margin: const EdgeInsets.only(left: 48),
               child: Column(
-                children: comment.replies.asMap().entries.map<Widget>((entry) {
-                  int replyIndex = entry.key;
-                  var reply = entry.value;
-                  return _buildReply(reply, index, replyIndex, widget.postId);
-                }).toList(),
+                children:
+                    comment.replies.asMap().entries.map<Widget>((entry) {
+                      int replyIndex = entry.key;
+                      var reply = entry.value;
+                      return _buildReply(
+                        reply,
+                        index,
+                        replyIndex,
+                        widget.postId,
+                      );
+                    }).toList(),
               ),
             ),
         ],
@@ -1187,25 +1400,32 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         }
       },
       child: Container(
-        padding: const EdgeInsets.only(left: 16, top: 12, right: 16, bottom: 12),
+        padding: const EdgeInsets.only(
+          left: 16,
+          top: 12,
+          right: 16,
+          bottom: 12,
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CircleAvatar(
               radius: 16,
               backgroundColor: Colors.grey.shade100,
-              backgroundImage: (reply.user?.avtar != null &&
-                  reply.user?.avtar != "")
-                  ? NetworkImage(AppUrls.getFullImageUrl(reply.user!.avtar!))
-                  : null,
-              child: (reply.user?.avtar == null ||
-                  reply.user?.avtar == "")
-                  ? Icon(
-                Icons.person,
-                color: Colors.grey.shade700,
-                size: 20,
-              )
-                  : null,
+              backgroundImage:
+                  (reply.user?.avtar != null && reply.user?.avtar != "")
+                      ? NetworkImage(
+                        AppUrls.getFullImageUrl(reply.user!.avtar!),
+                      )
+                      : null,
+              child:
+                  (reply.user?.avtar == null || reply.user?.avtar == "")
+                      ? Icon(
+                        Icons.person,
+                        color: Colors.grey.shade700,
+                        size: 20,
+                      )
+                      : null,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -1267,15 +1487,23 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   }
 
   Widget _buildInputField() {
-    final List<String> quickEmojis = ["❤️", "🔥", "👏", "😂", "😮", "😍", "😢", "🙌", "👍"];
+    final List<String> quickEmojis = [
+      "❤️",
+      "🔥",
+      "👏",
+      "😂",
+      "😮",
+      "😍",
+      "😢",
+      "🙌",
+      "👍",
+    ];
 
     return Container(
       padding: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.9),
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200, width: 1),
-        ),
+        border: Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -1297,17 +1525,21 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
-                    textController.text = textController.text + quickEmojis[index];
+                    textController.text =
+                        textController.text + quickEmojis[index];
                     textController.selection = TextSelection.fromPosition(
-                        TextPosition(offset: textController.text.length)
+                      TextPosition(offset: textController.text.length),
                     );
                   },
                   child: Container(
                     margin: const EdgeInsets.only(right: 12),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                       color: Colors.grey.shade100,
-                       borderRadius: BorderRadius.circular(16)
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     alignment: Alignment.center,
                     child: Text(
@@ -1319,7 +1551,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               },
             ),
           ),
-          
+
           Divider(height: 1, color: Colors.grey.shade100),
 
           // Replying indicator
@@ -1389,9 +1621,10 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                       maxLines: null,
                       style: const TextStyle(fontSize: 14),
                       decoration: InputDecoration(
-                        hintText: replyingToCommentId != null
-                            ? "Write a reply..."
-                            : "Share your thoughts...",
+                        hintText:
+                            replyingToCommentId != null
+                                ? "Write a reply..."
+                                : "Share your thoughts...",
                         hintStyle: TextStyle(
                           color: Colors.grey.shade500,
                           fontSize: 14,
@@ -1424,7 +1657,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                         // Do not pop, just clear so user can comment again or see result
                         // Navigator.pop(context, commentController.commentsList.length);
                       }
-  
+
                       textController.clear();
                       setState(() {
                         replyingToCommentId = null;
@@ -1463,29 +1696,30 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   }
 
   void _showDeletePopupBlur(
-      BuildContext context,
-      Offset position,
-      int commentId,
-      int commentIndex,
-      int postId, {
-        required bool isReply,
-        int? replyIndex,
-      }) {
+    BuildContext context,
+    Offset position,
+    int commentId,
+    int commentIndex,
+    int postId, {
+    required bool isReply,
+    int? replyIndex,
+  }) {
     OverlayState overlayState = Overlay.of(context);
     late OverlayEntry blurEntry;
     late OverlayEntry popupEntry;
 
     blurEntry = OverlayEntry(
-      builder: (_) => GestureDetector(
-        onTap: () {
-          blurEntry.remove();
-          popupEntry.remove();
-        },
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(color: Colors.black.withOpacity(0.4)),
-        ),
-      ),
+      builder:
+          (_) => GestureDetector(
+            onTap: () {
+              blurEntry.remove();
+              popupEntry.remove();
+            },
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(color: Colors.black.withOpacity(0.4)),
+            ),
+          ),
     );
 
     popupEntry = OverlayEntry(
@@ -1519,8 +1753,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     // Delete reply
                     Navigator.pop(context);
                     await commentController.deleteComments(postId, commentId);
-                    commentController.commentsList[commentIndex].replies.removeAt(replyIndex);
-
+                    commentController.commentsList[commentIndex].replies
+                        .removeAt(replyIndex);
                   } else {
                     // Delete main comment
                     await commentController.deleteComments(postId, commentId);

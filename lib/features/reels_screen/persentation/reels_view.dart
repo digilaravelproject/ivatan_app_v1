@@ -1195,7 +1195,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
             },
             behavior: HitTestBehavior.opaque,
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
               child: AnimatedScale(
                 scale: 1.0, // Keeping scale consistent to prevent visual shifting
                 duration: const Duration(milliseconds: 200),
@@ -1204,23 +1204,24 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(
-                      width: 40,
-                      height: 40,
+                      width: 50,
+                      height: 50,
                       child: Center(
                         child: controller.isLikedMap[index]?.value == true
-                            ? const Icon(
-                                CupertinoIcons.heart_fill,
-                                size: 34,
-                                color: Colors.red,
-                              )
+                            ? Image.asset(
+                          "assets/icon/ic_liked.png",
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.contain,
+                        )
                             : const Icon(
-                                CupertinoIcons.heart,
-                                size: 34,
+                                CupertinoIcons.suit_heart,
+                                size: 24,
                                 color: Colors.white,
                               ),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       controller.likeCounts[index]?.value.toString() ?? "0",
                       style: const TextStyle(color: Colors.white, fontSize: 12),
@@ -1232,7 +1233,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
           ),
         ),
 
-        const SizedBox(height: 16),
+       // const SizedBox(height: 16),
         Obx(
               () => _buildIconButton(
             icon:
@@ -1240,7 +1241,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
             CustomIcon(
               svgString: AppIcons.ic_comments,
               color: Colors.white,
-              size: 28,
+              size: 20,
               removeColor: false,
             ),
             label: controller.commentCounts[index]?.value.toString() ?? "0",
@@ -1255,12 +1256,12 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
           ),
         ),
 
-        const SizedBox(height: 16),
+       // const SizedBox(height: 16),
         _buildIconButton(
           icon: CustomIcon(
             svgString: AppIcons.ic_share,
             color: Colors.white,
-            size: 28,
+            size: 18,
             removeColor: false,
           ),
           label: controller.shareCounts[index]?.value.toString() ?? "0",

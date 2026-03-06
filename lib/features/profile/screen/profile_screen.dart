@@ -31,6 +31,7 @@ import '../../dashboard/persentation/reel_media_picker_screen.dart';
 import '../../product/persentation/create_product_screen.dart';
 import '../../product/persentation/my_orders_screen.dart';
 import '../../product/persentation/my_products_screen.dart';
+import '../../product/persentation/seller_dashboard_screen.dart';
 import '../../service/persentation/my_services_screen.dart';
 import '../../service/persentation/create_service_screen.dart';
 import '../../dashboard/persentation/service_screen.dart';
@@ -258,7 +259,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 Get.to(() => MyProductsScreen());
                                               } else if (value == 'services') {
                                                 Get.to(() => MyServicesScreen());
+                                              } else if (value == 'dashboard') {
+                                                Get.to(() => SellerDashboard());
                                               }
+
                                             },
                                             itemBuilder: (context) => [
                                               const PopupMenuItem(
@@ -308,6 +312,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     Icon(CupertinoIcons.chat_bubble_text, size: 20),
                                                     SizedBox(width: 10),
                                                     Text("Enquiry"),
+                                                  ],
+                                                ),
+                                              ),
+                                              const PopupMenuItem(
+                                                value: 'dashboard',
+                                                child: Row(
+                                                  children: [
+                                                    Icon(CupertinoIcons.doc_append, size: 20),
+                                                    SizedBox(width: 10),
+                                                    Text("Dashboard"),
                                                   ],
                                                 ),
                                               ),

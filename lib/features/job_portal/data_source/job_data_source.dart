@@ -106,7 +106,6 @@ class JobRemoteDataSourceImpl implements JobRemoteDataSource {
       final List dataList = response['data']['data'];
       return dataList.map((e) => JobApplication.fromJson(e)).toList();
     }
-
     return [];
   }
 
