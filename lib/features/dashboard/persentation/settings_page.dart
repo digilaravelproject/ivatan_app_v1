@@ -235,6 +235,59 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ),
 
+              const SizedBox(height: 16),
+
+              // CONTACT VISIBILITY
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade400)
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.contact_phone_outlined, color: Colors.black54),
+                        const SizedBox(width: 12),
+                        const Text("Contact Visibility", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Obx(() => Column(
+                      children: [
+                        _buildVisibilityOption(
+                          label: "Show Both (Phone & Email)",
+                          value: 'both',
+                          groupValue: profileController.contactVisibility.value,
+                          onChanged: (val) => profileController.contactVisibility.value = val!,
+                        ),
+                        _buildVisibilityOption(
+                          label: "Show Phone Only",
+                          value: 'phone',
+                          groupValue: profileController.contactVisibility.value,
+                          onChanged: (val) => profileController.contactVisibility.value = val!,
+                        ),
+                        _buildVisibilityOption(
+                          label: "Show Email Only",
+                          value: 'email',
+                          groupValue: profileController.contactVisibility.value,
+                          onChanged: (val) => profileController.contactVisibility.value = val!,
+                        ),
+                        _buildVisibilityOption(
+                          label: "Hide Contact Button",
+                          value: 'none',
+                          groupValue: profileController.contactVisibility.value,
+                          onChanged: (val) => profileController.contactVisibility.value = val!,
+                        ),
+                      ],
+                    )),
+                  ],
+                ),
+              ),
+
               SizedBox(height: 16,),
 
 
@@ -387,6 +440,24 @@ class SettingsScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: child,
+    );
+  }
+
+  Widget _buildVisibilityOption({
+    required String label,
+    required String value,
+    required String groupValue,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return RadioListTile<String>(
+      title: Text(label, style: const TextStyle(fontSize: 14)),
+      value: value,
+      groupValue: groupValue,
+      onChanged: onChanged,
+      activeColor: AppColors.primary,
+      contentPadding: EdgeInsets.zero,
+      dense: true,
+      visualDensity: VisualDensity.compact,
     );
   }
 }

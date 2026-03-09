@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../../route/app_pages.dart';
+import '../../../../core/network/app_urls.dart';
 import '../../data/model/job_model.dart';
-import '../controller/job_controller.dart';
+import '../controller/recruiter_jobs_controller.dart';
 
-
-class MyCreatedJobScreen extends GetWidget<JobController> {
+class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
   const MyCreatedJobScreen({super.key});
 
   @override
@@ -20,7 +21,7 @@ class MyCreatedJobScreen extends GetWidget<JobController> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
         title: Text(
-          'My Jobs',
+          'My Created Jobs',
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             color: Colors.black,
@@ -33,23 +34,37 @@ class MyCreatedJobScreen extends GetWidget<JobController> {
 
           Expanded(
             child: Obx(() {
-              if (controller.isLoading.value &&
-                  controller.jobList.isEmpty) {
+              if (controller.isLoading.value && controller.jobs.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              if (controller.jobList.isEmpty) {
-                return const Center(child: Text("No jobs found"));
+              if (controller.jobs.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.work_off_outlined, size: 64, color: Colors.grey[400]),
+                      const SizedBox(height: 16),
+                      Text(
+                        "No jobs found",
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               }
 
               return ListView.builder(
                 controller: controller.scrollController,
                 padding: const EdgeInsets.all(16),
-                itemCount: controller.jobList.length +
-                    (controller.isMoreLoading.value ? 1 : 0),
+                itemCount: controller.jobs.length + (controller.isMoreLoading.value ? 1 : 0),
                 itemBuilder: (context, index) {
-                  if (index < controller.jobList.length) {
-                    final job = controller.jobList[index];
+                  if (index < controller.jobs.length) {
+                    final job = controller.jobs[index];
                     return _buildJobCard(job);
                   } else {
                     return const Padding(
@@ -67,18 +82,13 @@ class MyCreatedJobScreen extends GetWidget<JobController> {
       ),
     );
   }
-}
 
-
-
-Widget _buildJobCard(JobModel job,) {
-  return
-    InkWell(
-      onTap: (){
+  Widget _buildJobCard(JobModel job) {
+    return InkWell(
+      onTap: () {
         Get.toNamed(AppRoutes.jobDescriptionScreen, arguments: job.slug);
       },
-      child:
-      Container(
+      child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -86,9 +96,9 @@ Widget _buildJobCard(JobModel job,) {
           border: Border.all(color: Colors.grey[200]!),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -98,17 +108,23 @@ Widget _buildJobCard(JobModel job,) {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Company Logo
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      // border: Border.all(color: Colors.grey[300]!),
-                      image: DecorationImage(
-                        image: NetworkImage("https://cdn-icons-png.flaticon.com/512/731/731985.png"),
-                        fit: BoxFit.cover,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: CachedNetworkImage(
+                      imageUrl: AppUrls.getFullImageUrl(job.companyLogo),
+                      width: 48,
+                      height: 48,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey[100],
+                        child: const Icon(Icons.business, color: Colors.grey),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: Colors.grey[100],
+                        child: const Icon(Icons.business, color: Colors.grey),
                       ),
                     ),
                   ),
@@ -119,42 +135,38 @@ Widget _buildJobCard(JobModel job,) {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          job.companyName,
-                          style: GoogleFonts.poppins(
-                            // fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                        Text(
                           job.title,
                           style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
                         ),
+                        Text(
+                          job.companyName,
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
                         Row(
                           children: [
+                            Icon(Icons.location_on_outlined, size: 14, color: Colors.grey[500]),
+                            const SizedBox(width: 4),
                             Text(
-                              '📍 ${job.location}',
+                              job.location,
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 color: Colors.grey[600],
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            Container(
-                              width: 4,
-                              height: 4,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[400],
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 12),
+                            Icon(Icons.work_outline, size: 14, color: Colors.grey[500]),
+                            const SizedBox(width: 4),
                             Text(
-                              '💼 ${job.employmentType}',
+                              job.employmentType,
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 color: Colors.grey[600],
@@ -165,93 +177,76 @@ Widget _buildJobCard(JobModel job,) {
                       ],
                     ),
                   ),
-
+                  // Urgent Badge
+                  if (job.isUrgentActive == true)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red[50],
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'Urgent',
+                        style: GoogleFonts.poppins(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red[700],
+                        ),
+                      ),
+                    ),
                 ],
               ),
 
-              const SizedBox(height: 10),
-
-              // Job Description
-              Text(
-                job.description,
-                style: GoogleFonts.poppins(
-                  fontSize: 13,
-                  color: Colors.grey[700],
-                  height: 1.5,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-
               const SizedBox(height: 16),
+              
+              const Divider(),
 
-              // Footer with Days Left and Apply Button
+              const SizedBox(height: 12),
+
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Days Left
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Text('⏳', style: GoogleFonts.poppins(fontSize: 12)),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${7} days left',
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey[700],
-                          ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Salary Range',
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          color: Colors.grey[500],
                         ),
-                      ],
+                      ),
+                      Text(
+                        '${job.currency} ${job.salaryMin ?? 'N/A'} - ${job.salaryMax ?? 'N/A'}',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  ElevatedButton(
+                    onPressed: () {
+                      Get.toNamed(AppRoutes.applicantListScreen, arguments: job.id);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    ),
+                    child: Text(
+                      'View Applicants (${job.applicationsCount ?? 0})',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-
-                  const Spacer(),
-
-                  // Salary
-                  Text(
-                    '💰 \$${job.salaryMax}k/yr',
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
-                  ),
-
-                  const SizedBox(width: 12),
-
-                  // Apply Button
-                  // InkWell(
-                  //   onTap: () {
-                  //     Get.toNamed(AppRoutes.applicantListScreen, arguments: job.id);
-                  //   },
-                  //   child: Container(
-                  //     padding: const EdgeInsets.symmetric(
-                  //       horizontal: 20,
-                  //       vertical: 10,
-                  //     ),
-                  //     decoration: BoxDecoration(
-                  //       color: Colors.black,
-                  //       borderRadius: BorderRadius.circular(10),
-                  //     ),
-                  //     child: Text(
-                  //       'Apply',
-                  //       style: GoogleFonts.poppins(
-                  //         fontSize: 14,
-                  //         fontWeight: FontWeight.w600,
-                  //         color: Colors.white,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
             ],
@@ -259,49 +254,49 @@ Widget _buildJobCard(JobModel job,) {
         ),
       ),
     );
-}
+  }
 
-
-Widget _buildSearchBar(JobController controller) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2),
-    child: Container(
-      height: 45,
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: Colors.grey[400]!),
-      ),
-      child: Row(
-        children: [
-          const SizedBox(width: 16),
-          SvgPicture.string(
-            '''<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M21 21L16.65 16.65" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>''',
-            width: 20,
-            height: 20,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: TextField(
-              controller: controller.searchController,
-              onChanged: (value) => controller.searchText.value = value,
-              decoration: InputDecoration(
-                hintText: 'Search jobs, companies...',
-                hintStyle: GoogleFonts.poppins(
-                  color: Colors.grey[500],
-                  fontSize: 14,
-                ),
-                border: InputBorder.none,
-              ),
-              style: GoogleFonts.poppins(color: Colors.black, fontSize: 14),
+  Widget _buildSearchBar(RecruiterJobsController controller) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        height: 50,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
+          ],
+        ),
+        child: TextField(
+          controller: controller.searchController,
+          onChanged: controller.onSearchChanged,
+          onSubmitted: (value) => controller.fetchJobs(search: value),
+          decoration: InputDecoration(
+            hintText: 'Search by job title...',
+            hintStyle: GoogleFonts.poppins(
+              color: Colors.grey[400],
+              fontSize: 14,
+            ),
+            prefixIcon: const Icon(Icons.search, color: Colors.black),
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.clear, size: 18),
+                onPressed: () {
+                  controller.searchController.clear();
+                  controller.searchText.value = '';
+                  controller.fetchJobs(search: '');
+                }
+            ),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(vertical: 15),
           ),
-          const SizedBox(width: 16),
-        ],
+          style: GoogleFonts.poppins(color: Colors.black, fontSize: 14),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }

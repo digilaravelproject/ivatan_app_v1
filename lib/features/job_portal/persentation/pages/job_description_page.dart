@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,6 +7,8 @@ import '../../../../route/app_pages.dart';
 import '../../data/model/job_model.dart';
 import '../controller/job_discription_controller.dart';
 import 'package:i_vatan_app/core/network/app_urls.dart';
+
+import 'occupation_form_page.dart';
 
 class JobDescriptionScreen extends GetView<JobDescriptionController> {
   const JobDescriptionScreen({super.key});
@@ -41,7 +44,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
           ),
           actions: [
             // Only show edit/delete for recruiters
-            if (_isRecruiter()) ...[
+            if (_isRecruiter() && job.isMine) ...[
               IconButton(
                 icon: const Icon(Icons.edit, color: Colors.black),
                 onPressed: () => controller.editJob(),
@@ -195,9 +198,17 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
               height: 45,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: NetworkImage(AppUrls.getFullImageUrl(job.companyLogo ?? job.employer.profilePhotoPath)),
+                border: Border.all(color: Colors.grey[100]!),
+              ),
+              child: ClipOval(
+                child: CachedNetworkImage(
+                  imageUrl: AppUrls.getFullImageUrl(job.companyLogo ?? job.employer.profilePhotoPath),
                   fit: BoxFit.cover,
+                  errorWidget: (context, url, error) => const Icon(
+                    Icons.business,
+                    size: 24,
+                    color: Colors.grey,
+                  ),
                 ),
               ),
             ),
@@ -387,10 +398,17 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                   height: 50,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.grey[300]!),
-                    image: DecorationImage(
-                      image: NetworkImage(AppUrls.getFullImageUrl(job.employer.profilePhotoPath)),
+                    border: Border.all(color: Colors.grey[100]!),
+                  ),
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: AppUrls.getFullImageUrl(job.employer.profilePhotoPath),
                       fit: BoxFit.cover,
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.business,
+                        size: 30,
+                        color: Colors.grey,
+                      ),
                     ),
                   ),
                 ),
@@ -519,7 +537,52 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
 
   Widget _buildApplyButton(JobModel job) {
     final isRecruiter = _isRecruiter();
-    
+    final canViewApplicants = isRecruiter && job.isMine;
+
+    // Recruiter jo is job ka owner nahi hai → koi button nahi dikhana
+    if (isRecruiter && !job.isMine) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Salary Range',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  Text(
+                    '${job.currency} ${job.salaryMin} - ${job.salaryMax}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
@@ -558,12 +621,12 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
             ),
           ),
           ElevatedButton(
-            onPressed: (){
-              if (isRecruiter) {
+            onPressed: () {
+              if (canViewApplicants) {
                 Get.toNamed(AppRoutes.applicantListScreen, arguments: job.id);
               } else {
-                // Handle apply for applier
-                controller.applyForJob();
+                // Applier → apply flow
+                Get.to(() => const ResumeFormScreen(), arguments: {'jobId': job.id});
               }
             },
             style: ElevatedButton.styleFrom(
@@ -576,7 +639,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
               elevation: 0,
             ),
             child: Text(
-              isRecruiter ? 'View Applicant' : 'Apply Now',
+              canViewApplicants ? 'View Applicants' : 'Apply Now',
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,

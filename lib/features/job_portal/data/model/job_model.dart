@@ -72,6 +72,9 @@ class JobModel {
   final int viewsCount;
   final String createdAt;
   final String updatedAt;
+  final bool isMine;
+  final bool isUrgentActive;
+  final int? applicationsCount;
   final EmployerModel employer;
 
   JobModel({
@@ -97,6 +100,9 @@ class JobModel {
     required this.viewsCount,
     required this.createdAt,
     required this.updatedAt,
+    this.isMine = false,
+    this.isUrgentActive = false,
+    this.applicationsCount,
     required this.employer,
   });
 
@@ -116,14 +122,17 @@ class JobModel {
       location: json['location'] ?? '',
       country: json['country'] ?? '',
       employmentType: json['employment_type'] ?? '',
-      salaryMin: json['salary_min'] ?? '',
-      salaryMax: json['salary_max'] ?? '',
+      salaryMin: json['salary_min']?.toString() ?? '',
+      salaryMax: json['salary_max']?.toString() ?? '',
       currency: json['currency'] ?? '',
       isRemote: json['is_remote'] ?? false,
       status: json['status'] ?? '',
       viewsCount: json['views_count'] ?? 0,
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
+      isMine: json['is_mine'] ?? false,
+      isUrgentActive: json['is_urgent_active'] ?? false,
+      applicationsCount: json['applications_count'],
       employer: EmployerModel.fromJson(json['employer'] ?? {}),
     );
   }
@@ -230,6 +239,7 @@ class CreateJobRequestModel {
   final double salaryMax;
   final String currency;
   final bool isRemote;
+  final bool isUrgent;
   final String status;
   final String? responsibilities;
   final String? requirements;
@@ -247,6 +257,7 @@ class CreateJobRequestModel {
     required this.salaryMax,
     required this.currency,
     required this.isRemote,
+    required this.isUrgent,
     required this.status,
     this.responsibilities,
     this.requirements,
@@ -266,6 +277,7 @@ class CreateJobRequestModel {
       'salary_max': salaryMax,
       'currency': currency,
       'is_remote': isRemote,
+      'is_urgent': isUrgent,
       'status': status,
       'responsibilities': responsibilities,
       'requirements': requirements,

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import '../../../../core/network/app_urls.dart';
 import '../controller/job_controller.dart';
 
 class JobCreateScreen extends GetView<JobController> {
@@ -38,46 +39,70 @@ class JobCreateScreen extends GetView<JobController> {
               // Company Logo Upload
               Text('Company Logo', style: _labelStyle()),
               const SizedBox(height: 6),
-              Obx(() => GestureDetector(
-                onTap: () => _pickImage(),
-                child: Container(
-                  width: double.infinity,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: controller.companyLogoFile.value != null
-                          ? Colors.black
-                          : Colors.grey[300]!,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.grey[50],
-                  ),
-                  child: controller.companyLogoFile.value != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(6),
-                          child: Image.file(
-                            controller.companyLogoFile.value!,
-                            fit: BoxFit.cover,
+              Obx(() {
+                final hasLocalFile = controller.companyLogoFile.value != null;
+                final hasNetworkLogo = controller.editingJobLogoUrl.value != null &&
+                    controller.editingJobLogoUrl.value!.isNotEmpty;
+                final hasAnyLogo = hasLocalFile || hasNetworkLogo;
+
+                return GestureDetector(
+                  onTap: () => _pickImage(),
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 150,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: hasAnyLogo ? Colors.black : Colors.grey[300]!,
+                            width: 2,
                           ),
-                        )
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.image_outlined,
-                                size: 40, color: Colors.grey[400]),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Tap to upload logo',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.grey[50],
                         ),
-                ),
-              )),
+                        child: hasLocalFile
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: Image.file(
+                                  controller.companyLogoFile.value!,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : hasNetworkLogo
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: Image.network(
+                                      AppUrls.getFullImageUrl(controller.editingJobLogoUrl.value),
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => _logoPlaceholder(),
+                                    ),
+                                  )
+                                : _logoPlaceholder(),
+                      ),
+                      if (hasAnyLogo)
+                        Positioned(
+                          bottom: 8,
+                          right: 8,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.6),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.edit, size: 12, color: Colors.white),
+                                SizedBox(width: 4),
+                                Text('Change', style: TextStyle(color: Colors.white, fontSize: 11)),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              }),
               const SizedBox(height: 16),
 
               Text('Company/Individual Name', style: _labelStyle()),
@@ -256,16 +281,28 @@ class JobCreateScreen extends GetView<JobController> {
               )),
               const SizedBox(height: 16),
 
-              Text('Work Mode', style: _labelStyle()),
-              const SizedBox(height: 6),
-              Obx(() => CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text("Remote Job"),
-                value: controller.isRemote.value,
-                onChanged: (val) {
-                  controller.isRemote.value = val ?? false;
-                },
+              Text('Work Mode & Priority', style: _labelStyle()),
+              const SizedBox(height: 10),
+              Obx(() => Row(
+                children: [
+                  _buildToggleCard(
+                    emoji: '🏠',
+                    label: 'Remote Job',
+                    isActive: controller.isRemote.value,
+                    activeColor: const Color(0xFF1A73E8),
+                    onTap: () => controller.isRemote.value = !controller.isRemote.value,
+                  ),
+                  const SizedBox(width: 12),
+                  _buildToggleCard(
+                    emoji: '🔥',
+                    label: 'Urgent Hire',
+                    isActive: controller.isUrgent.value,
+                    activeColor: const Color(0xFFE53935),
+                    onTap: () => controller.isUrgent.value = !controller.isUrgent.value,
+                  ),
+                ],
               )),
+
               const SizedBox(height: 32),
 
               // Submit Button
@@ -350,6 +387,81 @@ class JobCreateScreen extends GetView<JobController> {
       fontSize: 14,
       fontWeight: FontWeight.w600,
       color: Colors.black87,
+    );
+  }
+
+  Widget _logoPlaceholder() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.business, size: 40, color: Colors.grey[400]),
+        const SizedBox(height: 8),
+        Text(
+          'Tap to upload logo',
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildToggleCard({
+    required String emoji,
+    required String label,
+    required bool isActive,
+    required Color activeColor,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+          decoration: BoxDecoration(
+            color: isActive ? activeColor.withOpacity(0.08) : Colors.grey[100],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isActive ? activeColor : Colors.grey[300]!,
+              width: isActive ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 20)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: isActive ? activeColor : Colors.grey[700],
+                  ),
+                ),
+              ),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isActive ? activeColor : Colors.transparent,
+                  border: Border.all(
+                    color: isActive ? activeColor : Colors.grey[400]!,
+                    width: 2,
+                  ),
+                ),
+                child: isActive
+                    ? const Icon(Icons.check, size: 13, color: Colors.white)
+                    : null,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

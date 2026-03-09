@@ -25,7 +25,7 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
   final minSalaryController = TextEditingController();
   final companyNameController = TextEditingController();
   final titleFormController = TextEditingController();
-  final companyWebsiteController = TextEditingController();
+  final companyWebsiteController = TextEditingController(text: "https://");
   final descriptionFormController = TextEditingController();
   final maxSalaryController = TextEditingController();
   final responsibilitiesController = TextEditingController();
@@ -37,9 +37,11 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
   final RxString selectedCurrency = 'INR'.obs;
   final RxString selectedStatus = 'published'.obs;
   final RxBool isRemote = true.obs;
+  final RxBool isUrgent = false.obs;
 
   // Image upload
   final companyLogoFile = Rx<File?>(null);
+  final editingJobLogoUrl = RxnString(); // existing logo URL when editing
 
   // Form validation errors
   final companyNameError = ''.obs;
@@ -215,6 +217,7 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
         salaryMax: double.tryParse(maxSalaryController.text) ?? 80000.0,
         currency: selectedCurrency.value,
         isRemote: isRemote.value,
+        isUrgent: isUrgent.value,
         status: selectedStatus.value,
         responsibilities: isEditing.value || responsibilitiesController.text.isNotEmpty ? responsibilitiesController.text : null,
         requirements: isEditing.value || requirementsController.text.isNotEmpty ? requirementsController.text : null,
@@ -222,15 +225,15 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
         country: isEditing.value || countryController.text.isNotEmpty ? countryController.text : null,
       );
 
-      final success = isEditing.value 
+      final message = isEditing.value
           ? await repository.updateJob(editingJobId.value!, request, logoFile: companyLogoFile.value)
           : await repository.createJob(request, logoFile: companyLogoFile.value);
 
-      if (success) {
+      if (message != null) {
         Get.back();
         Get.snackbar(
           'Success',
-          isEditing.value ? 'Job updated successfully.' : 'Job created successfully.',
+          message,
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green,
           colorText: Colors.white,
@@ -249,7 +252,7 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
     } catch (e) {
       Get.snackbar(
         'Error',
-        'An error occurred: $e',
+        e.toString().replaceAll('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -273,6 +276,8 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
     selectedCurrency.value = job.currency;
     selectedStatus.value = job.status;
     isRemote.value = job.isRemote;
+    isUrgent.value = job.isUrgentActive;
+    editingJobLogoUrl.value = job.companyLogo; // store existing logo URL
     responsibilitiesController.text = job.responsibilities ?? '';
     requirementsController.text = job.requirements ?? '';
     locationController.text = job.location;
@@ -298,6 +303,7 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
     countryController.clear();
     
     companyLogoFile.value = null;
+    editingJobLogoUrl.value = null;
     
     // Clear all errors
     companyNameError.value = '';
@@ -315,6 +321,7 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
     selectedCurrency.value = 'INR';
     selectedStatus.value = 'published';
     isRemote.value = true;
+    isUrgent.value = false;
     isFormValid.value = false;
   }
 

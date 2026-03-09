@@ -621,11 +621,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                  }, isExpanded: true),
                                                ),
                                                const SizedBox(width: 8),
-                                               Expanded(
-                                                 child: _buildActionButton("Contact", () {
-                                                   _showContactBottomSheet(user);
-                                                 }, isExpanded: true),
-                                               ),
+                                               if (profileController.userProfile.value?.contactVisibility != 'none')
+                                                 Expanded(
+                                                   child: _buildActionButton("Contact", () {
+                                                     _showContactBottomSheet(user);
+                                                   }, isExpanded: true),
+                                                 ),
                                              ],
                                            ],
                                          ),

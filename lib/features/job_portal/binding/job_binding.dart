@@ -6,6 +6,7 @@ import '../data_source/job_data_source.dart';
 import '../persentation/controller/applicant_controller.dart';
 import '../persentation/controller/job_controller.dart';
 import '../persentation/controller/job_discription_controller.dart';
+import '../persentation/controller/recruiter_jobs_controller.dart';
 import '../repository/job_repository.dart';
 
 class JobBinding extends Bindings {
@@ -30,5 +31,9 @@ class JobBinding extends Bindings {
 
     Get.lazyPut(() => ApplicantController(Get.find<JobRepository>()));
 
+    Get.lazyPut<RecruiterJobsController>(
+      () => RecruiterJobsController(repository: Get.find<JobRepository>()),
+    );
   }
 }
+

@@ -140,6 +140,7 @@ class UserData {
   bool? is_following;
   bool? is_follower;
   int? chat_id;
+  String? contactVisibility; // 'both', 'phone', 'email', 'none'
 
   UserData({
     this.id,
@@ -180,7 +181,8 @@ class UserData {
     this.is_mine,
     this.is_following,
     this.is_follower,
-    this.chat_id
+    this.chat_id,
+    this.contactVisibility
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) {
@@ -226,7 +228,8 @@ class UserData {
       is_mine: json["is_mine"],
       is_following: json["is_following"],
       is_follower: json["is_follower"],
-      chat_id: json["chat_id"]
+      chat_id: json["chat_id"],
+      contactVisibility: json["contact_visibility"] ?? 'both'
     );
   }
 }

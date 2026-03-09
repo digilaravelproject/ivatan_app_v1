@@ -44,6 +44,8 @@ class AppUrls {
 
 
   static const allJobs  ="api/v1/jobs";
+  static const recruiterJobs = "api/v1/jobs/recruiter";
+  static const careerProfile = "api/v1/jobs/my/profile";
 
 
 

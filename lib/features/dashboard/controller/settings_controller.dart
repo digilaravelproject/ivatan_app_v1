@@ -326,6 +326,7 @@ class SettingsController extends GetxController {
   RxBool isPrivate = false.obs;
   RxBool isLoading = false.obs;
   Rx<UserData?> userProfile = Rx<UserData?>(null);
+  RxString contactVisibility = 'both'.obs; // 'both', 'phone', 'email', 'none'
 
   final nameController = TextEditingController();
   final emailController = TextEditingController();
@@ -420,6 +421,7 @@ class SettingsController extends GetxController {
 
 
       request.fields["account_privacy"] = isPrivate.value ? "private" : "public";
+      request.fields["contact_visibility"] = contactVisibility.value;
 
 
       request.fields["messaging_privacy"] = staticMessagingPrivacy;
@@ -739,6 +741,7 @@ class SettingsController extends GetxController {
         bioController.text = result.user!.bio ?? "";
         languageController.text = result.user!.languagePreference ?? "en";
         isPrivate.value = result.user!.accountPrivacy == "private";
+        contactVisibility.value = result.user!.contactVisibility ?? 'both';
         
         // SYNC FOLLOW STATUS
         if (result.user?.id != null) {

@@ -110,8 +110,17 @@ class ApiServices extends GetxService {
         request.headers.addAll(_defaultHeaders());
 
         data.forEach((key, value) {
-          if (value is String) {
-            request.fields[key] = value;
+          if (value is File) return; // files handled separately below
+          if (value == null) return; // skip null values
+          
+          if (value is Map || value is List) {
+            _flattenMultipartData(key, value, request.fields);
+          } else if (value is bool) {
+            request.fields[key] = value ? '1' : '0';
+          } else if (value is num) {
+            request.fields[key] = value.toString();
+          } else {
+            request.fields[key] = value.toString();
           }
         });
 
@@ -126,17 +135,15 @@ class ApiServices extends GetxService {
         for (final entry in data.entries) {
           if (entry.value is File) {
             final file = entry.value as File;
-            final fileStream = http.ByteStream(file.openRead());
-            final length = await file.length();
-            final multipartFile = http.MultipartFile(
+            final multipartFile = await http.MultipartFile.fromPath(
               entry.key,
-              fileStream,
-              length,
+              file.path,
               filename: file.path.split("/").last,
             );
             request.files.add(multipartFile);
           }
         }
+
 
         final streamedResponse = await request.send().timeout(_timeout);
         final response = await http.Response.fromStream(streamedResponse);
@@ -236,7 +243,13 @@ class ApiServices extends GetxService {
         request.headers.addAll(_defaultHeaders());
 
         data.forEach((key, value) {
-          if (value is String) {
+          if (value is File) return; // files handled separately below
+          if (value == null) return;  // skip null values
+          if (value is bool) {
+            request.fields[key] = value ? '1' : '0';
+          } else if (value is num) {
+            request.fields[key] = value.toString();
+          } else if (value is String) {
             request.fields[key] = value;
           }
         });
@@ -244,17 +257,15 @@ class ApiServices extends GetxService {
         for (final entry in data.entries) {
           if (entry.value is File) {
             final file = entry.value as File;
-            final fileStream = http.ByteStream(file.openRead());
-            final length = await file.length();
-            final multipartFile = http.MultipartFile(
+            final multipartFile = await http.MultipartFile.fromPath(
               entry.key,
-              fileStream,
-              length,
+              file.path,
               filename: file.path.split("/").last,
             );
             request.files.add(multipartFile);
           }
         }
+
 
         _logRequest(
           method: "PUT",
@@ -380,7 +391,27 @@ BODY: ${response.body}
 
 
 
+
+  /// Helper to flatten nested Maps and Lists for multipart requests
+  void _flattenMultipartData(String prefix, dynamic value, Map<String, String> fields) {
+    if (value is Map) {
+      value.forEach((key, val) {
+        _flattenMultipartData("$prefix[$key]", val, fields);
+      });
+    } else if (value is List) {
+      for (int i = 0; i < value.length; i++) {
+        _flattenMultipartData("$prefix[$i]", value[i], fields);
+      }
+    } else if (value != null) {
+      if (value is bool) {
+        fields[prefix] = value ? '1' : '0';
+      } else {
+        fields[prefix] = value.toString();
+      }
+    }
+  }
 }
+
 
 extension DeleteRequestWithBody on http.Request {
   Future<http.Response> sendWithBody(

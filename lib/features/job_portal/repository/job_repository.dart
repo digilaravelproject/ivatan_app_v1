@@ -1,21 +1,25 @@
 import 'package:http/http.dart' as http;
 import 'dart:io';
+import '../data/model/career_profile_model.dart';
 import '../data/model/job_model.dart';
 import '../data/model/user_application_model.dart';
+import '../data/model/job_application_request_model.dart';
 import '../data_source/job_data_source.dart';
 
 abstract class JobRepository {
   Future<List<JobModel>> getJobs();
   Future<JobModel?> getJobDetails(String slug);
-  Future<bool> createJob(CreateJobRequestModel request, {File? logoFile});
-  Future<bool> updateJob(int id, CreateJobRequestModel request, {File? logoFile});
+  Future<String?> createJob(CreateJobRequestModel request, {File? logoFile});
+  Future<String?> updateJob(int id, CreateJobRequestModel request, {File? logoFile});
   Future<bool> deleteJob(int id);
   Future<List<JobApplication>> getJobApplications(int jobId);
   Future<List<UserApplication>> getUserApplications({String? status});
+  Future<String?> applyJob(int jobId, JobApplicationRequestModel request); // Added applyJob method
   Future<http.Response?> downloadResume(int applicationId);
   Future<bool> updateApplicationStatus(int id, String status);
+  Future<Map<String, dynamic>> getRecruiterJobs({int page = 1, String? search});
+  Future<CareerProfileModel?> getCareerProfile();
 }
-
 
 
 
@@ -31,12 +35,12 @@ class JobRepositoryImpl implements JobRepository {
   }
 
   @override
-  Future<bool> createJob(CreateJobRequestModel request, {File? logoFile}) {
+  Future<String?> createJob(CreateJobRequestModel request, {File? logoFile}) {
     return remoteDataSource.createJob(request, logoFile: logoFile);
   }
 
   @override
-  Future<bool> updateJob(int id, CreateJobRequestModel request, {File? logoFile}) {
+  Future<String?> updateJob(int id, CreateJobRequestModel request, {File? logoFile}) {
     return remoteDataSource.updateJob(id, request, logoFile: logoFile);
   }
 
@@ -67,4 +71,19 @@ class JobRepositoryImpl implements JobRepository {
   Future<bool> updateApplicationStatus(int id, String status) {
     return remoteDataSource.updateApplicationStatus(id, status);
   }
+
+  Future<String?> applyJob(int jobId, JobApplicationRequestModel request) {
+    return remoteDataSource.applyJob(jobId, request);
+  }
+
+  @override
+  Future<Map<String, dynamic>> getRecruiterJobs({int page = 1, String? search}) {
+    return remoteDataSource.getRecruiterJobs(page: page, search: search);
+  }
+
+  @override
+  Future<CareerProfileModel?> getCareerProfile() {
+    return remoteDataSource.getCareerProfile();
+  }
 }
+

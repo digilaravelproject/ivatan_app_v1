@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -312,15 +313,17 @@ class JobSearchScreen extends GetView<JobController> {
         return const Center(child: CircularProgressIndicator());
       }
 
-      if (controller.jobList.isEmpty) {
-        return const Center(child: Text("No jobs found"));
+      final urgentJobs = controller.jobList.where((j) => j.isUrgentActive).toList();
+
+      if (urgentJobs.isEmpty) {
+        return const Center(child: Text("No urgent jobs found"));
       }
 
       return ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: controller.jobList.length,
+        itemCount: urgentJobs.length,
         itemBuilder: (context, index) {
-          final job = controller.jobList[index];
+          final job = urgentJobs[index];
           return _buildJobCard(job, true);
         },
       );
@@ -329,10 +332,31 @@ class JobSearchScreen extends GetView<JobController> {
 
 
   Widget _buildRecentJobsTab() {
-    return Column(
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      final recentJobs = controller.jobList.where((j) => !j.isUrgentActive).toList();
+
+      if (recentJobs.isEmpty) {
+        return const Center(child: Text("No recent jobs found"));
+      }
+
+      return ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: recentJobs.length,
+        itemBuilder: (context, index) {
+          final job = recentJobs[index];
+          return _buildJobCard(job, false);
+        },
+      );
+    });
+
+    /*return Column(
       children: [
         // Filter Chips
-        SizedBox(
+       *//* SizedBox(
           height: 60,
           child: Obx(() => ListView(
             scrollDirection: Axis.horizontal,
@@ -359,21 +383,21 @@ class JobSearchScreen extends GetView<JobController> {
           ),
           )
 
-        ),
+        ),*//*
 
         // Job List
-        // Expanded(
-        //   child: ListView.builder(
-        //     padding: const EdgeInsets.symmetric(horizontal: 16),
-        //     itemCount: controller.recentJobs.length,
-        //     itemBuilder: (context, index) {
-        //       final job = controller.recentJobs[index];
-        //       return _buildJobCard(job, false);
-        //     },
-        //   ),
-        // ),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: controller.recentJobs.length,
+            itemBuilder: (context, index) {
+              final job = controller.recentJobs[index];
+              return _buildJobCard(job, false);
+            },
+          ),
+        ),
       ],
-    );
+    );*/
   }
 
   Widget _buildFilterChip(String label, bool isSelected) {
@@ -442,11 +466,24 @@ class JobSearchScreen extends GetView<JobController> {
                     height: 40,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                     // border: Border.all(color: Colors.grey[300]!),
-                      image: DecorationImage(
-                        image: NetworkImage("https://cdn-icons-png.flaticon.com/512/731/731985.png"),
-                        fit: BoxFit.cover,
-                      ),
+                      border: Border.all(color: Colors.grey[100]!),
+                    ),
+                    child: ClipOval(
+                      child: (job.companyLogo != null && job.companyLogo!.isNotEmpty)
+                          ? CachedNetworkImage(
+                              imageUrl: AppUrls.getFullImageUrl(job.companyLogo),
+                              fit: BoxFit.cover,
+                              errorWidget: (context, url, error) => const Icon(
+                                Icons.business,
+                                size: 24,
+                                color: Colors.grey,
+                              ),
+                            )
+                          : const Icon(
+                              Icons.business,
+                              size: 24,
+                              color: Colors.grey,
+                            ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -552,7 +589,7 @@ class JobSearchScreen extends GetView<JobController> {
               // Footer with Days Left and Apply Button
               Row(
                 children: [
-                  // Days Left
+                  // Days Since Posted
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -564,10 +601,10 @@ class JobSearchScreen extends GetView<JobController> {
                     ),
                     child: Row(
                       children: [
-                        Text('⏳', style: GoogleFonts.poppins(fontSize: 12)),
+                        Text('📅', style: GoogleFonts.poppins(fontSize: 12)),
                         const SizedBox(width: 4),
                         Text(
-                          '${7} days left',
+                          _getPostedLabel(job.createdAt),
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -582,7 +619,7 @@ class JobSearchScreen extends GetView<JobController> {
       
                   // Salary
                   Text(
-                    '💰 \$${job.salaryMax}k/yr',
+                    '💰 ${job.currency} ${job.salaryMax}',
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -623,5 +660,22 @@ class JobSearchScreen extends GetView<JobController> {
         ),
       ),
     );
+  }
+
+  /// Returns a human-readable "posted" label calculated from [createdAt].
+  /// e.g. "Today", "Yesterday", "3 days ago"
+  String _getPostedLabel(String createdAt) {
+    try {
+      final posted = DateTime.parse(createdAt).toLocal();
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final postedDay = DateTime(posted.year, posted.month, posted.day);
+      final diff = today.difference(postedDay).inDays;
+      if (diff == 0) return 'Today';
+      if (diff == 1) return 'Yesterday';
+      return '$diff days ago';
+    } catch (_) {
+      return 'Recently';
+    }
   }
 }
