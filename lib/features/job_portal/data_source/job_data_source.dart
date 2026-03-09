@@ -11,7 +11,16 @@ import '../data/model/user_application_model.dart';
 import '../data/model/job_application_request_model.dart';
 
 abstract class JobRemoteDataSource {
-  Future<List<JobModel>> getJobs();
+  Future<List<JobModel>> getJobs({
+    String? q,
+    String? location,
+    String? country,
+    String? employmentType,
+    bool? isRemote,
+    double? salaryMin,
+    double? salaryMax,
+    int page = 1,
+  });
 
   Future<JobModel?> getJobDetails(String slug);
 
@@ -41,8 +50,31 @@ class JobRemoteDataSourceImpl implements JobRemoteDataSource {
   final ApiServices apiServices = Get.find<ApiServices>();
 
   @override
-  Future<List<JobModel>> getJobs() async {
-    final response = await apiServices.callGet(AppUrls.allJobs);
+  Future<List<JobModel>> getJobs({
+    String? q,
+    String? location,
+    String? country,
+    String? employmentType,
+    bool? isRemote,
+    double? salaryMin,
+    double? salaryMax,
+    int page = 1,
+  }) async {
+    Map<String, dynamic> queryParams = {'page': page};
+
+    if (q != null && q.isNotEmpty) queryParams['q'] = q;
+    if (location != null && location.isNotEmpty) queryParams['location'] = location;
+    if (country != null && country.isNotEmpty) queryParams['country'] = country;
+    if (employmentType != null && employmentType.isNotEmpty) {
+      queryParams['employment_type'] = employmentType;
+    }
+    if (isRemote != null) queryParams['is_remote'] = isRemote ? '1' : '0';
+    if (salaryMin != null) queryParams['salary_min'] = salaryMin.toString();
+    if (salaryMax != null) queryParams['salary_max'] = salaryMax.toString();
+
+    final response = await apiServices.callGet(AppUrls.allJobs, queryParams: queryParams);
+
+    print("alljobs : "+response.toString());
 
     if (response != null && response['status'] == true) {
       final List dataList = response['data']['data'];
@@ -222,4 +254,3 @@ class JobRemoteDataSourceImpl implements JobRemoteDataSource {
     return null;
   }
 }
-

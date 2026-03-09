@@ -197,14 +197,14 @@ class ProfileDrawer extends StatelessWidget {
                         Get.to(JobCreateScreen());
                       },
                     ),
-                  if (_isRecruiter())
-                    _buildDrawerItem(
-                      icon: Icons.sensor_occupied,
-                      title: 'Occupation',
-                      onTap: () {
-                        Get.to(ResumeFormScreen());
-                      },
-                    ),
+                  // if (_isRecruiter())
+                  //   _buildDrawerItem(
+                  //     icon: Icons.sensor_occupied,
+                  //     title: 'Occupation',
+                  //     onTap: () {
+                  //       Get.to(ResumeFormScreen());
+                  //     },
+                  //   ),
                   if (_isRecruiter())
                     _buildDrawerItem(
                       icon: Icons.local_activity,

@@ -7,7 +7,16 @@ import '../data/model/job_application_request_model.dart';
 import '../data_source/job_data_source.dart';
 
 abstract class JobRepository {
-  Future<List<JobModel>> getJobs();
+  Future<List<JobModel>> getJobs({
+    String? q,
+    String? location,
+    String? country,
+    String? employmentType,
+    bool? isRemote,
+    double? salaryMin,
+    double? salaryMax,
+    int page = 1,
+  });
   Future<JobModel?> getJobDetails(String slug);
   Future<String?> createJob(CreateJobRequestModel request, {File? logoFile});
   Future<String?> updateJob(int id, CreateJobRequestModel request, {File? logoFile});
@@ -30,8 +39,26 @@ class JobRepositoryImpl implements JobRepository {
   JobRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<List<JobModel>> getJobs() {
-    return remoteDataSource.getJobs();
+  Future<List<JobModel>> getJobs({
+    String? q,
+    String? location,
+    String? country,
+    String? employmentType,
+    bool? isRemote,
+    double? salaryMin,
+    double? salaryMax,
+    int page = 1,
+  }) {
+    return remoteDataSource.getJobs(
+      q: q,
+      location: location,
+      country: country,
+      employmentType: employmentType,
+      isRemote: isRemote,
+      salaryMin: salaryMin,
+      salaryMax: salaryMax,
+      page: page,
+    );
   }
 
   @override
@@ -86,4 +113,3 @@ class JobRepositoryImpl implements JobRepository {
     return remoteDataSource.getCareerProfile();
   }
 }
-

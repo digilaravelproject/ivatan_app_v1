@@ -31,14 +31,20 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
       body: Column(
         children: [
           _buildSearchBar(controller),
-
           Expanded(
-            child: Obx(() {
+            child: Stack(
+              children: [
+                Obx(() {
               if (controller.isLoading.value && controller.jobs.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              if (controller.jobs.isEmpty) {
+              // Filter jobs by search text
+              final filteredJobs = controller.jobs.where((job) {
+                return job.title.toLowerCase().contains(controller.searchText.value.toLowerCase());
+              }).toList();
+
+              if (filteredJobs.isEmpty) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -46,7 +52,7 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
                       Icon(Icons.work_off_outlined, size: 64, color: Colors.grey[400]),
                       const SizedBox(height: 16),
                       Text(
-                        "No jobs found",
+                        controller.searchText.value.isEmpty ? "No jobs found" : "No jobs match your search",
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           color: Colors.grey[600],
@@ -61,22 +67,34 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
               return ListView.builder(
                 controller: controller.scrollController,
                 padding: const EdgeInsets.all(16),
-                itemCount: controller.jobs.length + (controller.isMoreLoading.value ? 1 : 0),
+                itemCount: filteredJobs.length,
                 itemBuilder: (context, index) {
-                  if (index < controller.jobs.length) {
-                    final job = controller.jobs[index];
-                    return _buildJobCard(job);
-                  } else {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 20),
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
+                  return _buildJobCard(filteredJobs[index]);
                 },
               );
             }),
+                Obx(() {
+                  if (controller.isMoreLoading.value && controller.searchText.value.isEmpty) {
+                    return Positioned(
+                      bottom: 20,
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: SizedBox(
+                          width: 30,
+                          height: 30,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.grey[400]!),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                }),
+              ],
+            ),
           ),
         ],
       ),
@@ -274,8 +292,9 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
         ),
         child: TextField(
           controller: controller.searchController,
-          onChanged: controller.onSearchChanged,
-          onSubmitted: (value) => controller.fetchJobs(search: value),
+          onChanged: (value) {
+            controller.searchText.value = value;
+          },
           decoration: InputDecoration(
             hintText: 'Search by job title...',
             hintStyle: GoogleFonts.poppins(
@@ -285,11 +304,11 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
             prefixIcon: const Icon(Icons.search, color: Colors.black),
             suffixIcon: IconButton(
               icon: const Icon(Icons.clear, size: 18),
-                onPressed: () {
-                  controller.searchController.clear();
-                  controller.searchText.value = '';
-                  controller.fetchJobs(search: '');
-                }
+              onPressed: () {
+                controller.searchController.clear();
+                controller.searchText.value = '';
+                controller.isMoreLoading.value = false;
+              }
             ),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 15),

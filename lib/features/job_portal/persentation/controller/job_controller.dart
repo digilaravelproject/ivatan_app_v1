@@ -39,6 +39,16 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
   final RxBool isRemote = true.obs;
   final RxBool isUrgent = false.obs;
 
+  // Search and Filter variables
+  final RxString searchQ = ''.obs;
+  final RxString filterLocation = ''.obs;
+  final RxString filterCountry = ''.obs;
+  final RxString filterEmploymentType = ''.obs;
+  final RxBool filterIsRemote = false.obs;
+  final RxString filterSalaryMin = ''.obs;
+  final RxString filterSalaryMax = ''.obs;
+  final RxBool isFilterApplied = false.obs;
+
   // Image upload
   final companyLogoFile = Rx<File?>(null);
   final editingJobLogoUrl = RxnString(); // existing logo URL when editing
@@ -81,6 +91,50 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
         loadMoreJobs();
       }
     });
+
+    // Debounce search
+    debounce(searchQ, (_) => fetchJobs(), time: const Duration(milliseconds: 500));
+  }
+
+  void updateFilters({
+    String? q,
+    String? location,
+    String? country,
+    String? employmentType,
+    bool? isRemote,
+    String? salaryMin,
+    String? salaryMax,
+  }) {
+    if (q != null) searchQ.value = q;
+    if (location != null) filterLocation.value = location;
+    if (country != null) filterCountry.value = country;
+    if (employmentType != null) filterEmploymentType.value = employmentType;
+    if (isRemote != null) filterIsRemote.value = isRemote;
+    if (salaryMin != null) filterSalaryMin.value = salaryMin;
+    if (salaryMax != null) filterSalaryMax.value = salaryMax;
+    
+    isFilterApplied.value = searchQ.value.isNotEmpty || 
+        filterLocation.value.isNotEmpty || 
+        filterCountry.value.isNotEmpty || 
+        filterEmploymentType.value.isNotEmpty || 
+        filterIsRemote.value || 
+        filterSalaryMin.value.isNotEmpty || 
+        filterSalaryMax.value.isNotEmpty;
+    
+    fetchJobs();
+  }
+
+  void clearFilters() {
+    searchQ.value = '';
+    filterLocation.value = '';
+    filterCountry.value = '';
+    filterEmploymentType.value = '';
+    filterIsRemote.value = false;
+    filterSalaryMin.value = '';
+    filterSalaryMax.value = '';
+    isFilterApplied.value = false;
+    searchController.clear();
+    fetchJobs();
   }
 
   void validateForm() {
@@ -160,9 +214,18 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
       currentPage = 1;
       hasMore = true;
 
-      final jobs = await repository.getJobs();
+      final jobs = await repository.getJobs(
+        q: searchQ.value,
+        location: filterLocation.value,
+        country: filterCountry.value,
+        employmentType: filterEmploymentType.value,
+        isRemote: filterIsRemote.value,
+        salaryMin: double.tryParse(filterSalaryMin.value),
+        salaryMax: double.tryParse(filterSalaryMax.value),
+        page: currentPage,
+      );
       jobList.assignAll(jobs);
-      calculateDaysAgo(); // 🔥 yahin call zaroori hai
+      calculateDaysAgo();
       print("joblist in controller : "+jobList.length.toString());
     } finally {
       isLoading.value = false;
@@ -178,12 +241,21 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
     currentPage++;
 
     try {
-      final jobs = await repository.getJobs();
+      final jobs = await repository.getJobs(
+        q: searchQ.value,
+        location: filterLocation.value,
+        country: filterCountry.value,
+        employmentType: filterEmploymentType.value,
+        isRemote: filterIsRemote.value,
+        salaryMin: double.tryParse(filterSalaryMin.value),
+        salaryMax: double.tryParse(filterSalaryMax.value),
+        page: currentPage,
+      );
       if (jobs.isEmpty) {
         hasMore = false;
       } else {
         jobList.addAll(jobs);
-        calculateDaysAgo(); // new jobs ke liye daysAgo update
+        calculateDaysAgo();
       }
     } finally {
       isMoreLoading.value = false;
