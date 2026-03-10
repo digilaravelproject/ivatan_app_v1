@@ -33,6 +33,10 @@ class UserModel {
   final String updatedAt;
   final String? deletedAt;
   final bool isEmployer;
+  final int hideEmail;
+  final int hidePhone;
+  final String? countryCode;
+  final String? isoCode;
 
   /// FIX: Interests should be List<Map>
   final List<Map<String, dynamic>> interests;
@@ -75,6 +79,10 @@ class UserModel {
     required this.updatedAt,
     this.deletedAt,
     required this.isEmployer,
+    required this.hideEmail,
+    required this.hidePhone,
+    this.countryCode,
+    this.isoCode,
     required this.interests,
     required this.token,
   });
@@ -118,6 +126,10 @@ class UserModel {
       updatedAt: data["updated_at"] ?? "",
       deletedAt: data["deleted_at"],
       isEmployer: data["is_employer"] ?? false,
+      hideEmail: data["hide_email"] ?? 0,
+      hidePhone: data["hide_phone"] ?? 0,
+      countryCode: data["country_code"],
+      isoCode: data["iso_code"],
 
       interests: List<Map<String, dynamic>>.from(data["interests"] ?? []),
 
@@ -160,6 +172,10 @@ class UserModel {
     "updated_at": updatedAt,
     "deleted_at": deletedAt,
     "is_employer": isEmployer,
+    "hide_email": hideEmail,
+    "hide_phone": hidePhone,
+    "country_code": countryCode,
+    "iso_code": isoCode,
     "interests": interests,
     "token": token,
   };

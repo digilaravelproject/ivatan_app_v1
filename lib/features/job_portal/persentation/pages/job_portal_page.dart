@@ -1,39 +1,67 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:i_vatan_app/core/network/app_urls.dart';
-import 'package:i_vatan_app/features/job_portal/persentation/controller/job_controller.dart';
+import 'package:i_vatan_app/features/job_portal/data/model/job_model.dart';
 import 'package:i_vatan_app/route/app_pages.dart';
+
 import '../../../../db/shared_pref_manager.dart';
-import '../../data/model/job_model.dart';
+import '../controller/job_controller.dart';
+import '../controller/job_portal_controller.dart';
+import '../widgets/profile_drawer.dart';
+import 'job_description_page.dart';
+import 'create_job_page.dart';
 
 class JobSearchScreen extends GetView<JobController> {
   JobSearchScreen({super.key});
 
+  final GlobalKey<ScaffoldState> _scaffoldKey =  GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
+    final isEmployer = SharedPrefManager().user?.isEmployer ?? false;
+    final isSeller = SharedPrefManager().user?.isSeller ?? false;
+    final isRecruiter = isEmployer || isSeller;
+
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.white,
+      drawer: const ProfileDrawer(),
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(context),
-            const SizedBox(height: 20),
+            // Top App Bar with Profile
+            _buildAppBar(),
+
+            // Search Bar
             _buildSearchBar(),
-            const SizedBox(height: 20),
-            _buildCompanyLogos(),
-            const SizedBox(height: 10),
+
+            // Tab Bar for Urgent/Recent
             _buildTabBar(),
+
+            // Tab View Content - Show different content based on user type
             Expanded(
-              child: TabBarView(
-                controller: controller.tabController,
-                children: [
-                  _buildAllJobsTab(),
-                  _buildUrgentJobsTab(),
-                ],
-              ),
+              child: isRecruiter
+                  ? TabBarView(
+                      controller: controller.tabController,
+                      children: [
+                        // Urgent Needed Tab
+                        _buildUrgentJobsTab(),
+                        // Recent Jobs Tab
+                        _buildRecentJobsTab(),
+                      ],
+                    )
+                  : TabBarView(
+                      controller: controller.tabController,
+                      children: [
+                        // For appliers - show all jobs
+                        _buildAllJobsTab(),
+                        // For appliers - show urgent jobs
+                        _buildUrgentJobsTab(),
+                      ],
+                    ),
             ),
           ],
         ),
@@ -41,25 +69,39 @@ class JobSearchScreen extends GetView<JobController> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildAppBar() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+      padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 25,
-            backgroundColor: Colors.grey[200],
-            backgroundImage: NetworkImage(SharedPrefManager().user!.profilePhotoPath.toString()),
+          // Profile Section - Clickable
+          GestureDetector(
+            onTap: () {
+              print("profilePhotoPath : "+AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString());
+              _scaffoldKey.currentState?.openDrawer();
+            },
+            child: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.black, width: 2),
+                image: DecorationImage(
+                  image: NetworkImage(AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString()),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
           ),
           const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Hi, ${SharedPrefManager().user!.name}',
+                SharedPrefManager().user!.name.toString(),
                 style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
                   color: Colors.black,
                 ),
               ),
@@ -73,43 +115,39 @@ class JobSearchScreen extends GetView<JobController> {
             ],
           ),
           const Spacer(),
-          // Filter Icon replacing Bell
-          GestureDetector(
-            onTap: () => _showFilterSheet(context),
-            child: Stack(
-              children: [
-                Obx(() => Container(
-                  width: 50,
-                  height: 50,
+          // Bell Icon with Notification
+          Stack(
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: Center(
+                  child: SvgPicture.string(
+                    '''<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16Z" fill="black"/>
+                    </svg>''',
+                    width: 24,
+                    height: 24,
+                  ),
+                ),
+              ),
+              Positioned(
+                right: 10,
+                top: 10,
+                child: Container(
+                  width: 8,
+                  height: 8,
                   decoration: BoxDecoration(
+                    color: Colors.red,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.grey[300]!),
-                    color: controller.isFilterApplied.value ? Colors.black : Colors.white,
                   ),
-                  child: Center(
-                    child: Icon(
-                      Icons.filter_list,
-                      color: controller.isFilterApplied.value ? Colors.white : Colors.black,
-                      size: 24,
-                    ),
-                  ),
-                )),
-                Obx(() => controller.isFilterApplied.value
-                  ? Positioned(
-                      right: 10,
-                      top: 10,
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    )
-                  : const SizedBox.shrink()),
-              ],
-            ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -140,9 +178,7 @@ class JobSearchScreen extends GetView<JobController> {
             const SizedBox(width: 12),
             Expanded(
               child: TextField(
-                controller: controller.searchController,
-                onChanged: (value) => controller.searchQ.value = value,
-                onSubmitted: (value) => controller.fetchJobs(),
+               // controller: controller.searchController,
                 decoration: InputDecoration(
                   hintText: 'Search jobs, companies, keywords...',
                   hintStyle: GoogleFonts.poppins(
@@ -150,16 +186,6 @@ class JobSearchScreen extends GetView<JobController> {
                     fontSize: 14,
                   ),
                   border: InputBorder.none,
-                  suffixIcon: Obx(() => controller.searchQ.value.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, size: 20),
-                          onPressed: () {
-                            controller.searchController.clear();
-                            controller.searchQ.value = '';
-                            controller.fetchJobs();
-                          },
-                        )
-                      : const SizedBox.shrink()),
                 ),
                 style: GoogleFonts.poppins(color: Colors.black, fontSize: 14),
               ),
@@ -180,43 +206,70 @@ class JobSearchScreen extends GetView<JobController> {
         itemCount: controller.companies.length,
         itemBuilder: (context, index) {
           final company = controller.companies[index];
-          return Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: GestureDetector(
-              onTap: () => controller.selectCompany(index),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(12)),
-                      color: Colors.grey[200],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Image(
-                        image: NetworkImage(company.logo),
-                        fit: BoxFit.cover,
+          return
+         //   Obx(() =>
+                Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: GestureDetector(
+                onTap: () => controller.selectCompany(index),
+                  // decoration: BoxDecoration(
+                  //   color: controller.selectedCompanyIndex.value == index
+                  //       ? Colors.grey[900]
+                  //       : Colors.white,
+                  //   borderRadius: BorderRadius.circular(12),
+                  //   border: Border.all(
+                  //     color: controller.selectedCompanyIndex.value == index
+                  //         ? Colors.black
+                  //         : Colors.grey[300]!,
+                  //     width: 2,
+                  //   ),
+                  //   boxShadow: [
+                  //     BoxShadow(
+                  //       color: Colors.grey.withOpacity(0.1),
+                  //       blurRadius: 10,
+                  //       offset: const Offset(0, 4),
+                  //     ),
+                  //   ],
+                  // ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Company Logo Placeholder
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                          color: Colors.grey[200],
+                          // image: DecorationImage(
+                          //   image: NetworkImage(company.logo),
+                          //   fit: BoxFit.cover,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Image(
+                            image: NetworkImage(company.logo),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        //),
                       ),
-                    ),
+                      const SizedBox(height: 8),
+                      Text(
+                        company.name,
+                        style: GoogleFonts.poppins(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: controller.selectedCompanyIndex.value == index
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  Obx(() => Text(
-                    company.name,
-                    style: GoogleFonts.poppins(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      color: controller.selectedCompanyIndex.value == index
-                          ? Colors.blue
-                          : Colors.black,
-                    ),
-                    textAlign: TextAlign.center,
-                  )),
-                ],
               ),
-            ),
+           // ),
           );
         },
       ),
@@ -228,12 +281,13 @@ class JobSearchScreen extends GetView<JobController> {
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: TabBar(
         controller: controller.tabController,
+       // indicatorColor: Colors.black,
         indicator: const UnderlineTabIndicator(
           borderSide: BorderSide(
             width: 2,
             color: Colors.black,
           ),
-          borderRadius: BorderRadius.zero,
+          borderRadius: BorderRadius.zero, // 👈 NO CURVE
         ),
         labelColor: Colors.black,
         unselectedLabelColor: Colors.grey[600],
@@ -245,7 +299,7 @@ class JobSearchScreen extends GetView<JobController> {
           fontWeight: FontWeight.w500,
           fontSize: 14,
         ),
-        tabs: const [Tab(text: 'All Jobs'), Tab(text: 'Urgent Needed  🔥')],
+        tabs: const [Tab(text: 'Urgent Needed  🔥'), Tab(text: ' Recent')],
       ),
     );
   }
@@ -273,6 +327,76 @@ class JobSearchScreen extends GetView<JobController> {
     });
   }
 
+
+  Widget _buildRecentJobsTab() {
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      final recentJobs = controller.jobList.where((j) => !j.isUrgentActive).toList();
+
+      if (recentJobs.isEmpty) {
+        return const Center(child: Text("No recent jobs found"));
+      }
+
+      return ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: recentJobs.length,
+        itemBuilder: (context, index) {
+          final job = recentJobs[index];
+          return _buildJobCard(job, false);
+        },
+      );
+    });
+
+    /*return Column(
+      children: [
+        // Filter Chips
+       *//* SizedBox(
+          height: 60,
+          child: Obx(() => ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            children: [
+              _buildFilterChip('All', controller.selectedFilter.value == 'All'),
+              _buildFilterChip(
+                'Full Time',
+                controller.selectedFilter.value == 'Full Time',
+              ),
+              _buildFilterChip(
+                'Part Time',
+                controller.selectedFilter.value == 'Part Time',
+              ),
+              _buildFilterChip(
+                'Remote',
+                controller.selectedFilter.value == 'Remote',
+              ),
+              _buildFilterChip(
+                'Contract',
+                controller.selectedFilter.value == 'Contract',
+              ),
+            ],
+          ),
+          )
+
+        ),*//*
+
+        // Job List
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: controller.recentJobs.length,
+            itemBuilder: (context, index) {
+              final job = controller.recentJobs[index];
+              return _buildJobCard(job, false);
+            },
+          ),
+        ),
+      ],
+    );*/
+  }
+
   Widget _buildAllJobsTab() {
     return Obx(() {
       if (controller.isLoading.value) {
@@ -286,58 +410,77 @@ class JobSearchScreen extends GetView<JobController> {
       }
 
       return ListView.builder(
-        controller: controller.scrollController,
-        padding: const EdgeInsets.all(12),
-        itemCount: allJobs.length + (controller.isMoreLoading.value ? 1 : 0),
+        padding: const EdgeInsets.all(16),
+        itemCount: allJobs.length,
         itemBuilder: (context, index) {
-          if (index < allJobs.length) {
-            final job = allJobs[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: _buildJobCard(job, job.isUrgentActive),
-            );
-          } else {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Center(
-                child: SizedBox(
-                  width: 30,
-                  height: 30,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              ),
-            );
-          }
+          final job = allJobs[index];
+          return _buildJobCard(job, job.isUrgentActive);
         },
       );
     });
   }
 
+  Widget _buildFilterChip(String label, bool isSelected) {
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
+      child: FilterChip(
+        showCheckmark: false,
+        label: Text(
+          label,
+          style: GoogleFonts.poppins(
+            color: isSelected ? Colors.white : Colors.black,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        selected: isSelected,
+        onSelected: (selected) {
+          final controller1 = Get.find<JobController1>();
+          controller1.selectedFilter.value = selected ? label : 'All';
+        },
+        backgroundColor: Colors.white,
+        selectedColor: Colors.black,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8), // 👈 yaha kam / zyada control
+          side: BorderSide(
+            color: isSelected ? Colors.black : Colors.grey[400]!,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildJobCard(JobModel job, bool isUrgent) {
-    return InkWell(
-      onTap: () {
+    return
+      InkWell(
+      onTap: (){
         Get.toNamed(AppRoutes.jobDescriptionScreen, arguments: job.slug);
+
+       // Get.toNamed(() => JobDescriptionScreen(), arguments: job.slug);
       },
-      child: Container(
+      child:
+      Container(
+        margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.grey[200]!),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
+                  // Company Logo
                   Container(
                     width: 40,
                     height: 40,
@@ -364,6 +507,7 @@ class JobSearchScreen extends GetView<JobController> {
                     ),
                   ),
                   const SizedBox(width: 12),
+                  // Company Info
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -371,15 +515,15 @@ class JobSearchScreen extends GetView<JobController> {
                         Text(
                           job.companyName,
                           style: GoogleFonts.poppins(
+                           // fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            fontSize: 12,
                             color: Colors.grey[700],
                           ),
                         ),
                         Text(
                           job.title,
                           style: GoogleFonts.poppins(
-                            fontSize: 13,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: Colors.black,
                           ),
@@ -389,24 +533,24 @@ class JobSearchScreen extends GetView<JobController> {
                             Text(
                               '📍 ${job.location}',
                               style: GoogleFonts.poppins(
-                                fontSize: 11,
+                                fontSize: 12,
                                 color: Colors.grey[600],
                               ),
                             ),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 8),
                             Container(
-                              width: 3,
-                              height: 3,
+                              width: 4,
+                              height: 4,
                               decoration: BoxDecoration(
                                 color: Colors.grey[400],
                                 shape: BoxShape.circle,
                               ),
                             ),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 8),
                             Text(
                               '💼 ${job.employmentType}',
                               style: GoogleFonts.poppins(
-                                fontSize: 11,
+                                fontSize: 12,
                                 color: Colors.grey[600],
                               ),
                             ),
@@ -415,11 +559,12 @@ class JobSearchScreen extends GetView<JobController> {
                       ],
                     ),
                   ),
+                  // Urgent Badge
                   if (isUrgent)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
+                        horizontal: 8,
+                        vertical: 4,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.red.withOpacity(0.1),
@@ -429,12 +574,12 @@ class JobSearchScreen extends GetView<JobController> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('🔥', style: GoogleFonts.poppins(fontSize: 10)),
-                          const SizedBox(width: 2),
+                          Text('🔥', style: GoogleFonts.poppins(fontSize: 12)),
+                          const SizedBox(width: 4),
                           Text(
                             'Urgent',
                             style: GoogleFonts.poppins(
-                              fontSize: 9,
+                              fontSize: 10,
                               fontWeight: FontWeight.w600,
                               color: Colors.red,
                             ),
@@ -444,24 +589,31 @@ class JobSearchScreen extends GetView<JobController> {
                     ),
                 ],
               ),
-              const SizedBox(height: 8),
+      
+              const SizedBox(height: 10),
+      
+              // Job Description
               Text(
                 job.description,
                 style: GoogleFonts.poppins(
-                  fontSize: 12,
+                  fontSize: 13,
                   color: Colors.grey[700],
-                  height: 1.4,
+                  height: 1.5,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 10),
+      
+              const SizedBox(height: 16),
+      
+              // Footer with Days Left and Apply Button
               Row(
                 children: [
+                  // Days Since Posted
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
+                      horizontal: 12,
+                      vertical: 6,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
@@ -469,12 +621,12 @@ class JobSearchScreen extends GetView<JobController> {
                     ),
                     child: Row(
                       children: [
-                        Text('📅', style: GoogleFonts.poppins(fontSize: 10)),
-                        const SizedBox(width: 3),
+                        Text('📅', style: GoogleFonts.poppins(fontSize: 12)),
+                        const SizedBox(width: 4),
                         Text(
                           _getPostedLabel(job.createdAt),
                           style: GoogleFonts.poppins(
-                            fontSize: 11,
+                            fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: Colors.grey[700],
                           ),
@@ -482,15 +634,45 @@ class JobSearchScreen extends GetView<JobController> {
                       ],
                     ),
                   ),
+      
                   const Spacer(),
+      
+                  // Salary
                   Text(
                     '💰 ${job.currency} ${job.salaryMax}',
                     style: GoogleFonts.poppins(
-                      fontSize: 12,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Colors.black,
                     ),
                   ),
+      
+                /*  const SizedBox(width: 12),
+      
+                  // Apply Button
+                  InkWell(
+                    onTap: () {
+                      Get.toNamed(AppRoutes.applicantListScreen, arguments: job.id);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        'Apply',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),*/
                 ],
               ),
             ],
@@ -500,6 +682,8 @@ class JobSearchScreen extends GetView<JobController> {
     );
   }
 
+  /// Returns a human-readable "posted" label calculated from [createdAt].
+  /// e.g. "Today", "Yesterday", "3 days ago"
   String _getPostedLabel(String createdAt) {
     try {
       final posted = DateTime.parse(createdAt).toLocal();
@@ -513,230 +697,5 @@ class JobSearchScreen extends GetView<JobController> {
     } catch (_) {
       return 'Recently';
     }
-  }
-
-  void _showFilterSheet(BuildContext context) {
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Filters',
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      controller.clearFilters();
-                      Get.back();
-                    },
-                    child: Text(
-                      'Clear All',
-                      style: GoogleFonts.poppins(color: Colors.red),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              
-              _buildFilterLabel('Location'),
-              _buildFilterTextField(
-                hint: 'Enter City',
-                initialValue: controller.filterLocation.value,
-                onChanged: (val) => controller.filterLocation.value = val,
-              ),
-              
-              const SizedBox(height: 16),
-              _buildFilterLabel('Country'),
-              _buildFilterTextField(
-                hint: 'Enter Country',
-                initialValue: controller.filterCountry.value,
-                onChanged: (val) => controller.filterCountry.value = val,
-              ),
-              
-              const SizedBox(height: 16),
-              _buildFilterLabel('Employment Type'),
-              _buildEmploymentTypeChips(),
-              
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildFilterLabel('Remote Only'),
-                  Obx(() => Switch(
-                    value: controller.filterIsRemote.value,
-                    onChanged: (val) => controller.filterIsRemote.value = val,
-                    activeColor: Colors.black,
-                  )),
-                ],
-              ),
-              
-              const SizedBox(height: 16),
-              _buildFilterLabel('Salary Range'),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildFilterTextField(
-                      hint: 'Min',
-                      initialValue: controller.filterSalaryMin.value,
-                      onChanged: (val) => controller.filterSalaryMin.value = val,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text('-'),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildFilterTextField(
-                      hint: 'Max',
-                      initialValue: controller.filterSalaryMax.value,
-                      onChanged: (val) => controller.filterSalaryMax.value = val,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 30),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        controller.clearFilters();
-                        Get.back();
-                      },
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        side: const BorderSide(color: Colors.grey),
-                      ),
-                      child: Text(
-                        'Clear',
-                        style: GoogleFonts.poppins(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        controller.updateFilters();
-                        Get.back();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Text(
-                        'Apply Filters',
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ),
-      isScrollControlled: true,
-    );
-  }
-
-  Widget _buildFilterLabel(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(
-        label,
-        style: GoogleFonts.poppins(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilterTextField({
-    required String hint,
-    required String initialValue,
-    required Function(String) onChanged,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TextFormField(
-        initialValue: initialValue,
-        onChanged: onChanged,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          hintText: hint,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        ),
-        style: GoogleFonts.poppins(fontSize: 14),
-      ),
-    );
-  }
-
-  Widget _buildEmploymentTypeChips() {
-    final types = [
-      {'label': 'Full Time', 'value': 'full_time'},
-      {'label': 'Part Time', 'value': 'part_time'},
-      {'label': 'Contract', 'value': 'contract'},
-      {'label': 'Freelance', 'value': 'freelance'},
-    ];
-
-    return Obx(() => Wrap(
-      spacing: 8,
-      children: types.map((type) {
-        final isSelected = controller.filterEmploymentType.value == type['value'];
-        return ChoiceChip(
-          label: Text(type['label']!),
-          selected: isSelected,
-          onSelected: (selected) {
-            controller.filterEmploymentType.value = selected ? type['value']! : '';
-          },
-          selectedColor: Colors.black,
-          labelStyle: GoogleFonts.poppins(
-            color: isSelected ? Colors.white : Colors.black,
-            fontSize: 12,
-          ),
-        );
-      }).toList(),
-    ));
   }
 }

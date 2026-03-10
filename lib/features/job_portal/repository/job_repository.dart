@@ -9,12 +9,6 @@ import '../data_source/job_data_source.dart';
 abstract class JobRepository {
   Future<List<JobModel>> getJobs({
     String? q,
-    String? location,
-    String? country,
-    String? employmentType,
-    bool? isRemote,
-    double? salaryMin,
-    double? salaryMax,
     int page = 1,
   });
   Future<JobModel?> getJobDetails(String slug);
@@ -41,22 +35,10 @@ class JobRepositoryImpl implements JobRepository {
   @override
   Future<List<JobModel>> getJobs({
     String? q,
-    String? location,
-    String? country,
-    String? employmentType,
-    bool? isRemote,
-    double? salaryMin,
-    double? salaryMax,
     int page = 1,
   }) {
     return remoteDataSource.getJobs(
       q: q,
-      location: location,
-      country: country,
-      employmentType: employmentType,
-      isRemote: isRemote,
-      salaryMin: salaryMin,
-      salaryMax: salaryMax,
       page: page,
     );
   }

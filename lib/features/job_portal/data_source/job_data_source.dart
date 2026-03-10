@@ -13,12 +13,6 @@ import '../data/model/job_application_request_model.dart';
 abstract class JobRemoteDataSource {
   Future<List<JobModel>> getJobs({
     String? q,
-    String? location,
-    String? country,
-    String? employmentType,
-    bool? isRemote,
-    double? salaryMin,
-    double? salaryMax,
     int page = 1,
   });
 
@@ -52,25 +46,11 @@ class JobRemoteDataSourceImpl implements JobRemoteDataSource {
   @override
   Future<List<JobModel>> getJobs({
     String? q,
-    String? location,
-    String? country,
-    String? employmentType,
-    bool? isRemote,
-    double? salaryMin,
-    double? salaryMax,
     int page = 1,
   }) async {
-    Map<String, dynamic> queryParams = {'page': page};
+    Map<String, String> queryParams = {'page': page.toString()};
 
     if (q != null && q.isNotEmpty) queryParams['q'] = q;
-    if (location != null && location.isNotEmpty) queryParams['location'] = location;
-    if (country != null && country.isNotEmpty) queryParams['country'] = country;
-    if (employmentType != null && employmentType.isNotEmpty) {
-      queryParams['employment_type'] = employmentType;
-    }
-    if (isRemote != null) queryParams['is_remote'] = isRemote ? '1' : '0';
-    if (salaryMin != null) queryParams['salary_min'] = salaryMin.toString();
-    if (salaryMax != null) queryParams['salary_max'] = salaryMax.toString();
 
     final response = await apiServices.callGet(AppUrls.allJobs, queryParams: queryParams);
 

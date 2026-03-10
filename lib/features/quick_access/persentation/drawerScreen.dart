@@ -144,20 +144,7 @@ class DrawerScreen extends StatelessWidget {
                       Row(
                       children: [
                        Expanded(child:_buildBottomCard(context, "i-QuickHire", CupertinoIcons.briefcase_fill, "Job Board", onTap: () {
-                         final type = AppUrls.selectedUserType.value;
-                         //Get.offAllNamed(AppRoutes.jobSearchScreen);
-                         if (type == AppUrls.recruiter || type == AppUrls.applier) {
-                          // Get.to(() => JobSearchScreen());
-                           Get.toNamed(AppRoutes.jobSearchScreen);
-                         } else {
-                           Get.snackbar(
-                             "Access Restricted",
-                             "Please switch to Recruiter or Applier account first.",
-                             snackPosition: SnackPosition.BOTTOM,
-                             backgroundColor: Colors.red.withOpacity(0.1),
-                             colorText: Colors.red,
-                           );
-                         }
+                         Get.toNamed(AppRoutes.jobSearchScreen);
                        })),
                         const SizedBox(width: 12),
                         Expanded(child: _buildBottomCard(context, "Universal App", CupertinoIcons.app_badge_fill, "Mini Apps")),

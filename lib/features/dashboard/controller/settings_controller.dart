@@ -327,6 +327,8 @@ class SettingsController extends GetxController {
   RxBool isLoading = false.obs;
   Rx<UserData?> userProfile = Rx<UserData?>(null);
   RxString contactVisibility = 'both'.obs; // 'both', 'phone', 'email', 'none'
+  RxBool isEmployer = false.obs;
+  RxBool isSeller = false.obs;
 
   final nameController = TextEditingController();
   final emailController = TextEditingController();
@@ -426,10 +428,15 @@ class SettingsController extends GetxController {
 
       request.fields["messaging_privacy"] = staticMessagingPrivacy;
 
-      // Interests array - Postman style
-      // request.fields["interests[]"] = "Web Development";
-      // request.fields["interests[]"] = "App Development";
-      // request.fields["interests[]"] = "Flutter";
+      // Employer and Seller values
+      request.fields["is_employer"] = isEmployer.value ? "1" : "0";
+      request.fields["is_seller"] = isSeller.value ? "1" : "0";
+
+      // Interests array
+      // final interests = userProfile.value?.interests ?? [];
+      // for (int i = 0; i < interests.length; i++) {
+      //   request.fields["interests[$i]"] = interests[i]["id"].toString();
+      // }
 
 
       if (imageFile.value != null) {
@@ -742,6 +749,8 @@ class SettingsController extends GetxController {
         languageController.text = result.user!.languagePreference ?? "en";
         isPrivate.value = result.user!.accountPrivacy == "private";
         contactVisibility.value = result.user!.contactVisibility ?? 'both';
+        isEmployer.value = result.user!.isEmployer ?? false;
+        isSeller.value = result.user!.isSeller ?? false;
         
         // SYNC FOLLOW STATUS
         if (result.user?.id != null) {

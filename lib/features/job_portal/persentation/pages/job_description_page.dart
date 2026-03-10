@@ -7,6 +7,7 @@ import '../../../../route/app_pages.dart';
 import '../../data/model/job_model.dart';
 import '../controller/job_discription_controller.dart';
 import 'package:i_vatan_app/core/network/app_urls.dart';
+import '../../../../db/shared_pref_manager.dart';
 
 import 'occupation_form_page.dart';
 
@@ -652,7 +653,6 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
   }
 
   bool _isRecruiter() {
-    final type = AppUrls.selectedUserType.value;
-    return type == 'recruiter';
+    return SharedPrefManager().user?.isEmployer ?? false;
   }
 }

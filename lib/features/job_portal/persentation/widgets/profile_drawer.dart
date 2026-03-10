@@ -9,13 +9,10 @@ import '../../../../core/network/app_urls.dart';
 import '../../../../db/shared_pref_manager.dart';
 import '../../../dashboard/persentation/settings_page.dart';
 import '../../../profile/screen/profile_screen.dart';
-import '../pages/applicant_list.dart';
 import '../pages/create_job_page.dart';
 import '../pages/delete_account_page.dart';
 import '../pages/help_privacy_page.dart';
 import '../pages/job_history_page.dart';
-import '../pages/my_jobs.dart';
-import '../pages/occupation_form_page.dart';
 
 class ProfileDrawer extends StatelessWidget {
   const ProfileDrawer({super.key});
@@ -213,7 +210,7 @@ class ProfileDrawer extends StatelessWidget {
                         Get.toNamed(AppRoutes.myCreatedJobScreen);
                       },
                     ),
-                  // Applier only items
+                  // Applier only items - Hide in Employer mode
                   if (!_isRecruiter())
                     _buildDrawerItem(
                       icon: Icons.history,
@@ -327,8 +324,7 @@ class ProfileDrawer extends StatelessWidget {
   }
 
   bool _isRecruiter() {
-    final type = AppUrls.selectedUserType.value;
-    return type == 'recruiter';
+    return SharedPrefManager().user?.isEmployer ?? false;
   }
 
 }

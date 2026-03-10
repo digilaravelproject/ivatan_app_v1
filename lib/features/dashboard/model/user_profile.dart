@@ -193,13 +193,13 @@ class UserData {
       occupation: json["occupation"],
       name: json["name"],
       email: json["email"],
-      isSeller: json["is_seller"],
+      isSeller: json["is_seller"] == true || json["is_seller"] == 1 || json["is_seller"] == "1",
       phone: json["phone"],
       emailVerifiedAt: json["email_verified_at"],
       dateOfBirth: json["date_of_birth"],
       gender: json["gender"],
       languagePreference: json["language_preference"],
-      twoFactorEnabled: json["two_factor_enabled"],
+      twoFactorEnabled: json["two_factor_enabled"] == true || json["two_factor_enabled"] == 1 || json["two_factor_enabled"] == "1",
       messagingPrivacy: json["messaging_privacy"],
       isOnline: json["is_online"],
       lastSeenAt: json["last_seen_at"],
@@ -220,7 +220,7 @@ class UserData {
       createdAt: json["created_at"],
       updatedAt: json["updated_at"],
       deletedAt: json["deleted_at"],
-      isEmployer: json["is_employer"],
+      isEmployer: json["is_employer"] == true || json["is_employer"] == 1 || json["is_employer"] == "1",
 
       interests: json["interests"] != null
           ? List<String>.from(json["interests"].map((e) => e["name"].toString()))

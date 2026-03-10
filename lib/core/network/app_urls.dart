@@ -6,15 +6,11 @@ class AppUrls {
   AppUrls._();
 
   // User Types for account switching
-  static const String creator = "creator";
-  static const String music = "music";
-  static const String businessService = "business_service";
-  static const String businessProduct = "business_product";
-  static const String recruiter = "recruiter";
-  static const String applier = "applier";
+  static const String seller = "seller";
+  static const String employer = "employer";
 
   // Current selected user type (Reactive)
-  static RxString selectedUserType = creator.obs;
+  static RxString selectedUserType = employer.obs;
 
   static const String baseUrl =
     //  "https://darkorange-baboon-922736.hostingersite.com";
@@ -47,7 +43,8 @@ class AppUrls {
   static const recruiterJobs = "api/v1/jobs/recruiter";
   static const careerProfile = "api/v1/jobs/my/profile";
 
-
+  static const sellerProducts = "api/v1/seller/products";
+  static const sellerServices = "api/v1/seller/services";
 
   static const defaultApiKey =
       "1|1yCFcc7ahglUgOL3cftZZ7T83gcyFJreXGlQx0zud042e463";

@@ -118,33 +118,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
           final bool isPrivateHidden = isOtherProfile && 
                                      user.accountPrivacy == "private" && 
                                      !isFollowing;
-          return Obx(() {
-            final userType = AppUrls.selectedUserType.value;
-            
             // Build dynamic tabs and views
             List<Tab> tabs = [
               Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 
               Tab(child: Image.asset(AppAssets.icVideo, width: 24, height: 24)),
-              Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)), // Products
-              Tab(child: Icon(Icons.room_service_outlined, color: Colors.black, size: 26)), // Services
+              Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)), // Products - always visible
+              Tab(child: Icon(Icons.room_service_outlined, color: Colors.black, size: 26)), // Services - always visible
             ];
             
             List<Widget> tabViews = [
               MyPostScreen(username: finalUserName),
               MyVideoScreen(username: finalUserName),
-              ProductGridScreen(isOwnProfile: !isOtherProfile), // Products tab
-              DigitalProductListScreen(isOwnProfile: !isOtherProfile), // Services tab
+              (user.isSeller == true && !isOtherProfile)
+                ? ProductGridScreen(isOwnProfile: true)
+              // Seller viewing their own products
+                : ProductGridScreen(isOwnProfile: false), // Non-seller or viewing other profile - browse mode
+              // Services tab: Show seller's services if they're a seller, otherwise show browsable services
+              (user.isSeller == true && !isOtherProfile)
+                ? DigitalProductListScreen(isOwnProfile: true) // Seller viewing their own services
+                : DigitalProductListScreen(isOwnProfile: false), // Non-seller or viewing other profile - browse mode
             ];
-            
-            // Add Creator Analysis tab only for creators
-            if (userType == AppUrls.creator) {
-              tabs.add(Tab(child: Icon(Icons.person_add_alt_1_outlined, color: Colors.black, size: 26)));
-              tabViews.add(CreatorAnalysisScreen());
-            }
-
             return DefaultTabController(
-              key: ValueKey(userType), // Force recreate when type changes
-              length: tabs.length,
+              key: ValueKey("${user.id}_${user.isSeller}"), // Force recreate when owner or seller status changes
+              length: 4, // Always 4 tabs now
               child: Stack(
                 children: [
                   NestedScrollView(
@@ -244,6 +240,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ),
 
                                         // 3 Dot Menu
+                                      if (!isOtherProfile)
                                         Positioned(
                                           top: 40,
                                           right: 10,
@@ -285,46 +282,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   ],
                                                 ),
                                               ),
-                                              const PopupMenuItem(
-                                                value: 'products',
-                                                child: Row(
-                                                  children: [
-                                                    Icon(CupertinoIcons.cube_box, size: 20),
-                                                    SizedBox(width: 10),
-                                                    Text("Your Products"),
-                                                  ],
+                                              if (user.isSeller == true)
+                                                const PopupMenuItem(
+                                                  value: 'products',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(CupertinoIcons.cube_box, size: 20),
+                                                      SizedBox(width: 10),
+                                                      Text("Your Products"),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                              const PopupMenuItem(
-                                                value: 'services',
-                                                child: Row(
-                                                  children: [
-                                                    Icon(Icons.room_service_outlined, size: 20),
-                                                    SizedBox(width: 10),
-                                                    Text("Your Services"),
-                                                  ],
+                                              if (user.isSeller == true)
+                                                const PopupMenuItem(
+                                                  value: 'services',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(Icons.room_service_outlined, size: 20),
+                                                      SizedBox(width: 10),
+                                                      Text("Your Services"),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                              const PopupMenuItem(
-                                                value: 'enquiry',
-                                                child: Row(
-                                                  children: [
-                                                    Icon(CupertinoIcons.chat_bubble_text, size: 20),
-                                                    SizedBox(width: 10),
-                                                    Text("Enquiry"),
-                                                  ],
+                                              if (user.isSeller == true)
+                                                const PopupMenuItem(
+                                                  value: 'enquiry',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(CupertinoIcons.chat_bubble_text, size: 20),
+                                                      SizedBox(width: 10),
+                                                      Text("Enquiry"),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                              const PopupMenuItem(
-                                                value: 'dashboard',
-                                                child: Row(
-                                                  children: [
-                                                    Icon(CupertinoIcons.doc_append, size: 20),
-                                                    SizedBox(width: 10),
-                                                    Text("Dashboard"),
-                                                  ],
+                                              if (user.isSeller == true)
+                                                const PopupMenuItem(
+                                                  value: 'dashboard',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(CupertinoIcons.doc_append, size: 20),
+                                                      SizedBox(width: 10),
+                                                      Text("Dashboard"),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
                                             ],
                                             child: Container(
                                               padding: const EdgeInsets.all(6),
@@ -538,29 +539,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           },
                                                         ),
                                                         const SizedBox(height: 10),
-                                                        _buildCreateOption(
-                                                          icon: Icons.shopping_bag,
-                                                          color: Colors.orange,
-                                                          title: "Product",
-                                                          subtitle: "Add your product",
-                                                          onTap: () {
-                                                            Get.back();
-                                                            Get.to(() => CreateProductScreen());
-                                                          },
-                                                        ),
-                                                        const SizedBox(height: 10),
-                                                        _buildCreateOption(
-                                                          icon: Icons.miscellaneous_services,
-                                                          color: Colors.orange,
-                                                          title: "Service",
-                                                          subtitle: "Add your service",
-                                                          onTap: () {
-                                                            Get.back();
-                                                            Get.to(CreateServiceScreen());
-                                                            // Use same logic as home screen add story
-                                                           // storyController.showPickerOptions();
-                                                          },
-                                                        ),
+                                                        if (user.isSeller == true)
+                                                          _buildCreateOption(
+                                                            icon: Icons.shopping_bag,
+                                                            color: Colors.orange,
+                                                            title: "Product",
+                                                            subtitle: "Add your product",
+                                                            onTap: () {
+                                                              Get.back();
+                                                              Get.to(() => CreateProductScreen());
+                                                            },
+                                                          ),
+                                                        if (user.isSeller == true)
+                                                          const SizedBox(height: 10),
+                                                        if (user.isSeller == true)
+                                                          _buildCreateOption(
+                                                            icon: Icons.miscellaneous_services,
+                                                            color: Colors.orange,
+                                                            title: "Service",
+                                                            subtitle: "Add your service",
+                                                            onTap: () {
+                                                              Get.back();
+                                                              Get.to(CreateServiceScreen());
+                                                              // Use same logic as home screen add story
+                                                             // storyController.showPickerOptions();
+                                                            },
+                                                          ),
                                                       ],
                                                     ),
                                                   ),
@@ -736,20 +740,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           );
-        });
         }),
-      ),
-    );
+        ),
+      );
+   // );
   }
 
-  Widget _buildStatItem(String label, dynamic user, int index) {
-      final isFollowing = profileController.followController.isUserFollowing(user.id!).value;
-      final bool isPrivateHidden = isOtherProfile && 
-                                 user.accountPrivacy == "private" && 
-                                 !isFollowing;
-                                 
+  Widget _buildStatItem(String label, UserData user, int index) {
       return InkWell(
           onTap: () {
+               final isFollowing = profileController.followController.isUserFollowing(user.id!, initialValue: user.is_following).value;
+               final bool isPrivateHidden = isOtherProfile && 
+                                          user.accountPrivacy == "private" && 
+                                          !isFollowing;
+               
                if (isPrivateHidden) return;
                Get.to(() => FollowTabs(initialTab: index, userId: user.id!))?.then((_) {
                  // Refresh profile data when coming back
@@ -760,7 +764,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Text(
               label,
-              style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
             ),
           ),
       );
@@ -1887,8 +1891,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-
-
-
-
 

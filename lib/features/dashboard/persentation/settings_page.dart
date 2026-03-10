@@ -291,97 +291,69 @@ class SettingsScreen extends StatelessWidget {
               SizedBox(height: 16,),
 
 
-              GestureDetector(
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    backgroundColor: Colors.white,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-                    ),
-                    builder: (context) {
-                      final profileTypes = [
-                        {'icon': Icons.videocam_outlined, 'title': 'Creator Profile', 'type': AppUrls.creator},
-                        {'icon': Icons.music_note_outlined, 'title': 'Music Profile', 'type': AppUrls.music},
-                        {'icon': Icons.business_outlined, 'title': 'Business (Service based)', 'type': AppUrls.businessService},
-                        {'icon': Icons.store_outlined, 'title': 'Business (Product based)', 'type': AppUrls.businessProduct},
-                        {'icon': Icons.work_outline, 'title': 'Recruiter', 'type': AppUrls.recruiter},
-                        {'icon': Icons.person_search_outlined, 'title': 'Applier', 'type': AppUrls.applier},
-                      ];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const SizedBox(height: 16),
-                            Container(
-                              width: 40,
-                              height: 4,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade400,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'Switch Account',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 12),
-                            Flexible(
-                              child: ListView(
-                                shrinkWrap: true,
-                                children: profileTypes.map((type) => ListTile(
-                                  leading: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Icon(type['icon'] as IconData, color: AppColors.primary),
-                                  ),
-                                  title: Text(
-                                    type['title'] as String,
-                                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-                                  ),
-                                  trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
-                                  onTap: () {
-                                    AppUrls.selectedUserType.value = type['type'] as String;
-                                    Navigator.pop(context);
-                                    Get.snackbar(
-                                      "Account Switched", 
-                                      "Switched to ${type['title']}",
-                                      snackPosition: SnackPosition.BOTTOM,
-                                      backgroundColor: AppColors.primary.withOpacity(0.1),
-                                      colorText: AppColors.primary,
-                                    );
-                                  },
-                                )).toList(),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                  decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade400)
-                  ),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 12),
-                      const Text("Switch Account", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios_rounded,size: 18,)
-                    ],
-                  ),
+              // EMPLOYER TOGGLE
+              Obx(() => Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12,),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade400)
                 ),
-              ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.work_outline, color: Colors.black54),
+                    const SizedBox(width: 12),
+                    const Text("Employer Account", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                    const Spacer(),
+                    Transform.scale(
+                      scale: 0.7,
+                      child: Switch(
+                        value: profileController.isEmployer.value,
+                        onChanged: (val) {
+                          profileController.isEmployer.value = val;
+                          // If switching to employer, optionally update AppUrls globally
+                          if (val) AppUrls.selectedUserType.value = AppUrls.employer;
+                          profileController.updateProfile(shouldGoBack: false);
+                        },
+                        activeColor: AppColors.primary,
+                      ),
+                    )
+                  ],
+                ),
+              )),
+
+              const SizedBox(height: 16),
+
+              // SELLER TOGGLE
+              Obx(() => Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12,),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade400)
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.store_outlined, color: Colors.black54),
+                    const SizedBox(width: 12),
+                    const Text("Seller Account", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                    const Spacer(),
+                    Transform.scale(
+                      scale: 0.7,
+                      child: Switch(
+                        value: profileController.isSeller.value,
+                        onChanged: (val) {
+                          profileController.isSeller.value = val;
+                          // If switching to seller, optionally update AppUrls globally
+                          if (val) AppUrls.selectedUserType.value = AppUrls.seller;
+                          profileController.updateProfile(shouldGoBack: false);
+                        },
+                        activeColor: AppColors.primary,
+                      ),
+                    )
+                  ],
+                ),
+              )),
 
               SizedBox(height: 16,),
 
