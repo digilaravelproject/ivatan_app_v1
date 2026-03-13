@@ -1,58 +1,65 @@
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get.dart';
+import 'controller/financial_controller.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class BankDetailsScreen extends StatelessWidget {
   const BankDetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(FinancialController());
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bank Accounts'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed:() => Get.to(AddBankAccountScreen()),
-            //() => Navigator.pushNamed(context, '/add-bank'),
+            onPressed: () => Get.to(() => const AddBankAccountScreen()),
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _buildBankAccountCard(
-            context,
-            bankName: 'State Bank of India',
-            accountNumber: '**** **** 1234',
-            ifsc: 'SBIN0012345',
-            holderName: 'Ramesh Gupta',
-            isDefault: true,
-          ),
-          const SizedBox(height: 12),
-          _buildBankAccountCard(
-            context,
-            bankName: 'HDFC Bank',
-            accountNumber: '**** **** 5678',
-            ifsc: 'HDFC0004321',
-            holderName: 'Ramesh Gupta',
-            isDefault: false,
-          ),
-        ],
-      ),
+      body: Obx(() {
+        if (controller.isFetching.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (controller.bankData.isEmpty) {
+          return const Center(
+            child: Text(
+              'No bank accounts added yet',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+          );
+        }
+
+        final data = controller.bankData;
+        return ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            _buildBankAccountCard(
+              context,
+              bankName: data['bank_name']?.toString() ?? 'N/A',
+              accountNumber: data['account_number_masked']?.toString() ?? 'N/A',
+              ifsc: data['ifsc_code']?.toString() ?? 'N/A',
+              holderName: data['account_holder_name']?.toString() ?? 'N/A',
+              isDefault: data['is_active'] == true,
+            ),
+          ],
+        );
+      }),
     );
   }
 
   Widget _buildBankAccountCard(
-      BuildContext context, {
-        required String bankName,
-        required String accountNumber,
-        required String ifsc,
-        required String holderName,
-        required bool isDefault,
-      }) {
+    BuildContext context, {
+    required String bankName,
+    required String accountNumber,
+    required String ifsc,
+    required String holderName,
+    required bool isDefault,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).brightness == Brightness.dark
@@ -176,6 +183,7 @@ class AddBankAccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final FinancialController controller = Get.put(FinancialController());
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor = isDark ? Colors.black : Colors.white;
     final cardColor = isDark ? Colors.grey.shade900 : Colors.grey.shade100;
@@ -222,25 +230,64 @@ class AddBankAccountScreen extends StatelessWidget {
               _buildTextField(
                   label: 'Account Holder Name',
                   icon: Icons.person_outline,
+                  controller: controller.holderNameController,
                   isDark: isDark),
               const SizedBox(height: 16),
               _buildTextField(
-                  label: 'Bank Name', icon: Icons.account_balance, isDark: isDark),
+                  label: 'Bank Name', 
+                  icon: Icons.account_balance, 
+                  controller: controller.bankNameController,
+                  isDark: isDark),
               const SizedBox(height: 16),
               _buildTextField(
                   label: 'Account Number',
                   icon: Icons.numbers,
+                  controller: controller.accountNumberController,
                   keyboardType: TextInputType.number,
                   isDark: isDark),
               const SizedBox(height: 16),
               _buildTextField(
                   label: 'Confirm Account Number',
                   icon: Icons.numbers,
+                  controller: controller.confirmAccountNumberController,
                   keyboardType: TextInputType.number,
                   isDark: isDark),
               const SizedBox(height: 16),
               _buildTextField(
-                  label: 'IFSC Code', icon: Icons.code, isDark: isDark),
+                  label: 'IFSC Code', 
+                  icon: Icons.code, 
+                  controller: controller.ifscController,
+                  isDark: isDark),
+              const SizedBox(height: 16),
+              
+              // Account Type Dropdown
+              Obx(() => Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey.shade800 : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: controller.selectedAccountType.value,
+                    isExpanded: true,
+                    dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                    items: controller.accountTypes.map((String type) {
+                      return DropdownMenuItem<String>(
+                        value: type,
+                        child: Text(type.capitalizeFirst ?? type),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        controller.selectedAccountType.value = newValue;
+                      }
+                    },
+                  ),
+                ),
+              )),
+
               const SizedBox(height: 30),
 
               Row(
@@ -264,7 +311,7 @@ class AddBankAccountScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton(
+                    child: Obx(() => ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
                         isDark ? Colors.white12 : Colors.black87,
@@ -272,25 +319,30 @@ class AddBankAccountScreen extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                       ),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Bank account added successfully',
-                              style: TextStyle(
-                                  color: isDark ? Colors.white : Colors.white),
+                      onPressed: controller.isLoading.value 
+                        ? null 
+                        : () async {
+                          bool success = await controller.addBankAccount();
+                          if (success) {
+                            Get.back();
+                          }
+                        },
+                      child: controller.isLoading.value
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
                             ),
-                            backgroundColor: isDark ? Colors.green.shade700 : Colors.green,
+                          )
+                        : const Text(
+                            'Add Account',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600),
                           ),
-                        );
-                      },
-                      child: Text(
-                        'Add Account',
-                        style: TextStyle(
-                            color: isDark ? Colors.white : Colors.white,
-                            fontWeight: FontWeight.w600),
-                      ),
-                    ),
+                    )),
                   ),
                 ],
               ),
@@ -304,10 +356,12 @@ class AddBankAccountScreen extends StatelessWidget {
   Widget _buildTextField({
     required String label,
     required IconData icon,
+    required TextEditingController controller,
     bool isDark = false,
     TextInputType? keyboardType,
   }) {
     return TextFormField(
+      controller: controller,
       keyboardType: keyboardType,
       style: TextStyle(color: isDark ? Colors.white : Colors.black87),
       decoration: InputDecoration(

@@ -714,26 +714,15 @@ class SettingsController extends GetxController {
 
   Future<void> fetchUserDetails(String userName) async {
     try {
-   //   isLoading.value = true;
-
-      //String username = SharedPrefManager().user?.username ?? "";
-
-      print("fetchuserdetails : "+userName);
+      isLoading.value = true;
+      print("fetchuserdetails for: $userName");
 
       final result = await getUserDetails(userName);
-      if (result == null) {
-        // Get.snackbar(
-        //   "User Not Found",
-        //   "The user '$userName' does not exist or cannot be accessed.",
-        //   snackPosition: SnackPosition.BOTTOM,
-        // );
-        return;
-      }
-
-      print("fetchuserdetails : "+result!.user.toString());
-
+      
       if (result != null) {
+        print("fetchuserdetails success: ${result.user?.username}");
         userProfile.value = result.user;
+
         // await SharedPrefManager().updateUserName(result.user!.name ?? "");
         //
         // await SharedPrefManager().updateUserProfilePhoto(result.user!.profilePhotoPath ?? "");
@@ -756,6 +745,8 @@ class SettingsController extends GetxController {
         if (result.user?.id != null) {
           followController.setInitialFollowStatus(result.user!.id!, result.user!.is_following ?? false);
         }
+      } else {
+        print("fetchuserdetails: result is null");
       }
     } catch (e) {
       print("Error fetching user details: $e");

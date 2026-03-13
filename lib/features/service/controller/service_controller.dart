@@ -1,60 +1,105 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/theme/app_colors.dart';
 import '../model/service_model.dart';
+import '../repository/service_repository.dart';
 
 class ServiceController extends GetxController {
+  final ServiceRepository repository = Get.put(ServiceRepositoryImpl());
+
   var services = <ServiceModel>[].obs;
   var isLoading = false.obs;
+  var errorMessage = ''.obs;
+
+  // Marketplace Services
+  var marketplaceServices = <ServiceModel>[].obs;
+  var isMarketplaceLoading = false.obs;
+  var marketplacePage = 1;
+  var hasMoreMarketplace = true.obs;
+  
+  // Service Detail
+  var selectedService = Rx<ServiceModel?>(null);
+  var isDetailLoading = false.obs;
+
+  // Seller Enquiries
+  var sellerEnquiries = <Map<String, dynamic>>[].obs;
+  var isEnquiriesLoading = false.obs;
+  var enquiriesTotal = 0.obs;
+  var enquiriesPending = 0.obs;
+  var enquiriesReplied = 0.obs;
+  var enquiriesClosed = 0.obs;
+  var isStatsLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    loadSampleServices();
+    fetchServices();
+    fetchMarketplaceServices();
   }
 
-  void loadSampleServices() {
-    // Sample services data
-    services.value = [
-      ServiceModel(
-        id: '1',
-        title: 'Web Development',
-        description: 'Professional website development with modern technologies',
-        category: 'Development',
-        price: 5000,
-        duration: '2 weeks',
-        images: ['https://m.media-amazon.com/images/I/71vFKBpKakL._AC_UF894,1000_QL80_.jpg'],
-        isActive: true,
-        userId: 'user1',
-      ),
-      ServiceModel(
-        id: '2',
-        title: 'Graphic Design',
-        description: 'Creative graphic design for your brand',
-        category: 'Design',
-        price: 2000,
-        duration: '3 days',
-        images: ['https://m.media-amazon.com/images/I/71vFKBpKakL._AC_UF894,1000_QL80_.jpg'],
-        isActive: true,
-        userId: 'user1',
-      ),
-      ServiceModel(
-        id: '3',
-        title: 'Digital Marketing',
-        description: 'Complete digital marketing solutions',
-        category: 'Marketing',
-        price: 8000,
-        duration: '1 month',
-        images: ['https://m.media-amazon.com/images/I/71vFKBpKakL._AC_UF894,1000_QL80_.jpg'],
-        isActive: true,
-        userId: 'user1',
-      ),
-    ];
+  Future<void> fetchServiceDetail(int id) async {
+    try {
+      isDetailLoading(true);
+      selectedService.value = null;
+      final service = await repository.getMarketplaceServiceDetail(id);
+      selectedService.value = service;
+    } catch (e) {
+      print('Error fetching service detail: $e');
+    } finally {
+      isDetailLoading(false);
+    }
+  }
+
+  Future<void> fetchServices() async {
+    try {
+      isLoading(true);
+      errorMessage('');
+      final fetchedServices = await repository.getServices();
+      services.assignAll(fetchedServices);
+    } catch (e) {
+      errorMessage('Failed to fetch services: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> fetchMarketplaceServices({bool isRefresh = false}) async {
+    if (isRefresh) {
+      marketplacePage = 1;
+      hasMoreMarketplace(true);
+    }
+
+    if (!hasMoreMarketplace.value || isMarketplaceLoading.value) return;
+
+    try {
+      isMarketplaceLoading(true);
+      errorMessage('');
+      final fetchedServices = await repository.getMarketplaceServices(page: marketplacePage);
+      
+      if (isRefresh) {
+        marketplaceServices.assignAll(fetchedServices);
+      } else {
+        marketplaceServices.addAll(fetchedServices);
+      }
+
+      if (fetchedServices.length < 10) {
+        hasMoreMarketplace(false);
+      } else {
+        marketplacePage++;
+      }
+    } catch (e) {
+      errorMessage('Error fetching products: $e');
+      print('Error fetching marketplace services: $e');
+    } finally {
+      isMarketplaceLoading(false);
+    }
   }
 
   void addService(ServiceModel service) {
     services.add(service);
   }
 
-  void updateService(String id, ServiceModel updatedService) {
+  void updateService(int id, ServiceModel updatedService) {
     final index = services.indexWhere((s) => s.id == id);
     if (index != -1) {
       services[index] = updatedService;
@@ -62,26 +107,166 @@ class ServiceController extends GetxController {
     }
   }
 
-  void deleteService(String id) {
-    services.removeWhere((s) => s.id == id);
+  Future<void> deleteService(int id) async {
+    try {
+      isLoading(true);
+      final response = await repository.deleteService(id);
+      if (response != null && response['success'] == true) {
+        services.removeWhere((s) => s.id == id);
+        Get.snackbar("Success", response['message'] ?? "Service deleted successfully",
+            backgroundColor: AppColors.success, colorText: Colors.white);
+      } else {
+        Get.snackbar("Error", response?['message'] ?? "Failed to delete service",
+            backgroundColor: AppColors.error, colorText: Colors.white);
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Failed to delete service: $e",
+          backgroundColor: AppColors.error, colorText: Colors.white);
+    } finally {
+      isLoading(false);
+    }
   }
 
-  void toggleServiceStatus(String id) {
-    final index = services.indexWhere((s) => s.id == id);
-    if (index != -1) {
-      final service = services[index];
-      services[index] = ServiceModel(
-        id: service.id,
-        title: service.title,
-        description: service.description,
-        category: service.category,
-        price: service.price,
-        duration: service.duration,
-        images: service.images,
-        isActive: !service.isActive,
-        userId: service.userId,
+  Future<void> submitEnquiry({
+    required int sellerId,
+    required int serviceId,
+    required String name,
+    required String email,
+    required String phone,
+    required String subject,
+    required String message,
+    required VoidCallback onSuccess,
+  }) async {
+    try {
+      isLoading(true);
+      final response = await repository.submitEnquiry(
+        sellerId: sellerId,
+        serviceId: serviceId,
+        name: name,
+        email: email,
+        phone: phone,
+        subject: subject,
+        message: message,
       );
-      services.refresh();
+
+      if (response != null && response['success'] == true) {
+        Get.snackbar(
+          "Success",
+          response['message'] ?? "Enquiry submitted successfully.",
+          backgroundColor: AppColors.success,
+          colorText: Colors.white,
+        );
+        onSuccess();
+      } else {
+        Get.snackbar(
+          "Error",
+          response?['message'] ?? "Failed to submit enquiry",
+          backgroundColor: AppColors.error,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "An unexpected error occurred: $e",
+        backgroundColor: AppColors.error,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> fetchSellerEnquiries() async {
+    try {
+      isEnquiriesLoading(true);
+      final response = await repository.getSellerEnquiries();
+      if (response != null && response['success'] == true) {
+        final List data = response['data'] ?? [];
+        sellerEnquiries.assignAll(data.map((e) => e as Map<String, dynamic>).toList());
+      }
+    } catch (e) {
+      print('Error fetching seller enquiries: $e');
+    } finally {
+      isEnquiriesLoading(false);
+    }
+  }
+
+  Future<void> fetchSellerEnquiriesStats() async {
+    try {
+      isStatsLoading(true);
+      final response = await repository.getSellerEnquiriesStats();
+      if (response != null && response['success'] == true) {
+        final data = response['data'];
+        enquiriesTotal.value = data['total'] ?? 0;
+        enquiriesPending.value = data['pending'] ?? 0;
+        enquiriesReplied.value = data['replied'] ?? 0;
+        enquiriesClosed.value = data['closed'] ?? 0;
+      }
+    } catch (e) {
+      print('Error fetching seller enquiries stats: $e');
+    } finally {
+      isStatsLoading(false);
+    }
+  }
+
+  Future<void> updateEnquiryStatus(int id, String status) async {
+    try {
+      isLoading(true);
+      final response = await repository.updateEnquiryStatus(id, status);
+      if (response != null && response['success'] == true) {
+        Get.back(); // Close the sheet
+        Get.snackbar(
+          "Success",
+          "Status updated to $status",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+        // Refresh everything
+        fetchSellerEnquiries();
+        fetchSellerEnquiriesStats();
+      } else {
+        Get.snackbar(
+          "Error",
+          response?['message'] ?? "Failed to update status",
+          backgroundColor: AppColors.error,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      print('Error updating enquiry status: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> deleteEnquiry(int id) async {
+    try {
+      isLoading(true);
+      final response = await repository.deleteEnquiry(id);
+      if (response != null && response['success'] == true) {
+        Get.back(); // Close the sheet
+        Get.snackbar(
+          "Success",
+          "Enquiry deleted successfully",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+        // Refresh everything
+        fetchSellerEnquiries();
+        fetchSellerEnquiriesStats();
+      } else {
+        Get.snackbar(
+          "Error",
+          response?['message'] ?? "Failed to delete enquiry",
+          backgroundColor: AppColors.error,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      print('Error deleting enquiry: $e');
+    } finally {
+      isLoading(false);
     }
   }
 }

@@ -44,7 +44,24 @@ class AppUrls {
   static const careerProfile = "api/v1/jobs/my/profile";
 
   static const sellerProducts = "api/v1/seller/products";
-  static const sellerServices = "api/v1/seller/services";
+  static const sellerServices = "api/v1/services";
+  static const marketplaceServices = "api/v1/marketplace/services";
+  static const cart = "api/v1/cart";
+  static const checkout = "api/v1/checkout";
+  static const razorpayOrder = "api/v1/payment/razorpay/order";
+  static const razorpayVerify = "api/v1/payment/razorpay/verify";
+  static const enquiries = "api/v1/enquiries";
+  static const sellerEnquiries = "api/v1/seller/enquiries";
+  static const sellerEnquiriesStats = "api/v1/seller/enquiries/stats";
+  static String sellerEnquiryStatusUpdate(int id) => "api/v1/seller/enquiries/$id/stats";
+  static String deleteEnquiry(int id) => "api/v1/seller/enquiries/$id";
+  static const financial = "api/v1/seller/financials";
+  static const orders = "api/v1/orders";
+  static String orderDetail(int id) => "api/v1/orders/$id";
+  static const sellerOrders = "api/v1/seller/orders";
+  static String sellerOrderDetail(int id) => "api/v1/seller/orders/$id";
+  static String sellerOrderStatusUpdate(int id) => "api/v1/seller/orders/$id/status";
+  static const sellerStats = "api/v1/seller/dashboard/stats";
 
   static const defaultApiKey =
       "1|1yCFcc7ahglUgOL3cftZZ7T83gcyFJreXGlQx0zud042e463";

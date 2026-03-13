@@ -1,111 +1,228 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:i_vatan_app/core/network/app_urls.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:i_vatan_app/core/utils/custom_buttons.dart';
 import 'package:i_vatan_app/core/widgets/custom_dialog.dart';
+import 'package:i_vatan_app/core/network/api_services.dart';
 import 'package:i_vatan_app/route/app_pages.dart';
 
+import '../data/model/cart_model.dart';
+import '../repository/cart_repository.dart';
 import 'add_address_screen.dart';
 
 
 
 
+import '../../payment/presentation/controller/payment_controller.dart';
+
+
 class CartController extends GetxController {
-  var cartItems = <CartItem>[].obs;
+  final CartRepository cartRepository = Get.put(CartRepositoryImpl());
+  final ApiServices apiServices = Get.find<ApiServices>();
+  final PaymentController paymentController = Get.put(PaymentController());
+
+  var cartItems = <CartItemModel>[].obs;
+  var totalPrice = 0.0.obs;
+  var totalItems = 0.obs;
+  var isLoading = false.obs;
+
   var selectedAddress = Rx<Address?>(null);
   var addresses = <Address>[].obs;
+  var isLoadingAddresses = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    // Sample data with proper product images
-    cartItems.addAll([
-      CartItem(
-        name: 'Wireless Headphones',
-        originalPrice: 2999,
-        discountedPrice: 2499,
-        quantity: 1,
-        image: 'https://m.media-amazon.com/images/I/610ub5kytVL.jpg',
-      ),
-      CartItem(
-        name: 'Smart Watch',
-        originalPrice: 4999,
-        discountedPrice: 3999,
-        quantity: 1,
-        image: 'https://m.media-amazon.com/images/I/61ZjlBOp+rL._AC_UL320_.jpg',
-      ),
-      CartItem(
-        name: 'Phone Case',
-        originalPrice: 499,
-        discountedPrice: 399,
-        quantity: 2,
-        image: 'https://m.media-amazon.com/images/I/71e+R8mQcvL._AC_UL320_.jpg',
-      ),
-    ]);
-
-    addresses.addAll([
-      Address(
-        id: '1',
-        type: 'Home',
-        fullName: 'Rahul Sharma',
-        addressLine: '123, Green Park Extension',
-        city: 'New Delhi',
-        state: 'Delhi',
-        pincode: '110016',
-        phone: '+91 9876543210',
-      ),
-      Address(
-        id: '2',
-        type: 'Office',
-        fullName: 'Rahul Sharma',
-        addressLine: 'Cyber City, Tower B, 5th Floor',
-        city: 'Gurugram',
-        state: 'Haryana',
-        pincode: '122002',
-        phone: '+91 9876543210',
-      ),
-    ]);
-
-    selectedAddress.value = addresses.first;
+    fetchCartData();
+    fetchAddresses();
   }
 
-  int get itemPrice => cartItems.fold(0, (sum, item) =>
-  sum + (item.originalPrice * item.quantity));
+  Future<void> fetchCartData({bool showLoader = true}) async {
+    if (showLoader) isLoading.value = true;
+    try {
+      final response = await cartRepository.getCart();
+      debugPrint("🛒 CART API RESPONSE: $response");
+      
+      if (response != null) {
+        // Check if the response contains cart data directly or within a success wrapper
+        if (response.containsKey('cart') || response['success'] == true) {
+          final cartRes = CartResponse.fromJson(response);
+          cartItems.value = cartRes.cart?.items ?? [];
+          totalPrice.value = cartRes.totalPrice;
+          totalItems.value = cartRes.totalItems;
+          debugPrint("🛒 CART ITEMS LOADED: ${cartItems.length}");
+        } else {
+          debugPrint("🛒 CART API RESPONSE MISSING EXPECTED DATA: $response");
+        }
+      } else {
+        debugPrint("🛒 CART API ERROR: Response is null");
+      }
+    } catch (e, stackTrace) {
+      debugPrint('🛒 Error parsing/fetching cart: $e');
+      debugPrint('🛒 StackTrace: $stackTrace');
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
-  int get discountedPrice => cartItems.fold(0, (sum, item) =>
-  sum + (item.discountedPrice * item.quantity));
+  Future<void> fetchAddresses() async {
+    isLoadingAddresses.value = true;
+    try {
+      final response = await apiServices.callGet('api/v1/addresses');
+      
+      if (response != null && response['success'] == true) {
+        final List<dynamic> data = response['data'] ?? [];
+        addresses.value = data.map((item) => Address.fromJson(item)).toList();
+        
+        if (addresses.isNotEmpty) {
+          selectedAddress.value = addresses.first;
+        }
+      } else {
+        // Fallback to sample data for addresses if needed, or keep empty
+      }
+    } catch (e) {
+      print('Error fetching addresses: $e');
+    } finally {
+      isLoadingAddresses.value = false;
+    }
+  }
 
-  int get totalDiscount => itemPrice - discountedPrice;
+  // Price calculation based on API data
+  double get itemPriceValue => cartItems.fold(0.0, (sum, item) =>
+  sum + (double.tryParse(item.price) ?? 0.0) * item.quantity);
 
-  int get addonsPrice => 0; // Can be modified based on addons
-
-  int get subtotal => discountedPrice + addonsPrice;
+  // For UI compatibility, keeping existing getters with same naming if possible
+  int get itemPrice => itemPriceValue.toInt();
+  int get discountedPrice => totalPrice.value.toInt();
+  int get totalDiscount => (itemPriceValue - totalPrice.value).toInt();
+  int get addonsPrice => 0;
+  int get subtotal => totalPrice.value.toInt();
 
   void incrementQuantity(int index) {
-    cartItems[index].quantity++;
-    cartItems.refresh();
+    _updateQuantity(index, cartItems[index].quantity + 1);
   }
 
   void decrementQuantity(int index) {
     if (cartItems[index].quantity > 1) {
-      cartItems[index].quantity--;
-      cartItems.refresh();
+      _updateQuantity(index, cartItems[index].quantity - 1);
     } else {
       removeItem(index);
     }
   }
 
-  void removeItem(int index) {
-    final itemName = cartItems[index].name;
-    cartItems.removeAt(index);
-    Get.snackbar(
-      'Item Removed',
-      '$itemName has been removed from cart',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: AppColors.error,
-      colorText: Colors.white,
-      duration: const Duration(seconds: 2),
+  Future<void> _updateQuantity(int index, int newQuantity) async {
+    final item = cartItems[index];
+    
+    // Optimistic local update for immediate UI feedback
+    final oldQuantity = item.quantity;
+    cartItems[index] = item.copyWith(quantity: newQuantity);
+    cartItems.refresh();
+
+    try {
+      // Use specific cart update API
+      final response = await cartRepository.updateCartQuantity(
+        cartItemId: item.id,
+        quantity: newQuantity,
+        showErrorToast: true,
+      );
+
+      if (response != null && response['success'] == true) {
+        // Refresh cart data in background to update totals without global loader
+        fetchCartData(showLoader: false); 
+      } else {
+        // Revert local update on failure
+        cartItems[index] = item.copyWith(quantity: oldQuantity);
+        cartItems.refresh();
+      }
+    } catch (e) {
+      // Revert local update on error
+      cartItems[index] = item.copyWith(quantity: oldQuantity);
+      cartItems.refresh();
+      print('Error updating quantity: $e');
+    }
+  }
+
+  Future<void> confirmRemove(int index) async {
+    final item = cartItems[index];
+    CustomDialog.showConfirmation(
+      title: "Remove Item",
+      message: "Are you sure you want to remove ${item.name} from your cart?",
+      confirmText: "Remove",
+      cancelText: "Cancel",
+      confirmColor: AppColors.error,
+      icon: Icons.delete_outline,
+      onConfirm: () => removeItem(index),
     );
+  }
+
+  Future<void> removeItem(int index) async {
+    final item = cartItems[index];
+    final itemName = item.name;
+    try {
+      final response = await cartRepository.deleteCartItem(
+        cartItemId: item.id,
+        showErrorToast: true,
+      );
+
+      if (response != null && response['success'] == true) {
+        Get.snackbar(
+          'Item Removed',
+          '$itemName has been removed from cart',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.error,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+        fetchCartData(showLoader: false);
+      }
+    } catch (e) {
+      print('Error removing item: $e');
+    }
+  }
+
+  Future<void> confirmClear() async {
+    if (cartItems.isEmpty) return;
+    CustomDialog.showConfirmation(
+      title: "Clear Cart",
+      message: "Are you sure you want to remove all items from your cart?",
+      confirmText: "Clear All",
+      cancelText: "Cancel",
+      confirmColor: AppColors.error,
+      icon: Icons.delete_sweep_outlined,
+      onConfirm: () => clearCart(),
+    );
+  }
+
+  Future<void> clearCart() async {
+    final oldItems = List<CartItemModel>.from(cartItems);
+    // Optimistic local update
+    cartItems.clear();
+    
+    try {
+      final response = await cartRepository.clearAllCart(
+        showErrorToast: true,
+      );
+
+      if (response != null && response['success'] == true) {
+        Get.snackbar(
+          'Cart Cleared',
+          'All items have been removed from your cart',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.error,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+        fetchCartData(showLoader: false);
+      } else {
+        // Revert on failure
+        cartItems.value = oldItems;
+      }
+    } catch (e) {
+      // Revert on error
+      cartItems.value = oldItems;
+      print('Error clearing cart: $e');
+    }
   }
 
   void selectAddress(Address address) {
@@ -117,24 +234,93 @@ class CartController extends GetxController {
     addresses.add(address);
     selectedAddress.value = address;
   }
+
+  Future<void> checkout() async {
+    if (selectedAddress.value == null) {
+      Get.snackbar(
+        "Address Required",
+        "Please select a delivery address first",
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (cartItems.isEmpty) {
+      Get.snackbar(
+        "Cart Empty",
+        "Your cart is empty",
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    isLoading.value = true;
+    try {
+      final address = selectedAddress.value!;
+      
+      // Prepare checkout data as per the user's provided sample
+      final Map<String, dynamic> checkoutData = {
+        "payment_method": "razorpay",
+        "shipping_address": {
+          "name": address.fullName,
+          "phone": address.phone,
+          "address_line1": address.addressLine, // Note: We might need to split this if the API is strict, but using existing fields for now
+          "address_line2": "", 
+          "city": address.city,
+          "state": address.state,
+          "country": "IN",
+          "postal_code": address.pincode,
+        },
+        "notes": "Delivered from Ivatan App"
+      };
+
+      final response = await cartRepository.checkout(checkoutData: checkoutData);
+      
+      if (response != null && response['success'] == true) {
+        final orderId = response['order']?['id'];
+        
+        // Clear cart after successful order creation
+        cartItems.clear();
+        totalPrice.value = 0.0;
+        totalItems.value = 0;
+
+        if (orderId != null) {
+          // 3. Initiate Razorpay Payment
+          await paymentController.initiatePayment(orderId is int ? orderId : int.parse(orderId.toString()));
+        } else {
+           Get.snackbar(
+            "Order Partial Success",
+            "Order created but payment could not be initiated.",
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+          );
+        }
+      } else {
+        Get.snackbar(
+          "Checkout Failed",
+          response?['message'] ?? "Something went wrong during checkout",
+          backgroundColor: AppColors.error,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      print('Checkout error: $e');
+      Get.snackbar(
+        "Error",
+        "An unexpected error occurred: $e",
+        backgroundColor: AppColors.error,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
 }
 
 
-class CartItem {
-  String name;
-  int originalPrice;
-  int discountedPrice;
-  int quantity;
-  String image;
 
-  CartItem({
-    required this.name,
-    required this.originalPrice,
-    required this.discountedPrice,
-    required this.quantity,
-    required this.image,
-  });
-}
 
 class Address {
   String id;
@@ -157,6 +343,19 @@ class Address {
     required this.phone,
   });
 
+  factory Address.fromJson(Map<String, dynamic> json) {
+    return Address(
+      id: json['id'].toString(),
+      type: json['type'] ?? 'Home',
+      fullName: json['name'] ?? '',
+      addressLine: '${json['address_line1'] ?? ''}${json['address_line2'] != null ? ', ${json['address_line2']}' : ''}',
+      city: json['city'] ?? '',
+      state: json['state'] ?? '',
+      pincode: json['postal_code'] ?? '',
+      phone: json['phone'] ?? '',
+    );
+  }
+
   String get fullAddress => '$addressLine, $city, $state - $pincode';
 }
 
@@ -176,10 +375,24 @@ class CartScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 1,
         iconTheme: IconThemeData(color: Colors.black),
+        actions: [
+          Obx(() => controller.cartItems.isNotEmpty
+              ? IconButton(
+                  onPressed: () => controller.confirmClear(),
+                  icon: Icon(Icons.delete_sweep_outlined, color: AppColors.error),
+                  tooltip: 'Clear Cart',
+                )
+              : SizedBox.shrink()),
+        ],
       ),
-      body: Obx(() => controller.cartItems.isEmpty
-          ? _buildEmptyCart()
-          : _buildCartContent(context)),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return Center(child: CircularProgressIndicator(color: Colors.black));
+        }
+        return controller.cartItems.isEmpty
+            ? _buildEmptyCart()
+            : _buildCartContent(context);
+      }),
     );
   }
 
@@ -212,7 +425,7 @@ class CartScreen extends StatelessWidget {
           SizedBox(height: 24),
           ElevatedButton(
             onPressed: () {
-              // Navigate to home screen
+              Get.back();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
@@ -222,7 +435,7 @@ class CartScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: Text('Browse Menu'),
+            child: Text('Browse Marketplace'),
           ),
         ],
       ),
@@ -230,43 +443,51 @@ class CartScreen extends StatelessWidget {
   }
 
   Widget _buildCartContent(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              children: [
-                // Cart Items
-                ...List.generate(controller.cartItems.length, (index) {
-                  final item = controller.cartItems[index];
-                  return _buildCartItemCard(index, item);
-                }),
-
-                SizedBox(height: 12),
-
-                // Address Section
-                _buildAddressSection(context),
-
-                SizedBox(height: 16),
-
-                // Price Details
-                _buildPriceDetails(),
-
-                SizedBox(height: 16),
-
-              ],
+    return RefreshIndicator(
+      onRefresh: () => controller.fetchCartData(),
+      color: Colors.black,
+      child: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  // Cart Items
+                  ...List.generate(controller.cartItems.length, (index) {
+                    final item = controller.cartItems[index];
+                    return _buildCartItemCard(index, item);
+                  }),
+  
+                  SizedBox(height: 12),
+  
+                  // Address Section
+                  _buildAddressSection(context),
+  
+                  SizedBox(height: 16),
+  
+                  // Price Details
+                  _buildPriceDetails(),
+  
+                  SizedBox(height: 16),
+  
+                ],
+              ),
             ),
           ),
-        ),
-
-        // Confirm Delivery Button
-        _buildConfirmButton(),
-      ],
+  
+          // Confirm Delivery Button
+          _buildConfirmButton(),
+        ],
+      ),
     );
   }
 
-  Widget _buildCartItemCard(int index, CartItem item) {
+  Widget _buildCartItemCard(int index, CartItemModel item) {
+    final String fullImageUrl = "${AppUrls.imageurl}${item.coverImage}";
+    final double originalPrice = double.tryParse(item.product?.price ?? item.price) ?? 0.0;
+    final double discountedPrice = double.tryParse(item.product?.discountPrice ?? item.price) ?? 0.0;
+
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(6),
@@ -288,7 +509,7 @@ class CartScreen extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.network(
-              item.image,
+              fullImageUrl,
               width: 70,
               height: 70,
               fit: BoxFit.cover,
@@ -312,34 +533,51 @@ class CartScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item.name,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.name,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => controller.confirmRemove(index),
+                      icon: Icon(Icons.delete_outline, color: AppColors.error, size: 20),
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 4),
                 Row(
                   children: [
                     Text(
-                      '₹${item.discountedPrice}',
+                      '₹${discountedPrice.toStringAsFixed(0)}',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                         color: Colors.green.shade700,
                       ),
                     ),
-                    SizedBox(width: 4),
-                    Text(
-                      '₹${item.originalPrice}',
-                      style: TextStyle(
-                        decoration: TextDecoration.lineThrough,
-                        color: Colors.black38,
-                        fontSize: 10,
+                    if (originalPrice > discountedPrice) ...[
+                      SizedBox(width: 4),
+                      Text(
+                        '₹${originalPrice.toStringAsFixed(0)}',
+                        style: TextStyle(
+                          decoration: TextDecoration.lineThrough,
+                          color: Colors.black38,
+                          fontSize: 10,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ],
@@ -347,16 +585,10 @@ class CartScreen extends StatelessWidget {
           ),
 
           // Quantity Controls
-          // Quantity Controls
-
           Column(
             children: [
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                // decoration: BoxDecoration(
-                //   color: Colors.grey.shade100,
-                //   borderRadius: BorderRadius.circular(30),
-                // ),
                 child: Row(
                   children: [
                     GestureDetector(
@@ -416,7 +648,7 @@ class CartScreen extends StatelessWidget {
               SizedBox(height: 8),
               // Item Total
               Text(
-                '₹${item.discountedPrice * item.quantity}',
+                '₹${(discountedPrice * item.quantity).toStringAsFixed(0)}',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
@@ -608,30 +840,10 @@ class CartScreen extends StatelessWidget {
         ],
       ),
       child: SafeArea(
-        child: ElevatedButton(
-          onPressed: () {
-            // Show order confirmation
-            CustomDialog.showConfirmation(
-              title: "Confirm Order",
-              message: "Total Amount: ₹${controller.subtotal}\n\nProceed with this order?",
-              confirmText: "Place Order",
-              cancelText: "Cancel",
-              confirmColor: AppColors.black,
-              icon: Icons.shopping_bag_outlined,
-              onConfirm: () {
-                Get.snackbar(
-                  "Order Placed",
-                  "Your order has been placed successfully!",
-                  backgroundColor: AppColors.success,
-                  colorText: Colors.white,
-                  snackPosition: SnackPosition.BOTTOM,
-                  duration: const Duration(seconds: 3),
-                );
-                // Clear cart after order
-                controller.cartItems.clear();
-              },
-            );
-          },
+        child: Obx(() => ElevatedButton(
+          onPressed: controller.isLoading.value 
+            ? null 
+            : () => controller.checkout(),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.black,
             foregroundColor: Colors.white,
@@ -641,14 +853,16 @@ class CartScreen extends StatelessWidget {
             ),
             minimumSize: Size(double.infinity, 50),
           ),
-          child: Text(
-            'Confirm Delivery Details',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
+          child: controller.isLoading.value
+            ? CircularProgressIndicator(color: Colors.white)
+            : Text(
+                'Checkout',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+        )),
       ),
     );
   }
@@ -703,15 +917,36 @@ class CartScreen extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Obx(() => ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                itemCount: controller.addresses.length,
-                itemBuilder: (context, index) {
-                  final address = controller.addresses[index];
-                  final isSelected = controller.selectedAddress.value?.id == address.id;
-                  return _buildAddressCard(address, isSelected);
-                },
-              )),
+              child: Obx(() {
+                if (controller.isLoadingAddresses.value) {
+                  return Center(
+                    child: CircularProgressIndicator(color: Colors.black),
+                  );
+                }
+                
+                if (controller.addresses.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.location_off, size: 50, color: Colors.grey),
+                        SizedBox(height: 16),
+                        Text('No addresses found'),
+                      ],
+                    ),
+                  );
+                }
+                
+                return ListView.builder(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: controller.addresses.length,
+                  itemBuilder: (context, index) {
+                    final address = controller.addresses[index];
+                    final isSelected = controller.selectedAddress.value?.id == address.id;
+                    return _buildAddressCard(address, isSelected);
+                  },
+                );
+              }),
             ),
           ],
         ),

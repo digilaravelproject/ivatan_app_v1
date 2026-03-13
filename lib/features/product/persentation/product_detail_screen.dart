@@ -1,18 +1,172 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
-import '../../dashboard/persentation/product_screen.dart';
+import 'package:i_vatan_app/core/network/app_urls.dart';
+import 'package:i_vatan_app/core/network/api_services.dart';
+import '../../../core/widgets/custom_dialog.dart';
+import 'create_product_screen.dart';
+import 'image_viewer_screen.dart';
+import 'my_products_screen.dart';
+import '../data/model/marketplace_product_model.dart';
 import 'controller/product_Controller.dart';
-import 'cart_screen.dart';
 
-class ProductDetailScreen extends StatelessWidget {
-  final Product product;
+class ProductDetailScreen extends StatefulWidget {
+  final dynamic product; // Can be Product, ProductModel, or MarketplaceProduct
 
   const ProductDetailScreen({super.key, required this.product});
 
   @override
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  late Future<dynamic> _productFuture;
+  final ApiServices apiServices = Get.find<ApiServices>();
+  final ProductController productController = Get.isRegistered<ProductController>() 
+      ? Get.find<ProductController>() 
+      : Get.put(ProductController());
+
+  @override
+  void initState() {
+    super.initState();
+    // Check if it's a marketplace product and fetch full details
+    if (widget.product.runtimeType.toString().contains('MarketplaceProduct')) {
+      _productFuture = _fetchMarketplaceProduct(widget.product.id);
+    } else {
+      _productFuture = Future.value(widget.product);
+    }
+  }
+
+  Future<MarketplaceProduct> _fetchMarketplaceProduct(String productId) async {
+    try {
+      final response = await apiServices.callGet('api/v1/marketplace/products/$productId');
+      
+      if (response != null && response['success'] == true) {
+        return MarketplaceProduct.fromJson(response['data'] ?? {});
+      } else {
+        throw Exception(response?['message'] ?? "Failed to fetch product");
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<void> _deleteProduct(String productId) async {
+    try {
+      CustomDialog.showLoading(message: "Deleting product...");
+      final response = await apiServices.callDelete("${AppUrls.sellerProducts}/$productId");
+      CustomDialog.hideLoading();
+
+      if (response != null && response['success'] == true) {
+        // Refresh the products list if the controller exists
+        try {
+          if (Get.isRegistered<MyProductsController>()) {
+            Get.find<MyProductsController>().fetchProducts();
+          }
+        } catch (e) {
+          debugPrint("Error refreshing products: $e");
+        }
+
+        Get.back(); // Go back to previous screen
+        Get.snackbar(
+          "Success",
+          response['message'] ?? "Product deleted successfully",
+          backgroundColor: AppColors.success,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        // Error is already handled by ApiServices but it's good to have a backup
+      }
+    } catch (e) {
+      CustomDialog.hideLoading();
+      Get.snackbar(
+        "Error",
+        e.toString(),
+        backgroundColor: AppColors.error,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final ProductController controller = Get.find<ProductController>();
+    return FutureBuilder<dynamic>(
+      future: _productFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => Get.back(),
+              ),
+            ),
+            body: const Center(
+              child: CircularProgressIndicator(color: AppColors.black),
+            ),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => Get.back(),
+              ),
+            ),
+            body: Center(
+              child: Text('Error: ${snapshot.error}'),
+            ),
+          );
+        }
+
+        final product = snapshot.data ?? widget.product;
+        return _buildProductDetail(product);
+      },
+    );
+  }
+
+  Widget _buildProductDetail(dynamic product) {
+    // Check product type
+    final isSellersProduct = product.runtimeType.toString().contains('ProductModel');
+    final isMarketplaceProduct = product.runtimeType.toString().contains('MarketplaceProduct');
+    
+    final dynamic rawPrice = product is Map ? product['price'] : product.price;
+    final double price = double.tryParse(rawPrice?.toString() ?? '0') ?? 0.0;
+    
+    final dynamic rawDiscountPrice = (product is Map)
+        ? (product['discount_price'] ?? product['original_price'])
+        : ((isSellersProduct || isMarketplaceProduct) ? product.discountPrice : product.originalPrice);
+    
+    final double? discountPrice = rawDiscountPrice != null ? double.tryParse(rawDiscountPrice.toString()) : null;
+    final String title = (product is Map ? product['title'] : product.title) ?? '';
+    final String description = (product is Map ? product['description'] : product.description) ?? '';
+    final String? coverImage = (product is Map ? product['cover_image'] : product.coverImage);
+    
+    List images = [];
+    if (product is Map) {
+      images = product['images'] ?? [];
+    } else {
+      try {
+        images = product.images ?? [];
+      } catch (e) {
+        // Fallback for types that might not have images property
+        images = [];
+      }
+    }
+
+    final imageUrl = coverImage != null
+        ? AppUrls.getFullImageUrl(coverImage)
+        : 'https://via.placeholder.com/300';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -24,10 +178,31 @@ class ProductDetailScreen extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.share_outlined, color: Colors.black),
-            onPressed: () {},
-          ),
+          if (isSellersProduct)
+            IconButton(
+              icon: const Icon(Icons.edit_outlined, color: Colors.blue),
+              onPressed: () {
+                Get.to(() => CreateProductScreen(product: product));
+              },
+            ),
+          if (isSellersProduct)
+            IconButton(
+              icon: const Icon(Icons.delete_outline, color: AppColors.error),
+              onPressed: () {
+                CustomDialog.showConfirmation(
+                  title: "Delete Product",
+                  message: "Are you sure you want to delete this product?",
+                  confirmText: "Delete",
+                  cancelText: "Cancel",
+                  confirmColor: AppColors.error,
+                  icon: Icons.delete_outline,
+                  onConfirm: () {
+                    final String productId = (product is Map ? product['id'] : product.id).toString();
+                    _deleteProduct(productId);
+                  },
+                );
+              },
+            ),
         ],
       ),
       body: Column(
@@ -43,47 +218,19 @@ class ProductDetailScreen extends StatelessWidget {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.grey.shade100,
-                      image: const DecorationImage(
-                        image: NetworkImage('https://m.media-amazon.com/images/I/610ub5kytVL.jpg'),
-                        fit: BoxFit.cover,
-                      ),
                     ),
-                    child: Stack(
-                      children: [
-                        // Rating Badge
-                        Positioned(
-                          top: 16,
-                          right: 16,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 8,
-                                ),
-                              ],
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.star, color: Colors.amber, size: 18),
-                                SizedBox(width: 4),
-                                Text(
-                                  '4.5',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  ' (120)',
-                                  style: TextStyle(color: Colors.grey, fontSize: 12),
-                                ),
-                              ],
-                            ),
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Center(
+                          child: Icon(
+                            Icons.image_not_supported,
+                            size: 80,
+                            color: Colors.grey.shade400,
                           ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
                   ),
 
@@ -99,7 +246,7 @@ class ProductDetailScreen extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                product.title,
+                                title,
                                 style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -109,9 +256,9 @@ class ProductDetailScreen extends StatelessWidget {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                if (product.originalPrice != null)
+                                if (discountPrice != null && discountPrice > 0)
                                   Text(
-                                    '₹${product.originalPrice!.toStringAsFixed(0)}',
+                                    '₹${discountPrice.toStringAsFixed(0)}',
                                     style: TextStyle(
                                       decoration: TextDecoration.lineThrough,
                                       color: Colors.grey.shade600,
@@ -119,7 +266,7 @@ class ProductDetailScreen extends StatelessWidget {
                                     ),
                                   ),
                                 Text(
-                                  '₹${product.price.toStringAsFixed(0)}',
+                                  '₹${price.toStringAsFixed(0)}',
                                   style: const TextStyle(
                                     color: Colors.green,
                                     fontWeight: FontWeight.bold,
@@ -133,19 +280,21 @@ class ProductDetailScreen extends StatelessWidget {
 
                         const SizedBox(height: 8),
 
-                        // Seller Info
-                        Text(
-                          'Sold by: Mobile Shop',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 14,
+                        // Stock Info
+                        if (isSellersProduct)
+                          Text(
+                            'Stock: ${product.stock} units',
+                            style: TextStyle(
+                              color: product.stock > 0 ? Colors.grey.shade600 : AppColors.error,
+                              fontSize: 14,
+                              fontWeight: product.stock == 0 ? FontWeight.bold : FontWeight.normal,
+                            ),
                           ),
-                        ),
 
                         const SizedBox(height: 20),
 
                         // Discount Badge
-                        if (product.originalPrice != null)
+                        if (discountPrice != null && discountPrice > 0)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
@@ -153,7 +302,7 @@ class ProductDetailScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              '${(((product.originalPrice! - product.price) / product.originalPrice!) * 100).toStringAsFixed(0)}% OFF',
+                              '${(((price - discountPrice) / price) * 100).toStringAsFixed(0)}% OFF',
                               style: TextStyle(
                                 color: Colors.green.shade700,
                                 fontWeight: FontWeight.bold,
@@ -174,7 +323,7 @@ class ProductDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Experience crystal-clear sound and deep bass with these premium headphones. Designed for comfort during long listening sessions, they feature advanced noise-cancellation technology, a sleek ergonomic design, and a durable build quality that ensures longevity.',
+                          description,
                           style: TextStyle(
                             color: Colors.grey.shade700,
                             height: 1.6,
@@ -184,118 +333,61 @@ class ProductDetailScreen extends StatelessWidget {
 
                         const SizedBox(height: 24),
 
-                        // Features
-                        const Text(
-                          'Key Features',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        _buildFeature('Active Noise Cancellation'),
-                        _buildFeature('40 Hours Battery Life'),
-                        _buildFeature('Bluetooth 5.0 Connectivity'),
-                        _buildFeature('Premium Sound Quality'),
-                        _buildFeature('Comfortable Ear Cushions'),
-
-                        const SizedBox(height: 24),
-
-                        // Reviews Section
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Customer Reviews',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                _showWriteReviewDialog(context);
-                              },
-                              child: Text(
-                                'Write Review',
-                                style: TextStyle(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Overall Rating
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey.shade200),
-                          ),
-                          child: Row(
+                        // Additional Images Grid
+                        if (images.isNotEmpty)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                '4.5',
+                                'More Images',
                                 style: TextStyle(
-                                  fontSize: 48,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: List.generate(
-                                        5,
-                                        (index) => Icon(
-                                          index < 4 ? Icons.star : Icons.star_half,
-                                          color: Colors.amber,
-                                          size: 20,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Based on 120 reviews',
-                                      style: TextStyle(
-                                        color: Colors.grey.shade600,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
+                              const SizedBox(height: 16),
+                              GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 10,
+                                  mainAxisSpacing: 10,
                                 ),
+                                itemCount: images.length,
+                                itemBuilder: (context, index) {
+                                  final img = images[index];
+                                  final imagePath = img is Map ? img['image_path'] : img.imagePath;
+                                  final imageUrl = AppUrls.getFullImageUrl(imagePath);
+                                  return GestureDetector(
+                                    onTap: () {
+                                      final List<String> galleryImages = images.map((img) {
+                                        return (img is Map ? img['image_path'] : img.imagePath).toString();
+                                      }).toList();
+                                      Get.to(() => ImageViewerScreen(
+                                        images: galleryImages,
+                                        initialIndex: index,
+                                      ));
+                                    },
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.network(
+                                        imageUrl,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(
+                                            color: Colors.grey.shade200,
+                                            child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
+                              const SizedBox(height: 24),
                             ],
                           ),
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // Individual Reviews
-                        _buildReviewCard(
-                          'Rahul Sharma',
-                          5,
-                          '2 days ago',
-                          'Excellent product! Sound quality is amazing and battery life is great. Highly recommended!',
-                        ),
-                        _buildReviewCard(
-                          'Priya Patel',
-                          4,
-                          '1 week ago',
-                          'Good headphones for the price. Comfortable to wear for long hours. Noise cancellation works well.',
-                        ),
-                        _buildReviewCard(
-                          'Amit Kumar',
-                          5,
-                          '2 weeks ago',
-                          'Best purchase ever! Crystal clear sound and deep bass. Worth every penny.',
-                        ),
 
                         const SizedBox(height: 100), // Space for bottom buttons
                       ],
@@ -306,351 +398,143 @@ class ProductDetailScreen extends StatelessWidget {
             ),
           ),
 
-          // Bottom Buttons
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, -5),
-                ),
-              ],
-            ),
-            child: SafeArea(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Obx(() {
-                      final isInCart = controller.isInCart(product.id);
-                      final cartQty = controller.getCartQuantity(product.id);
-
-                      return SizedBox(
-                        height: 50,
-                        child: isInCart
-                            ? Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: AppColors.primary, width: 2),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    IconButton(
-                                      onPressed: () => controller.decreaseCartQuantity(product.id),
-                                      icon: Icon(Icons.remove, color: AppColors.primary),
-                                    ),
-                                    Text(
-                                      '$cartQty',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                    IconButton(
-                                      onPressed: () => controller.increaseCartQuantity(product.id),
-                                      icon: Icon(Icons.add, color: AppColors.primary),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : OutlinedButton(
-                                onPressed: () {
-                                  controller.addToCart(product.id);
-                                  Get.snackbar(
-                                    'Success',
-                                    'Added to cart',
-                                    snackPosition: SnackPosition.BOTTOM,
-                                    backgroundColor: Colors.green,
-                                    colorText: Colors.white,
-                                    duration: const Duration(seconds: 2),
-                                  );
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  side: BorderSide(color: AppColors.primary, width: 2),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                child: Text(
-                                  'ADD TO CART',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ),
-                      );
-                    }),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: SizedBox(
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Add to cart if not already added
-                          if (!controller.isInCart(product.id)) {
-                            controller.addToCart(product.id);
-                          }
-                          // Navigate to cart screen
-                          Get.to(() => CartScreen());
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'BUY NOW',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
+          // Bottom Buttons - Only show for non-seller products
+          if (!isSellersProduct)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
                   ),
                 ],
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+              child: SafeArea(
+                child: Obx(() {
+                  final String productId = (product is Map ? product['id'] : product.id).toString();
+                  final isInCart = productController.isInCart(productId);
+                  final cartQty = productController.getCartQuantity(productId);
+                  final displayQty = cartQty == 0 ? 1 : cartQty;
+                  final isLoading = productController.loadingIds.contains(productId);
 
-  Widget _buildFeature(String feature) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Icon(Icons.check_circle, color: Colors.green.shade600, size: 20),
-          const SizedBox(width: 8),
-          Text(
-            feature,
-            style: TextStyle(
-              color: Colors.grey.shade700,
-              fontSize: 15,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildReviewCard(String name, int rating, String time, String review) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: AppColors.primary.withOpacity(0.1),
-                child: Text(
-                  name[0],
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Row(
-                          children: List.generate(
-                            5,
-                            (index) => Icon(
-                              index < rating ? Icons.star : Icons.star_border,
-                              color: Colors.amber,
-                              size: 16,
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Circular Quantity Controls
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () => productController.decreaseCartQuantity(productId),
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.remove, size: 24, color: Colors.black87),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          time,
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 12,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: Text(
+                              '$displayQty',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            review,
-            style: TextStyle(
-              color: Colors.grey.shade700,
-              fontSize: 14,
-              height: 1.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showWriteReviewDialog(BuildContext context) {
-    int selectedRating = 5;
-    final reviewController = TextEditingController();
-
-    Get.dialog(
-      Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Write a Review',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Rating',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              StatefulBuilder(
-                builder: (context, setState) {
-                  return Row(
-                    children: List.generate(
-                      5,
-                      (index) => IconButton(
-                        onPressed: () {
-                          setState(() {
-                            selectedRating = index + 1;
-                          });
-                        },
-                        icon: Icon(
-                          index < selectedRating ? Icons.star : Icons.star_border,
-                          color: Colors.amber,
-                          size: 32,
-                        ),
+                          GestureDetector(
+                            onTap: () => productController.increaseCartQuantity(productId),
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: AppColors.black,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.add, size: 24, color: Colors.white),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                      const SizedBox(height: 16),
+                      
+                      // Bottom Action Buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () {
+                                if (isLoading) return;
+                                if (cartQty == 0) {
+                                  productController.addToCart(productId);
+                                }
+                                productController.addToCartApi(productId);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: AppColors.black, width: 2),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                              child: isLoading
+                                  ? const SizedBox(
+                                      height: 18,
+                                      width: 18,
+                                      child: CircularProgressIndicator(
+                                        color: AppColors.black,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Text(
+                                      'ADD TO CART',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.black,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          // const SizedBox(width: 12),
+                          // Expanded(
+                          //   child: ElevatedButton(
+                          //     onPressed: () {
+                          //       // Implement Buy Now logic or navigation to cart
+                          //     },
+                          //     style: ElevatedButton.styleFrom(
+                          //       backgroundColor: AppColors.black,
+                          //       foregroundColor: Colors.white,
+                          //       shape: RoundedRectangleBorder(
+                          //         borderRadius: BorderRadius.circular(12),
+                          //       ),
+                          //       padding: const EdgeInsets.symmetric(vertical: 14),
+                          //     ),
+                          //     child: const Text(
+                          //       'BUY NOW',
+                          //       style: TextStyle(
+                          //         fontSize: 14,
+                          //         fontWeight: FontWeight.bold,
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
+                        ],
+                      ),
+                    ],
                   );
-                },
+                }),
               ),
-              const SizedBox(height: 16),
-              const Text(
-                'Your Review',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: reviewController,
-                maxLines: 4,
-                decoration: InputDecoration(
-                  hintText: 'Share your experience with this product...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: AppColors.primary, width: 2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Get.back(),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: BorderSide(color: Colors.grey.shade300),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (reviewController.text.isNotEmpty) {
-                          Get.back();
-                          Get.snackbar(
-                            'Success',
-                            'Review submitted successfully!',
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: Colors.green,
-                            colorText: Colors.white,
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        'Submit',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+            ),
+        ],
       ),
     );
   }

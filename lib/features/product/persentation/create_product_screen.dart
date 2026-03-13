@@ -5,14 +5,20 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/network/app_urls.dart';
 import '../../../core/network/api_services.dart';
+import 'my_products_screen.dart';
 
 class CreateProductController extends GetxController {
   final ImagePicker _picker = ImagePicker();
   final ApiServices apiServices = Get.find<ApiServices>();
 
   var coverImage = Rx<File?>(null);
-  var additionalImages = <File>[].obs;
+  var additionalImages = <dynamic>[].obs; // Can be File or ProductImage
   var isLoading = false.obs;
+  var productStatus = 'active'.obs;
+  
+  // For edit mode
+  var isEditMode = false.obs;
+  var productId = ''.obs;
 
   Future<void> pickCoverImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -38,6 +44,11 @@ class CreateProductController extends GetxController {
     }
   }
 
+  void loadExistingImages(List<ProductImage> existingImages) {
+    additionalImages.clear();
+    additionalImages.addAll(existingImages);
+  }
+
   Future<void> createProduct({
     required String title,
     required String description,
@@ -57,8 +68,8 @@ class CreateProductController extends GetxController {
       return;
     }
 
-    // Validation 2: Check cover image
-    if (coverImage.value == null) {
+    // Validation 2: Check cover image (only required for new products)
+    if (!isEditMode.value && coverImage.value == null) {
       Get.snackbar(
         "Error",
         "Please select a cover image",
@@ -107,29 +118,15 @@ class CreateProductController extends GetxController {
       }
     }
 
-    // Validation 5: Check image file types
+    // Validation 5: Check image file types (only if new image is selected)
     List<String> validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
     
-    // Check cover image
-    String coverImageExt = coverImage.value!.path.split('.').last.toLowerCase();
-    if (!validExtensions.contains(coverImageExt)) {
-      Get.snackbar(
-        "Error",
-        "Cover image must be jpeg, jpg, png, or webp format",
-        backgroundColor: AppColors.error,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
-
-    // Check additional images
-    for (var img in additionalImages) {
-      String imgExt = img.path.split('.').last.toLowerCase();
-      if (!validExtensions.contains(imgExt)) {
+    if (coverImage.value != null) {
+      String coverImageExt = coverImage.value!.path.split('.').last.toLowerCase();
+      if (!validExtensions.contains(coverImageExt)) {
         Get.snackbar(
           "Error",
-          "All images must be jpeg, jpg, png, or webp format",
+          "Cover image must be jpeg, jpg, png, or webp format",
           backgroundColor: AppColors.error,
           colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM,
@@ -138,43 +135,115 @@ class CreateProductController extends GetxController {
       }
     }
 
+    // Check additional images (only File type, not existing ProductImage)
+    for (var img in additionalImages) {
+      if (img is File) {
+        String imgExt = img.path.split('.').last.toLowerCase();
+        if (!validExtensions.contains(imgExt)) {
+          Get.snackbar(
+            "Error",
+            "All images must be jpeg, jpg, png, or webp format",
+            backgroundColor: AppColors.error,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+          return;
+        }
+      }
+    }
+
     isLoading.value = true;
 
     try {
+      // Check if we have new files to upload
+      bool hasNewFiles = coverImage.value != null;
+      if (!hasNewFiles) {
+        for (var img in additionalImages) {
+          if (img is File) {
+            hasNewFiles = true;
+            break;
+          }
+        }
+      }
+
       Map<String, dynamic> body = {
         "title": title,
         "description": description,
         "price": priceValue,
         "discount_price": discountPrice.isNotEmpty ? double.parse(discountPrice) : null,
         "stock": stock.isNotEmpty ? int.parse(stock) : 0,
-        "cover_image": coverImage.value,
+        "status": productStatus.value,
       };
 
-      // Add additional images with indexed keys
-      for (int i = 0; i < additionalImages.length; i++) {
-        body["images[$i]"] = additionalImages[i];
+      // Add files only if we're using multipart
+      if (hasNewFiles) {
+        // Add cover image only if selected
+        if (coverImage.value != null) {
+          body["cover_image"] = coverImage.value;
+        }
+
+        // Add additional images with indexed keys (only File type)
+        int imageIndex = 0;
+        for (var img in additionalImages) {
+          if (img is File) {
+            body["images[$imageIndex]"] = img;
+            imageIndex++;
+          }
+        }
       }
 
-      final response = await apiServices.callPost(
-        AppUrls.sellerProducts,
-        data: body,
-        isFormData: true,
-      );
+      late final response;
+      
+      if (isEditMode.value) {
+        // PATCH request for edit
+        // Use multipart only if there are new files, otherwise use JSON
+        response = await apiServices.callPost(
+          "${AppUrls.sellerProducts}/${productId.value}",
+          data: body,
+          isFormData: hasNewFiles,
+        );
+      } else {
+        // POST request for create - always use multipart
+        response = await apiServices.callPost(
+          AppUrls.sellerProducts,
+          data: body,
+          isFormData: true,
+        );
+      }
 
       if (response != null && response['success'] == true) {
-        // Store API response data
         final productData = response['data'];
-        print("Product Created Successfully!");
+        print("Product ${isEditMode.value ? 'Updated' : 'Created'} Successfully!");
         print("Product ID: ${productData['id']}");
         print("Product UUID: ${productData['uuid']}");
         print("Product Slug: ${productData['slug']}");
         print("Status: ${productData['status']}");
         print("Created At: ${productData['created_at']}");
 
+        // Update product in list
+        try {
+          final myProductsController = Get.find<MyProductsController>();
+          
+          if (isEditMode.value) {
+            // Update existing product
+            final index = myProductsController.products.indexWhere((p) => p.id == productId.value);
+            if (index != -1) {
+              myProductsController.products[index] = ProductModel.fromJson(productData);
+              myProductsController.products.refresh();
+            }
+          } else {
+            // Add new product to list
+            myProductsController.products.insert(0, ProductModel.fromJson(productData));
+            myProductsController.products.refresh();
+          }
+        } catch (e) {
+          print('Error updating product in list: $e');
+        }
+
         Get.back();
         Get.snackbar(
           "Success",
-          response['message'] ?? "Product created successfully",
+          response['message'] ?? "Product ${isEditMode.value ? 'updated' : 'created'} successfully",
           backgroundColor: AppColors.success,
           colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM,
@@ -182,7 +251,7 @@ class CreateProductController extends GetxController {
       } else {
         Get.snackbar(
           "Error",
-          response?['message'] ?? "Failed to create product",
+          response?['message'] ?? "Failed to ${isEditMode.value ? 'update' : 'create'} product",
           backgroundColor: AppColors.error,
           colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM,
@@ -203,24 +272,50 @@ class CreateProductController extends GetxController {
 }
 
 class CreateProductScreen extends StatelessWidget {
-  CreateProductScreen({super.key});
+  final ProductModel? product;
+  
+  CreateProductScreen({super.key, this.product});
 
-  final CreateProductController controller = Get.put(CreateProductController());
+  late final CreateProductController controller = Get.put(
+    CreateProductController(),
+    tag: product?.id ?? 'create',
+  );
 
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController priceController = TextEditingController();
-  final TextEditingController discountPriceController = TextEditingController();
-  final TextEditingController stockController = TextEditingController();
+  late final TextEditingController titleController = TextEditingController(
+    text: product?.title ?? '',
+  );
+  late final TextEditingController descriptionController = TextEditingController(
+    text: product?.description ?? '',
+  );
+  late final TextEditingController priceController = TextEditingController(
+    text: product?.price.toString() ?? '',
+  );
+  late final TextEditingController discountPriceController = TextEditingController(
+    text: product?.discountPrice?.toString() ?? '',
+  );
+  late final TextEditingController stockController = TextEditingController(
+    text: product?.stock.toString() ?? '',
+  );
 
   @override
   Widget build(BuildContext context) {
+    // Initialize edit mode
+    if (product != null) {
+      controller.isEditMode.value = true;
+      controller.productId.value = product!.id;
+      controller.productStatus.value = product!.status;
+      // Load existing images
+      if (product!.images.isNotEmpty) {
+        controller.loadExistingImages(product!.images);
+      }
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          "Add Product",
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          product != null ? "Edit Product" : "Add Product",
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
         foregroundColor: AppColors.black,
@@ -325,6 +420,61 @@ class CreateProductScreen extends StatelessWidget {
 
               const SizedBox(height: 25),
 
+              /// 🔹 Product Status
+              const Text(
+                "Product Status",
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              ),
+              const SizedBox(height: 8),
+              Obx(() => GestureDetector(
+                onTap: () {
+                  controller.productStatus.value = 
+                    controller.productStatus.value == 'active' ? 'inactive' : 'active';
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: controller.productStatus.value == 'active'
+                        ? AppColors.success.withOpacity(0.1)
+                        : Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: controller.productStatus.value == 'active'
+                          ? AppColors.success
+                          : Colors.grey.shade400,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        controller.productStatus.value == 'active'
+                            ? Icons.check_circle
+                            : Icons.cancel,
+                        size: 18,
+                        color: controller.productStatus.value == 'active'
+                            ? AppColors.success
+                            : Colors.grey.shade600,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        controller.productStatus.value == 'active' ? "Active" : "Inactive",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: controller.productStatus.value == 'active'
+                              ? AppColors.success
+                              : Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )),
+
+              const SizedBox(height: 25),
+
               /// 🔹 Additional Images
               const Text(
                 "Additional Images",
@@ -365,9 +515,9 @@ class CreateProductScreen extends StatelessWidget {
                             strokeWidth: 2,
                           ),
                         )
-                      : const Text(
-                          "Add Product",
-                          style: TextStyle(
+                      : Text(
+                          product != null ? "Update Product" : "Add Product",
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -386,20 +536,36 @@ class CreateProductScreen extends StatelessWidget {
   /// 🔹 Cover Image Picker Widget
   Widget _buildCoverImagePicker() {
     return Obx(() {
+      final hasExistingImage = product != null && 
+          product!.coverImage != null && 
+          product!.coverImage!.isNotEmpty;
+      
       return Column(
         children: [
-          // Selected Cover Image
-          if (controller.coverImage.value != null)
+          // Selected Cover Image or Existing Image
+          if (controller.coverImage.value != null || hasExistingImage)
             Stack(
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.file(
-                    controller.coverImage.value!,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: 200,
-                  ),
+                  child: controller.coverImage.value != null
+                      ? Image.file(
+                          controller.coverImage.value!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: 200,
+                        )
+                      : Image.network(
+                          AppUrls.getFullImageUrl(product!.coverImage!),
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: 200,
+                          errorBuilder: (_, __, ___) => Container(
+                            color: Colors.grey.shade200,
+                            height: 200,
+                            child: const Icon(Icons.image, size: 40),
+                          ),
+                        ),
                 ),
                 Positioned(
                   top: 8,
@@ -422,7 +588,8 @@ class CreateProductScreen extends StatelessWidget {
                 ),
               ],
             ),
-          if (controller.coverImage.value != null) const SizedBox(height: 10),
+          if (controller.coverImage.value != null || hasExistingImage) 
+            const SizedBox(height: 10),
           // Pick Cover Image Button
           GestureDetector(
             onTap: controller.pickCoverImage,
@@ -444,7 +611,7 @@ class CreateProductScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    controller.coverImage.value == null
+                    (controller.coverImage.value == null && !hasExistingImage)
                         ? "Tap to select cover image"
                         : "Change cover image",
                     style: TextStyle(
@@ -479,16 +646,28 @@ class CreateProductScreen extends StatelessWidget {
               ),
               itemCount: controller.additionalImages.length,
               itemBuilder: (context, index) {
+                final image = controller.additionalImages[index];
                 return Stack(
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.file(
-                        controller.additionalImages[index],
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                      ),
+                      child: image is File
+                          ? Image.file(
+                              image,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            )
+                          : Image.network(
+                              AppUrls.getFullImageUrl(image.imagePath),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                              errorBuilder: (_, __, ___) => Container(
+                                color: Colors.grey.shade200,
+                                child: const Icon(Icons.image, size: 30),
+                              ),
+                            ),
                     ),
                     Positioned(
                       top: 4,

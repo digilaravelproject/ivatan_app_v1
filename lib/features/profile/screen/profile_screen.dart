@@ -123,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 
               Tab(child: Image.asset(AppAssets.icVideo, width: 24, height: 24)),
               Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)), // Products - always visible
-              Tab(child: Icon(Icons.room_service_outlined, color: Colors.black, size: 26)), // Services - always visible
+              Tab(child: Icon(Icons.miscellaneous_services_outlined, color: Colors.black, size: 26)), // Services - always visible
             ];
             
             List<Widget> tabViews = [

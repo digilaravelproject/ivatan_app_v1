@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:i_vatan_app/core/theme/app_colors.dart';
-import '../controller/service_controller.dart';
+import 'dart:io';
+
+import '../controller/create_service_controller.dart';
+import '../../../core/network/app_urls.dart';
+import '../../../core/theme/app_colors.dart';
 import '../model/service_model.dart';
 
 class EditServiceScreen extends StatefulWidget {
@@ -14,235 +17,352 @@ class EditServiceScreen extends StatefulWidget {
 }
 
 class _EditServiceScreenState extends State<EditServiceScreen> {
-  final _formKey = GlobalKey<FormState>();
-  late TextEditingController titleController;
-  late TextEditingController descriptionController;
-  late TextEditingController categoryController;
-  late TextEditingController priceController;
-  late TextEditingController durationController;
+  final CreateServiceController controller = Get.put(CreateServiceController());
+
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController priceController = TextEditingController();
+  final TextEditingController discountPriceController = TextEditingController();
+  final TextEditingController stockController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    titleController = TextEditingController(text: widget.service.title);
-    descriptionController = TextEditingController(text: widget.service.description);
-    categoryController = TextEditingController(text: widget.service.category);
-    priceController = TextEditingController(text: widget.service.price.toString());
-    durationController = TextEditingController(text: widget.service.duration);
-  }
-
-  @override
-  void dispose() {
-    titleController.dispose();
-    descriptionController.dispose();
-    categoryController.dispose();
-    priceController.dispose();
-    durationController.dispose();
-    super.dispose();
+    controller.initForEdit(widget.service);
+    nameController.text = widget.service.title;
+    descriptionController.text = widget.service.description;
+    priceController.text = widget.service.price;
+    discountPriceController.text = widget.service.discountPrice ?? '';
+    // stock is not in ServiceModel but in user request? 
+    // Wait, ServiceModel doesn't have stock. I'll add it or ignore if not available.
+    // Based on user provided response, stock is not there but in request it is.
   }
 
   @override
   Widget build(BuildContext context) {
-    final ServiceController controller = Get.find<ServiceController>();
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Get.back(),
-        ),
         title: const Text(
-          'Edit Service',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          "Edit Service",
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(20),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Service Image
-            Container(
-              height: 200,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(12),
-                image: widget.service.images.isNotEmpty
-                    ? DecorationImage(
-                        image: NetworkImage(widget.service.images[0]),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
-              ),
-              child: widget.service.images.isEmpty
-                  ? const Center(
-                      child: Icon(Icons.room_service, size: 50, color: Colors.grey),
-                    )
-                  : null,
-            ),
-            const SizedBox(height: 24),
+            /// 🔹 Image Pickers
+            const Text("Cover Image *",
+                style: TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 10),
+            _buildCoverImagePicker(),
 
-            // Title
-            TextFormField(
-              controller: titleController,
-              decoration: InputDecoration(
-                labelText: 'Service Title',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.primary, width: 2),
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter service title';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
+            const Text("Additional Images",
+                style: TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 10),
+            _buildAdditionalImagesPicker(),
 
-            // Description
-            TextFormField(
+            const SizedBox(height: 25),
+
+            /// 🔹 Service Name
+            const Text("Service Name *",
+                style: TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            _buildTextField(
+              controller: nameController,
+              hint: "Enter service name",
+            ),
+
+            const SizedBox(height: 20),
+
+            /// 🔹 Description
+            const Text("Description",
+                style: TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            _buildTextField(
               controller: descriptionController,
+              hint: "Enter description",
               maxLines: 4,
-              decoration: InputDecoration(
-                labelText: 'Description',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.primary, width: 2),
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter description';
-                }
-                return null;
-              },
             ),
-            const SizedBox(height: 16),
 
-            // Category
-            TextFormField(
-              controller: categoryController,
-              decoration: InputDecoration(
-                labelText: 'Category',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+            const SizedBox(height: 20),
+
+            /// 🔹 Pricing
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Price *",
+                          style: TextStyle(fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 8),
+                      _buildTextField(
+                        controller: priceController,
+                        hint: "Enter price",
+                        keyboardType: TextInputType.number,
+                      ),
+                    ],
+                  ),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.primary, width: 2),
+                const SizedBox(width: 15),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Discount Price",
+                          style: TextStyle(fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 8),
+                      _buildTextField(
+                        controller: discountPriceController,
+                        hint: "Enter discount",
+                        keyboardType: TextInputType.number,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter category';
-                }
-                return null;
-              },
+              ],
             ),
-            const SizedBox(height: 16),
 
-            // Price
-            TextFormField(
-              controller: priceController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Price (₹)',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.primary, width: 2),
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter price';
-                }
-                return null;
-              },
+            const SizedBox(height: 20),
+
+            /// 🔹 Status Toggle
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Status (Active / Pending)",
+                    style: TextStyle(fontWeight: FontWeight.w600)),
+                Obx(() => Switch(
+                  value: controller.status.value == 'active',
+                  onChanged: (value) {
+                    controller.status.value = value ? 'active' : 'pending';
+                  },
+                  activeColor: AppColors.success,
+                )),
+              ],
             ),
-            const SizedBox(height: 16),
 
-            // Duration
-            TextFormField(
-              controller: durationController,
-              decoration: InputDecoration(
-                labelText: 'Duration (e.g., 2 weeks, 1 month)',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.primary, width: 2),
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter duration';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 40),
 
-            // Update Button
+            /// 🔹 Submit Button
             SizedBox(
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    final updatedService = ServiceModel(
-                      id: widget.service.id,
-                      title: titleController.text,
-                      description: descriptionController.text,
-                      category: categoryController.text,
-                      price: double.parse(priceController.text),
-                      duration: durationController.text,
-                      images: widget.service.images,
-                      isActive: widget.service.isActive,
-                      userId: widget.service.userId,
-                    );
-
-                    controller.updateService(widget.service.id, updatedService);
-                    Get.back();
-                    Get.snackbar(
-                      'Success',
-                      'Service updated successfully',
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: Colors.green,
-                      colorText: Colors.white,
-                    );
-                  }
+              width: double.infinity,
+              child: Obx(() => ElevatedButton(
+                onPressed: controller.isLoading.value
+                    ? null
+                    : () {
+                  controller.submitService(
+                    title: nameController.text,
+                    description: descriptionController.text,
+                    price: priceController.text,
+                    discountPrice: discountPriceController.text,
+                    stock: '', // Removed from UI
+                  );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: Colors.black87,
+                  padding: const EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Update Service',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                child: controller.isLoading.value
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                  "Update Service",
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              )),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCoverImagePicker() {
+    return Obx(() {
+      return GestureDetector(
+        onTap: controller.pickCoverImage,
+        child: Container(
+          height: 150,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: Colors.black26),
+            color: Colors.grey.shade100,
+          ),
+          child: (controller.coverImage.value == null && controller.existingCoverImageUrl.isEmpty)
+              ? const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.image_outlined, size: 40, color: Colors.grey),
+              SizedBox(height: 8),
+              Text("Select Cover Image"),
+            ],
+          )
+              : Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: controller.coverImage.value != null 
+                  ? Image.file(
+                      controller.coverImage.value!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                    )
+                  : Image.network(
+                      controller.existingCoverImageUrl.value,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: GestureDetector(
+                  onTap: controller.removeCoverImage,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Colors.black54,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.close, color: Colors.white, size: 20),
                   ),
                 ),
               ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildAdditionalImagesPicker() {
+    return Obx(() {
+      final int existingCount = controller.existingImages.length;
+      final int newCount = controller.additionalImages.length;
+      final int totalCount = existingCount + newCount;
+
+      return Column(
+        children: [
+          if (totalCount > 0)
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemCount: totalCount,
+              itemBuilder: (context, index) {
+                bool isExisting = index < existingCount;
+                return Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: isExisting
+                          ? Image.network(
+                              AppUrls.getFullImageUrl(controller.existingImages[index].imagePath),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            )
+                          : Image.file(
+                              controller.additionalImages[index - existingCount],
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                    ),
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: GestureDetector(
+                        onTap: () {
+                          if (isExisting) {
+                            controller.removeExistingImage(index);
+                          } else {
+                            controller.removeAdditionalImage(index - existingCount);
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: const BoxDecoration(
+                            color: Colors.black54,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.close, color: Colors.white, size: 16),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
-          ],
+          if (totalCount > 0) const SizedBox(height: 10),
+          GestureDetector(
+            onTap: controller.pickAdditionalImages,
+            child: Container(
+              height: 80,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: Colors.black26, style: BorderStyle.solid),
+                color: Colors.grey.shade50,
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.add_photo_alternate_outlined, color: Colors.grey),
+                  SizedBox(width: 8),
+                  Text("Add More Images", style: TextStyle(color: Colors.grey)),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return TextFormField(
+      controller: controller,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        hintText: hint,
+        filled: true,
+        fillColor: Colors.grey.shade100,
+        contentPadding:
+        const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
       ),
     );

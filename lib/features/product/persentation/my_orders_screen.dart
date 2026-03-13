@@ -1,83 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
-
-class MyOrdersController extends GetxController {
-  var orders = <OrderModel>[].obs;
-  var isLoading = true.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    fetchOrders();
-  }
-
-  void fetchOrders() {
-    isLoading.value = true;
-    
-    // TODO: API call to fetch orders
-    Future.delayed(const Duration(seconds: 1), () {
-      orders.value = [
-        OrderModel(
-          id: "ORD001",
-          productName: "Wireless Headphones",
-          productImage: "https://m.media-amazon.com/images/I/610ub5kytVL.jpg",
-          price: 2999,
-          quantity: 1,
-          orderDate: DateTime.now().subtract(const Duration(days: 2)),
-          status: OrderStatus.shipped,
-        ),
-        OrderModel(
-          id: "ORD002",
-          productName: "Smart Watch",
-          productImage: "https://m.media-amazon.com/images/I/61ZjlBOp+rL._AC_UL320_.jpg",
-          price: 4999,
-          quantity: 2,
-          orderDate: DateTime.now().subtract(const Duration(days: 5)),
-          status: OrderStatus.delivered,
-        ),
-        OrderModel(
-          id: "ORD003",
-          productName: "Phone Case",
-          productImage: "https://m.media-amazon.com/images/I/71GLMJ7TQiL._AC_UL320_.jpg",
-          price: 499,
-          quantity: 1,
-          orderDate: DateTime.now().subtract(const Duration(hours: 5)),
-          status: OrderStatus.processing,
-        ),
-      ];
-      isLoading.value = false;
-    });
-  }
-}
-
-enum OrderStatus {
-  pending,
-  processing,
-  shipped,
-  delivered,
-  cancelled,
-}
-
-class OrderModel {
-  final String id;
-  final String productName;
-  final String productImage;
-  final double price;
-  final int quantity;
-  final DateTime orderDate;
-  final OrderStatus status;
-
-  OrderModel({
-    required this.id,
-    required this.productName,
-    required this.productImage,
-    required this.price,
-    required this.quantity,
-    required this.orderDate,
-    required this.status,
-  });
-}
+import '../../../core/network/app_urls.dart';
+import 'controller/my_orders_controller.dart';
+import 'order_detail_screen.dart';
+import '../model/order_model.dart';
+import 'package:intl/intl.dart';
 
 class MyOrdersScreen extends StatefulWidget {
   const MyOrdersScreen({super.key});
@@ -103,7 +31,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         elevation: 0,
       ),
       body: Obx(() {
-        if (controller.isLoading.value) {
+        if (controller.isLoading.value && controller.orders.isEmpty) {
           return const Center(
             child: CircularProgressIndicator(color: AppColors.black),
           );
@@ -125,237 +53,122 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
           );
         }
 
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: controller.orders.length,
-          itemBuilder: (context, index) {
-            final order = controller.orders[index];
-            return _buildOrderCard(order, context);
-          },
+        return RefreshIndicator(
+          onRefresh: () async => controller.refreshOrders(),
+          color: AppColors.black,
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: controller.orders.length,
+            itemBuilder: (context, index) {
+              final order = controller.orders[index];
+              return _buildOrderCard(order, context);
+            },
+          ),
         );
       }),
     );
   }
 
   Widget _buildOrderCard(OrderModel order, BuildContext context) {
+    // For now, take details from the first item if available
+    final firstItem = order.items != null && order.items!.isNotEmpty ? order.items!.first : null;
+    
     return GestureDetector(
       onTap: () {
-        Get.to(() => OrderDetailScreen(order: order));
+        if (order.id != null) {
+          Get.to(() => OrderDetailScreen(orderId: order.id!));
+        }
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.lightBorder),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 20,
+            offset: const Offset(2, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    order.productImage,
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
+            // Order Header with Status
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            //  color: Colors.grey.shade50,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        order.productName,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "Order ID: ${order.id}",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "₹${order.price.toStringAsFixed(0)} × ${order.quantity}",
+                        "Order #${order.id}",
                         style: const TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        order.createdAt != null ? DateFormat('dd MMM yyyy, hh:mm a').format(order.createdAt!) : '',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade600,
                         ),
                       ),
                     ],
                   ),
-                ),
-                _buildStatusChip(order.status),
-              ],
+                  _buildStatusChip(order.status ?? 'pending'),
+                ],
+              ),
             ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  _formatDate(order.orderDate),
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                ),
-                Text(
-                  "Total: ₹${(order.price * order.quantity).toStringAsFixed(0)}",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
-  Widget _buildStatusChip(OrderStatus status) {
-    Color color;
-    String text;
 
-    switch (status) {
-      case OrderStatus.pending:
-        color = Colors.orange;
-        text = "Pending";
-        break;
-      case OrderStatus.processing:
-        color = Colors.blue;
-        text = "Processing";
-        break;
-      case OrderStatus.shipped:
-        color = Colors.purple;
-        text = "Shipped";
-        break;
-      case OrderStatus.delivered:
-        color = AppColors.success;
-        text = "Delivered";
-        break;
-      case OrderStatus.cancelled:
-        color = AppColors.error;
-        text = "Cancelled";
-        break;
-    }
+           // Divider(color: Colors.grey.shade100),
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: color,
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
 
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
+            // Order Items
+            if (order.items != null)
+              ...order.items!.map((item) => _buildOrderItemTile(item)),
 
-    if (difference.inDays == 0) {
-      return "Today";
-    } else if (difference.inDays == 1) {
-      return "Yesterday";
-    } else if (difference.inDays < 7) {
-      return "${difference.inDays} days ago";
-    } else {
-      return "${date.day}/${date.month}/${date.year}";
-    }
-  }
-}
-
-// Order Detail Screen with Timeline
-class OrderDetailScreen extends StatelessWidget {
-  final OrderModel order;
-
-  const OrderDetailScreen({super.key, required this.order});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          "Order Details",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.black,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Product Info
+            // Order Footer
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.lightBackground,
-                borderRadius: BorderRadius.circular(12),
+                border: Border(top: BorderSide(color: Colors.grey.shade300)),
               ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      order.productImage,
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
+                  Text(
+                    "${order.items?.length ?? 0} Item${(order.items?.length ?? 0) > 1 ? 's' : ''}",
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade700,
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  RichText(
+                    text: TextSpan(
                       children: [
-                        Text(
-                          order.productName,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          "Order ID: ${order.id}",
+                        TextSpan(
+                          text: "Total: ",
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey.shade600,
+                            color: Colors.grey.shade700,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          "₹${order.price.toStringAsFixed(0)} × ${order.quantity}",
+                        TextSpan(
+                          text: "₹${double.tryParse(order.totalAmount ?? '0')?.toStringAsFixed(0)}",
                           style: const TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
                           ),
                         ),
                       ],
@@ -364,106 +177,120 @@ class OrderDetailScreen extends StatelessWidget {
                 ],
               ),
             ),
-
-            const SizedBox(height: 30),
-
-            // Order Status Timeline
-            const Text(
-              "Order Status",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-
-            _buildTimeline(order.status),
           ],
         ),
       ),
+    ),
     );
   }
 
-  Widget _buildTimeline(OrderStatus currentStatus) {
-    final statuses = [
-      {"status": OrderStatus.pending, "title": "Order Placed", "subtitle": "Your order has been placed"},
-      {"status": OrderStatus.processing, "title": "Processing", "subtitle": "We are preparing your order"},
-      {"status": OrderStatus.shipped, "title": "Shipped", "subtitle": "Your order is on the way"},
-      {"status": OrderStatus.delivered, "title": "Delivered", "subtitle": "Order delivered successfully"},
-    ];
-
-    return Column(
-      children: List.generate(statuses.length, (index) {
-        final statusData = statuses[index];
-        final status = statusData["status"] as OrderStatus;
-        final isCompleted = status.index <= currentStatus.index;
-        final isLast = index == statuses.length - 1;
-
-        return _buildTimelineItem(
-          title: statusData["title"] as String,
-          subtitle: statusData["subtitle"] as String,
-          isCompleted: isCompleted,
-          isLast: isLast,
-        );
-      }),
-    );
-  }
-
-  Widget _buildTimelineItem({
-    required String title,
-    required String subtitle,
-    required bool isCompleted,
-    required bool isLast,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          children: [
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: isCompleted ? AppColors.success : Colors.grey.shade300,
-                shape: BoxShape.circle,
-              ),
-              child: isCompleted
-                  ? const Icon(Icons.check, color: Colors.white, size: 16)
-                  : null,
+  Widget _buildOrderItemTile(OrderItem item) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Item Image Placeholder or Actual
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(10),
             ),
-            if (!isLast)
-              Container(
-                width: 2,
-                height: 50,
-                color: isCompleted ? AppColors.success : Colors.grey.shade300,
-              ),
-          ],
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 30),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: item.image != null 
+                ? Image.network(
+                    AppUrls.getFullImageUrl(item.image), 
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image_outlined, color: Colors.grey),
+                  )
+                : const Icon(Icons.shopping_bag_outlined, color: Colors.grey, size: 30),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  item.title ?? "Product ID: ${item.itemId}",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Quantity: ${item.quantity}",
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isCompleted ? AppColors.black : Colors.grey.shade600,
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey.shade600,
+                  "₹${double.tryParse(item.price ?? '0')?.toStringAsFixed(0)}",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
               ],
             ),
           ),
+         // _buildStatusChip(item.status ?? 'pending'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusChip(String status) {
+    Color color;
+    String text = status.capitalizeFirst ?? status;
+
+    switch (status.toLowerCase()) {
+      case 'pending':
+        color = Colors.orange;
+        break;
+      case 'processing':
+        color = Colors.blue;
+        break;
+      case 'shipped':
+        color = Colors.purple;
+        break;
+      case 'delivered':
+        color = AppColors.success;
+        break;
+      case 'cancelled':
+        color = AppColors.error;
+        break;
+      default:
+        color = Colors.grey;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
         ),
-      ],
+      ),
     );
   }
 }
+
+// Remove the old OrderDetailScreen as we aren't using deep click yet

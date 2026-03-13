@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get.dart';
 import 'package:i_vatan_app/features/product/persentation/transcation_history_screen.dart';
+import 'package:i_vatan_app/features/product/persentation/controller/seller_dashboard_controller.dart';
 
 import 'bank_details_screen.dart';
 import 'controller/order_history_screen.dart';
@@ -12,12 +12,9 @@ class SellerDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Static data
-    final totalOrders = 120;
-    final pendingOrdersCount = 25;
-    final completedOrdersCount = 80;
-    final totalEarnings = 15250.0;
-
+    final controller = Get.put(SellerDashboardController());
+    
+    // Static data (can keep for now or remove if not used elsewhere)
     final recentOrders = [
       {
         'id': 'ORD001',
@@ -43,96 +40,98 @@ class SellerDashboard extends StatelessWidget {
         elevation: 0,
         title: const Text('Seller Dashboard', style: TextStyle(color: Colors.black)),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Welcome Card
-            InkWell(
-              onTap: () {},
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.black, Colors.black.withOpacity(0.6)],
+      body: RefreshIndicator(
+        onRefresh: () => controller.fetchDashboardStats(),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Welcome Card
+              InkWell(
+                onTap: () {},
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.black, Colors.black.withOpacity(0.6)],
+                    ),
+                    borderRadius: BorderRadius.circular(15),
                   ),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text('Welcome back,',
-                              style: TextStyle(color: Colors.white, fontSize: 14)),
-                          SizedBox(height: 4),
-                          Text('Ramesh Gupta 👋',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold)),
-                          SizedBox(height: 8),
-                          Text('Gold Seller',
-                              style: TextStyle(color: Colors.white70, fontSize: 12)),
-                        ],
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text('Welcome back,',
+                                style: TextStyle(color: Colors.white, fontSize: 14)),
+                            SizedBox(height: 4),
+                            Text('Ramesh Gupta 👋',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold)),
+                            SizedBox(height: 8),
+                            Text('Gold Seller',
+                                style: TextStyle(color: Colors.white70, fontSize: 12)),
+                          ],
+                        ),
                       ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: const BoxDecoration(
-                        color: Colors.white24,
-                        shape: BoxShape.circle,
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: const BoxDecoration(
+                          color: Colors.white24,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.storefront, color: Colors.white, size: 32),
                       ),
-                      child: const Icon(Icons.storefront, color: Colors.white, size: 32),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-
-            // Stats Grid
-            const Text(
-              'Overview',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          mainAxisSpacing: 15,
-          crossAxisSpacing: 15,
-          childAspectRatio: 1.5,
-          children: [
-            _buildStatCard(
-              'Total Products',
-              '156',
-              Icons.inventory,
-              Colors.blue,
-            ),
-            _buildStatCard(
-              'Total Orders',
-              '1,234',
-              Icons.shopping_cart,
-              Colors.green,
-            ),
-            _buildStatCard(
-              'Total Earnings',
-              '₹45,678',
-              Icons.currency_rupee,
-              Colors.orange,
-            ),
-            _buildStatCard(
-              'Pending Orders',
-              '23',
-              Icons.pending_actions,
-              Colors.red,
-            ),
-          ],
-        ),
+              const SizedBox(height: 20),
+  
+              // Stats Grid
+              const Text(
+                'Overview',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+          Obx(() => GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            mainAxisSpacing: 15,
+            crossAxisSpacing: 15,
+            childAspectRatio: 1.5,
+            children: [
+              _buildStatCard(
+                'Total Products',
+                controller.totalProducts.value.toString(),
+                Icons.inventory,
+                Colors.blue,
+              ),
+              _buildStatCard(
+                'Total Orders',
+                controller.totalOrders.value.toString(),
+                Icons.shopping_cart,
+                Colors.green,
+              ),
+              _buildStatCard(
+                'Total Earnings',
+                '₹${controller.totalRevenue.value.toStringAsFixed(0)}',
+                Icons.currency_rupee,
+                Colors.orange,
+              ),
+              _buildStatCard(
+                'Pending Orders',
+                controller.pendingOrders.value.toString(),
+                Icons.pending_actions,
+                Colors.red,
+              ),
+            ],
+          )),
             const SizedBox(height: 24),
 
             // Quick Actions
@@ -182,6 +181,7 @@ class SellerDashboard extends StatelessWidget {
           ],
         ),
       ),
+      )
     );
   }
 

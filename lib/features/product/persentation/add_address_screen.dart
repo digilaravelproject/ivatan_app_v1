@@ -1,9 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/custom_buttons.dart';
@@ -62,6 +58,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
 
               // Form Fields
               _buildTextField(
+                controller: controller.nameController,
                 label: 'Full Name',
                 hint: 'Enter your full name',
                 icon: Icons.person_outline,
@@ -69,6 +66,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
               const SizedBox(height: 20),
 
               _buildTextField(
+                controller: controller.phoneController,
                 label: 'Phone Number',
                 hint: 'Enter your phone number',
                 icon: Icons.phone_outlined,
@@ -77,6 +75,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
               const SizedBox(height: 20),
 
               _buildTextField(
+                controller: controller.addressLine1Controller,
                 label: 'Address Line 1',
                 hint: 'House/Flat No., Building Name',
                 icon: Icons.home_outlined,
@@ -84,6 +83,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
               const SizedBox(height: 20),
 
               _buildTextField(
+                controller: controller.addressLine2Controller,
                 label: 'Address Line 2',
                 hint: 'Street, Area (Optional)',
                 icon: Icons.location_on_outlined,
@@ -95,6 +95,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
                 children: [
                   Expanded(
                     child: _buildTextField(
+                      controller: controller.cityController,
                       label: 'City',
                       hint: 'Enter city',
                     ),
@@ -102,6 +103,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: _buildTextField(
+                      controller: controller.stateController,
                       label: 'State',
                       hint: 'Enter state',
                     ),
@@ -115,6 +117,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
                 children: [
                   Expanded(
                     child: _buildTextField(
+                      controller: controller.pinCodeController,
                       label: 'PIN Code',
                       hint: 'Enter PIN code',
                       keyboardType: TextInputType.number,
@@ -124,8 +127,13 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
                   Expanded(
                     child: _buildDropdownField(
                       label: 'Country',
-                      value: 'India',
+                      value: controller.selectedCountry.value,
                       items: ['India', 'USA', 'UK', 'Canada'],
+                      onChanged: (value) {
+                        if (value != null) {
+                          controller.setCountry(value);
+                        }
+                      },
                     ),
                   ),
                 ],
@@ -133,7 +141,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
               const SizedBox(height: 30),
 
               // Address Type Selection
-              const Text(
+             /* const Text(
                 'Address Type',
                 style: TextStyle(
                   fontSize: 16,
@@ -151,7 +159,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
                   _buildAddressTypeChip('Other', Icons.location_on),
                 ],
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 30),*/
 
               // Save as Default Checkbox
               // Row(
@@ -182,13 +190,16 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
               // const SizedBox(height: 30),
 
               // Save Address Button
-
-              CustomButton(
-                  backgroundColor: AppColors.primary,
-                  borderRadius: 16,
-                  title: "Save Address", onPressed: (){
-
-              }),
+              Obx(() => CustomButton(
+                backgroundColor: AppColors.primary,
+                borderRadius: 16,
+                title: controller.isLoading.value ? "Saving..." : "Save Address",
+                onPressed: controller.isLoading.value
+                    ? null
+                    : () {
+                        controller.saveAddress();
+                      },
+              )),
 
               const SizedBox(height: 16),
 
@@ -201,6 +212,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
 
 
   Widget _buildTextField({
+    TextEditingController? controller,
     required String label,
     required String hint,
     IconData? icon,
@@ -230,6 +242,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
             ],
           ),
           child: TextFormField(
+            controller: controller,
             keyboardType: keyboardType,
             decoration: InputDecoration(
               hintText: hint,
@@ -266,6 +279,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
     required String label,
     required String value,
     required List<String> items,
+    Function(String?)? onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -300,7 +314,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
                   ),
                 );
               }).toList(),
-              onChanged: (newValue) {},
+              onChanged: onChanged,
               style: const TextStyle(fontSize: 14, color: Colors.black87),
             ),
           ),

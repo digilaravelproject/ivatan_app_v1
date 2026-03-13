@@ -119,7 +119,7 @@ class UserData {
   final String? lastSeenAt;
   final String? deviceTokens;
   final int? reputationScore;
-  final String? emailNotificationPreferences;
+  final dynamic emailNotificationPreferences;
   final String? accountPrivacy;
   final String? profilePhotoPath;
   final String? bio;
@@ -135,7 +135,7 @@ class UserData {
   final String? updatedAt;
   final String? deletedAt;
   final bool? isEmployer;
-  final List<String>? interests;
+  final List<dynamic>? interests;
   bool? is_mine;
   bool? is_following;
   bool? is_follower;
@@ -221,9 +221,8 @@ class UserData {
       updatedAt: json["updated_at"],
       deletedAt: json["deleted_at"],
       isEmployer: json["is_employer"] == true || json["is_employer"] == 1 || json["is_employer"] == "1",
-
-      interests: json["interests"] != null
-          ? List<String>.from(json["interests"].map((e) => e["name"].toString()))
+      interests: json["interests"] is List 
+          ? json["interests"] 
           : [],
       is_mine: json["is_mine"],
       is_following: json["is_following"],

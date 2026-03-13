@@ -107,7 +107,7 @@ class ApiServices extends GetxService {
     return _safeCall(() async {
       if (isFormData) {
         final request = http.MultipartRequest("POST", uri);
-        request.headers.addAll(_defaultHeaders());
+        request.headers.addAll(_multipartHeaders());
 
         data.forEach((key, value) {
           if (value is File) return; // files handled separately below
@@ -240,7 +240,7 @@ class ApiServices extends GetxService {
       if (isFormData) {
         // Multipart PUT request
         final request = http.MultipartRequest("PUT", uri);
-        request.headers.addAll(_defaultHeaders());
+        request.headers.addAll(_multipartHeaders());
 
         data.forEach((key, value) {
           if (value is File) return; // files handled separately below
@@ -288,11 +288,94 @@ class ApiServices extends GetxService {
     });
   }
 
+  /// Common PATCH method
+  Future<Map<String, dynamic>?> callPatch(
+      String endpoint, {
+        required Map<String, dynamic> data,
+        bool isUserRequired = false,
+        bool isFormData = false,
+        bool showErrorToast = true,
+      }) async {
+    if (isUserRequired) {
+      final userId = {
+        ApiKeys.userId: (SharedPrefManager().user?.id ?? "").toString(),
+      };
+      data.addAll(userId);
+    }
+
+    final uri = Uri.parse("${AppUrls.apiBaseUrl}$endpoint");
+    logApiMessage("PATCH Request --> ${uri.toString()}");
+
+    return _safeCall(() async {
+      if (isFormData) {
+        // Multipart PATCH request
+        final request = http.MultipartRequest("PATCH", uri);
+        request.headers.addAll(_multipartHeaders());
+
+        data.forEach((key, value) {
+          if (value is File) return; // files handled separately below
+          if (value == null) return;  // skip null values
+          if (value is bool) {
+            request.fields[key] = value ? '1' : '0';
+          } else if (value is num) {
+            request.fields[key] = value.toString();
+          } else if (value is String) {
+            request.fields[key] = value;
+          }
+        });
+
+        for (final entry in data.entries) {
+          if (entry.value is File) {
+            final file = entry.value as File;
+            final multipartFile = await http.MultipartFile.fromPath(
+              entry.key,
+              file.path,
+              filename: file.path.split("/").last,
+            );
+            request.files.add(multipartFile);
+          }
+        }
+
+        _logRequest(
+          method: "PATCH",
+          uri: uri,
+          headers: _defaultHeaders(),
+          body: data,
+        );
+
+        final streamedResponse = await request.send().timeout(_timeout);
+        final response = await http.Response.fromStream(streamedResponse);
+        _logResponse(response);
+        return _parseResponse(response, showErrorToast: showErrorToast);
+      } else {
+        // Normal JSON PATCH
+        _logRequest(
+          method: "PATCH",
+          uri: uri,
+          headers: _defaultHeaders(),
+          body: data,
+        );
+        final response = await http
+            .patch(uri, headers: _defaultHeaders(), body: jsonEncode(data))
+            .timeout(_timeout);
+        _logResponse(response);
+        return _parseResponse(response, showErrorToast: showErrorToast);
+      }
+    });
+  }
+
 
   /// Default headers
   Map<String, String> _defaultHeaders() => {
     HttpHeaders.acceptHeader: "application/json",
     HttpHeaders.contentTypeHeader: "application/json",
+    "Authorization":
+        "Bearer ${SharedPrefManager().token ?? AppUrls.defaultApiKey}",
+  };
+
+  /// Headers for multipart requests (without content-type)
+  Map<String, String> _multipartHeaders() => {
+    HttpHeaders.acceptHeader: "application/json",
     "Authorization":
         "Bearer ${SharedPrefManager().token ?? AppUrls.defaultApiKey}",
   };
@@ -321,11 +404,11 @@ class ApiServices extends GetxService {
       logApiMessage(" Response --> $body  ${response.statusCode}");
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return body is Map<String, dynamic> ? body : {"data": body};
-      } else if (response.statusCode == 401 || response.statusCode == 404) {
+      } else if (response.statusCode == 400 || response.statusCode == 401 || response.statusCode == 403 || response.statusCode == 404) {
         if (showErrorToast) {
-          _handleError(body['message']);
+          _handleError(body['message'] ?? response.reasonPhrase);
         } else {
-          printMessage("HTTP ERROR: ${body['message']}");
+          printMessage("HTTP ERROR: ${body['message'] ?? response.reasonPhrase}");
         }
         return body;
       } else if (response.statusCode == 422) {
