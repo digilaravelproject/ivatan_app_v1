@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/features/product/persentation/transcation_history_screen.dart';
 import 'package:i_vatan_app/features/product/persentation/controller/seller_dashboard_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../db/shared_pref_manager.dart';
 import 'bank_details_screen.dart';
 import 'controller/order_history_screen.dart';
 
@@ -63,17 +65,17 @@ class SellerDashboard extends StatelessWidget {
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text('Welcome back,',
+                          children: [
+                            const Text('Welcome back,',
                                 style: TextStyle(color: Colors.white, fontSize: 14)),
-                            SizedBox(height: 4),
-                            Text('Ramesh Gupta 👋',
-                                style: TextStyle(
+                            const SizedBox(height: 4),
+                            Text('${SharedPrefManager().user?.username} 👋',
+                                style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold)),
-                            SizedBox(height: 8),
-                            Text('Gold Seller',
+                            const SizedBox(height: 8),
+                            Text('${SharedPrefManager().user?.occupation}',
                                 style: TextStyle(color: Colors.white70, fontSize: 12)),
                           ],
                         ),
@@ -159,7 +161,7 @@ class SellerDashboard extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Recent Orders
-            Row(
+           /* Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Recent Orders',
@@ -177,7 +179,7 @@ class SellerDashboard extends StatelessWidget {
                 final order = recentOrders[index];
                 return _recentOrderCard(order);
               },
-            ),
+            ),*/
           ],
         ),
       ),

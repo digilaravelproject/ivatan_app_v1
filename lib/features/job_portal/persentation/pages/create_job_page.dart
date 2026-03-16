@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../../../core/network/app_urls.dart';
@@ -286,18 +287,18 @@ class JobCreateScreen extends GetView<JobController> {
               Obx(() => Row(
                 children: [
                   _buildToggleCard(
-                    emoji: '🏠',
+                   // emoji: '🏠',
                     label: 'Remote Job',
                     isActive: controller.isRemote.value,
-                    activeColor: const Color(0xFF1A73E8),
+                    activeColor:  AppColors.primary,
                     onTap: () => controller.isRemote.value = !controller.isRemote.value,
                   ),
                   const SizedBox(width: 12),
                   _buildToggleCard(
-                    emoji: '🔥',
+                   // emoji: '🔥',
                     label: 'Urgent Hire',
                     isActive: controller.isUrgent.value,
-                    activeColor: const Color(0xFFE53935),
+                    activeColor:  AppColors.primary,
                     onTap: () => controller.isUrgent.value = !controller.isUrgent.value,
                   ),
                 ],
@@ -408,7 +409,6 @@ class JobCreateScreen extends GetView<JobController> {
   }
 
   Widget _buildToggleCard({
-    required String emoji,
     required String label,
     required bool isActive,
     required Color activeColor,
@@ -430,7 +430,7 @@ class JobCreateScreen extends GetView<JobController> {
           ),
           child: Row(
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 20)),
+             // Text(emoji, style: const TextStyle(fontSize: 20)),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(

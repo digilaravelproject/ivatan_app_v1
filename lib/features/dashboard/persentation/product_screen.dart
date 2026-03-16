@@ -298,99 +298,50 @@ class Product {
 }
 
 // Browse Products View - Fetches from Marketplace API
-class _BrowseProductsView extends StatefulWidget {
-  @override
-  State<_BrowseProductsView> createState() => _BrowseProductsViewState();
-}
-
-class _BrowseProductsViewState extends State<_BrowseProductsView> {
-  late Future<List<Product>> _productsFuture;
-  final ApiServices apiServices = Get.find<ApiServices>();
-
-  @override
-  void initState() {
-    super.initState();
-    _productsFuture = _fetchProducts();
-  }
-
-  Future<List<Product>> _fetchProducts() async {
-    try {
-      final response = await apiServices.callGet('api/v1/marketplace/products');
-
-      if (response != null && response['success'] == true) {
-        final data = response['data'];
-
-        // Handle paginated response
-        List<dynamic> productsList = [];
-        if (data is Map && data['data'] != null) {
-          productsList = data['data'] as List<dynamic>;
-        } else if (data is List) {
-          productsList = data;
-        }
-
-        return productsList.map((item) => Product.fromJson(item)).toList();
-      } else {
-        throw Exception(response?['message'] ?? "Failed to fetch products");
-      }
-    } catch (e) {
-      throw Exception(e.toString());
-    }
-  }
-
+class _BrowseProductsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Product>>(
-      future: _productsFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(color: AppColors.black),
-          );
-        }
+    final MarketplaceProductController marketplaceController = Get.put(MarketplaceProductController());
 
-        if (snapshot.hasError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 80,
-                  color: Colors.grey.shade400,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Failed to load products',
-                  style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                ),
-              ],
-            ),
-          );
-        }
+    return Obx(() {
+      if (marketplaceController.isLoading.value && marketplaceController.products.isEmpty) {
+        return const Center(
+          child: CircularProgressIndicator(color: AppColors.black),
+        );
+      }
 
-        final products = snapshot.data ?? [];
+      final productsData = marketplaceController.products;
 
-        if (products.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.shopping_bag_outlined,
-                  size: 80,
-                  color: Colors.grey.shade300,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'No products available',
-                  style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                ),
-              ],
-            ),
-          );
-        }
+      if (productsData.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.shopping_bag_outlined,
+                size: 80,
+                color: Colors.grey.shade300,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No products available',
+                style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => marketplaceController.fetchMarketplaceProducts(isRefresh: true),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        );
+      }
 
-        return Padding(
+      final products = productsData.map((item) => Product.fromJson(item)).toList();
+
+      return RefreshIndicator(
+        onRefresh: () => marketplaceController.fetchMarketplaceProducts(isRefresh: true),
+        child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -404,9 +355,9 @@ class _BrowseProductsViewState extends State<_BrowseProductsView> {
               return ProductCard(product: products[index]);
             },
           ),
-        );
-      },
-    );
+        ),
+      );
+    });
   }
 }
 

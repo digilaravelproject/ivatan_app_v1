@@ -44,7 +44,7 @@ class ProfileDrawer extends StatelessWidget {
                                 shape: BoxShape.circle,
                                 border: Border.all(color: Colors.black, width: 2),
                                 image: DecorationImage(
-                                  image: NetworkImage(AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString()),
+                                  image: NetworkImage(SharedPrefManager().user!.profilePhotoPath.toString()),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -227,13 +227,13 @@ class ProfileDrawer extends StatelessWidget {
                       Get.to(HelpPrivacyPage());
                     },
                   ),
-                  _buildDrawerItem(
-                    icon: Icons.settings_outlined,
-                    title: 'Settings',
-                    onTap: () {
-                      Get.to(AccountDeleteReasonScreen());
-                    },
-                  ),
+                  // _buildDrawerItem(
+                  //   icon: Icons.settings_outlined,
+                  //   title: 'Settings',
+                  //   onTap: () {
+                  //     Get.to(AccountDeleteReasonScreen());
+                  //   },
+                  // ),
                 ],
               ),
             ),

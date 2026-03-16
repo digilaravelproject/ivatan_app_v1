@@ -32,6 +32,7 @@ import '../../product/persentation/create_product_screen.dart';
 import '../../product/persentation/my_orders_screen.dart';
 import '../../product/persentation/my_products_screen.dart';
 import '../../product/persentation/seller_dashboard_screen.dart';
+import '../../service/controller/service_controller.dart';
 import '../../service/persentation/my_services_screen.dart';
 import '../../service/persentation/create_service_screen.dart';
 import '../../dashboard/persentation/service_screen.dart';
@@ -42,6 +43,7 @@ import '../../product/persentation/cart_screen.dart';
 import '../../service/persentation/create_service_screen.dart';
 import '../../service/persentation/service_enquire_form.dart';
 import '../../story/persentation/storyfullview.dart';
+import '../../product/persentation/controller/product_Controller.dart';
 import '../controller/profile_controller.dart';
 import 'follow_tabs.dart' hide CustomEmptyState;
 import 'my_post.dart';
@@ -163,10 +165,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: Stack(
                                     fit: StackFit.expand,
                                     children: [
-
                                       Image.network(
                                         user.profilePhotoPath != null && user.profilePhotoPath!.isNotEmpty
-                                            ? "${AppUrls.imageurl}${user.profilePhotoPath}"
+                                            ? "${user.profilePhotoPath}"
                                             : "",
                                         fit: BoxFit.cover,
                                         errorBuilder: (_, __, ___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
@@ -245,7 +246,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           top: 40,
                                           right: 10,
                                           child: PopupMenuButton<String>(
-                                            onSelected: (value) {
+                                            onSelected: (value) async {
                                               if (value == 'profile') {
                                                 Get.to(() => SettingsScreen());
                                               } else if (value == 'enquiry') {
@@ -253,13 +254,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               } else if (value == 'orders') {
                                                 Get.to(() => MyOrdersScreen());
                                               } else if (value == 'products') {
-                                                Get.to(() => MyProductsScreen());
+                                                await Get.to(() => MyProductsScreen());
+                                                if (Get.isRegistered<MarketplaceProductController>()) {
+                                                  Get.find<MarketplaceProductController>().fetchMarketplaceProducts(isRefresh: true);
+                                                }
                                               } else if (value == 'services') {
-                                                Get.to(() => MyServicesScreen());
+                                                await Get.to(() => MyServicesScreen());
+                                                if (Get.isRegistered<ServiceController>()) {
+                                                  Get.find<ServiceController>().fetchMarketplaceServices(isRefresh: true);
+                                                }
                                               } else if (value == 'dashboard') {
                                                 Get.to(() => SellerDashboard());
                                               }
-
                                             },
                                             itemBuilder: (context) => [
                                               const PopupMenuItem(
@@ -545,9 +551,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             color: Colors.orange,
                                                             title: "Product",
                                                             subtitle: "Add your product",
-                                                            onTap: () {
+                                                            onTap: () async {
                                                               Get.back();
-                                                              Get.to(() => CreateProductScreen());
+                                                              await Get.to(() => CreateProductScreen());
+                                                              if (Get.isRegistered<MarketplaceProductController>()) {
+                                                                Get.find<MarketplaceProductController>().fetchMarketplaceProducts(isRefresh: true);
+                                                              }
                                                             },
                                                           ),
                                                         if (user.isSeller == true)
@@ -558,11 +567,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             color: Colors.orange,
                                                             title: "Service",
                                                             subtitle: "Add your service",
-                                                            onTap: () {
+                                                            onTap: () async {
                                                               Get.back();
-                                                              Get.to(CreateServiceScreen());
-                                                              // Use same logic as home screen add story
-                                                             // storyController.showPickerOptions();
+                                                              await Get.to(CreateServiceScreen());
+                                                              if (Get.isRegistered<ServiceController>()) {
+                                                                Get.find<ServiceController>().fetchMarketplaceServices(isRefresh: true);
+                                                              }
                                                             },
                                                           ),
                                                       ],
@@ -659,7 +669,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 );
                                                 final story = controller.highlights[index - 1];
                                                 return GestureDetector(
-                                                    onTap: () => Get.to(() => HighlightScreenStoryViewer(stories: story.stories, highlightId: story.id, initialIndex: 0)),
+                                                    onTap: () {
+                                                      if (story.stories.isNotEmpty) {
+                                                        Get.to(() => HighlightScreenStoryViewer(stories: story.stories, highlightId: story.id, initialIndex: 0));
+                                                      } else {
+                                                        CustomSnackBar.showError(message: "This highlight has no stories.");
+                                                      }
+                                                    },
                                                     child: _buildStoryItem(story.title, story.cover_media_url)
                                                 );
                                               },
@@ -689,7 +705,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   backgroundImage: NetworkImage(
                                       AppUrls.getFullImageUrl(user.profilePhotoPath)
                                   ),
-                                  onBackgroundImageError: (_,__) {},
+                                  onBackgroundImageError: (error, stackTrace) {
+                                    print("Image Load Error: $error");
+                                  },
                                   child: (user.profilePhotoPath == null || user.profilePhotoPath!.isEmpty)
                                       ? Icon(Icons.person, color: Colors.grey.shade400, size: 60)
                                       : null,

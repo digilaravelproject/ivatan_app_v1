@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../core/network/api_services.dart';
 import '../../repository/cart_repository.dart';
 import '../../../../core/theme/app_colors.dart';
 
@@ -140,5 +141,40 @@ class ProductController extends GetxController {
   // Check if product is in cart
   bool isInCart(String productId) {
     return cartItems.containsKey(productId);
+  }
+}
+
+class MarketplaceProductController extends GetxController {
+  final ApiServices apiServices = Get.find<ApiServices>();
+  RxList<dynamic> products = <dynamic>[].obs;
+  RxBool isLoading = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchMarketplaceProducts();
+  }
+
+  Future<void> fetchMarketplaceProducts({bool isRefresh = false}) async {
+    if (isLoading.value && !isRefresh) return;
+    try {
+      isLoading.value = true;
+      final response = await apiServices.callGet('api/v1/marketplace/products');
+
+      if (response != null && response['success'] == true) {
+        final data = response['data'];
+        List<dynamic> productsList = [];
+        if (data is Map && data['data'] != null) {
+          productsList = data['data'] as List<dynamic>;
+        } else if (data is List) {
+          productsList = data;
+        }
+        products.value = productsList;
+      }
+    } catch (e) {
+      debugPrint("Error fetching marketplace products: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

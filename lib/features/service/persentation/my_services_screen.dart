@@ -224,10 +224,10 @@ class MyServicesScreen extends StatelessWidget {
                       ],
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  //const SizedBox(height: 16),
 
                   // Action Buttons
-                  Row(
+                /*  Row(
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
@@ -260,7 +260,7 @@ class MyServicesScreen extends StatelessWidget {
                         icon: const Icon(Icons.delete_outline, color: Colors.red),
                       ),
                     ],
-                  ),
+                  ),*/
                 ],
               ),
             ),

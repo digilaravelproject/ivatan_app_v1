@@ -98,7 +98,7 @@ class JobApplicationController extends GetxController {
 
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
+        allowedExtensions: ['pdf', 'doc', 'docx'],
         allowMultiple: false,
       );
 

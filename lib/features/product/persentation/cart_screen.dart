@@ -435,7 +435,7 @@ class CartScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: Text('Browse Marketplace'),
+            child: Text('Browse Products'),
           ),
         ],
       ),

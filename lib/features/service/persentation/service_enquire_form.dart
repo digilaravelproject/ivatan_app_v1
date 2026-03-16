@@ -198,7 +198,11 @@ class _EnquiryFormState extends State<EnquiryForm> {
                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.primary)),
                   contentPadding: const EdgeInsets.all(15),
                 ),
-                validator: (value) => value == null || value.isEmpty ? 'Please enter your message' : null,
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Please enter your message';
+                  if (value.length < 10) return 'The message field must be at least 10 characters.';
+                  return null;
+                },
               ),
               const SizedBox(height: 20),
 

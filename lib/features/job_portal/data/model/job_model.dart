@@ -283,14 +283,11 @@ class CreateJobRequestModel {
       'requirements': requirements,
       'location': location,
       'country': country,
-      'company_logo': companyLogo,
     };
 
-    // if (responsibilities != null) data['responsibilities'] = responsibilities;
-    // if (requirements != null) data['requirements'] = requirements;
-    // if (location != null) data['location'] = location;
-    // if (country != null) data['country'] = country;
-    // if (companyLogo != null) data['company_logo'] = companyLogo;
+    if (companyLogo != null) {
+      data['company_logo'] = companyLogo;
+    }
 
     return data;
   }

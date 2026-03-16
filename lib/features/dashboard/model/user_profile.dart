@@ -207,7 +207,7 @@ class UserData {
       reputationScore: json["reputation_score"],
       emailNotificationPreferences: json["email_notification_preferences"],
       accountPrivacy: json["account_privacy"],
-      profilePhotoPath: json["profile_photo_path"],
+      profilePhotoPath: json["profile_photo_url"],
       bio: json["bio"],
       status: json["status"],
       isBlocked: json["is_blocked"],

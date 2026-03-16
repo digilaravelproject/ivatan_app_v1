@@ -297,7 +297,7 @@ class JobHistoryScreen extends StatelessWidget {
       UserApplication application, JobHistoryController controller) {
     return GestureDetector(
       onTap: () {
-        Get.toNamed(AppRoutes.jobDescriptionScreen);
+        Get.toNamed(AppRoutes.jobDescriptionScreen,arguments: application.job.slug);
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),

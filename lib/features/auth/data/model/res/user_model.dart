@@ -112,7 +112,7 @@ class UserModel {
       reputationScore: data["reputation_score"] ?? 0,
       emailNotificationPreferences: data["email_notification_preferences"],
       accountPrivacy: data["account_privacy"] ?? "",
-      profilePhotoPath: data["profile_photo_path"],
+      profilePhotoPath: data["profile_photo_url"],
       bio: data["bio"],
       status: data["status"] ?? "",
       isBlocked: data["is_blocked"] ?? false,

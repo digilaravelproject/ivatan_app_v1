@@ -103,16 +103,17 @@ class JobRemoteDataSourceImpl implements JobRemoteDataSource {
   @override
   Future<String?> updateJob(int id, CreateJobRequestModel request, {File? logoFile}) async {
     final data = request.toJson();
+    data['_method'] = 'PUT'; // Laravel method spoofing for handling multipart form data correctly
     
     // Add logo file if provided
     if (logoFile != null) {
       data['company_logo'] = logoFile;
     }
 
-    final response = await apiServices.callPut(
+    final response = await apiServices.callPost(
       "${AppUrls.allJobs}/$id",
       data: data,
-      isFormData: logoFile != null,
+      isFormData: true, // Always use form data so method spoofing and files work robustly
     );
 
     if (response != null) {
@@ -182,13 +183,26 @@ class JobRemoteDataSourceImpl implements JobRemoteDataSource {
       "api/v1/jobs/$jobId/apply",
       data: data,
       isFormData: true,
+      showErrorToast: false,
     );
 
     if (response != null) {
-      if (response['status'] == true) {
+      if (response['status'] == true || response['success'] == true) {
         return response['message']?.toString() ?? 'Application submitted successfully';
       } else {
-        throw response['message']?.toString() ?? 'Failed to apply for job.';
+        String errorMessage = response['message']?.toString() ?? 'Failed to apply for job.';
+        if (response['errors'] != null && response['errors'] is Map) {
+          final errors = response['errors'] as Map;
+          if (errors.isNotEmpty) {
+            final firstError = errors.values.first;
+            if (firstError is List && firstError.isNotEmpty) {
+              errorMessage = firstError.first.toString();
+            } else {
+              errorMessage = firstError.toString();
+            }
+          }
+        }
+        throw errorMessage;
       }
     }
     return null;

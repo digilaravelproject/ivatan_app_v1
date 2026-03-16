@@ -151,8 +151,24 @@ class ServiceRepositoryImpl implements ServiceRepository {
     final response = await apiServices.callPost(
       endpoint,
       data: body,
-      showErrorToast: true,
+      showErrorToast: false, // Turn off generic toast to handle 422 errors manually
     );
+
+    if (response != null && response['success'] != true) {
+      String errorMessage = response['message']?.toString() ?? 'Failed to submit enquiry.';
+      if (response['errors'] != null && response['errors'] is Map) {
+        final errors = response['errors'] as Map;
+        if (errors.isNotEmpty) {
+          final firstError = errors.values.first;
+          if (firstError is List && firstError.isNotEmpty) {
+            errorMessage = firstError.first.toString();
+          } else {
+            errorMessage = firstError.toString();
+          }
+        }
+      }
+      throw errorMessage;
+    }
 
     return response;
   }

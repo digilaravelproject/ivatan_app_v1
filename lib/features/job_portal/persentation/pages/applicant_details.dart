@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../core/network/app_urls.dart';
 import '../../data/model/job_model.dart';
 import '../controller/applicant_controller.dart';
 
@@ -76,7 +77,7 @@ class ApplicantDetail extends GetView<ApplicantController> {
                     radius: 45,
                     backgroundColor: Colors.grey.shade100,
                     backgroundImage: applicant.profilePhotoPath != null 
-                      ? NetworkImage(applicant.profilePhotoPath!) 
+                      ? NetworkImage(AppUrls.imageurl+applicant.profilePhotoPath!)
                       : null,
                     child: applicant.profilePhotoPath == null
                       ? Text(

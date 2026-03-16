@@ -36,7 +36,7 @@ class JobSearchScreen extends GetView<JobController> {
             _buildAppBar(),
 
             // Search Bar
-            _buildSearchBar(),
+           // _buildSearchBar(),
 
             // Tab Bar for Urgent/Recent
             _buildTabBar(),
@@ -77,7 +77,7 @@ class JobSearchScreen extends GetView<JobController> {
           // Profile Section - Clickable
           GestureDetector(
             onTap: () {
-              print("profilePhotoPath : "+AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString());
+              print("profilePhotoPath : "+SharedPrefManager().user!.profilePhotoPath.toString());
               _scaffoldKey.currentState?.openDrawer();
             },
             child: Container(
@@ -87,7 +87,7 @@ class JobSearchScreen extends GetView<JobController> {
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.black, width: 2),
                 image: DecorationImage(
-                  image: NetworkImage(AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString()),
+                  image: NetworkImage(SharedPrefManager().user!.profilePhotoPath.toString()),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -116,7 +116,7 @@ class JobSearchScreen extends GetView<JobController> {
           ),
           const Spacer(),
           // Bell Icon with Notification
-          Stack(
+        /*  Stack(
             children: [
               Container(
                 width: 50,
@@ -148,7 +148,7 @@ class JobSearchScreen extends GetView<JobController> {
                 ),
               ),
             ],
-          ),
+          ),*/
         ],
       ),
     );

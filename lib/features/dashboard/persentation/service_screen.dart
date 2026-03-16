@@ -234,7 +234,7 @@ class DigitalProductListItem extends StatelessWidget {
                           ],
                         ),
 
-                        InkWell(
+                        /*InkWell(
                           onTap: (){
                             _showEnquiryBottomSheet(context);
                           },
@@ -259,7 +259,7 @@ class DigitalProductListItem extends StatelessWidget {
                               ),
                             ),
                           ),
-                        ),
+                        ),*/
                       ],
                     ),
                   ],

@@ -76,7 +76,7 @@ class SettingsScreen extends StatelessWidget {
                                 } else if (userProfile?.profilePhotoPath != null && userProfile!.profilePhotoPath!.isNotEmpty) {
                                   avatarChild = CustomImageView(
                                     key: ValueKey(userProfile!.profilePhotoPath),
-                                    url: "${AppUrls.imageurl}${userProfile!.profilePhotoPath}",
+                                    url: "${userProfile!.profilePhotoPath}",
                                     fit: BoxFit.cover,
                                   );
                                 } else {

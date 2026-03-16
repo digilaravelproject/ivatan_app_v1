@@ -323,7 +323,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   ),
                   child: ClipOval(
                     child: order.buyer?.profilePhotoPath != null
-                      ? Image.network(AppUrls.getFullImageUrl(order.buyer!.profilePhotoPath!), fit: BoxFit.cover)
+                      ? Image.network((AppUrls.imageurl+order.buyer!.profilePhotoPath!), fit: BoxFit.cover)
                       : const Icon(Icons.person, color: Colors.grey),
                   ),
                 ),
