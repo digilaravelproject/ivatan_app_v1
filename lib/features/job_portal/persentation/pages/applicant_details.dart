@@ -239,12 +239,13 @@ class ApplicantDetail extends GetView<ApplicantController> {
               ],
             ),
 
+
             /// 🔹 Status Badge (Reactive)
             Obx(() {
               final currentApp = controller.getApplicantById(applicationId);
               if (currentApp == null) return const SizedBox.shrink();
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 4),
                 decoration: BoxDecoration(
                   color: _getStatusColor(currentApp.status),
                   borderRadius: BorderRadius.circular(20),
@@ -264,7 +265,8 @@ class ApplicantDetail extends GetView<ApplicantController> {
 
             /// 🔹 Status Action Buttons
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.only(right: 16,left: 16, top: 8,bottom: 30),
+             // EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -291,8 +293,8 @@ class ApplicantDetail extends GetView<ApplicantController> {
                       ),
                       _statusActionButton(
                         context, 
-                        'accepted', 
-                        Colors.green.shade700,
+                        'applied',
+                        Colors.greenAccent.shade700,
                         Icons.check_circle_outline,
                       ),
                       _statusActionButton(
@@ -305,6 +307,12 @@ class ApplicantDetail extends GetView<ApplicantController> {
                         context, 
                         'viewed', 
                         Colors.orange.shade700,
+                        Icons.remove_red_eye_outlined,
+                      ),
+                      _statusActionButton(
+                        context,
+                        'hired',
+                        Colors.green.shade700,
                         Icons.remove_red_eye_outlined,
                       ),
                     ],

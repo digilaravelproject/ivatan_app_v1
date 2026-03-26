@@ -30,9 +30,10 @@ abstract class ServiceRepository {
     required String subject,
     required String message,
   });
+  Future<Map<String, dynamic>?> getMyEnquiries({int page = 1});
   Future<Map<String, dynamic>?> getSellerEnquiries({int page = 1});
   Future<Map<String, dynamic>?> getSellerEnquiriesStats();
-  Future<Map<String, dynamic>?> updateEnquiryStatus(int id, String status);
+  Future<Map<String, dynamic>?> updateEnquiryStatus(int id, String status, {String? replyMessage});
   Future<Map<String, dynamic>?> deleteEnquiry(int id);
 }
 
@@ -174,6 +175,15 @@ class ServiceRepositoryImpl implements ServiceRepository {
   }
 
   @override
+  Future<Map<String, dynamic>?> getMyEnquiries({int page = 1}) async {
+    final response = await apiServices.callGet(
+      AppUrls.myEnquiries,
+      queryParams: {'page': page.toString()},
+    );
+    return response;
+  }
+
+  @override
   Future<Map<String, dynamic>?> getSellerEnquiries({int page = 1}) async {
     final response = await apiServices.callGet(
       AppUrls.sellerEnquiries,
@@ -191,11 +201,12 @@ class ServiceRepositoryImpl implements ServiceRepository {
   }
 
   @override
-  Future<Map<String, dynamic>?> updateEnquiryStatus(int id, String status) async {
+  Future<Map<String, dynamic>?> updateEnquiryStatus(int id, String status, {String? replyMessage}) async {
     final response = await apiServices.callPost(
       AppUrls.sellerEnquiryStatusUpdate(id),
       data: {
         "status": status,
+        if (replyMessage != null && replyMessage.isNotEmpty) "reply_message": replyMessage,
       },
       isFormData: true,
     );

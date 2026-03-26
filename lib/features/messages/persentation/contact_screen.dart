@@ -260,6 +260,8 @@ class ContactPerson extends StatelessWidget {
         // Action for Message button
         // onTapAction = () {
         onTapAction= () async {
+        //  final chatId = await chatController.createSinglePrivateChat(user.id!);
+
           if (contact.chat_id != null) {
 
             Get.toNamed(

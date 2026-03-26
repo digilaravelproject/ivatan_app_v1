@@ -650,22 +650,14 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
   }
 
   void _showEnquiryDetails(BuildContext context, Map<String, dynamic> enquiry) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => _EnquiryDetailsSheet(enquiry: enquiry),
-    );
+    Get.to(() => EnquiryDetailScreen(enquiry: enquiry));
   }
 }
 
-
-// Detail bottom sheet showing full enquiry info from API
-class _EnquiryDetailsSheet extends StatelessWidget {
+// Full-screen screen showing full enquiry info
+class EnquiryDetailScreen extends StatelessWidget {
   final Map<String, dynamic> enquiry;
-  const _EnquiryDetailsSheet({required this.enquiry});
+  const EnquiryDetailScreen({super.key, required this.enquiry});
 
   String _formatDate(String? dateStr) {
     if (dateStr == null) return '';
@@ -679,19 +671,40 @@ class _EnquiryDetailsSheet extends StatelessWidget {
 
   Widget _infoRow(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: AppColors.primary),
-          const SizedBox(width: 12),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, size: 22, color: AppColors.primary),
+          ),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold)),
-                const SizedBox(height: 2),
-                Text(value, style: const TextStyle(fontSize: 14,)),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
               ],
             ),
           ),
@@ -712,164 +725,206 @@ class _EnquiryDetailsSheet extends StatelessWidget {
     final String serviceTitle = service?['title'] ?? '';
     final String status = enquiry['status'] ?? 'pending';
     final String createdAt = _formatDate(enquiry['created_at']);
-    final ServiceController controller = Get.isRegistered<ServiceController>()
-        ? Get.find<ServiceController>()
-        : Get.put(ServiceController());
+    final ServiceController controller = Get.find<ServiceController>();
 
     Color statusColor;
     switch (status) {
       case 'pending':
         statusColor = Colors.orange;
         break;
-      case 'contacted':
+      case 'replied':
         statusColor = Colors.blue;
         break;
-      case 'completed':
+      case 'closed':
         statusColor = Colors.green;
         break;
       default:
         statusColor = Colors.grey;
     }
 
-    return DraggableScrollableSheet(
-      expand: false,
-      initialChildSize: 0.65,
-      minChildSize: 0.4,
-      maxChildSize: 0.9,
-      builder: (_, scrollController) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: SingleChildScrollView(
-          controller: scrollController,
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Drag handle
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)),
-                ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('Enquiry Details'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0.5,
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Status Header
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: statusColor.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: statusColor.withOpacity(0.2)),
               ),
-              const SizedBox(height: 16),
-
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Row(
                 children: [
-                  Text(
-                    'Enquiry #${enquiry['id']}',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: statusColor.withOpacity(0.4)),
+                      color: statusColor.withOpacity(0.15),
+                      shape: BoxShape.circle,
                     ),
-                    child: Text(
-                      status.toUpperCase(),
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: statusColor),
-                    ),
+                    child: Icon(Icons.info_outline, color: statusColor, size: 24),
                   ),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // Customer Info Section
-              const Text('Customer Details', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-              const Divider(height: 16),
-              _infoRow(Icons.person_outline, 'Name', name),
-              _infoRow(Icons.email_outlined, 'Email', email),
-              _infoRow(Icons.phone_outlined, 'Phone', phone),
-
-              const SizedBox(height: 8),
-
-              // Enquiry Info Section
-              const Text('Enquiry Details', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-              const Divider(height: 16),
-              if (serviceTitle.isNotEmpty) _infoRow(Icons.design_services_outlined, 'Service', serviceTitle),
-              //_infoRow(Icons.subject, 'Subject', subject),
-              _infoRow(Icons.message_outlined, 'Message', message),
-              _infoRow(Icons.access_time, 'Submitted', createdAt),
-
-              const SizedBox(height: 24),
-
-              // Action Buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: phone.isEmpty 
-                        ? null 
-                        : () async => await launchUrl(Uri.parse('tel:$phone')),
-                      icon: const Icon(Icons.call),
-                      label: const Text('Call'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  const SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Current Status',
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: email.isEmpty 
-                        ? null 
-                        : () async => await launchUrl(Uri.parse('mailto:$email?subject=Regarding your enquiry: $subject')),
-                      icon: const Icon(Icons.email),
-                      label: const Text('Email'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      Text(
+                        status.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: statusColor,
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+            ),
+            const SizedBox(height: 32),
 
-              // Update Status Section
-              const Text('Update Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-              const Divider(height: 16),
-              Row(
-                children: [
-                   _statusButton(context, 'pending', Colors.orange, controller, enquiry['id']),
-                   const SizedBox(width: 8),
-                   _statusButton(context, 'replied', Colors.blue, controller, enquiry['id']),
-                   const SizedBox(width: 8),
-                   _statusButton(context, 'closed', Colors.green, controller, enquiry['id']),
-                ],
-              ),
-              const SizedBox(height: 24),
+            // Customer Section
+            Row(
+              children: [
+                const Icon(Icons.person, size: 20, color: AppColors.primary),
+                const SizedBox(width: 8),
+                const Text(
+                  'Customer Details',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _infoRow(Icons.person_outline, 'Full Name', name),
+            _infoRow(Icons.email_outlined, 'Email Address', email),
+            _infoRow(Icons.phone_outlined, 'Phone Number', phone),
 
-              // Delete Button
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: controller.isLoading.value 
-                    ? null 
-                    : () => _showDeleteConfirmation(context, controller, enquiry['id']),
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  label: const Text('Delete Enquiry', style: TextStyle(color: Colors.red)),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.red),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            const SizedBox(height: 16),
+
+            // Enquiry Section
+            Row(
+              children: [
+                const Icon(Icons.description, size: 20, color: AppColors.primary),
+                const SizedBox(width: 8),
+                const Text(
+                  'Enquiry Information',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (serviceTitle.isNotEmpty) _infoRow(Icons.design_services_outlined, 'Interested Service', serviceTitle),
+            _infoRow(Icons.message_outlined, 'Message/Query', message),
+            _infoRow(Icons.calendar_today_outlined, 'Submission Date', createdAt),
+
+            const SizedBox(height: 40),
+
+            // Action Buttons
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: phone.isEmpty 
+                      ? null 
+                      : () async => await launchUrl(Uri.parse('tel:$phone')),
+                    icon: const Icon(Icons.call),
+                    label: const Text('Call'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.green,
+                      side: const BorderSide(color: Colors.green),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
                   ),
                 ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: email.isEmpty 
+                      ? null 
+                      : () async => await launchUrl(Uri.parse('mailto:$email?subject=Regarding your enquiry: $subject')),
+                    icon: const Icon(Icons.email),
+                    label: const Text('Email'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      side: const BorderSide(color: AppColors.primary),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            
+            // Delete Button (Secondary action)
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () => _showDeleteConfirmation(
+                  context,
+                  controller,
+                  enquiry['id'],
+                ),
+                icon: const Icon(Icons.delete_outline, size: 20),
+                label: const Text('Delete Enquiry'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 2,
+                ),
               ),
-              const SizedBox(height: 20),
-            ],
+            ),
+            
+            const SizedBox(height: 100), // Space for bottom button
+          ],
+        ),
+      ),
+      bottomSheet: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.15),
+              spreadRadius: 1,
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: ElevatedButton(
+            onPressed: () => _showUpdateBottomSheet(context, enquiry),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 0,
+            ),
+            child: const Text(
+              'Update Status & Reply',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
           ),
         ),
       ),
@@ -888,8 +943,9 @@ class _EnquiryDetailsSheet extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              Get.back(); // Close the dialog
+              Get.back(); // Close dialog
               controller.deleteEnquiry(id is int ? id : int.parse(id.toString()));
+              Get.back(); // Close detail screen
             },
             child: const Text('Delete', style: TextStyle(color: Colors.red)),
           ),
@@ -898,25 +954,181 @@ class _EnquiryDetailsSheet extends StatelessWidget {
     );
   }
 
-  Widget _statusButton(BuildContext context, String status, Color color, ServiceController controller, dynamic id) {
-    return Expanded(
-      child: Obx(() => ElevatedButton(
-        onPressed: controller.isLoading.value 
-          ? null 
-          : () => controller.updateEnquiryStatus(id is int ? id : int.parse(id.toString()), status),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color.withOpacity(0.1),
-          foregroundColor: color,
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          side: BorderSide(color: color.withOpacity(0.5)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+  void _showUpdateBottomSheet(BuildContext context, Map<String, dynamic> enquiry) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => UpdateEnquirySheet(enquiry: enquiry),
+    );
+  }
+}
+
+// Separate Bottom Sheet for Update form
+class UpdateEnquirySheet extends StatefulWidget {
+  final Map<String, dynamic> enquiry;
+  const UpdateEnquirySheet({super.key, required this.enquiry});
+
+  @override
+  State<UpdateEnquirySheet> createState() => _UpdateEnquirySheetState();
+}
+
+class _UpdateEnquirySheetState extends State<UpdateEnquirySheet> {
+  late String selectedStatus;
+  final TextEditingController _replyController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    selectedStatus = widget.enquiry['status'] ?? 'pending';
+  }
+
+  @override
+  void dispose() {
+    _replyController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ServiceController controller = Get.find<ServiceController>();
+
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+        left: 20,
+        right: 20,
+        top: 10,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)),
+            ),
+          ),
+          const Text(
+            'Update Enquiry',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          const SizedBox(height: 20),
+          
+          const Text('Select Status', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildStatusRadio('pending', Colors.orange),
+              _buildStatusRadio('replied', Colors.blue),
+              _buildStatusRadio('closed', Colors.green),
+            ],
+          ),
+          
+          const SizedBox(height: 24),
+          
+          const Text('Reply Message', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _replyController,
+            maxLines: 4,
+            decoration: InputDecoration(
+              hintText: 'Enter your reply message here...',
+              filled: true,
+              fillColor: Colors.grey.shade50,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: AppColors.primary),
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 24),
+          
+          Obx(() => SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: controller.isLoading.value 
+                ? null 
+                : () async {
+                    await controller.updateEnquiryStatus(
+                      widget.enquiry['id'], 
+                      selectedStatus, 
+                      replyMessage: _replyController.text
+                    );
+                    Get.back(); // Close original sheet if needed or it's handled by controller.back()
+                  },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: controller.isLoading.value
+                ? const CircularProgressIndicator(color: Colors.white)
+                : const Text(
+                    'Update Now',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+            ),
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusRadio(String value, Color color) {
+    bool isSelected = selectedStatus == value;
+    return InkWell(
+      onTap: () => setState(() => selectedStatus = value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withOpacity(0.1) : Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: isSelected ? color : Colors.grey.shade300),
         ),
-        child: Text(
-          status.toUpperCase(),
-          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 16,
+              height: 16,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: isSelected ? color : Colors.grey.shade400),
+                color: isSelected ? color : Colors.transparent,
+              ),
+              child: isSelected 
+                ? const Icon(Icons.check, size: 10, color: Colors.white) 
+                : null,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              value.capitalizeFirst!,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? color : Colors.grey.shade700,
+              ),
+            ),
+          ],
         ),
-      )),
+      ),
     );
   }
 }

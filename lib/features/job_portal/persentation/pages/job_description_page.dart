@@ -538,6 +538,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
 
   Widget _buildApplyButton(JobModel job) {
     final isRecruiter = _isRecruiter();
+    final isApplied = job.isApplied;
     final canViewApplicants = isRecruiter && job.isMine;
 
     // Recruiter jo is job ka owner nahi hai → koi button nahi dikhana
@@ -621,7 +622,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
               ],
             ),
           ),
-          ElevatedButton(
+          /*ElevatedButton(
             onPressed: () {
               if (canViewApplicants) {
                 Get.toNamed(AppRoutes.applicantListScreen, arguments: job.id);
@@ -630,7 +631,8 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                 Get.to(() => const ResumeFormScreen(), arguments: {'jobId': job.id});
               }
             },
-            style: ElevatedButton.styleFrom(
+            style:
+            ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -646,7 +648,41 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                 fontWeight: FontWeight.w600,
               ),
             ),
+          ),*/
+
+          ElevatedButton(
+            onPressed: (!isRecruiter && isApplied)
+                ? null // disable क्लिक
+                : () {
+              if (canViewApplicants) {
+                Get.toNamed(AppRoutes.applicantListScreen, arguments: job.id);
+              } else {
+                Get.to(() => const ResumeFormScreen(),
+                    arguments: {'jobId': job.id});
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: (!isRecruiter && isApplied)
+                  ? Colors.grey // disabled look
+                  : Colors.black,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 0,
+            ),
+            child: Text(
+              (!isRecruiter && isApplied)
+                  ? 'Applied'
+                  : (canViewApplicants ? 'View Applicants' : 'Apply Now'),
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
+
         ],
       ),
     );

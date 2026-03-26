@@ -89,7 +89,7 @@ class _DigitalProductListScreenState extends State<DigitalProductListScreen> {
         onRefresh: () => controller.fetchMarketplaceServices(isRefresh: true),
         child: ListView.builder(
           controller: _scrollController,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12, top: 0),
           itemCount: controller.marketplaceServices.length + (controller.hasMoreMarketplace.value ? 1 : 0),
           itemBuilder: (context, index) {
             if (index == controller.marketplaceServices.length) {
@@ -328,7 +328,7 @@ class _MyServicesTabView extends StatelessWidget {
       }
 
       return GridView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 0),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           childAspectRatio: 0.8,

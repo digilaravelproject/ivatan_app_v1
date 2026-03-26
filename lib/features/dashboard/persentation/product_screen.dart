@@ -342,8 +342,9 @@ class _BrowseProductsView extends StatelessWidget {
       return RefreshIndicator(
         onRefresh: () => marketplaceController.fetchMarketplaceProducts(isRefresh: true),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
           child: GridView.builder(
+            padding: EdgeInsets.zero,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               childAspectRatio: 0.68,
@@ -393,7 +394,7 @@ class _MyProductsTabView extends StatelessWidget {
       }
 
       return GridView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 0),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           childAspectRatio: 0.8,

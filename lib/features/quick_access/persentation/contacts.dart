@@ -25,7 +25,6 @@ class ContactScreen extends StatelessWidget {
   final ChattController chatController = Get.put(ChattController());
 
 
-
   @override
   Widget build(BuildContext context) {
     return Container(

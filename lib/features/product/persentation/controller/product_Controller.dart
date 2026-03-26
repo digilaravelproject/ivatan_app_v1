@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../../core/network/api_services.dart';
 import '../../repository/cart_repository.dart';
 import '../../../../core/theme/app_colors.dart';
+import 'cart_controller.dart';
 
 class ProductController extends GetxController {
   final CartRepository cartRepository = Get.put(CartRepositoryImpl());
@@ -56,6 +57,15 @@ class ProductController extends GetxController {
           // Reset local display quantity back to 1 (by setting storage to 0)
           cartItems[productId] = 0;
           cartItems.refresh();
+          
+          // Refresh the global cart controller to reflect updates in badge and cart screen
+          try {
+            if (Get.isRegistered<CartController>()) {
+              Get.find<CartController>().fetchCartData(showLoader: false);
+            }
+          } catch (e) {
+            debugPrint("Error refreshing cart controller: $e");
+          }
           
           Get.snackbar(
             'Success',

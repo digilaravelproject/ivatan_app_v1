@@ -28,18 +28,20 @@ import '../../dashboard/persentation/creater_analysis_screen.dart';
 import '../../dashboard/persentation/post_media_picker_screen.dart';
 import '../../dashboard/persentation/product_screen.dart';
 import '../../dashboard/persentation/reel_media_picker_screen.dart';
+import '../../product/persentation/cart_screen.dart';
 import '../../product/persentation/create_product_screen.dart';
 import '../../product/persentation/my_orders_screen.dart';
 import '../../product/persentation/my_products_screen.dart';
 import '../../product/persentation/seller_dashboard_screen.dart';
 import '../../service/controller/service_controller.dart';
+import '../../service/persentation/my_enquiries.dart';
 import '../../service/persentation/my_services_screen.dart';
 import '../../service/persentation/create_service_screen.dart';
 import '../../dashboard/persentation/service_screen.dart';
 import '../../dashboard/persentation/settings_page.dart';
 import '../../messages/controller/chatt_controller.dart';
 import '../../messages/persentation/chatting_screen.dart';
-import '../../product/persentation/cart_screen.dart';
+import '../../product/persentation/controller/cart_controller.dart';
 import '../../service/persentation/create_service_screen.dart';
 import '../../service/persentation/service_enquire_form.dart';
 import '../../story/persentation/storyfullview.dart';
@@ -69,6 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late SettingsController profileController;
   final StoryController storyController = Get.put(StoryController());
   final ChattController chatController = Get.put(ChattController());
+  final CartController cartController = Get.put(CartController());
 
   //final HomeController homeController= Get.put(HomeController());
 
@@ -225,17 +228,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           right: 60,
                                           child: GestureDetector(
                                             onTap: () => Get.to(() => CartScreen()),
-                                            child: Container(
-                                              padding: const EdgeInsets.all(6),
-                                              decoration: const BoxDecoration(
-                                                color: Colors.black26,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(
-                                                Icons.shopping_cart_outlined,
-                                                color: Colors.white,
-                                                size: 22,
-                                              ),
+                                            child: Stack(
+                                              clipBehavior: Clip.none,
+                                              children: [
+                                                Container(
+                                                  padding: const EdgeInsets.all(6),
+                                                  decoration: const BoxDecoration(
+                                                    color: Colors.black26,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.shopping_cart_outlined,
+                                                    color: Colors.white,
+                                                    size: 22,
+                                                  ),
+                                                ),
+                                                Obx(() => cartController.totalItems.value > 0
+                                                    ? Positioned(
+                                                        right: -4,
+                                                        top: -4,
+                                                        child: Container(
+                                                          padding: const EdgeInsets.all(4),
+                                                          decoration: const BoxDecoration(
+                                                            color: Colors.red,
+                                                            shape: BoxShape.circle,
+                                                          ),
+                                                          constraints: const BoxConstraints(
+                                                            minWidth: 16,
+                                                            minHeight: 16,
+                                                          ),
+                                                          child: Text(
+                                                            '${cartController.totalItems.value}',
+                                                            style: const TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: 10,
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                            textAlign: TextAlign.center,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : const SizedBox.shrink()),
+                                              ],
                                             ),
                                           ),
                                         ),
@@ -253,7 +287,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 Get.to(() => EnquiriesListScreen());
                                               } else if (value == 'orders') {
                                                 Get.to(() => MyOrdersScreen());
-                                              } else if (value == 'products') {
+                                              } else if (value == 'enquiries') {
+                                                Get.to(() => MyEnquiryListScreen());
+                                              }
+                                              else if (value == 'products') {
                                                 await Get.to(() => MyProductsScreen());
                                                 if (Get.isRegistered<MarketplaceProductController>()) {
                                                   Get.find<MarketplaceProductController>().fetchMarketplaceProducts(isRefresh: true);
@@ -285,6 +322,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     Icon(CupertinoIcons.bag, size: 20),
                                                     SizedBox(width: 10),
                                                     Text("My Orders"),
+                                                  ],
+                                                ),
+                                              ),
+                                              const PopupMenuItem(
+                                                value: 'enquiries',
+                                                child: Row(
+                                                  children: [
+                                                    Icon(CupertinoIcons.bag, size: 20),
+                                                    SizedBox(width: 10),
+                                                    Text("My Enquiries"),
                                                   ],
                                                 ),
                                               ),

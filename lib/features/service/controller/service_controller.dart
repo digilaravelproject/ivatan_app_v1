@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
+import '../model/enquiry_model_user.dart';
 import '../model/service_model.dart';
 import '../repository/service_repository.dart';
 
@@ -29,6 +30,12 @@ class ServiceController extends GetxController {
   var enquiriesReplied = 0.obs;
   var enquiriesClosed = 0.obs;
   var isStatsLoading = false.obs;
+
+  // My Enquiries (User side)
+  var myEnquiries = <EnquiryUserModel>[].obs;
+  var isMyEnquiriesLoading = false.obs;
+  var myEnquiriesPage = 1;
+  var hasMoreMyEnquiries = true.obs;
 
   @override
   void onInit() {
@@ -192,6 +199,53 @@ class ServiceController extends GetxController {
     }
   }
 
+  Future<void> fetchMyEnquiries({bool isRefresh = false}) async {
+    if (isRefresh) {
+      myEnquiriesPage = 1;
+      hasMoreMyEnquiries(true);
+    }
+
+    if (!hasMoreMyEnquiries.value || isMyEnquiriesLoading.value) return;
+
+    try {
+      isMyEnquiriesLoading(true);
+      final response = await repository.getMyEnquiries(page: myEnquiriesPage);
+      if (response != null && response['success'] == true) {
+        final List data = response['data'] ?? [];
+        final List<EnquiryUserModel> fetchedList = data.map((e) => EnquiryUserModel.fromJson(e)).toList();
+
+        if (isRefresh) {
+          myEnquiries.assignAll(fetchedList);
+        } else {
+          myEnquiries.addAll(fetchedList);
+        }
+
+        // Check if there are more pages
+        final meta = response['meta'];
+        if (meta != null) {
+          final int currentPage = meta['current_page'] ?? 1;
+          final int lastPage = meta['last_page'] ?? 1;
+          if (currentPage >= lastPage) {
+            hasMoreMyEnquiries(false);
+          } else {
+            myEnquiriesPage++;
+          }
+        } else {
+          // If meta is missing, assume no more pages if fetched list is small
+          if (fetchedList.length < 15) {
+            hasMoreMyEnquiries(false);
+          } else {
+            myEnquiriesPage++;
+          }
+        }
+      }
+    } catch (e) {
+      print('Error fetching my enquiries: $e');
+    } finally {
+      isMyEnquiriesLoading(false);
+    }
+  }
+
   Future<void> fetchSellerEnquiriesStats() async {
     try {
       isStatsLoading(true);
@@ -210,10 +264,10 @@ class ServiceController extends GetxController {
     }
   }
 
-  Future<void> updateEnquiryStatus(int id, String status) async {
+  Future<void> updateEnquiryStatus(int id, String status, {String? replyMessage}) async {
     try {
       isLoading(true);
-      final response = await repository.updateEnquiryStatus(id, status);
+      final response = await repository.updateEnquiryStatus(id, status, replyMessage: replyMessage);
       if (response != null && response['success'] == true) {
         Get.back(); // Close the sheet
         Get.snackbar(

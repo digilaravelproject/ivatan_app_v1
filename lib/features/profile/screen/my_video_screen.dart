@@ -14,9 +14,9 @@ class MyVideoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final OwnPostController controller = Get.put(OwnPostController(filterType: "videos", UserName: username ));
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: NotificationListener<ScrollNotification>(
+    return Container(
+      color: AppColors.white,
+      child: NotificationListener<ScrollNotification>(
         onNotification: (scroll) {
           if (!controller.isLoading.value &&
               controller.isMoreDataAvailable.value &&
@@ -29,59 +29,57 @@ class MyVideoScreen extends StatelessWidget {
           onRefresh: () async {
             await controller.fetchOwnPosts(filterType: "videos", username: username);
           },
-          child: SafeArea(
-            child: Column(
-              children: [
-                SizedBox(height: 2), // Tiny gap
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 0), // Full width
-                    child: Obx(() {
-                      if (controller.isLoading.value && controller.posts.isEmpty) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
+          child: Column(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 0), // Full width
+                  child: Obx(() {
+                    if (controller.isLoading.value && controller.posts.isEmpty) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-                      if (controller.posts.isEmpty) {
-                        return const Center(child: Text("No videos found"));
-                      }
+                    if (controller.posts.isEmpty) {
+                      return const Center(child: Text("No videos found"));
+                    }
 
-                      return GridView.builder(
-                        physics: const BouncingScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 2,
-                          mainAxisSpacing: 2,
-                          childAspectRatio: 0.7, // Taller for functionality feeling (Reels/TikTok style)
-                        ),
-                        itemCount: controller.posts.length,
-                        itemBuilder: (context, index) {
-                          final post = controller.posts[index];
-                          // Safely get thumbnail
-                          String thumb = "";
-                          if(post.media.isNotEmpty) {
-                             thumb = post.media.first.thumbnail.isNotEmpty 
-                                ? post.media.first.thumbnail 
-                                : post.media.first.url;
-                          }
+                    return GridView.builder(
+                      padding: EdgeInsets.zero,
+                      physics: const BouncingScrollPhysics(),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 2,
+                        mainAxisSpacing: 2,
+                        childAspectRatio: 0.7, // Taller for functionality feeling (Reels/TikTok style)
+                      ),
+                      itemCount: controller.posts.length,
+                      itemBuilder: (context, index) {
+                        final post = controller.posts[index];
+                        // Safely get thumbnail
+                        String thumb = "";
+                        if(post.media.isNotEmpty) {
+                           thumb = post.media.first.thumbnail.isNotEmpty 
+                              ? post.media.first.thumbnail 
+                              : post.media.first.url;
+                        }
 
-                          return GestureDetector(
-                              onTap: () {
-                                if(post.media.isNotEmpty) {
-                                  Get.to(() => VideoPlayerScreen(
-                                    videoUrl: post.media.first.url,
-                                    videoId: post.id,
-                                  ));
-                                }
-                              },
-                              child: _buildVideoItem(thumb, post.stats.viewCount)
-                          );
-                        },
-                      );
-                    }),
-                  ),
+                        return GestureDetector(
+                            onTap: () {
+                              if(post.media.isNotEmpty) {
+                                Get.to(() => VideoPlayerScreen(
+                                  videoUrl: post.media.first.url,
+                                  videoId: post.id,
+                                ));
+                              }
+                            },
+                            child: _buildVideoItem(thumb, post.stats.viewCount)
+                        );
+                      },
+                    );
+                  }),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

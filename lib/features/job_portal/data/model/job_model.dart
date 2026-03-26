@@ -74,6 +74,7 @@ class JobModel {
   final String updatedAt;
   final bool isMine;
   final bool isUrgentActive;
+  final bool isApplied;
   final int? applicationsCount;
   final EmployerModel employer;
 
@@ -102,6 +103,7 @@ class JobModel {
     required this.updatedAt,
     this.isMine = false,
     this.isUrgentActive = false,
+    this.isApplied = false,
     this.applicationsCount,
     required this.employer,
   });
@@ -132,6 +134,7 @@ class JobModel {
       updatedAt: json['updated_at'] ?? '',
       isMine: json['is_mine'] ?? false,
       isUrgentActive: json['is_urgent_active'] ?? false,
+      isApplied: json['is_applied'] ?? false,
       applicationsCount: json['applications_count'],
       employer: EmployerModel.fromJson(json['employer'] ?? {}),
     );

@@ -51,9 +51,11 @@ class AppUrls {
   static const razorpayOrder = "api/v1/payment/razorpay/order";
   static const razorpayVerify = "api/v1/payment/razorpay/verify";
   static const enquiries = "api/v1/enquiries";
-  static const sellerEnquiries = "api/v1/seller/enquiries";
+  static const myEnquiries = "api/v1/user/my-enquiries";
+  //static const sellerEnquiries = "api/v1/seller/enquiries";
+  static const sellerEnquiries = "api/v1/user/my-enquiries";
   static const sellerEnquiriesStats = "api/v1/seller/enquiries/stats";
-  static String sellerEnquiryStatusUpdate(int id) => "api/v1/seller/enquiries/$id/stats";
+  static String sellerEnquiryStatusUpdate(int id) => "api/v1/seller/enquiries/$id/status";
   static String deleteEnquiry(int id) => "api/v1/seller/enquiries/$id";
   static const financial = "api/v1/seller/financials";
   static const orders = "api/v1/orders";
