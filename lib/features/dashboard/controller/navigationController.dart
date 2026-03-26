@@ -16,6 +16,7 @@ import '../../videos/persentation/videos_screen.dart';
 import '../persentation/dashboard_page.dart';
 import '../persentation/home_screen.dart';
 import '../persentation/search_screen.dart';
+import 'homeController.dart';
 
 
 class NavigationController extends GetxController {
@@ -253,6 +254,15 @@ class DashboardController extends GetxController {
 
   /// Bottom nav / FAB tap
   void changeIndex(int index, {String? username}) {
+    // If already on Home and tapping Home again → refresh feed
+    if (index == 0 && selectedIndex.value == 0) {
+      try {
+        final homeController = Get.find<HomeController>();
+        homeController.fetchPosts();
+      } catch (_) {}
+      return;
+    }
+
     selectedIndex.value = index;
 
     if (index == 4) {

@@ -269,8 +269,7 @@ class DrawerScreen extends StatelessWidget {
   Widget _buildBottomCard(BuildContext context, String title, IconData icon, String subtitle, {VoidCallback? onTap}) {
     return GestureDetector(
       onTap: onTap ?? () {
-        Get.to(() => JobSearchScreen());
-        //showComingSoonDialog(context, title: title, message: "We're building a unique $subtitle experience for you. Stay tuned!"),
+        showComingSoonDialog(context, title: title, message: "We're building a unique $subtitle experience for you. Stay tuned!");
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),

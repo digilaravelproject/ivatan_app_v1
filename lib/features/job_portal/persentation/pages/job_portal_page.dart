@@ -74,6 +74,16 @@ class JobSearchScreen extends GetView<JobController> {
       padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
+          // Back Button
+          GestureDetector(
+            onTap: () => Get.back(),
+            child: const Icon(
+              Icons.arrow_back_ios_new,
+              size: 20,
+              color: Colors.black,
+            ),
+          ),
+          const SizedBox(width: 10),
           // Profile Section - Clickable
           GestureDetector(
             onTap: () {
@@ -81,8 +91,8 @@ class JobSearchScreen extends GetView<JobController> {
               _scaffoldKey.currentState?.openDrawer();
             },
             child: Container(
-              width: 50,
-              height: 50,
+              width: 38,
+              height: 38,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.black, width: 2),

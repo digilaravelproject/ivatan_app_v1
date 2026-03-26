@@ -120,7 +120,7 @@ class PaymentDetail {
       amount: json['amount']?.toString(),
       status: json['status'],
       transactionId: json['transaction_id'],
-      meta: json['meta'],
+      meta: json['meta']?.toString(), // Safely convert Map or String to String
     );
   }
 }
@@ -199,7 +199,7 @@ class AddressDetail {
       city: json['city'],
       state: json['state'],
       country: json['country'],
-      postalCode: json['postal_code'],
+      postalCode: json['postal_code']?.toString(), // Safely handle numeric postal codes
     );
   }
 }

@@ -5,7 +5,7 @@ import '../../../../core/network/app_urls.dart';
 import '../../../../core/widgets/custom_dialog.dart';
 import '../../controller/service_controller.dart';
 import '../../model/service_model.dart';
-import '../edit_service_screen.dart';
+import '../create_service_screen.dart';
 import '../service_enquire_form.dart';
 
 void _showEnquiryBottomSheet(BuildContext context, int sellerId, int serviceId) {
@@ -388,7 +388,7 @@ Widget _buildActionButtons(BuildContext context, ServiceModel service, bool isOw
               child: ElevatedButton.icon(
                 onPressed: () {
                   Navigator.pop(context);
-                  Get.to(() => EditServiceScreen(service: service));
+                  Get.to(() => CreateServiceScreen(service: service));
                 },
                 icon: const Icon(Icons.edit, size: 20),
                 label: const Text('Edit Service'),

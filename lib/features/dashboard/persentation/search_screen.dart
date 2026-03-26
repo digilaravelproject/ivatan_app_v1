@@ -14,6 +14,10 @@ import '../../post/presentation/image_post_screen.dart';
 import '../../videos/persentation/play_video_screen.dart';
 import 'comming_soon.dart';
 import '../../../core/network/app_urls.dart';
+import '../../search/model/mixed_feed_model.dart';
+import '../../reels_screen/model/reel_model.dart' as rm;
+import '../../reels_screen/persentation/reels_view.dart';
+import '../model/post_model.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -248,15 +252,27 @@ class TrendingScreen extends StatelessWidget {
 
                       return GestureDetector(
                         onTap: () {
-                          if (item.media.first.type == "video") {
-                            Get.to(() => VideoPlayerScreen(videoUrl: item.media.first.url, videoId: item.id, ));//url: item.media.first.url
+                          if (item.type == "video") {
+                            Get.to(() => VideoPlayerScreen(videoUrl: item.media.first.url, videoId: item.id, ));
                           }
-                          else if (item.media.first.type == "reel") {
-                          //  Get.to(() => ReelPlayerScreen(url: item.media.first.url));
+                          else if (item.type == "reel") {
+                             // Convert current list of posts to ReelModels for swiping
+                             final List<rm.ReelModel> reelList = controller.posts
+                                 .where((p) => p.type == "reel" && p.media.isNotEmpty)
+                                 .map((p) => _convertToReelModel(p))
+                                 .toList();
+
+                             final int initialIndex = reelList.indexWhere((r) => r.id == item.id);
+
+                             if (reelList.isNotEmpty) {
+                               Get.to(() => ReelsView(
+                                 reels: reelList,
+                                 initialIndex: initialIndex >= 0 ? initialIndex : 0,
+                               ));
+                             }
                           }
-                          else if (item.media.first.type == "image") {
+                          else if (item.type == "image") {
                             Get.to(()=>ImagePostScreen(postId: item.id,));
-                          //  Get.to(() => ImagePreviewScreen(url: item.media.first.url));
                           }
                         },
                         child: ClipRRect(
@@ -342,11 +358,25 @@ class TrendingScreen extends StatelessWidget {
                   Get.to(() => VideoPlayerScreen(videoUrl: videoUrl, videoId: postId, ));
                 }
                 else if (postType == "reel") {
-                  //  Get.to(() => ReelPlayerScreen(url: item.media.first.url));
+                  // Find the post in controller and open as reel
+                  final post = controller.intrestedPostList.firstWhereOrNull((p) => p.id == postId);
+                  if (post != null) {
+                    final List<rm.ReelModel> reelList = controller.intrestedPostList
+                        .where((p) => p.type == "reel" && p.media.isNotEmpty)
+                        .map((p) => _convertToReelModel(p))
+                        .toList();
+
+                    final int initialIndex = reelList.indexWhere((r) => r.id == postId);
+                    if (reelList.isNotEmpty) {
+                      Get.to(() => ReelsView(
+                        reels: reelList,
+                        initialIndex: initialIndex >= 0 ? initialIndex : 0,
+                      ));
+                    }
+                  }
                 }
                 else if (postType == "image") {
                   Get.to(()=>ImagePostScreen(postId: postId,));
-                  //  Get.to(() => ImagePreviewScreen(url: item.media.first.url));
                 }
               },
               child: ClipRRect(
@@ -381,6 +411,42 @@ class TrendingScreen extends StatelessWidget {
           const SizedBox(height: 4),
         ],
       ),
+    );
+  }
+
+  rm.ReelModel _convertToReelModel(TrendingPost post) {
+    return rm.ReelModel(
+      id: post.id,
+      uuid: post.uuid,
+      caption: post.caption ?? "",
+      isMine: post.isMine,
+      isFollowing: post.isFollowing,
+      user: rm.UserModel(
+        id: post.user.id,
+        name: post.user.name,
+        username: post.user.username,
+        avatar: post.user.avatar,
+        isVerified: post.user.isVerified,
+        interests: post.user.interests,
+      ),
+      media: post.media.map((m) => rm.MediaModel(
+        id: m.id,
+        type: m.type,
+        url: m.url,
+        thumbnail: m.thumbnail,
+        mimeType: m.mimeType,
+      )).toList(),
+      stats: rm.ReelStats(
+        likeCount: post.stats.likeCount,
+        commentCount: post.stats.commentCount,
+        shareCount: post.stats.shareCount,
+        viewCount: post.stats.viewCount,
+        isLiked: post.stats.isLiked,
+        isSaved: post.stats.isSaved,
+      ),
+      createdAt: post.createdAt.toIso8601String(),
+      createdHuman: post.createdHuman,
+      likeStatus: post.stats.isLiked,
     );
   }
 }

@@ -1,5 +1,5 @@
-import 'dart:developer';
+import 'package:flutter/foundation.dart';
 
 printMessage(String message) {
-  log(message);
+  debugPrint(message);
 }

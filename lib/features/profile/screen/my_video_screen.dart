@@ -5,7 +5,10 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../videos/persentation/play_video_screen.dart';
+import '../../reels_screen/model/reel_model.dart' as rm;
+import '../../reels_screen/persentation/reels_view.dart';
 import '../controller/ownpostController.dart';
+import '../../dashboard/model/post_model.dart';
 
 class MyVideoScreen extends StatelessWidget {
   final String username;
@@ -65,11 +68,29 @@ class MyVideoScreen extends StatelessWidget {
 
                         return GestureDetector(
                             onTap: () {
-                              if(post.media.isNotEmpty) {
-                                Get.to(() => VideoPlayerScreen(
-                                  videoUrl: post.media.first.url,
-                                  videoId: post.id,
-                                ));
+                              if (post.media.isNotEmpty) {
+                                if (post.type == "reel") {
+                                  // Convert current list of posts to ReelModels for swiping
+                                  final List<rm.ReelModel> reelList = controller.posts
+                                      .where((p) => p.type == "reel" && p.media.isNotEmpty)
+                                      .map((p) => _convertToReelModel(p))
+                                      .toList();
+
+                                  // Find the index of the clicked reel in the filtered list
+                                  final int initialIndex = reelList.indexWhere((r) => r.id == post.id);
+
+                                  if (reelList.isNotEmpty) {
+                                    Get.to(() => ReelsView(
+                                      reels: reelList,
+                                      initialIndex: initialIndex >= 0 ? initialIndex : 0,
+                                    ));
+                                  }
+                                } else {
+                                  Get.to(() => VideoPlayerScreen(
+                                    videoUrl: post.media.first.url,
+                                    videoId: post.id,
+                                  ));
+                                }
                               }
                             },
                             child: _buildVideoItem(thumb, post.stats.viewCount)
@@ -140,6 +161,42 @@ class MyVideoScreen extends StatelessWidget {
     );
   }
   
+  rm.ReelModel _convertToReelModel(PostItem post) {
+    return rm.ReelModel(
+      id: post.id,
+      uuid: post.uuid,
+      caption: post.caption,
+      isMine: post.is_mine,
+      isFollowing: post.is_following,
+      user: rm.UserModel(
+        id: post.user.id,
+        name: post.user.name,
+        username: post.user.username,
+        avatar: post.user.avatar,
+        isVerified: post.user.isVerified,
+        interests: post.user.interests,
+      ),
+      media: post.media.map((m) => rm.MediaModel(
+        id: m.id,
+        type: m.type,
+        url: m.url,
+        thumbnail: m.thumbnail,
+        mimeType: m.mimeType,
+      )).toList(),
+      stats: rm.ReelStats(
+        likeCount: post.stats.likeCount,
+        commentCount: post.stats.commentCount,
+        shareCount: post.stats.shareCount,
+        viewCount: post.stats.viewCount,
+        isLiked: post.stats.isLiked,
+        isSaved: post.stats.isSaved,
+      ),
+      createdAt: post.createdAt,
+      createdHuman: post.createdHuman,
+      likeStatus: post.stats.isLiked,
+    );
+  }
+
   String _formatCount(int count) {
     if (count >= 1000000) {
       return '${(count / 1000000).toStringAsFixed(1)}M';

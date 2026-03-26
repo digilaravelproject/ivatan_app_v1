@@ -188,8 +188,9 @@ class ServiceController extends GetxController {
     try {
       isEnquiriesLoading(true);
       final response = await repository.getSellerEnquiries();
-      if (response != null && response['success'] == true) {
-        final List data = response['data'] ?? [];
+      if (response != null && (response['success'] == true || response.containsKey('data'))) {
+        final dynamic rawData = (response['success'] == true && response['data'] is Map) ? response['data'] : response;
+        final List data = rawData['data'] ?? [];
         sellerEnquiries.assignAll(data.map((e) => e as Map<String, dynamic>).toList());
       }
     } catch (e) {
@@ -210,8 +211,9 @@ class ServiceController extends GetxController {
     try {
       isMyEnquiriesLoading(true);
       final response = await repository.getMyEnquiries(page: myEnquiriesPage);
-      if (response != null && response['success'] == true) {
-        final List data = response['data'] ?? [];
+      if (response != null && (response['success'] == true || response.containsKey('data'))) {
+        final dynamic rawData = (response['success'] == true && response['data'] is Map) ? response['data'] : response;
+        final List data = rawData['data'] ?? [];
         final List<EnquiryUserModel> fetchedList = data.map((e) => EnquiryUserModel.fromJson(e)).toList();
 
         if (isRefresh) {

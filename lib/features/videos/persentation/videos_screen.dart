@@ -717,25 +717,7 @@ class _VideosScreenState extends State<VideosScreen> {
                     ),
                   ),
                   // Duration badge (bottom-left)
-                  Positioned(
-                    bottom: 8,
-                    left: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.8),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Text(
-                        '2:34',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Removed hardcoded duration badge
                   // Views badge
                   Positioned(
                     top: 8,

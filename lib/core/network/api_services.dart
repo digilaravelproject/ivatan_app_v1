@@ -96,8 +96,8 @@ class ApiServices extends GetxService {
     dioClient.options.baseUrl = AppUrls.apiBaseUrl;
     dioClient.options.headers = _defaultHeaders();
     dioClient.options.connectTimeout = _timeout;
-    dioClient.options.receiveTimeout = _timeout;
-    dioClient.options.sendTimeout = _timeout;
+    dioClient.options.receiveTimeout = const Duration(minutes: 30);
+    dioClient.options.sendTimeout = const Duration(minutes: 30);
 
     final formData = dio.FormData();
 

@@ -1017,10 +1017,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               children: [
                 // Like Button
                 _buildActionButton(
-                  icon: Icons.favorite_rounded,
+                  icon: video.stats.isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                   label: _formatCount(video.stats.likeCount),
-                  isActive: true,
-                  onTap: () {},
+                  isActive: video.stats.isLiked,
+                  onTap: () {
+                    controller.likeVideo(video.id);
+                  },
                 ),
                 const SizedBox(width: 12),
                 // Comment Button

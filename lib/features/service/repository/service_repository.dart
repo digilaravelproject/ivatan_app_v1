@@ -2,6 +2,7 @@ import 'dart:io';
 
 import '../../../core/network/api_services.dart';
 import '../../../core/network/app_urls.dart';
+import 'package:flutter/foundation.dart';
 import '../model/service_model.dart';
 import 'package:get/get.dart';
 
@@ -11,12 +12,13 @@ abstract class ServiceRepository {
     required int id,
     required String title,
     String? description,
-    required double price,
-    double? discountPrice,
+    required String price,
+    String? discountPrice,
     int? stock,
     String? status,
     File? coverImage,
     List<File>? additionalImages,
+    List<String>? deletedImageIds,
   });
   Future<Map<String, dynamic>?> deleteService(int id);
   Future<List<ServiceModel>> getMarketplaceServices({int page = 1});
@@ -83,14 +85,16 @@ class ServiceRepositoryImpl implements ServiceRepository {
     required int id,
     required String title,
     String? description,
-    required double price,
-    double? discountPrice,
+    required String price,
+    String? discountPrice,
     int? stock,
     String? status,
     File? coverImage,
     List<File>? additionalImages,
+    List<String>? deletedImageIds,
   }) async {
     final String endpoint = "api/v1/services/$id";
+    debugPrint("Repository Update Service - Endpoint: $endpoint");
     
     Map<String, dynamic> body = {
       "title": title,
@@ -100,6 +104,11 @@ class ServiceRepositoryImpl implements ServiceRepository {
       "stock": stock,
       "status": status,
     };
+
+    debugPrint("Repository Update Service - Body keys: ${body.keys.toList()}");
+    bool hasNewFiles = coverImage != null || (additionalImages != null && additionalImages.isNotEmpty);
+    debugPrint("Repository Update Service - Endpoint: $endpoint");
+    debugPrint("Repository Update Service - hasNewFiles: $hasNewFiles");
 
     if (coverImage != null) {
       body["cover_image"] = coverImage;
@@ -111,10 +120,16 @@ class ServiceRepositoryImpl implements ServiceRepository {
       }
     }
 
-    final response = await apiServices.callPost(
+    if (deletedImageIds != null && deletedImageIds.isNotEmpty) {
+      for (int i = 0; i < deletedImageIds.length; i++) {
+        body["deleted_images[$i]"] = deletedImageIds[i];
+      }
+    }
+
+    final response = await apiServices.callPut(
       endpoint,
       data: body,
-      isFormData: true,
+      isFormData: hasNewFiles,
     );
 
     return response;

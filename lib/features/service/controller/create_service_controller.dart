@@ -16,21 +16,34 @@ class CreateServiceController extends GetxController {
   final ServiceRepository repository = Get.put(ServiceRepositoryImpl());
 
   var coverImage = Rx<File?>(null);
-  var additionalImages = <File>[].obs;
+  var additionalImages = <dynamic>[].obs; // Can be File or ServiceImage
   var isLoading = false.obs;
+  var deletedImageIds = <String>[].obs; // Track deleted IDs (String) to send to server
 
   // For editing
   var isEdit = false.obs;
   var serviceId = 0.obs;
   var existingCoverImageUrl = ''.obs;
   var existingImages = <ServiceImage>[].obs;
-  var status = 'pending'.obs;
+  var status = 'active'.obs;
+
+  void reset() {
+    isEdit.value = false;
+    serviceId.value = 0;
+    coverImage.value = null;
+    existingCoverImageUrl.value = '';
+    additionalImages.clear();
+    deletedImageIds.clear();
+    status.value = 'pending';
+    isLoading.value = false;
+  }
 
   void initForEdit(ServiceModel service) {
+    reset(); // Clear previous state
     isEdit.value = true;
     serviceId.value = service.id;
     existingCoverImageUrl.value = AppUrls.getFullImageUrl(service.coverImage);
-    existingImages.assignAll(service.images);
+    additionalImages.assignAll(service.images);
     status.value = service.status;
   }
 
@@ -55,6 +68,10 @@ class CreateServiceController extends GetxController {
 
   void removeAdditionalImage(int index) {
     if (index >= 0 && index < additionalImages.length) {
+      final image = additionalImages[index];
+      if (image is ServiceImage) {
+        deletedImageIds.add(image.id.toString());
+      }
       additionalImages.removeAt(index);
     }
   }
@@ -72,6 +89,7 @@ class CreateServiceController extends GetxController {
     required String discountPrice,
     required String stock,
   }) async {
+    debugPrint("Submit Service called - Title: $title, isEdit: ${isEdit.value}");
     if (title.isEmpty || price.isEmpty) {
       Get.snackbar("Error", "Title and Price are required",
           backgroundColor: AppColors.error, colorText: Colors.white);
@@ -82,16 +100,18 @@ class CreateServiceController extends GetxController {
     try {
       Map<String, dynamic>? response;
       if (isEdit.value) {
+        debugPrint("Updating service ID: ${serviceId.value}");
         response = await repository.updateService(
           id: serviceId.value,
           title: title,
           description: description,
-          price: double.tryParse(price) ?? 0.0,
-          discountPrice: discountPrice.isNotEmpty ? double.tryParse(discountPrice) : null,
+          price: price, // Pass raw string
+          discountPrice: discountPrice.isNotEmpty ? discountPrice : null,
           stock: stock.isNotEmpty ? int.tryParse(stock) : 0,
-          status: status.value,
+          status: status.value == 'active' ? 'active' : 'inactive', // Ensure valid status
           coverImage: coverImage.value,
-          additionalImages: additionalImages.isNotEmpty ? additionalImages : null,
+          additionalImages: additionalImages.whereType<File>().toList(),
+          deletedImageIds: deletedImageIds.isNotEmpty ? deletedImageIds : null,
         );
       } else {
         Map<String, dynamic> body = {
@@ -118,11 +138,13 @@ class CreateServiceController extends GetxController {
 
       if (response != null) {
         if (response['success'] == true) {
+          debugPrint("Service operation successful");
           Get.find<ServiceController>().fetchServices();
           Get.back();
           Get.snackbar("Success", response['message'] ?? "Operation successful",
               backgroundColor: AppColors.success, colorText: Colors.white);
         } else {
+          debugPrint("Service operation failed: ${response['message']}");
           // Handle specific validation errors
           String errorMsg = response['message'] ?? "Something went wrong";
           if (response['errors'] != null && response['errors'] is Map) {
@@ -138,8 +160,13 @@ class CreateServiceController extends GetxController {
           Get.snackbar("Error", errorMsg,
               backgroundColor: AppColors.error, colorText: Colors.white);
         }
+      } else {
+        debugPrint("Service operation failed: Response is null");
+        Get.snackbar("Error", "No response from server. Please check your connection.",
+            backgroundColor: AppColors.error, colorText: Colors.white);
       }
     } catch (e) {
+      debugPrint("Service operation error: $e");
       Get.snackbar("Error", e.toString(),
           backgroundColor: AppColors.error, colorText: Colors.white);
     } finally {

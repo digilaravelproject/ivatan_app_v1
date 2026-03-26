@@ -177,6 +177,48 @@ class VideoController extends GetxController {
     filteredList.refresh();
   }
 
+  Future<void> likeVideo(int postId) async {
+    try {
+      final response = await api.callPost(
+        "api/v1/posts/$postId/like",
+        data: {},
+      );
+
+      print("likeResponse : $response");
+
+      if (response != null &&
+          response["data"] != null &&
+          response["data"]["is_liked"] != null &&
+          response["data"]["likes_count"] != null) {
+        bool newLikeStatus = response["data"]["is_liked"];
+        int newCount = response["data"]["likes_count"];
+
+        if (currentVideo.value?.id == postId) {
+          currentVideo.value!.stats.isLiked = newLikeStatus;
+          currentVideo.value!.stats.likeCount = newCount;
+          currentVideo.refresh();
+        }
+
+        // Also update in lists
+        final index = posts.indexWhere((p) => p.id == postId);
+        if (index != -1) {
+          posts[index].stats.isLiked = newLikeStatus;
+          posts[index].stats.likeCount = newCount;
+          posts.refresh();
+        }
+
+        final filteredIndex = filteredList.indexWhere((p) => p.id == postId);
+        if (filteredIndex != -1) {
+          filteredList[filteredIndex].stats.isLiked = newLikeStatus;
+          filteredList[filteredIndex].stats.likeCount = newCount;
+          filteredList.refresh();
+        }
+      }
+    } catch (e) {
+      print("Like Error: $e");
+    }
+  }
+
 }
 
 

@@ -111,6 +111,10 @@ class PaymentController extends GetxController {
       Get.back();
 
       if (verifyResponse != null && verifyResponse['success'] == true) {
+        // ✅ Close the Cart screen BEFORE showing the success popup
+        // This ensures the popup appears on top of the dashboard/previous screen.
+        Get.back(); 
+
         // Show success dialog
         Get.dialog(
           AlertDialog(

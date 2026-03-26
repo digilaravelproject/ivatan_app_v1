@@ -29,25 +29,41 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // Check if it's a marketplace product and fetch full details
-    if (widget.product.runtimeType.toString().contains('MarketplaceProduct')) {
-      _productFuture = _fetchMarketplaceProduct(widget.product.id);
-    } else {
-      _productFuture = Future.value(widget.product);
-    }
+    _refreshData();
   }
 
-  Future<MarketplaceProduct> _fetchMarketplaceProduct(String productId) async {
+  void _refreshData() {
+    setState(() {
+      // Check if it's a marketplace product OR a seller product and fetch full details
+      final productType = widget.product.runtimeType.toString();
+      if (productType.contains('MarketplaceProduct') || productType.contains('ProductModel')) {
+        final String productId = (widget.product is Map ? widget.product['id'] : widget.product.id).toString();
+        _productFuture = _fetchProductDetails(productId);
+      } else {
+        _productFuture = Future.value(widget.product);
+      }
+    });
+  }
+
+  Future<dynamic> _fetchProductDetails(String productId) async {
     try {
+      // Use marketplace endpoint as it usually works for all products
       final response = await apiServices.callGet('api/v1/marketplace/products/$productId');
       
       if (response != null && response['success'] == true) {
-        return MarketplaceProduct.fromJson(response['data'] ?? {});
+        final data = response['data'] ?? {};
+        // If it was a ProductModel, try to map it or return raw map
+        if (widget.product.runtimeType.toString().contains('ProductModel')) {
+          return ProductModel.fromJson(data);
+        }
+        return MarketplaceProduct.fromJson(data);
       } else {
-        throw Exception(response?['message'] ?? "Failed to fetch product");
+        // Fallback to widget.product if fetch fails
+        return widget.product;
       }
     } catch (e) {
-      throw Exception(e.toString());
+      debugPrint("Error fetching product details: $e");
+      return widget.product;
     }
   }
 
@@ -135,10 +151,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildProductDetail(dynamic product) {
-    // Check product type
-    final isSellersProduct = product.runtimeType.toString().contains('ProductModel');
-    final isMarketplaceProduct = product.runtimeType.toString().contains('MarketplaceProduct');
+  Widget _buildProductDetail(dynamic initialProduct) {
+    return Obx(() {
+      dynamic product = initialProduct;
+
+      // Reactively retrieve the freshest version from MyProductsController if it exists
+      final isSellersProduct = initialProduct.runtimeType.toString().contains('ProductModel');
+      if (isSellersProduct && Get.isRegistered<MyProductsController>()) {
+        final myProductsController = Get.find<MyProductsController>();
+        final productId = (initialProduct is Map ? initialProduct['id'] : initialProduct.id).toString();
+        try {
+          final updatedProduct = myProductsController.products.firstWhere((p) => p.id == productId);
+          product = updatedProduct; // Override with fresh reactive data
+        } catch (e) {
+          // ignore, keep initial
+        }
+      }
+
+      final isMarketplaceProduct = product.runtimeType.toString().contains('MarketplaceProduct');
     
     final dynamic rawPrice = product is Map ? product['price'] : product.price;
     final double price = double.tryParse(rawPrice?.toString() ?? '0') ?? 0.0;
@@ -181,8 +211,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           if (isSellersProduct)
             IconButton(
               icon: const Icon(Icons.edit_outlined, color: Colors.blue),
-              onPressed: () {
-                Get.to(() => CreateProductScreen(product: product));
+              onPressed: () async {
+                await Get.to(() => CreateProductScreen(product: product));
+                _refreshData();
               },
             ),
           if (isSellersProduct)
@@ -257,22 +288,36 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 if (discountPrice != null && discountPrice > 0)
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        '₹${price.toStringAsFixed(0)}',
+                                        style: TextStyle(
+                                          decoration: TextDecoration.lineThrough,
+                                          color: Colors.grey.shade600,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      Text(
+                                        '₹${discountPrice.toStringAsFixed(0)}',
+                                        style: const TextStyle(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 26,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                else
                                   Text(
-                                    '₹${discountPrice.toStringAsFixed(0)}',
-                                    style: TextStyle(
-                                      decoration: TextDecoration.lineThrough,
-                                      color: Colors.grey.shade600,
-                                      fontSize: 16,
+                                    '₹${price.toStringAsFixed(0)}',
+                                    style: const TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 26,
                                     ),
                                   ),
-                                Text(
-                                  '₹${price.toStringAsFixed(0)}',
-                                  style: const TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 26,
-                                  ),
-                                ),
                               ],
                             ),
                           ],
@@ -537,5 +582,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ],
       ),
     );
+    });
   }
 }

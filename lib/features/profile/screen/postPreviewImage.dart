@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/db/shared_pref_manager.dart';
 import 'package:i_vatan_app/core/helper/custom_snack_bar.dart';
+import 'package:i_vatan_app/core/network/app_urls.dart';
 import 'package:video_player/video_player.dart';
 import '../controller/profile_controller.dart';
 import 'image_edit_screen.dart';
@@ -169,10 +170,15 @@ class _PreviewScreenState extends State<PreviewScreen> {
                             CircleAvatar(
                               radius: 20,
                               backgroundColor: Colors.grey.shade100,
-                              backgroundImage: SharedPrefManager().user?.profilePhotoPath != null
-                                  ? NetworkImage("https://www.ivatan.in/storage/${SharedPrefManager().user!.profilePhotoPath}")
+                              backgroundImage: SharedPrefManager().user?.profilePhotoPath != null &&
+                                      SharedPrefManager().user!.profilePhotoPath!.isNotEmpty
+                                  ? NetworkImage(
+                                      AppUrls.getFullImageUrl(
+                                          SharedPrefManager().user!.profilePhotoPath),
+                                    )
                                   : null,
-                              child: SharedPrefManager().user?.profilePhotoPath == null
+                              child: SharedPrefManager().user?.profilePhotoPath == null ||
+                                      SharedPrefManager().user!.profilePhotoPath!.isEmpty
                                   ? const Icon(Icons.person, color: Colors.grey, size: 24)
                                   : null,
                             ),

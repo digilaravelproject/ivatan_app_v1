@@ -5,7 +5,6 @@ import 'package:i_vatan_app/core/widgets/custom_dialog.dart';
 import '../../../core/network/app_urls.dart';
 import '../controller/service_controller.dart';
 import '../model/service_model.dart';
-import 'edit_service_screen.dart';
 import 'create_service_screen.dart';
 import 'widgets/service_detail_bottom_sheet.dart';
 
@@ -232,7 +231,7 @@ class MyServicesScreen extends StatelessWidget {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: () {
-                            Get.to(() => EditServiceScreen(service: service));
+                            Get.to(() => CreateServiceScreen(service: service));
                           },
                           icon: const Icon(Icons.edit, size: 18),
                           label: const Text('Edit'),

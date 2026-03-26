@@ -19,6 +19,7 @@ class CreateProductController extends GetxController {
   // For edit mode
   var isEditMode = false.obs;
   var productId = ''.obs;
+  var deletedImageIds = <String>[].obs; // Track deleted IDs (String) to send to server
 
   Future<void> pickCoverImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -40,12 +41,17 @@ class CreateProductController extends GetxController {
 
   void removeAdditionalImage(int index) {
     if (index >= 0 && index < additionalImages.length) {
+      final image = additionalImages[index];
+      if (image is ProductImage) {
+        deletedImageIds.add(image.id);
+      }
       additionalImages.removeAt(index);
     }
   }
 
   void loadExistingImages(List<ProductImage> existingImages) {
     additionalImages.clear();
+    deletedImageIds.clear(); // Reset deleted tracking
     additionalImages.addAll(existingImages);
   }
 
@@ -172,8 +178,13 @@ class CreateProductController extends GetxController {
         "price": priceValue,
         "discount_price": discountPrice.isNotEmpty ? double.parse(discountPrice) : null,
         "stock": stock.isNotEmpty ? int.parse(stock) : 0,
-        "status": productStatus.value,
+        "status": productStatus.value == 'active' ? 'active' : 'inactive',
       };
+      
+      // Ensure Laravel resourceful controllers correctly process this POST request as an UPDATE.
+      if (isEditMode.value) {
+        body["_method"] = "PUT";
+      }
 
       // Add files only if we're using multipart
       if (hasNewFiles) {
@@ -189,6 +200,13 @@ class CreateProductController extends GetxController {
             body["images[$imageIndex]"] = img;
             imageIndex++;
           }
+        }
+      }
+
+      // Send deleted image IDs if in edit mode
+      if (isEditMode.value && deletedImageIds.isNotEmpty) {
+        for (int i = 0; i < deletedImageIds.length; i++) {
+          body["deleted_images[$i]"] = deletedImageIds[i];
         }
       }
 
@@ -220,24 +238,14 @@ class CreateProductController extends GetxController {
         print("Status: ${productData['status']}");
         print("Created At: ${productData['created_at']}");
 
-        // Update product in list
+        // Update product in list by making a fresh API call
         try {
-          final myProductsController = Get.find<MyProductsController>();
-          
-          if (isEditMode.value) {
-            // Update existing product
-            final index = myProductsController.products.indexWhere((p) => p.id == productId.value);
-            if (index != -1) {
-              myProductsController.products[index] = ProductModel.fromJson(productData);
-              myProductsController.products.refresh();
-            }
-          } else {
-            // Add new product to list
-            myProductsController.products.insert(0, ProductModel.fromJson(productData));
-            myProductsController.products.refresh();
+          if (Get.isRegistered<MyProductsController>()) {
+            final myProductsController = Get.find<MyProductsController>();
+            myProductsController.fetchProducts();
           }
         } catch (e) {
-          print('Error updating product in list: $e');
+          print('Error fetching products list: $e');
         }
 
         Get.back();
@@ -249,9 +257,21 @@ class CreateProductController extends GetxController {
           snackPosition: SnackPosition.BOTTOM,
         );
       } else {
+        String errorMsg = response?['message'] ?? "Failed to ${isEditMode.value ? 'update' : 'create'} product";
+        print("API VALIDATION ERROR DETAILS: $response");
+        if (response != null && response['errors'] != null && response['errors'] is Map) {
+          Map errors = response['errors'];
+          if (errors.isNotEmpty) {
+            var firstKey = errors.keys.first;
+            var firstErrorList = errors[firstKey];
+            if (firstErrorList is List && firstErrorList.isNotEmpty) {
+              errorMsg = firstErrorList.first.toString();
+            }
+          }
+        }
         Get.snackbar(
           "Error",
-          response?['message'] ?? "Failed to ${isEditMode.value ? 'update' : 'create'} product",
+          errorMsg,
           backgroundColor: AppColors.error,
           colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM,
@@ -533,97 +553,84 @@ class CreateProductScreen extends StatelessWidget {
     );
   }
 
-  /// 🔹 Cover Image Picker Widget
   Widget _buildCoverImagePicker() {
     return Obx(() {
       final hasExistingImage = product != null && 
           product!.coverImage != null && 
           product!.coverImage!.isNotEmpty;
       
-      return Column(
-        children: [
-          // Selected Cover Image or Existing Image
-          if (controller.coverImage.value != null || hasExistingImage)
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: controller.coverImage.value != null
-                      ? Image.file(
-                          controller.coverImage.value!,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: 200,
-                        )
-                      : Image.network(
-                          AppUrls.getFullImageUrl(product!.coverImage!),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: 200,
-                          errorBuilder: (_, __, ___) => Container(
-                            color: Colors.grey.shade200,
-                            height: 200,
-                            child: const Icon(Icons.image, size: 40),
-                          ),
-                        ),
-                ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: GestureDetector(
-                    onTap: controller.removeCoverImage,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Colors.black54,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.close,
-                        color: Colors.white,
-                        size: 20,
+      if (controller.coverImage.value != null || hasExistingImage) {
+        return Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: controller.coverImage.value != null
+                  ? Image.file(
+                      controller.coverImage.value!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: 200,
+                    )
+                  : Image.network(
+                      AppUrls.getFullImageUrl(product!.coverImage!),
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: 200,
+                      errorBuilder: (_, __, ___) => Container(
+                        color: Colors.grey.shade200,
+                        height: 200,
+                        child: const Icon(Icons.image, size: 40),
                       ),
                     ),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: GestureDetector(
+                onTap: controller.pickCoverImage,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.edit, color: Colors.white, size: 16),
+                      SizedBox(width: 6),
+                      Text("Change", style: TextStyle(color: Colors.white, fontSize: 12)),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          if (controller.coverImage.value != null || hasExistingImage) 
-            const SizedBox(height: 10),
-          // Pick Cover Image Button
-          GestureDetector(
-            onTap: controller.pickCoverImage,
-            child: Container(
-              height: 120,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: AppColors.lightBorder, width: 2),
-                color: AppColors.lightBackground,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.image_outlined,
-                    size: 40,
-                    color: Colors.grey.shade600,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    (controller.coverImage.value == null && !hasExistingImage)
-                        ? "Tap to select cover image"
-                        : "Change cover image",
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
               ),
             ),
+          ],
+        );
+      }
+
+      return GestureDetector(
+        onTap: controller.pickCoverImage,
+        child: Container(
+          height: 120,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: AppColors.lightBorder, width: 2),
+            color: AppColors.lightBackground,
           ),
-        ],
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.image_outlined, size: 40, color: Colors.grey.shade600),
+              const SizedBox(height: 8),
+              Text(
+                "Tap to select cover image",
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+              ),
+            ],
+          ),
+        ),
       );
     });
   }
@@ -631,102 +638,94 @@ class CreateProductScreen extends StatelessWidget {
   /// 🔹 Additional Images Picker Widget
   Widget _buildAdditionalImagesPicker() {
     return Obx(() {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Display selected additional images in a grid
-          if (controller.additionalImages.isNotEmpty)
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-              ),
-              itemCount: controller.additionalImages.length,
-              itemBuilder: (context, index) {
-                final image = controller.additionalImages[index];
-                return Stack(
+      return GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+        ),
+        itemCount: controller.additionalImages.length + 1,
+        itemBuilder: (context, index) {
+          if (index == controller.additionalImages.length) {
+            // Pick Additional Images Button
+            return GestureDetector(
+              onTap: controller.pickAdditionalImages,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.lightBorder, width: 2),
+                  color: AppColors.lightBackground,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: image is File
-                          ? Image.file(
-                              image,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
-                            )
-                          : Image.network(
-                              AppUrls.getFullImageUrl(image.imagePath),
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
-                              errorBuilder: (_, __, ___) => Container(
-                                color: Colors.grey.shade200,
-                                child: const Icon(Icons.image, size: 30),
-                              ),
-                            ),
+                    Icon(
+                      Icons.add_photo_alternate_outlined,
+                      size: 28,
+                      color: Colors.grey.shade600,
                     ),
-                    Positioned(
-                      top: 4,
-                      right: 4,
-                      child: GestureDetector(
-                        onTap: () => controller.removeAdditionalImage(index),
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: const BoxDecoration(
-                            color: Colors.black54,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.close,
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                        ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "Add Image",
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
-                );
-              },
-            ),
-          if (controller.additionalImages.isNotEmpty) const SizedBox(height: 10),
-          // Pick Additional Images Button
-          GestureDetector(
-            onTap: controller.pickAdditionalImages,
-            child: Container(
-              height: 100,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: AppColors.lightBorder, width: 2),
-                color: AppColors.lightBackground,
+                ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.add_photo_alternate_outlined,
-                    size: 40,
-                    color: Colors.grey.shade600,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    controller.additionalImages.isEmpty
-                        ? "Tap to add more images"
-                        : "Add more images",
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 14,
+            );
+          }
+
+          final image = controller.additionalImages[index];
+          return Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: image is File
+                    ? Image.file(
+                        image,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                      )
+                    : Image.network(
+                        AppUrls.getFullImageUrl(image.imagePath),
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: Colors.grey.shade200,
+                          child: const Icon(Icons.image, size: 30),
+                        ),
+                      ),
+              ),
+              Positioned(
+                top: 4,
+                right: 4,
+                child: GestureDetector(
+                  onTap: () => controller.removeAdditionalImage(index),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Colors.black54,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 14,
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       );
     });
   }

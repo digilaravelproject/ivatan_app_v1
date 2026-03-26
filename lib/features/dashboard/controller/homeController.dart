@@ -216,7 +216,7 @@ class HomeController extends GetxController {
         
         final info = await VideoCompress.compressVideo(
           videoToCompress!.path,
-          quality: VideoQuality.HighestQuality,
+          quality: VideoQuality.MediumQuality, // Reduced from HighestQuality for faster upload
           deleteOrigin: false,
           startTime: shouldTrim ? (trimStartTime.value / 1000).toInt() : null,
           duration: shouldTrim ? (trimDuration.value / 1000).toInt() : null,
@@ -442,56 +442,127 @@ class HomeController extends GetxController {
   void openReportBottomSheet({required int postId}) {
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              "Report",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            // Handle
+            Container(
+              width: 48,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.report_gmailerrorred_rounded, color: Colors.redAccent, size: 28),
+                const SizedBox(width: 10),
+                const Text(
+                  "Report Post",
+                  style: TextStyle(
+                    fontSize: 20, 
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Your report is anonymous. If someone is in immediate danger, call the local emergency services. Don't wait.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey.shade600,
+              ),
+            ),
+            const SizedBox(height: 24),
 
             /// Reason
             TextField(
               controller: reasonController,
-              decoration: const InputDecoration(
-                labelText: "Report Reason",
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: "Why are you reporting this post?",
+                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                filled: true,
+                fillColor: Colors.grey.shade100,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.black12, width: 1),
+                ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
 
             /// Description
             TextField(
               controller: descriptionController,
               maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: "Description",
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: "Provide additional details (optional)",
+                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                filled: true,
+                fillColor: Colors.grey.shade100,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.black12, width: 1),
+                ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
 
             /// Button
             Obx(
               () => SizedBox(
                 width: double.infinity,
+                height: 50,
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    disabledBackgroundColor: Colors.redAccent.withOpacity(0.6),
+                  ),
                   onPressed:
                       isSubmitting.value ? null : () => submitReport(postId),
                   child:
                       isSubmitting.value
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text("Report"),
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                            )
+                          : const Text(
+                              "Submit Report",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                 ),
               ),
             ),
-            const SizedBox(height: 10),
           ],
         ),
       ),
@@ -500,9 +571,8 @@ class HomeController extends GetxController {
   }
 
   Future<void> submitReport(int postId) async {
-    if (reasonController.text.trim().isEmpty ||
-        descriptionController.text.trim().isEmpty) {
-      Get.snackbar("Error", "All fields are required");
+    if (reasonController.text.trim().isEmpty) {
+      Get.snackbar("Error", "Please provide a reason for the report.");
       return;
     }
 
@@ -515,22 +585,22 @@ class HomeController extends GetxController {
       };
 
       final response = await api.callPost(
-        "/api/v1/posts/$postId/report",
+        "api/v1/posts/$postId/report",
         data: body,
       );
 
       if (response != null && response["success"] == true) {
         Get.back(); // close bottom sheet
 
-        Get.snackbar("Success", response["message"] ?? "Report submitted");
+        Get.snackbar("Report Submitted", "Thank you for letting us know.");
 
         reasonController.clear();
         descriptionController.clear();
       } else {
-        Get.snackbar("Error", "Failed to report post");
+        Get.snackbar("Error", "Failed to report post. Please try again later.");
       }
     } catch (e) {
-      Get.snackbar("Error", "Something went wrong");
+      Get.snackbar("Error", "Something went wrong.");
     } finally {
       isSubmitting.value = false;
     }
