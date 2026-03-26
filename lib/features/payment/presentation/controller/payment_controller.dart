@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart' as rzp;
 import '../../../../db/shared_pref_manager.dart';
 import '../../data/repository/payment_repository.dart';
 
 class PaymentController extends GetxController {
   final PaymentRepository repository = Get.put(PaymentRepositoryImpl());
-  late Razorpay _razorpay;
+  late rzp.Razorpay _razorpay;
   int? _currentOrderId;
 
   @override
   void onInit() {
     super.onInit();
-    _razorpay = Razorpay();
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    _razorpay = rzp.Razorpay();
+    _razorpay.on(rzp.Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(rzp.Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(rzp.Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
   @override
@@ -86,7 +86,7 @@ class PaymentController extends GetxController {
     }
   }
 
-  Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
+  Future<void> _handlePaymentSuccess(rzp.PaymentSuccessResponse response) async {
     if (_currentOrderId == null) {
       Get.snackbar("Warning", "Payment successful, but Order ID was lost.",
           backgroundColor: Colors.orange, colorText: Colors.white);
@@ -157,12 +157,12 @@ class PaymentController extends GetxController {
     }
   }
 
-  void _handlePaymentError(PaymentFailureResponse response) {
+  void _handlePaymentError(rzp.PaymentFailureResponse response) {
     Get.snackbar("Payment Failed", "Error: ${response.code} - ${response.message}",
         backgroundColor: Colors.red, colorText: Colors.white);
   }
 
-  void _handleExternalWallet(ExternalWalletResponse response) {
+  void _handleExternalWallet(rzp.ExternalWalletResponse response) {
     Get.snackbar("External Wallet Selected", "Wallet: ${response.walletName}",
         backgroundColor: Colors.blue, colorText: Colors.white);
   }

@@ -34,11 +34,12 @@ class StoryWidgets {
   /// STORY ITEM (NAME + IMAGE)
   static Widget storyItem({
     required String name,
-    required String imageUrl,
+    String? imageUrl,
   }) {
     return Padding(
       padding: const EdgeInsets.only(right: 12),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
@@ -47,21 +48,16 @@ class StoryWidgets {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Image.network(
-                imageUrl.isNotEmpty
-                    ? imageUrl
-                    : "https://cloudinary-marketing-res.cloudinary.com/image/upload/w_700/hiking_dog_mountain",
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.network(
-                    "https://cloudinary-marketing-res.cloudinary.com/image/upload/w_700/hiking_dog_mountain",
-                    fit: BoxFit.cover,
-                  );
-                },
-              ),
-            ),
+            child: (imageUrl == null || imageUrl.isEmpty)
+                ? _placeholder()
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => _placeholder(),
+                    ),
+                  ),
           ),
           const SizedBox(height: 4),
           Text(
@@ -70,8 +66,30 @@ class StoryWidgets {
               fontSize: 11,
               color: Colors.black87,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
+      ),
+    );
+  }
+
+  static Widget _placeholder() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: Colors.grey.shade300,
+          width: 0.5,
+        ),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.photo_library_outlined,
+          color: Colors.grey.shade400,
+          size: 24,
+        ),
       ),
     );
   }

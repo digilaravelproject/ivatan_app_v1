@@ -27,6 +27,7 @@ import '../persentation/createStoryScreen.dart';
 import '../persentation/story_media_picker_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:image_cropper/image_cropper.dart';
+import '../model/story_model.dart';
 
 
 class StoryController extends GetxController {
@@ -57,6 +58,15 @@ class StoryController extends GetxController {
 
   // ------------------ FORM FIELDS ---------------------
   RxString selectedType = "post".obs;
+  
+  void refreshProfileHighlights() {
+    final username = SharedPrefManager().user!.username;
+    if (Get.isRegistered<ProfileController>(tag: username)) {
+      Get.find<ProfileController>(tag: username).fetchHighlightes(username);
+    } else {
+      controller.fetchHighlightes(username);
+    }
+  }
   RxString selectedVisibility = "public".obs;
   TextEditingController captionCtrl = TextEditingController();
   int? currentHighlightId;
@@ -296,14 +306,17 @@ class StoryController extends GetxController {
 
   Future<void> createHighlight() async {
     try {
+      if (captionCtrl.text.trim().isEmpty) {
+        CustomSnackBar.showError(message: "Please enter highlight name");
+        return;
+      }
       isLoading.value = true;
 
       // Ye list ek bhi id ho sakti hai ya multiple
       List<int> storyIds = [currentStoryId]; // e.g. [123] OR [123, 456]
 
       Map<String, dynamic> body = {
-        "title": captionCtrl.text.isEmpty ? "Highlight" : captionCtrl.text,
-
+        "title": captionCtrl.text.trim(),
       };
 
       // 👉 OPTIONAL cover_media (image/video)
@@ -320,8 +333,11 @@ class StoryController extends GetxController {
       }
 
       // 👉 STORY IDs ko array format me send karna (1 ho ya 10 ho)
-      for (int i = 0; i < storyIds.length; i++) {
-        body["story_ids[$i]"] = storyIds[i].toString();
+      // Profile se Bina story ke bhi highlight banane ke liye isse conditional rakha hai
+      if (currentStoryId > 0) {
+        for (int i = 0; i < storyIds.length; i++) {
+          body["story_ids[$i]"] = storyIds[i].toString();
+        }
       }
 
       print("Final Request Body => $body");
@@ -336,6 +352,10 @@ class StoryController extends GetxController {
 
       if (response != null) {
         CustomSnackBar.showSuccess(message: response["message"]);
+        
+        refreshProfileHighlights();
+        
+        captionCtrl.clear();
         Get.back();
       }
 
@@ -460,41 +480,29 @@ class StoryController extends GetxController {
                         onTap: () {
                           Get.back(closeOverlays: true);
                           createNewHighlight();
-
-                          // Get.to(() => FullScreenStoryViewer(
-                          //   stories: controller.storyData,   // list jo aap pass karoge
-                          //   initialIndex: index,      // kis story se start karni
-                          // ));
-                          //  storyController.showPickerOptions();
                         },
-
                         child: StoryWidgets.addStory(),
                       );
                     }
 
                     // Story item
                     final storyIndex = index - 1;
-
-                    if (storyIndex >=
-                        controller.highlights.length) {
-                      return SizedBox(); // Safety
+                    if (storyIndex >= controller.highlights.length) {
+                      return const SizedBox(); // Safety
                     }
 
-                    final story =
-                    controller
-                        .highlights[storyIndex];
+                    final story = controller.highlights[storyIndex];
+
+                    // Dynamic cover logic for sheet
+                    String? imageUrl = story.cover_media_url;
+                    if ((imageUrl == null || imageUrl.isEmpty) && story.stories.isNotEmpty) {
+                      imageUrl = story.stories.first.thumbnailUrl.isNotEmpty 
+                          ? story.stories.first.thumbnailUrl 
+                          : story.stories.first.mediaUrl;
+                    }
 
                     return GestureDetector(
                       onTap: () {
-                        // if (story.stories.isEmpty) {
-                        //   Get.snackbar(
-                        //     "No Highlights",
-                        //     "Highlights not added yet.",
-                        //     snackPosition:
-                        //     SnackPosition.BOTTOM,
-                        //   );
-                        //   return;
-                        // }
                         final highlightId = story.id;
                         Get.back(closeOverlays: true);
                         addStoryToHighlight(
@@ -503,8 +511,8 @@ class StoryController extends GetxController {
                         );
                       },
                       child: StoryWidgets.storyItem(
-                       name: story.title,
-                        imageUrl: story.cover_media_url,
+                        name: story.title,
+                        imageUrl: imageUrl,
                       ),
                     );
                   },
@@ -540,14 +548,11 @@ class StoryController extends GetxController {
       print("API RESULT  addStoryToHighlight: $response");
 
       if (response != null && response["success"] == true) {
+        CustomSnackBar.showSuccess(message: response["message"]);
+        refreshProfileHighlights();
         Get.back();
-        Get.back();
-
-        CustomSnackBar.showSuccess(message: "Story added to highlight");
-
       } else {
         CustomSnackBar.showError(message: "Could not add story");
-
       }
 
     } catch (e) {
@@ -612,7 +617,7 @@ class StoryController extends GetxController {
       if (status) {
 
         homeController.removeStory(storyId);
-      //  controller.fetchHighlightes();
+        controller.fetchHighlightes(SharedPrefManager().user!.username);
 
         CustomSnackBar.showSuccess(message: "Story removed successfully" );
         return true;   // API success
@@ -634,8 +639,33 @@ class StoryController extends GetxController {
     }
   }
 
+  void onCreateHighlightFromProfile() {
+    // 1. Find the current user's stories in homeController
+    final currentUserId = SharedPrefManager().user?.id;
+    final userStoryGroup = homeController.storyData.firstWhere(
+      (group) => group.user.id == currentUserId,
+      orElse: () => UserStoryGroup(
+          user: StoryUser(id: 0, username: "", name: "", avatar: "", isVerified: false),
+          stories: [],
+          hasUnseen: false
+      ),
+    );
+
+    // 2. Set the currentStoryId to the first available story (if any)
+    if (userStoryGroup.stories.isNotEmpty) {
+      currentStoryId = userStoryGroup.stories.first.id;
+    } else {
+      currentStoryId = 0; 
+      // Note: User can still create highlight from profile without stories 
+      // by picking a cover image (StoryWidgets.addStory() in the sheet).
+    }
+
+    // 3. Open the create highlight bottom sheet
+    createNewHighlight();
+  }
 
   void createNewHighlight() {
+    captionCtrl.clear();
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.only(top: 20),
@@ -670,9 +700,9 @@ class StoryController extends GetxController {
                 textAlign: TextAlign.center,
                   decoration: const InputDecoration(
                     alignLabelWithHint: true,
-                    hintText: "Highlight",
+                    hintText: "Enter highlight name",
                     hintStyle: TextStyle(
-                      color: AppColors.darkTextPrimary,
+                      color: AppColors.lightTextSecondary,
                     ),
                     border: InputBorder.none,
                   ),

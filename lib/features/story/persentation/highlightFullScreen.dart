@@ -296,11 +296,11 @@ class _HighlightScreenStoryViewerState extends State<HighlightScreenStoryViewer>
                       InkWell(
                         onTap: (){
                           //Get.back(closeOverlays: true);
+                          storyController.currentHighlightId = widget.highlightId;
+                          storyController.currentStoryId = widget.stories[currentIndex].id;
                           storyController.showMoreOption();
                           _betterPlayerController?.pause();
                           _progressTimer?.cancel();
-                          storyController.currentHighlightId = widget.highlightId;
-                          storyController.currentStoryId = widget.stories[currentIndex].id;
                           // storyController.showMoreOption();
                         },
                         child: Column(

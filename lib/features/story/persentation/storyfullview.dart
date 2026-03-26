@@ -354,13 +354,12 @@ class _FullScreenStoryViewerState extends State<FullScreenStoryViewer> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     InkWell(
-                      onTap: (){
+                      onTap: () {
                         //Get.back(closeOverlays: true);
+                        storyController.currentStoryId = widget.stories[currentIndex].id;
                         storyController.showMoreOption();
                         _betterPlayerController?.pause();
                         _progressTimer?.cancel();
-                          storyController.currentStoryId = widget.stories[currentIndex].id;
-                         // storyController.showMoreOption();
                       },
                       child: Column(
                         mainAxisSize: MainAxisSize.min,

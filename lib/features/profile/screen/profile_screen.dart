@@ -708,13 +708,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               itemBuilder: (context, index) {
                                                 if (index == 0) return GestureDetector(
                                                   onTap: (){
-                                                    showComingSoonDialog(context, 
-                                                      title: "Highlights", 
-                                                      message: "Create and manage your story highlights. Feature coming soon.");
+                                                    storyController.onCreateHighlightFromProfile();
                                                   }, 
                                                   child: _buildAddStory()
                                                 );
                                                 final story = controller.highlights[index - 1];
+                                                
+                                                // Dynamic cover image logic:
+                                                // 1. Use cover_media_url if present
+                                                // 2. Otherwise use the first story's thumbnail/media URL
+                                                // 3. Otherwise null (CustomImageView will handle placeholder)
+                                                String? displayUrl = story.cover_media_url;
+                                                if ((displayUrl == null || displayUrl.isEmpty) && story.stories.isNotEmpty) {
+                                                  displayUrl = story.stories.first.thumbnailUrl.isNotEmpty 
+                                                      ? story.stories.first.thumbnailUrl 
+                                                      : story.stories.first.mediaUrl;
+                                                }
+
                                                 return GestureDetector(
                                                     onTap: () {
                                                       if (story.stories.isNotEmpty) {
@@ -723,7 +733,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         CustomSnackBar.showError(message: "This highlight has no stories.");
                                                       }
                                                     },
-                                                    child: _buildStoryItem(story.title, story.cover_media_url)
+                                                    child: _buildStoryItem(story.title, displayUrl)
                                                 );
                                               },
                                             ),
@@ -1869,7 +1879,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildStoryItem(String name, String imageUrl) {
+  Widget _buildStoryItem(String name, String? imageUrl) {
     return Padding(
       padding: const EdgeInsets.only(right: 12),
       child: Column(
@@ -1879,36 +1889,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: 55,
             height: 55,
             decoration: BoxDecoration(
-              //   border: Border.all(color: Colors.blue, width: 2),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(15),
-                topRight: Radius.circular(15),
-                bottomLeft: Radius.circular(15),
-                bottomRight: Radius.circular(15),
-              ),
-            ),
-            child: ClipRRect(
               borderRadius: BorderRadius.circular(15),
-              child: Image.network(
-                imageUrl.isNotEmpty
-                    ? imageUrl
-                    : "https://cloudinary-marketing-res.cloudinary.com/image/upload/w_700/hiking_dog_mountain",
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.network(
-                    "https://cloudinary-marketing-res.cloudinary.com/image/upload/w_700/hiking_dog_mountain",
-                    fit: BoxFit.cover,
-                  );
-                },
+            ),
+            child: (imageUrl == null || imageUrl.isEmpty) 
+                ? _buildPlaceholderImage()
+                : CustomImageView(
+              url: imageUrl,
+              height: 55,
+              width: 55,
+              fit: BoxFit.cover,
+              radius: BorderRadius.circular(15),
+              placeHolder: (context, url) => Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Center(
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
               ),
+              errorWidget: (context, url, error) => _buildPlaceholderImage(),
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            name,
+            name.toTitleCase(),
             style: const TextStyle(fontSize: 11, color: Colors.black87),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderImage() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: Colors.grey.shade300,
+          width: 0.5,
+        ),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.photo_library_outlined,
+          color: Colors.grey.shade400,
+          size: 24,
+        ),
       ),
     );
   }
