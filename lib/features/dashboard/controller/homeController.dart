@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/db/shared_pref_manager.dart';
 
 import '../../../core/helper/custom_snack_bar.dart';
+import 'package:video_compress/video_compress.dart';
 import '../../../core/network/api_services.dart';
 import '../../../route/app_pages.dart';
 import '../../auth/data/model/res/user_model.dart';
@@ -36,6 +38,16 @@ class HomeController extends GetxController {
 
   int currentPage = 1;
   int lastPage = 1;
+
+  // Background Upload Progress
+  RxBool isUploading = false.obs;
+  RxBool isCompressing = false.obs;
+  RxDouble uploadProgress = 0.0.obs;
+  RxnString lastUploadType = RxnString();
+
+  // Trim settings for Reels
+  RxDouble trimStartTime = 0.0.obs; // In milliseconds
+  RxDouble trimDuration = 0.0.obs;  // In milliseconds
 
   @override
   void onInit() {
@@ -178,6 +190,71 @@ class HomeController extends GetxController {
     }
   }
 
+  Future<void> uploadMediaInBackground(String endpoint, Map<String, dynamic> body) async {
+    try {
+      isUploading.value = true;
+      uploadProgress.value = 0.0;
+      isCompressing.value = false;
+      lastUploadType.value = body['type']?.toString();
+
+      // Check for video and compress if needed
+      File? videoToCompress;
+      String? videoKey;
+
+      body.forEach((key, value) {
+        if (value is File && (value.path.endsWith(".mp4") || value.path.endsWith(".mov") || value.path.endsWith(".m4v"))) {
+          videoToCompress = value;
+          videoKey = key;
+        }
+      });
+
+      if (videoToCompress != null) {
+        isCompressing.value = true;
+        print("STARTING BACKGROUND COMPRESSION: ${videoToCompress!.path}");
+        
+        bool shouldTrim = trimDuration.value > 0;
+        
+        final info = await VideoCompress.compressVideo(
+          videoToCompress!.path,
+          quality: VideoQuality.HighestQuality,
+          deleteOrigin: false,
+          startTime: shouldTrim ? (trimStartTime.value / 1000).toInt() : null,
+          duration: shouldTrim ? (trimDuration.value / 1000).toInt() : null,
+        );
+
+        if (info != null && info.path != null) {
+          body[videoKey!] = File(info.path!);
+          print("BACKGROUND COMPRESSION COMPLETE: ${info.path}");
+        }
+        isCompressing.value = false;
+      }
+
+      final response = await api.callPostWithProgress(
+        endpoint,
+        data: body,
+        onSendProgress: (sent, total) {
+          if (total > 0) {
+            uploadProgress.value = sent / total;
+          }
+        },
+      );
+
+      if (response != null && response.statusCode! >= 200 && response.statusCode! < 300) {
+        CustomSnackBar.showSuccess(message: response.data["message"] ?? "Upload successful!");
+        fetchPosts(); // Refresh home feed
+      } else {
+        CustomSnackBar.showError(message: "Upload failed. Please try again.");
+      }
+    } catch (e) {
+      print("BACKGROUND UPLOAD ERROR: $e");
+      CustomSnackBar.showError(message: "An error occurred during upload.");
+    } finally {
+      trimStartTime.value = 0.0;
+      trimDuration.value = 0.0;
+      isUploading.value = false;
+      uploadProgress.value = 0.0;
+    }
+  }
   Future<void> fetchStories() async {
     isStoryLoading.value = true;
 

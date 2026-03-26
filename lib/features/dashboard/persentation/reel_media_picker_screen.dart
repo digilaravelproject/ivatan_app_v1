@@ -9,6 +9,7 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:video_player/video_player.dart';
 import '../../profile/controller/profile_controller.dart';
 import '../../profile/screen/postPreviewImage.dart';
+import 'package:video_compress/video_compress.dart';
 import 'story_camera_screen.dart';
 
 class ReelMediaPickerScreen extends StatefulWidget {
@@ -27,8 +28,8 @@ class _ReelMediaPickerScreenState extends State<ReelMediaPickerScreen> {
   Uint8List? selectedThumbnail;
   bool isLoading = true;
   
-  String selectedFilter = 'Recent';
-  final List<String> filters = ['Recent', 'Photos', 'Videos'];
+  String selectedFilter = 'Videos';
+  final List<String> filters = ['Videos', 'Recent'];
 
   @override
   void initState() {
@@ -69,9 +70,6 @@ class _ReelMediaPickerScreenState extends State<ReelMediaPickerScreen> {
     setState(() {
       mediaList = media;
       isLoading = false;
-      if (media.isNotEmpty) {
-        _selectMedia(media[0]);
-      }
     });
   }
 
@@ -98,7 +96,15 @@ class _ReelMediaPickerScreenState extends State<ReelMediaPickerScreen> {
   }
 
   Future<void> _useSelectedMedia() async {
-    if (selectedMedia == null) return;
+    if (selectedMedia == null) {
+      Get.snackbar("Notice", "Please select a video");
+      return;
+    }
+
+    // Clear previous media
+    controller.imageFiles.clear();
+    controller.imageFile.value = null;
+    controller.videoFile.value = null;
 
     // Get the actual file
     final file = await selectedMedia!.file;
@@ -109,10 +115,11 @@ class _ReelMediaPickerScreenState extends State<ReelMediaPickerScreen> {
       controller.imageFile.value = file;
       controller.videoFile.value = null;
     } else if (selectedMedia!.type == AssetType.video) {
+      // Just set the original file and navigate (DEFERRED COMPRESSION)
       controller.videoFile.value = file;
       controller.imageFile.value = null;
       
-      // Initialize video controller
+      // Initialize video controller with original file
       final videoController = VideoPlayerController.file(file);
       await videoController.initialize();
       controller.videoController = videoController;
@@ -124,7 +131,7 @@ class _ReelMediaPickerScreenState extends State<ReelMediaPickerScreen> {
     controller.selectedVisibility.value = 'public';
 
     // Navigate to preview screen for reel creation
-    Get.back(); // Close picker
+    if (Get.isOverlaysOpen) Get.back(); // Close picker bottom sheet if open
     Get.to(() => PreviewScreen(userName: currentUserName ?? ""));
   }
 
@@ -400,11 +407,9 @@ class _ReelMediaPickerScreenState extends State<ReelMediaPickerScreen> {
           controller.videoController = videoController;
           controller.isVideoInitialized.value = true;
           
-          controller.selectedType.value = 'reel';
-          controller.selectedVisibility.value = 'public';
-          
-          Get.back(); // Close picker bottom sheet
-          Get.to(() => PreviewScreen(userName: currentUserName ?? ""));
+          // Navigate to preview screen for reel creation
+          if (Get.isOverlaysOpen) Get.back();
+          Get.off(() => PreviewScreen(userName: currentUserName ?? ""));
         } else {
            // If photo captured for reel, maybe show error or treat as post?
            // For now, let's allow it but it might not be a "reel" effectively.
@@ -416,8 +421,8 @@ class _ReelMediaPickerScreenState extends State<ReelMediaPickerScreen> {
            controller.selectedType.value = 'reel'; 
            controller.selectedVisibility.value = 'public';
            
-           Get.back();
-           Get.to(() => PreviewScreen(userName: currentUserName ?? ""));
+           if (Get.isOverlaysOpen) Get.back();
+           Get.off(() => PreviewScreen(userName: currentUserName ?? ""));
         }
       },
     ));

@@ -172,7 +172,7 @@ class StoryController extends GetxController {
       // Compress video for older devices
       final info = await VideoCompress.compressVideo(
         picked.path,
-        quality: VideoQuality.MediumQuality, // 720p safe for all devices
+        quality: VideoQuality.HighestQuality, 
         deleteOrigin: false,
       );
 

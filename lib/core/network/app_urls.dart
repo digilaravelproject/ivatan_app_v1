@@ -20,11 +20,12 @@ class AppUrls {
   static const String imageurl = "https://www.ivatan.in/storage/";
 
   static String getFullImageUrl(String? path) {
-    if (path == null || path.isEmpty) return "";
-    if (path.startsWith('http')) return path;
+    if (path == null || path.trim().isEmpty) return "";
+    String p = path.trim();
+    if (p.toLowerCase().startsWith('http')) return p;
     
     // Remove leading slash if present to avoid double slashes
-    String cleanPath = path.startsWith('/') ? path.substring(1) : path;
+    String cleanPath = p.startsWith('/') ? p.substring(1) : p;
     return "$imageurl$cleanPath";
   }
 

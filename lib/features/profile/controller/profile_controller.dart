@@ -10,6 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_compress/video_compress.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 
 /*class ProfileController extends GetxController {
   final ImagePicker _picker = ImagePicker();
@@ -144,6 +146,7 @@ class ProfileController extends GetxController {
   ProfileController(this.userName);
 
   Rx<File?> imageFile = Rx<File?>(null);
+  RxList<File> imageFiles = <File>[].obs;
   Rx<File?> videoFile = Rx<File?>(null);
   RxBool isVideoInitialized = false.obs;
   RxString videoUrl = "".obs;
@@ -153,21 +156,32 @@ class ProfileController extends GetxController {
   final PostController = Get.put(OwnPostController(filterType: "posts", UserName: SharedPrefManager().user!.username));
 
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchHighlightes(userName);
-  }
-
-
   VideoPlayerController? videoController;
   final ApiServices api = ApiServices();
-
 
   // ------------------ FORM FIELDS ---------------------
   RxString selectedType = "post".obs;
   RxString selectedVisibility = "public".obs;
   TextEditingController captionCtrl = TextEditingController();
+  TextEditingController titleCtrl = TextEditingController();
+  
+  // For reactive validation
+  RxString currentCaption = "".obs;
+  RxString currentTitle = "".obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchHighlightes(userName);
+    
+    // Listen to controllers for reactive UI updates
+    captionCtrl.addListener(() {
+      currentCaption.value = captionCtrl.text;
+    });
+    titleCtrl.addListener(() {
+      currentTitle.value = titleCtrl.text;
+    });
+  }
 
   RxBool isLoading = false.obs;
 
@@ -175,6 +189,45 @@ class ProfileController extends GetxController {
   void setImage(File file) {
     imageFile.value = file;
     videoFile.value = null;
+  }
+
+  // ------------------ IMAGE CROPPER ---------------------
+  Future<void> cropImage() async {
+    if (imageFile.value == null || isLoading.value) return;
+
+    try {
+      isLoading.value = true;
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: imageFile.value!.path,
+        compressQuality: 90,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Edit Photo',
+            toolbarColor: Colors.black,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false,
+            backgroundColor: Colors.black,
+            activeControlsWidgetColor: Colors.blue,
+          ),
+          IOSUiSettings(
+            title: 'Edit Photo',
+          ),
+        ],
+      );
+
+      if (croppedFile != null) {
+        imageFile.value = File(croppedFile.path);
+        // If it's a carousel, update the first item (or current)
+        if (imageFiles.isNotEmpty) {
+           imageFiles[0] = imageFile.value!;
+        }
+      }
+    } catch (e) {
+      print("Crop error: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void setVideo(File file) async {
@@ -195,6 +248,10 @@ class ProfileController extends GetxController {
       if (pickedFile == null) return;
 
       imageFile.value = File(pickedFile.path);
+      imageFiles.clear();
+      imageFiles.add(imageFile.value!);
+      videoFile.value = null;
+      videoUrl.value = "";
       
       // Route to StoryScreen for story type, otherwise PreviewScreen
       if (selectedType.value == "story") {
@@ -234,21 +291,12 @@ class ProfileController extends GetxController {
 
       if (picked == null) return;
 
-      // Compress video for older devices
-      final info = await VideoCompress.compressVideo(
-        picked.path,
-        quality: VideoQuality.MediumQuality, // 720p safe for all devices
-        deleteOrigin: false,
-      );
-
-      if (info == null || info.path == null) {
-        Get.snackbar("Error", "Failed to compress video.");
-        return;
-      }
-
-      videoFile.value = File(info.path!);
-      videoUrl.value = info.path!;
-      print("Video ready: ${videoUrl.value}");
+      final file = File(picked.path);
+      videoFile.value = file;
+      videoUrl.value = file.path;
+      imageFile.value = null;
+      imageFiles.clear();
+      print("Video ready (Deferred Compression): ${videoUrl.value}");
 
       // Initialize controller
       videoController?.dispose();
@@ -398,45 +446,67 @@ class ProfileController extends GetxController {
   Future<void> createPost() async {
     try {
       isLoading.value = true;
+      CustomSnackBar.showInfo(message: "Sharing your post, please wait...");
 
       List<File> mediaFiles = [];
 
-      if (imageFile.value != null) {
+      if (imageFiles.isNotEmpty) {
+        mediaFiles.addAll(imageFiles);
+      } else if (imageFile.value != null) {
         mediaFiles.add(imageFile.value!);
       } else if (videoFile.value != null) {
         mediaFiles.add(videoFile.value!);
       }
 
+      String apiType = selectedType.value;
+      
+      // Auto-determine carousel/post if not explicitly set to video/reel
+      if (apiType == 'post' || apiType == 'carousel') {
+        if (mediaFiles.length > 1) {
+          apiType = 'carousel';
+        } else {
+          apiType = 'post';
+        }
+      }
+      final caption = captionCtrl.text.trim();
+      final title = titleCtrl.text.trim();
+      
       Map<String, dynamic> body = {
-        "type": selectedType.value,
-        "caption": captionCtrl.text,
+        "type": apiType,
+        "caption": caption,
+        "title": title.isEmpty ? caption : title,
+        "description": caption,
         "visibility": selectedVisibility.value,
       };
 
-      for (int i = 0; i < mediaFiles.length; i++) {
-        body["media[$i]"] = mediaFiles[i];
-      }
+      // Backend expects media[] ALWAYS to be an array for posts
+      body["media[]"] = mediaFiles;
 
       print("craetepostrequest : "+body.toString());
 
-      final response = await api.callPost(
-        "api/v1/posts",
-        data: body,
-        isFormData: true,
-      );
-      PostController.fetchOwnPosts();
-      homeController.fetchPosts();
-      print("POST RESPONSE: $response");
+      // Start background upload
+      homeController.uploadMediaInBackground("api/v1/posts", body);
 
+      // Navigate back to Profile immediately
+      Get.back();
 
-      if (response != null) {
-        CustomSnackBar.showSuccess(message: '${response["message"]}');
-        Get.back();
+      // Clear all state for next time
+      captionCtrl.clear();
+      titleCtrl.clear();
+      imageFiles.clear();
+      imageFile.value = null;
+      videoFile.value = null;
+      isVideoInitialized.value = false;
+      if (videoController != null) {
+        videoController!.dispose();
+        videoController = null;
       }
+      
+      CustomSnackBar.showInfo(message: "Sharing your post in background...");
 
     } catch (e) {
       print("POST ERROR: $e");
-      Get.snackbar("Error", "Failed to create post");
+      CustomSnackBar.showError(message: "Failed to start upload: $e");
     } finally {
       isLoading.value = false;
     }
@@ -507,10 +577,7 @@ class ProfileController extends GetxController {
         "caption": captionCtrl.text,
       };
 
-      // Backend usually expects: media[] instead of media[0]
-      for (int i = 0; i < mediaFiles.length; i++) {
-        body["media"] = mediaFiles[i];
-      }
+      body["media[]"] = mediaFiles;
 
       print("createStoryRequest : $body");
 

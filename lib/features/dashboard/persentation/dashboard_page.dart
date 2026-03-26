@@ -7,6 +7,8 @@ import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/iconoir.dart';
 
 import '../controller/navigationController.dart';
+import '../controller/homeController.dart';
+import '../../../../core/constants/app_assets.dart';
 import '../../../../core/network/app_urls.dart';
 
 class DashboardPage extends StatelessWidget {
@@ -40,12 +42,18 @@ class DashboardPage extends StatelessWidget {
       },
       child: Scaffold(
         backgroundColor: AppColors.white,
-        body: PageView(
-          controller: controller.pageController,
-          physics: const NeverScrollableScrollPhysics(),
-          onPageChanged: controller.onPageChanged,
-          children: controller.screenList,
+        body: Stack(
+          children: [
+            PageView(
+              controller: controller.pageController,
+              physics: const NeverScrollableScrollPhysics(),
+              onPageChanged: controller.onPageChanged,
+              children: controller.screenList,
+            ),
 
+            // Global Upload Progress
+            _buildGlobalUploadProgress(),
+          ],
         ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
@@ -79,6 +87,70 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
+  Widget _buildGlobalUploadProgress() {
+    final homeController = Get.find<HomeController>();
+    return Obx(() {
+      if (!homeController.isUploading.value) return const SizedBox.shrink();
+      
+      return Positioned(
+        bottom: 0,
+        left: 0,
+        right: 0,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, -2),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Obx(() => Text(
+                    homeController.isCompressing.value
+                        ? "Compressing video..."
+                        : "Sharing your ${homeController.lastUploadType.value ?? 'post'}...",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      color: Colors.blue,
+                    ),
+                  )),
+                  Obx(() => Text(
+                    "${(homeController.uploadProgress.value * 100).toInt()}%",
+                    style: const TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  )),
+                ],
+              ),
+              const SizedBox(height: 6),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(2),
+                child: Obx(() => LinearProgressIndicator(
+                  value: homeController.uploadProgress.value,
+                  backgroundColor: Colors.blue.withOpacity(0.1),
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+                  minHeight: 3,
+                )),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
   Widget _item(BuildContext context, dynamic iconData, int index, {String? imageUrl}) {
     return Obx(() {
       final isSelected = controller.selectedIndex.value == index;
@@ -93,7 +165,7 @@ class DashboardPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Specific logic for Profile Image (Index 4)
-              if (index == 4 && imageUrl != null && imageUrl.isNotEmpty)
+              if (index == 4)
                 Container(
                   width: 28,
                   height: 28,
@@ -107,11 +179,13 @@ class DashboardPage extends StatelessWidget {
                   child: Padding(
                      padding: const EdgeInsets.all(1.5),
                      child: ClipOval(
-                      child: Image.network(
-                        AppUrls.imageurl + imageUrl, 
-                        fit: BoxFit.cover,
-                        errorBuilder: (_,__,___) => Icon(iconData, size: 24, color: Colors.grey),
-                      ),
+                      child: (imageUrl != null && imageUrl.isNotEmpty)
+                        ? Image.network(
+                            AppUrls.getFullImageUrl(imageUrl), // Use getFullImageUrl helper
+                            fit: BoxFit.cover,
+                            errorBuilder: (_,__,___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                          )
+                        : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
                     ),
                   )
                 )

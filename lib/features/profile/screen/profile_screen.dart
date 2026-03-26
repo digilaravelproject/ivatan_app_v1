@@ -581,6 +581,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         ),
                                                         const SizedBox(height: 10),
                                                         _buildCreateOption(
+                                                          icon: Icons.play_circle_outline,
+                                                          color: Colors.purple,
+                                                          title: "Video",
+                                                          subtitle: "Share a longer video",
+                                                           onTap: () { 
+                                                             Get.back();
+                                                             Get.to(() => const PostMediaPickerScreen(initialFilter: 'Videos', initialType: 'video'));
+                                                           },
+                                                        ),
+                                                        const SizedBox(height: 10),
+                                                        _buildCreateOption(
                                                           icon: Icons.camera_alt_rounded,
                                                           color: Colors.orange,
                                                           title: "Story",
@@ -704,37 +715,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             height: 90,
                                             child: ListView.builder(
                                               scrollDirection: Axis.horizontal,
-                                              itemCount: controller.highlights.length + 1,
+                                              itemCount: isOtherProfile 
+                                                  ? controller.highlights.length 
+                                                  : controller.highlights.length + 1,
                                               itemBuilder: (context, index) {
-                                                if (index == 0) return GestureDetector(
-                                                  onTap: (){
-                                                    storyController.onCreateHighlightFromProfile();
-                                                  }, 
-                                                  child: _buildAddStory()
-                                                );
-                                                final story = controller.highlights[index - 1];
-                                                
-                                                // Dynamic cover image logic:
-                                                // 1. Use cover_media_url if present
-                                                // 2. Otherwise use the first story's thumbnail/media URL
-                                                // 3. Otherwise null (CustomImageView will handle placeholder)
-                                                String? displayUrl = story.cover_media_url;
-                                                if ((displayUrl == null || displayUrl.isEmpty) && story.stories.isNotEmpty) {
-                                                  displayUrl = story.stories.first.thumbnailUrl.isNotEmpty 
-                                                      ? story.stories.first.thumbnailUrl 
-                                                      : story.stories.first.mediaUrl;
-                                                }
+                                                if (!isOtherProfile) {
+                                                  if (index == 0) {
+                                                    return GestureDetector(
+                                                      onTap: () {
+                                                        storyController.onCreateHighlightFromProfile();
+                                                      }, 
+                                                      child: _buildAddStory()
+                                                    );
+                                                  }
+                                                  
+                                                  final story = controller.highlights[index - 1];
+                                                  String? displayUrl = story.cover_media_url;
+                                                  if ((displayUrl == null || displayUrl.isEmpty) && story.stories.isNotEmpty) {
+                                                    displayUrl = story.stories.first.thumbnailUrl.isNotEmpty 
+                                                        ? story.stories.first.thumbnailUrl 
+                                                        : story.stories.first.mediaUrl;
+                                                  }
 
-                                                return GestureDetector(
-                                                    onTap: () {
-                                                      if (story.stories.isNotEmpty) {
-                                                        Get.to(() => HighlightScreenStoryViewer(stories: story.stories, highlightId: story.id, initialIndex: 0));
-                                                      } else {
-                                                        CustomSnackBar.showError(message: "This highlight has no stories.");
-                                                      }
-                                                    },
-                                                    child: _buildStoryItem(story.title, displayUrl)
-                                                );
+                                                  return GestureDetector(
+                                                      onTap: () {
+                                                        if (story.stories.isNotEmpty) {
+                                                          Get.to(() => HighlightScreenStoryViewer(stories: story.stories, highlightId: story.id, initialIndex: 0));
+                                                        } else {
+                                                          CustomSnackBar.showError(message: "This highlight has no stories.");
+                                                        }
+                                                      },
+                                                      child: _buildStoryItem(story.title, displayUrl)
+                                                  );
+                                                } else {
+                                                  // Other profile: No "New" icon, index matches directly
+                                                  final story = controller.highlights[index];
+                                                  String? displayUrl = story.cover_media_url;
+                                                  if ((displayUrl == null || displayUrl.isEmpty) && story.stories.isNotEmpty) {
+                                                    displayUrl = story.stories.first.thumbnailUrl.isNotEmpty 
+                                                        ? story.stories.first.thumbnailUrl 
+                                                        : story.stories.first.mediaUrl;
+                                                  }
+
+                                                  return GestureDetector(
+                                                      onTap: () {
+                                                        if (story.stories.isNotEmpty) {
+                                                          Get.to(() => HighlightScreenStoryViewer(stories: story.stories, highlightId: story.id, initialIndex: 0));
+                                                        } else {
+                                                          CustomSnackBar.showError(message: "This highlight has no stories.");
+                                                        }
+                                                      },
+                                                      child: _buildStoryItem(story.title, displayUrl)
+                                                  );
+                                                }
                                               },
                                             ),
                                           );

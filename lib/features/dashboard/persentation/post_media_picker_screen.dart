@@ -9,10 +9,17 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:video_player/video_player.dart';
 import '../../profile/controller/profile_controller.dart';
 import '../../profile/screen/postPreviewImage.dart';
+import 'package:video_compress/video_compress.dart';
 import 'story_camera_screen.dart';
 
 class PostMediaPickerScreen extends StatefulWidget {
-  const PostMediaPickerScreen({Key? key}) : super(key: key);
+  final String initialFilter;
+  final String initialType;
+  const PostMediaPickerScreen({
+    Key? key, 
+    this.initialFilter = 'Recent',
+    this.initialType = 'post',
+  }) : super(key: key);
 
   @override
   State<PostMediaPickerScreen> createState() => _PostMediaPickerScreenState();
@@ -23,16 +30,18 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
   late ProfileController controller;
   
   List<AssetEntity> mediaList = [];
-  AssetEntity? selectedMedia;
+  List<AssetEntity> selectedMediaList = []; // Multi-select list
+  AssetEntity? selectedMedia; // For preview top area
   Uint8List? selectedThumbnail;
   bool isLoading = true;
   
-  String selectedFilter = 'Recent';
+  late String selectedFilter;
   final List<String> filters = ['Recent', 'Photos', 'Videos'];
 
   @override
   void initState() {
     super.initState();
+    selectedFilter = widget.initialFilter;
     // Initialize ProfileController for current user
     controller = Get.put(ProfileController(currentUserName ?? ""), tag: currentUserName ?? "");
     _loadMedia();
@@ -69,9 +78,6 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
     setState(() {
       mediaList = media;
       isLoading = false;
-      if (media.isNotEmpty) {
-        _selectMedia(media[0]);
-      }
     });
   }
 
@@ -86,46 +92,100 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
     }
   }
 
-  Future<void> _selectMedia(AssetEntity asset) async {
+  Future<void> _selectMedia(AssetEntity asset, {bool forceSelect = false}) async {
     final thumb = await asset.thumbnailDataWithSize(
-      const ThumbnailSize(400, 400), // Square thumbnail for post
+      const ThumbnailSize(400, 400),
     );
-    
+
     setState(() {
       selectedMedia = asset;
       selectedThumbnail = thumb;
+
+      if (asset.type == AssetType.video) {
+        // Videos are always single-select
+        selectedMediaList = [asset];
+      } else {
+        // Images support multi-select
+        final existingIndex = selectedMediaList.indexWhere((e) => e.id == asset.id);
+        if (existingIndex != -1) {
+          if (!forceSelect) {
+            selectedMediaList.removeAt(existingIndex);
+            // If we removed the currently previewed media, preview the last one in list
+            if (selectedMediaList.isEmpty) {
+              selectedMedia = null;
+              selectedThumbnail = null;
+            } else {
+              _selectMedia(selectedMediaList.last, forceSelect: true);
+            }
+          }
+        } else {
+          // If previous selection was a video, clear it
+          if (selectedMediaList.isNotEmpty && selectedMediaList.first.type == AssetType.video) {
+            selectedMediaList.clear();
+          }
+          selectedMediaList.add(asset);
+        }
+      }
     });
   }
 
   Future<void> _useSelectedMedia() async {
-    if (selectedMedia == null) return;
-
-    // Get the actual file
-    final file = await selectedMedia!.file;
-    if (file == null) return;
-
-    // Set media in controller based on type
-    if (selectedMedia!.type == AssetType.image) {
-      controller.imageFile.value = file;
-      controller.videoFile.value = null;
-    } else if (selectedMedia!.type == AssetType.video) {
-      controller.videoFile.value = file;
-      controller.imageFile.value = null;
-      
-      // Initialize video controller
-      final videoController = VideoPlayerController.file(file);
-      await videoController.initialize();
-      controller.videoController = videoController;
-      controller.isVideoInitialized.value = true;
+    if (selectedMediaList.isEmpty) {
+      Get.snackbar("Notice", "Please select at least one image or video");
+      return;
     }
 
-    // Set post type
-    controller.selectedType.value = 'post';
+    // Determine type
+    String finalType = widget.initialType;
+    if (finalType == 'post' || finalType == 'carousel') {
+      finalType = selectedMediaList.length > 1 ? 'carousel' : 'post';
+    }
+
+    // Set type in controller
+    controller.selectedType.value = finalType;
     controller.selectedVisibility.value = 'public';
 
-    // Navigate to preview screen for post creation
-    Get.back(); // Close picker
-    Get.to(() => PreviewScreen(userName: currentUserName ?? ""));
+    // Clear previous media
+    controller.imageFiles.clear();
+    controller.imageFile.value = null;
+    controller.videoFile.value = null;
+
+    setState(() => isLoading = true);
+
+    try {
+      if (selectedMediaList.first.type == AssetType.video) {
+        // Handle Video (single) - DEFERRED COMPRESSION
+        final file = await selectedMediaList.first.file;
+        if (file == null) return;
+
+        // Just set the original file and navigate
+        controller.videoFile.value = file;
+        
+        final videoController = VideoPlayerController.file(file);
+        await videoController.initialize();
+        controller.videoController = videoController;
+        controller.isVideoInitialized.value = true;
+      } else {
+        // Handle Images (single or multi)
+        for (final asset in selectedMediaList) {
+          final file = await asset.file;
+          if (file != null) {
+            controller.imageFiles.add(file);
+          }
+        }
+        if (controller.imageFiles.isNotEmpty) {
+          controller.imageFile.value = controller.imageFiles.first;
+        }
+      }
+    } catch (e) {
+      print("Processing error: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+
+    // Navigate to preview screen
+    if (Get.isOverlaysOpen) Get.back();
+    Get.off(() => PreviewScreen(userName: currentUserName ?? ""));
   }
 
   @override
@@ -330,6 +390,35 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
                       snapshot.data!,
                       fit: BoxFit.cover,
                     ),
+                    // Selection indicator for carousel
+                    if (asset.type == AssetType.image)
+                      Positioned(
+                        top: 5,
+                        right: 5,
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: selectedMediaList.any((e) => e.id == asset.id)
+                                ? Colors.blue
+                                : Colors.black.withOpacity(0.3),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 1.5),
+                          ),
+                          child: selectedMediaList.any((e) => e.id == asset.id)
+                              ? Center(
+                                  child: Text(
+                                    (selectedMediaList.indexWhere((e) => e.id == asset.id) + 1).toString(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                )
+                              : null,
+                        ),
+                      ),
                     if (asset.type == AssetType.video)
                       Positioned(
                         bottom: 4,

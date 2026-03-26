@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart' as dio;
 
 import '../../core/helper/custom_snack_bar.dart';
 import '../../core/network/app_urls.dart';
@@ -12,7 +13,7 @@ import '../helper/logger_helper.dart';
 import 'api_keys.dart';
 
 class ApiServices extends GetxService {
-  final Duration _timeout = const Duration(seconds: 60);
+  final Duration _timeout = const Duration(seconds: 300);
 
   /// Common GET method
   Future<Map<String, dynamic>?> callGet(
@@ -85,6 +86,97 @@ class ApiServices extends GetxService {
     return null;
   }
 
+  /// Common POST method with progress tracking (using Dio)
+  Future<dio.Response?> callPostWithProgress(
+    String endpoint, {
+    required Map<String, dynamic> data,
+    void Function(int, int)? onSendProgress,
+  }) async {
+    final dioClient = dio.Dio();
+    dioClient.options.baseUrl = AppUrls.apiBaseUrl;
+    dioClient.options.headers = _defaultHeaders();
+    dioClient.options.connectTimeout = _timeout;
+    dioClient.options.receiveTimeout = _timeout;
+    dioClient.options.sendTimeout = _timeout;
+
+    final formData = dio.FormData();
+
+    // Flatten data for multipart
+    for (var entry in data.entries) {
+      final key = entry.key;
+      final value = entry.value;
+
+      if (value is File) {
+        formData.files.add(MapEntry(
+          key,
+          dio.MultipartFile.fromFileSync(
+            value.path,
+            filename: value.path.split("/").last,
+          ),
+        ));
+      } else if (value is List<File>) {
+        for (var file in value) {
+          formData.files.add(MapEntry(
+            key, // Usually "media[]"
+            dio.MultipartFile.fromFileSync(
+              file.path,
+              filename: file.path.split("/").last,
+            ),
+          ));
+        }
+      } else if (value != null) {
+        if (value is Map || value is List) {
+           _flattenDioMultipartData(key, value, formData.fields);
+        } else {
+           formData.fields.add(MapEntry(key, value.toString()));
+        }
+      }
+    }
+
+    try {
+      print("API REQUEST [$endpoint]: ${formData.fields.map((e) => "${e.key}: ${e.value}")}");
+      print("API FILES [$endpoint]: ${formData.files.map((e) => "${e.key}: ${e.value.filename}")}");
+
+      final response = await dioClient.post(
+        endpoint,
+        data: formData,
+        onSendProgress: onSendProgress,
+      );
+      
+      print("API RESPONSE [$endpoint]: ${response.statusCode}");
+      return response;
+    } on dio.DioException catch (e) {
+      print("DIO ERROR [$endpoint]: ${e.message}");
+      print("DIO STATUS: ${e.response?.statusCode}");
+      print("DIO DATA: ${e.response?.data}");
+      
+      logApiError("DIO POST ERROR: ${e.message}");
+      if (e.response != null) {
+        _handleError(e.response?.data['message'] ?? e.message);
+      } else {
+        _handleError(e.message ?? "Unknown network error");
+      }
+      return e.response;
+    } catch (e) {
+      print("GENERAL ERROR [$endpoint]: $e");
+      return null;
+    }
+  }
+
+  void _flattenDioMultipartData(String prefix, dynamic value, List<MapEntry<String, String>> fields) {
+    if (value is Map) {
+      value.forEach((key, val) {
+        _flattenDioMultipartData("$prefix[$key]", val, fields);
+      });
+    } else if (value is List) {
+      for (int i = 0; i < value.length; i++) {
+        _flattenDioMultipartData("$prefix[$i]", value[i], fields);
+      }
+    } else if (value != null) {
+      fields.add(MapEntry(prefix, value.toString()));
+    }
+  }
+
   /// Common POST method
   Future<Map<String, dynamic>?> callPost(
     String endpoint, {
@@ -141,6 +233,16 @@ class ApiServices extends GetxService {
               filename: file.path.split("/").last,
             );
             request.files.add(multipartFile);
+          } else if (entry.value is List<File>) {
+            final files = entry.value as List<File>;
+            for (var file in files) {
+              final multipartFile = await http.MultipartFile.fromPath(
+                entry.key,
+                file.path,
+                filename: file.path.split("/").last,
+              );
+              request.files.add(multipartFile);
+            }
           }
         }
 
