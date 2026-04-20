@@ -153,7 +153,7 @@ class ProfileController extends GetxController {
 
   RxList<HighlightStoryModel> highlights = <HighlightStoryModel>[].obs;
   final HomeController homeController = Get.put(HomeController());
-  final PostController = Get.put(OwnPostController(filterType: "posts", UserName: SharedPrefManager().user!.username));
+  // Redundant global controller removed to prevent conflicts in profile tabs.
 
 
   VideoPlayerController? videoController;

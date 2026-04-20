@@ -33,8 +33,8 @@ class UserModel {
   final String updatedAt;
   final String? deletedAt;
   final bool isEmployer;
-  final int hideEmail;
-  final int hidePhone;
+  final bool hideEmail;
+  final bool hidePhone;
   final String? countryCode;
   final String? isoCode;
 
@@ -79,13 +79,19 @@ class UserModel {
     required this.updatedAt,
     this.deletedAt,
     required this.isEmployer,
-    required this.hideEmail,
-    required this.hidePhone,
+    this.hideEmail = false,
+    this.hidePhone = false,
     this.countryCode,
     this.isoCode,
     required this.interests,
     required this.token,
   });
+
+  static bool _toBool(dynamic value) {
+    if (value is bool) return value;
+    if (value is int) return value != 0;
+    return false;
+  }
 
   /// FIXED PARSER – supports both API & SharedPref
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -126,8 +132,8 @@ class UserModel {
       updatedAt: data["updated_at"] ?? "",
       deletedAt: data["deleted_at"],
       isEmployer: data["is_employer"] ?? false,
-      hideEmail: data["hide_email"] ?? 0,
-      hidePhone: data["hide_phone"] ?? 0,
+      hideEmail: _toBool(data["hide_email"]),
+      hidePhone: _toBool(data["hide_phone"]),
       countryCode: data["country_code"],
       isoCode: data["iso_code"],
 

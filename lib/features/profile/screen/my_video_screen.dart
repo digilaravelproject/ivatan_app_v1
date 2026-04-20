@@ -8,6 +8,7 @@ import '../../videos/persentation/play_video_screen.dart';
 import '../../reels_screen/model/reel_model.dart' as rm;
 import '../../reels_screen/persentation/reels_view.dart';
 import '../controller/ownpostController.dart';
+import '../../dashboard/controller/settings_controller.dart';
 import '../../dashboard/model/post_model.dart';
 
 class MyVideoScreen extends StatelessWidget {
@@ -16,7 +17,10 @@ class MyVideoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final OwnPostController controller = Get.put(OwnPostController(filterType: "videos", UserName: username ));
+    final OwnPostController controller = Get.put(
+      OwnPostController(filterType: "videos", UserName: username),
+      tag: "${username}_videos"
+    );
     return Container(
       color: AppColors.white,
       child: NotificationListener<ScrollNotification>(
@@ -43,7 +47,39 @@ class MyVideoScreen extends StatelessWidget {
                     }
 
                     if (controller.posts.isEmpty) {
-                      return const Center(child: Text("No videos found"));
+                      // Try to find status controller to check privacy status
+                      bool isPrivateStatus = false;
+                      if (Get.isRegistered<SettingsController>(tag: username)) {
+                         final pc = Get.find<SettingsController>(tag: username);
+                         isPrivateStatus = pc.userProfile.value?.accountPrivacy?.toLowerCase() == "private" && 
+                                          !(pc.userProfile.value?.is_following ?? false);
+                      }
+
+                      if (isPrivateStatus) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.lock_outline_rounded, size: 50, color: Colors.grey.shade400),
+                              const SizedBox(height: 12),
+                              const Text("This account is private", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                              const SizedBox(height: 4),
+                              const Text("Follow to see their videos", style: TextStyle(color: Colors.grey)),
+                            ],
+                          ),
+                        );
+                      }
+
+                      return const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.videocam_off_outlined, size: 50, color: Colors.grey),
+                            const SizedBox(height: 12),
+                            Text("No videos found", style: TextStyle(color: Colors.grey)),
+                          ],
+                        ),
+                      );
                     }
 
                     return GridView.builder(

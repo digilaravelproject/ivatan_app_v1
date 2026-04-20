@@ -4,6 +4,9 @@ import '../../../../core/network/api_services.dart';
 import '../../dashboard/controller/follow_controller.dart';
 import '../../dashboard/model/post_model.dart';
 import '../../search/model/mixed_feed_model.dart';
+import '../../../../core/helper/custom_snack_bar.dart';
+import '../../../../core/network/app_urls.dart';
+import '../../dashboard/controller/homeController.dart';
 import '../model/related_videoModel.dart';
 
 class VideoController extends GetxController {
@@ -51,6 +54,7 @@ class VideoController extends GetxController {
 
       if (response != null && response["data"] != null) {
         final model = FeedResponse.fromJson(response);
+        print("📹 API VIDEO COUNT: ${model.data.length}");
 
         if (loadMore) {
           posts.addAll(model.data);
@@ -219,6 +223,36 @@ class VideoController extends GetxController {
     }
   }
 
+  Future<void> toggleBookmark(int postId) async {
+    try {
+      final response = await api.callPost(AppUrls.bookmarkPost(postId), data: {});
+      
+      if (response != null && response["success"] == true) {
+        bool isBookmarked = response["is_bookmarked"] ?? false;
+        
+        if (currentVideo.value?.id == postId) {
+          currentVideo.value!.stats.isSaved = isBookmarked;
+          currentVideo.refresh();
+        }
+        
+        // Sync with HomeController feed if it exists to maintain global state
+        if (Get.isRegistered<HomeController>()) {
+          final home = Get.find<HomeController>();
+          int index = home.posts.indexWhere((p) => p.id == postId);
+          if (index != -1) {
+             home.posts[index].stats.isSaved = isBookmarked;
+             home.posts.refresh();
+          }
+        }
+
+        CustomSnackBar.showSuccess(
+          message: response["message"] ?? (isBookmarked ? "Video bookmarked" : "Bookmark removed")
+        );
+      }
+    } catch (e) {
+      print("Bookmark Error: $e");
+    }
+  }
 }
 
 

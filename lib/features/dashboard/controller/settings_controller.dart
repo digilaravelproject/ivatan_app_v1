@@ -11,6 +11,7 @@ import 'package:i_vatan_app/features/profile/screen/profile_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import '../../profile/screen/avatar_customizer_screen.dart';
+import '../../profile/screen/bookmarks_screen.dart';
 
 /*
 class ProfileController extends GetxController {
@@ -314,6 +315,7 @@ import '../../auth/data/model/res/user_model.dart';
 import '../../search/controller/mixed_feed_controller.dart';
 import '../model/user_profile.dart';
 import 'follow_controller.dart';
+import '../../profile/controller/ownpostController.dart';
 import 'homeController.dart';
 
 class SettingsController extends GetxController {
@@ -572,10 +574,71 @@ class SettingsController extends GetxController {
         }
         postController.intrestedPostList.refresh();
       }
+
+      // 4️⃣ Sync with Profile View Tabs (MyPostScreen, MyVideoScreen, etc.)
+      final List<String> filters = ["posts", "videos"];
+      for (var filter in filters) {
+        final tag = "${userName}_$filter";
+        if (Get.isRegistered<OwnPostController>(tag: tag)) {
+          final ownPostController = Get.find<OwnPostController>(tag: tag);
+          ownPostController.fetchOwnPosts(username: userName, filterType: filter);
+        }
+      }
+      
+      // Also sync ProfileLivePosts (which uses raw username as tag)
+      if (Get.isRegistered<OwnPostController>(tag: userName)) {
+         final livePostController = Get.find<OwnPostController>(tag: userName);
+         livePostController.fetchOwnPosts(username: userName, filterType: "posts");
+      }
       
     } catch (e) {
       print("Follow Error: $e");
     }
+  }
+
+  Future<void> toggleBlockUser(int userId) async {
+    try {
+      isLoading.value = true;
+      final response = await api.callPost(AppUrls.blockUser(userId));
+      isLoading.value = false;
+
+      if (response != null && response['success'] == true) {
+        bool blocked = response['is_blocked'] ?? false;
+        
+        // Update local state if we are viewing this user's profile
+        if (userProfile.value?.id == userId) {
+          userProfile.value = UserData.fromJson({
+            ...userProfile.value!.toJson(),
+            "is_blocked": blocked,
+          });
+          userProfile.refresh();
+        }
+
+        CustomSnackBar.showSuccess(
+          message: response['message'] ?? (blocked ? "User blocked" : "User unblocked")
+        );
+
+        // If blocked, we might want to refresh the feed or go back
+        if (blocked) {
+          // Clear posts from this user in feeds
+          if (Get.isRegistered<HomeController>()) {
+            Get.find<HomeController>().posts.removeWhere((p) => p.user.id == userId);
+            Get.find<HomeController>().posts.refresh();
+          }
+          // If on their profile, we might stay to show "Blocked" state or go back
+          // User requested "Block" option in 3-dot, so we'll stay and refresh.
+          fetchUserDetails(userProfile.value?.username ?? "");
+        }
+      }
+    } catch (e) {
+      isLoading.value = false;
+      print("Block Error: $e");
+      CustomSnackBar.showError(message: "Failed to update block status");
+    }
+  }
+
+  void openBookmarks() {
+    Get.to(() => const BookmarksScreen());
   }
 
 

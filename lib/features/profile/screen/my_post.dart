@@ -11,6 +11,7 @@ import '../../videos/persentation/play_video_screen.dart';
 import '../../reels_screen/persentation/reels_view.dart';
 import '../../reels_screen/model/reel_model.dart';
 import '../controller/ownpostController.dart';
+import '../../dashboard/controller/settings_controller.dart';
 import 'profile_feed_screen.dart';
 
 class MyPostScreen extends StatelessWidget {
@@ -24,8 +25,7 @@ class MyPostScreen extends StatelessWidget {
     // Actually, 'posts' filter type is same.
     final controller = Get.put(
       OwnPostController(filterType: "posts", UserName: username),
-      tag: username.toString(),
-      permanent: true,
+      tag: "${username}_posts",
     );
 
     return Container(
@@ -47,7 +47,39 @@ class MyPostScreen extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
             if (controller.posts.isEmpty) {
-              return const Center(child: Text("No posts found"));
+              // Try to find status controller to check privacy status
+              bool isPrivateStatus = false;
+              if (Get.isRegistered<SettingsController>(tag: username)) {
+                 final pc = Get.find<SettingsController>(tag: username);
+                 isPrivateStatus = pc.userProfile.value?.accountPrivacy?.toLowerCase() == "private" && 
+                                  !(pc.userProfile.value?.is_following ?? false);
+              }
+
+              if (isPrivateStatus) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.lock_outline_rounded, size: 50, color: Colors.grey.shade400),
+                      const SizedBox(height: 12),
+                      const Text("This account is private", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      const SizedBox(height: 4),
+                      const Text("Follow to see their posts", style: TextStyle(color: Colors.grey)),
+                    ],
+                  ),
+                );
+              }
+
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.post_add_outlined, size: 50, color: Colors.grey),
+                    SizedBox(height: 12),
+                    Text("No posts found", style: TextStyle(color: Colors.grey)),
+                  ],
+                ),
+              );
             }
 
             return MasonryGridView.count(

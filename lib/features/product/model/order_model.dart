@@ -45,14 +45,69 @@ class OrderModel {
       paymentStatus: json['payment_status'],
       createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at']) : null,
       updatedAt: json['updated_at'] != null ? DateTime.tryParse(json['updated_at']) : null,
-      items: json['items'] != null
-          ? (json['items'] as List).map((i) => OrderItem.fromJson(i)).toList()
-          : null,
+      items: _parseItems(json),
       payment: json['payment'] != null ? PaymentDetail.fromJson(json['payment']) : null,
       shipping: json['shipping'] != null ? ShippingDetail.fromJson(json['shipping']) : null,
       buyer: json['buyer'] != null ? BuyerDetail.fromJson(json['buyer']) : null,
       address: json['address'] != null ? AddressDetail.fromJson(json['address']) : null,
     );
+  }
+
+  static List<OrderItem>? _parseItems(Map<String, dynamic> json) {
+    List<OrderItem> allItems = [];
+
+    // 1. Check direct items
+    final List<String> possibleKeys = [
+      'items', 
+      'order_items', 
+      'order_line_items', 
+      'line_items', 
+      'order_products',
+      'products', 
+      'details', 
+      'order_details',
+      'items_only',
+      'orderItems',
+      'orderLineItems',
+      'orderProducts'
+    ];
+
+    for (var key in possibleKeys) {
+      final value = json[key];
+      if (value != null) {
+        if (value is List) {
+          allItems.addAll(value.map((i) => OrderItem.fromJson(i)).toList());
+        } else if (value is Map && value['data'] != null && value['data'] is List) {
+          allItems.addAll((value['data'] as List).map((i) => OrderItem.fromJson(i)).toList());
+        }
+      }
+    }
+
+    // 2. Check children (Sub-orders) and their items
+    if (json['children'] != null && json['children'] is List) {
+      for (var child in json['children']) {
+        if (child is Map<String, dynamic>) {
+          final childItems = _parseItems(child);
+          if (childItems != null) {
+            allItems.addAll(childItems);
+          }
+        }
+      }
+    }
+
+    // 3. Last resort: Find ANY field that is a non-empty List (excluding children)
+    if (allItems.isEmpty) {
+      for (var entry in json.entries) {
+        if (entry.key != 'children' && entry.value is List && entry.value.isNotEmpty) {
+           final firstItem = entry.value.first;
+           if (firstItem is Map) {
+             allItems.addAll((entry.value as List).map((i) => OrderItem.fromJson(i)).toList());
+           }
+        }
+      }
+    }
+
+    return allItems.isEmpty ? null : allItems;
   }
 }
 
@@ -86,17 +141,25 @@ class OrderItem {
   });
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
+    // Check if there is a nested product object
+    final productJson = json['product'] ?? json['item'] ?? {};
+    
     return OrderItem(
       id: json['id'],
       uuid: json['uuid'],
       orderId: json['order_id'],
       sellerId: json['seller_id'],
       itemType: json['item_type'],
-      itemId: json['item_id'],
-      quantity: json['quantity'],
-      price: json['price']?.toString(),
+      // Try top level, then within product object
+      itemId: json['item_id'] ?? json['product_id'] ?? json['id'] ?? productJson['id'],
+      quantity: json['quantity'] ?? json['qty'] ?? 1,
+      price: (json['price'] ?? json['unit_price'] ?? json['amount'] ?? productJson['price'] ?? '0').toString(),
       createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at']) : null,
       updatedAt: json['updated_at'] != null ? DateTime.tryParse(json['updated_at']) : null,
+      // Priority: Top level title > product title > name
+      title: json['title'] ?? productJson['title'] ?? json['name'] ?? productJson['name'],
+      // Priority: Top level image > product image > cover image
+      image: json['image'] ?? productJson['image'] ?? json['cover_image'] ?? productJson['cover_image'] ?? productJson['thumbnail_url'],
     );
   }
 }

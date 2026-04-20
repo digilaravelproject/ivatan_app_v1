@@ -231,4 +231,49 @@ class UserData {
       contactVisibility: json["contact_visibility"] ?? 'both'
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "uuid": uuid,
+      "username": username,
+      "occupation": occupation,
+      "name": name,
+      "email": email,
+      "is_seller": isSeller,
+      "phone": phone,
+      "email_verified_at": emailVerifiedAt,
+      "date_of_birth": dateOfBirth,
+      "gender": gender,
+      "language_preference": languagePreference,
+      "two_factor_enabled": twoFactorEnabled,
+      "messaging_privacy": messagingPrivacy,
+      "is_online": isOnline,
+      "last_seen_at": lastSeenAt,
+      "device_tokens": deviceTokens,
+      "reputation_score": reputationScore,
+      "email_notification_preferences": emailNotificationPreferences,
+      "account_privacy": accountPrivacy,
+      "profile_photo_url": profilePhotoPath,
+      "bio": bio,
+      "status": status,
+      "is_blocked": isBlocked,
+      "is_verified": isVerified,
+      "last_login_at": lastLoginAt,
+      "followers_count": followersCount,
+      "following_count": followingCount,
+      "settings": settings,
+      "posts_count": postsCount,
+      "created_at": createdAt,
+      "updated_at": updatedAt,
+      "deleted_at": deletedAt,
+      "is_employer": isEmployer,
+      "interests": interests,
+      "is_mine": is_mine,
+      "is_following": is_following,
+      "is_follower": is_follower,
+      "chat_id": chat_id,
+      "contact_visibility": contactVisibility,
+    };
+  }
 }

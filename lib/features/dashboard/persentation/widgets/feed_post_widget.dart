@@ -169,7 +169,7 @@ class FeedPostWidget extends StatelessWidget {
                 // More Menu
                 IconButton(
                    icon: const Icon(Icons.more_horiz, color: Colors.black87),
-                   onPressed: () => _showSideMenu(context, post.id, post.user.username),
+                   onPressed: () => _showSideMenu(context, post.id, post.user.username, post.user.id),
                    padding: EdgeInsets.zero,
                    constraints: const BoxConstraints(),
                    splashRadius: 20,
@@ -309,7 +309,14 @@ class FeedPostWidget extends StatelessWidget {
 
                     const Spacer(),
 
-                    const Icon(Icons.bookmark_border, color: Colors.black87, size: 26),
+                    GestureDetector(
+                      onTap: () => controller.toggleBookmark(post.id),
+                      child: Icon(
+                        post.stats.isSaved ? Icons.bookmark : Icons.bookmark_border, 
+                        color: post.stats.isSaved ? Colors.black : Colors.black87, 
+                        size: 26
+                      ),
+                    ),
                   ],
                 ),
                 
@@ -345,7 +352,7 @@ class FeedPostWidget extends StatelessWidget {
     );
   }
 
-  void _showSideMenu(BuildContext context, int postId, String username) {
+  void _showSideMenu(BuildContext context, int postId, String username, int userId) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -394,16 +401,36 @@ class FeedPostWidget extends StatelessWidget {
               },
             ),
 
-            // 3. Block
-             ListTile(
+            ListTile(
               leading: const Icon(Icons.block, color: Colors.redAccent),
               title: const Text("Block", style: TextStyle(fontWeight: FontWeight.w500, color: Colors.redAccent)),
               onTap: () {
                 Navigator.pop(context);
-                // Action
+                controller.blockUser(userId);
               },
             ),
             Divider(height: 1, thickness: 0.5, color: Colors.grey.shade100, indent: 16, endIndent: 16),
+            
+            // 4. Interested
+            ListTile(
+              leading: const Icon(Icons.star_border_rounded, color: Colors.black87),
+              title: const Text("Interested", style: TextStyle(fontWeight: FontWeight.w500)),
+              onTap: () {
+                Navigator.pop(context);
+                controller.markInterested(postId);
+              },
+            ),
+            Divider(height: 1, thickness: 0.5, color: Colors.grey.shade100, indent: 16, endIndent: 16),
+
+            // 5. Not Interested
+            ListTile(
+              leading: const Icon(Icons.visibility_off_outlined, color: Colors.black87),
+              title: const Text("Not interested", style: TextStyle(fontWeight: FontWeight.w500)),
+              onTap: () {
+                Navigator.pop(context);
+                controller.markNotInterested(postId);
+              },
+            ),
             const SizedBox(height: 20),
           ],
         ),

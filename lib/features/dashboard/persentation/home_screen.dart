@@ -736,7 +736,7 @@ class HomePage extends StatelessWidget {
                 IconButton(
                   icon: Icon(Icons.more_horiz, color: Colors.black87),
                   onPressed:
-                      () => _showSideMenu(context, post.id, post.user.username),
+                      () => _showSideMenu(context, post.id, post.user.username, post.user.id),
                   padding: EdgeInsets.zero,
                   constraints: BoxConstraints(),
                   splashRadius: 20,
@@ -848,10 +848,13 @@ class HomePage extends StatelessWidget {
 
                     Spacer(),
 
-                    Icon(
-                      Icons.bookmark_border,
-                      color: Colors.black87,
-                      size: 26,
+                    GestureDetector(
+                      onTap: () => controller.toggleBookmark(post.id),
+                      child: Icon(
+                        post.stats.isSaved ? Icons.bookmark : Icons.bookmark_border,
+                        color: post.stats.isSaved ? Colors.black : Colors.black87,
+                        size: 26,
+                      ),
                     ),
                   ],
                 ),
@@ -894,7 +897,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  void _showSideMenu(BuildContext context, int postId, String username) {
+  void _showSideMenu(BuildContext context, int postId, String username, int userId) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -976,7 +979,7 @@ class HomePage extends StatelessWidget {
                   ),
                   onTap: () {
                     Navigator.pop(context);
-                    // Action
+                    controller.blockUser(userId);
                   },
                 ),
                 Divider(
@@ -999,7 +1002,7 @@ class HomePage extends StatelessWidget {
                   ),
                   onTap: () {
                     Navigator.pop(context);
-                    // Action
+                    controller.markInterested(postId);
                   },
                 ),
 
@@ -1015,7 +1018,7 @@ class HomePage extends StatelessWidget {
                   ),
                   onTap: () {
                     Navigator.pop(context);
-                    // Action
+                    controller.markNotInterested(postId);
                   },
                 ),
 

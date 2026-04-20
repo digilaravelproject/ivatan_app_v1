@@ -242,6 +242,7 @@ class PostStats {
   int viewCount;
   bool isLiked;
   bool isSaved;
+  bool isBlocked;
 
   PostStats({
     required this.likeCount,
@@ -250,6 +251,7 @@ class PostStats {
     required this.viewCount,
     required this.isLiked,
     required this.isSaved,
+    required this.isBlocked,
   });
 
   factory PostStats.fromJson(Map<String, dynamic> json) {
@@ -260,6 +262,7 @@ class PostStats {
       viewCount: json["view_count"] ?? 0,
       isLiked: json["is_liked"] ?? false,
       isSaved: json["is_saved"] ?? false,
+      isBlocked: json["is_blocked"] ?? false,
     );
   }
 }

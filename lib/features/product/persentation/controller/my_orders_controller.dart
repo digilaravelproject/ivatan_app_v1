@@ -35,9 +35,6 @@ class MyOrdersController extends GetxController {
           orders.addAll(fetchedOrders);
         }
 
-        // Fetch missing product details (title, image) for items
-        _resolveProductDetails(fetchedOrders);
-
         currentPage.value = response['data']['current_page'] ?? 1;
         lastPage.value = response['data']['last_page'] ?? 1;
       }
@@ -45,25 +42,6 @@ class MyOrdersController extends GetxController {
       print('Error fetching orders: $e');
     } finally {
       isLoading.value = false;
-    }
-  }
-
-  Future<void> _resolveProductDetails(List<OrderModel> newOrders) async {
-    final MarketplaceRepository marketRepo = MarketplaceRepository(apiServices: Get.find<ApiServices>());
-    
-    for (var order in newOrders) {
-      if (order.items == null) continue;
-      
-      for (var item in order.items!) {
-        if (item.itemId != null && (item.title == null || item.image == null)) {
-          final product = await marketRepo.getProductById(item.itemId.toString());
-          if (product != null) {
-            item.title = product.title;
-            item.image = product.coverImage;
-            orders.refresh(); // Update UI as details come in
-          }
-        }
-      }
     }
   }
 

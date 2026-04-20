@@ -15,6 +15,8 @@ import '../persentation/greetingDialog.dart';
 import 'follow_controller.dart';
 import '../../reels_screen/controller/short_play_controller.dart';
 import 'settings_controller.dart';
+import '../../../core/network/app_urls.dart';
+import '../../../core/widgets/custom_dialog.dart';
 
 class HomeController extends GetxController {
   RxBool isLoading = false.obs;
@@ -439,6 +441,71 @@ class HomeController extends GetxController {
     }
   }
 
+  Future<void> blockUser(int userId) async {
+    CustomDialog.showConfirmation(
+      title: "Block User",
+      message: "Are you sure you want to block this user? They will no longer see your content or interact with you.",
+      confirmText: "Block",
+      confirmColor: Colors.redAccent,
+      icon: Icons.block,
+      onConfirm: () async {
+        try {
+          final response = await api.callPost(AppUrls.blockUser(userId), data: {});
+          if (response != null && response["success"] == true) {
+            // Remove all posts from this user from the feed
+            posts.removeWhere((p) => p.user.id == userId);
+            posts.refresh();
+            CustomSnackBar.showSuccess(message: response["message"] ?? "User blocked successfully.");
+          }
+        } catch (e) {
+          print("Block User Error: $e");
+        }
+      },
+    );
+  }
+
+  Future<void> markInterested(int postId) async {
+    CustomDialog.showConfirmation(
+      title: "Interested?",
+      message: "Would you like to see more content similar to this post?",
+      confirmText: "Yes",
+      icon: Icons.star_border_rounded,
+      onConfirm: () async {
+        try {
+          final response = await api.callPost(AppUrls.markInterested(postId), data: {});
+          if (response != null && response["success"] == true) {
+            CustomSnackBar.showSuccess(message: response["message"] ?? "Post marked as interested.");
+          }
+        } catch (e) {
+          print("Interested Error: $e");
+        }
+      },
+    );
+  }
+
+  Future<void> markNotInterested(int postId) async {
+    CustomDialog.showConfirmation(
+      title: "Not Interested?",
+      message: "Are you sure you want to hide this post? We will show you less content like this.",
+      confirmText: "Hide",
+      confirmColor: Colors.redAccent,
+      icon: Icons.visibility_off_outlined,
+      onConfirm: () async {
+        try {
+          final response = await api.callPost(AppUrls.markNotInterested(postId), data: {});
+          if (response != null && response["success"] == true) {
+            // Remove the specific post from the feed
+            posts.removeWhere((p) => p.id == postId);
+            posts.refresh();
+            CustomSnackBar.showSuccess(message: response["message"] ?? "Post marked as not interested.");
+          }
+        } catch (e) {
+          print("Not Interested Error: $e");
+        }
+      },
+    );
+  }
+
   void openReportBottomSheet({required int postId}) {
     Get.bottomSheet(
       Container(
@@ -606,39 +673,24 @@ class HomeController extends GetxController {
     }
   }
 
-  /*
-  Future<void> likeStory(int storyId, int index) async {
+  Future<void> toggleBookmark(int postId) async {
     try {
-      final response = await api.callPost(
-        "api/v1/stories/$storyId/like",
-        data: {},
-      );
-
-   //   print(object)
-
-      print("likeResponse : $response");
-
+      final response = await api.callPost(AppUrls.bookmarkPost(postId), data: {});
+      
       if (response != null && response["success"] == true) {
-
-        int newCount = response["like_count"] ?? 0;
-
-        // old value
-        bool oldLikeStatus = storyData[0].stories[0].isLiked;
-
-        // toggle
-        bool newLikeStatus = !oldLikeStatus;
-
-        // update
-        storyData[0].stories[index].isLiked = newLikeStatus;
-       // storyData[0].stories[storyIndex].likesCount = newCount;
-
-        // refresh list
-        storyData.refresh();
+        int index = posts.indexWhere((p) => p.id == postId);
+        if (index != -1) {
+          // Toggle the local state based on API response
+          posts[index].stats.isSaved = response["is_bookmarked"] ?? !posts[index].stats.isSaved;
+          posts.refresh(); // Reactive UI update
+        }
+        
+        CustomSnackBar.showSuccess(
+          message: response["message"] ?? (response["is_bookmarked"] == true ? "Post bookmarked" : "Bookmark removed")
+        );
       }
-
     } catch (e) {
-      print("Like Error: $e");
+      print("Bookmark Error: $e");
     }
   }
-*/
 }

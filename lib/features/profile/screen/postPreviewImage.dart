@@ -504,8 +504,8 @@ class _PreviewScreenState extends State<PreviewScreen> {
   String _getPostTypeLabel(String type) {
     switch (type) {
       case 'post': return 'Post';
-      case 'reel': return 'Reel';
-      case 'video': return 'Video';
+      case 'reel': return 'Clip';
+      case 'video': return 'I-Play';
       case 'carousel': return 'Carousel';
       default: return 'Post';
     }

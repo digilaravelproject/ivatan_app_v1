@@ -66,6 +66,19 @@ class AppUrls {
   static String sellerOrderStatusUpdate(int id) => "api/v1/seller/orders/$id/status";
   static const sellerStats = "api/v1/seller/dashboard/stats";
 
+  // --------- FEED / SEARCH -----------//
+  static const feedTrending = "api/v1/posts/feed/trending";
+  static const feedTrendingInterests = "api/v1/posts/feed/trending/interests";
+  static const feedForYou = "api/v1/posts/feed/for-you";
+  static const banners = "api/v1/banners";
+  static const logout = "api/v1/auth/logout";
+  static String blockUser(int id) => "api/v1/users/$id/block";
+  static String markInterested(int id) => "api/v1/posts/$id/interested";
+  static String markNotInterested(int id) => "api/v1/posts/$id/not-interested";
+  static String bookmarkPost(int id) => "api/v1/posts/$id/bookmark";
+  static const myBookmarks = "api/v1/user/bookmarks";
+  static const blockedUsers = "api/v1/user/blocked-users";
+
   static const defaultApiKey =
       "1|1yCFcc7ahglUgOL3cftZZ7T83gcyFJreXGlQx0zud042e463";
 }

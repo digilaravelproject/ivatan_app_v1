@@ -119,9 +119,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             return Center(child: CircularProgressIndicator());
           }
           
-          final isFollowing = profileController.followController.isUserFollowing(user.id!).value;
-          final bool isPrivateHidden = isOtherProfile && 
-                                     user.accountPrivacy == "private" && 
+          final bool isCurrentlyOther = finalUserName != (SharedPrefManager().user?.username ?? "");
+          
+          final bool isFollowing = profileController.followController.isUserFollowing(user.id!).value;
+          final bool isPrivateHidden = isCurrentlyOther && 
+                                     (user.accountPrivacy?.toLowerCase() == "private") && 
                                      !isFollowing;
             // Build dynamic tabs and views
             List<Tab> tabs = [
@@ -206,76 +208,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ),
                                         ),
 
-                                       // Icons
-                                      if (!isOtherProfile)
-                                        // Positioned(
-                                        //   top: 40,
-                                        //   right: 10,
-                                        //   child: IconButton(
-                                        //     icon: Container(
-                                        //       padding: const EdgeInsets.all(6),
-                                        //       decoration: BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
-                                        //       child: const Icon(Icons.settings, color: Colors.white, size: 20),
-                                        //     ),
-                                        //     onPressed: () => Get.to(() => SettingsScreen()),
-                                        //   ),
-                                        // ),
-
-
-                                        // Cart Icon (Left of 3 dot menu)
-                                        Positioned(
-                                          top: 40,
-                                          right: 60,
-                                          child: GestureDetector(
-                                            onTap: () => Get.to(() => CartScreen()),
-                                            child: Stack(
-                                              clipBehavior: Clip.none,
-                                              children: [
-                                                Container(
-                                                  padding: const EdgeInsets.all(6),
-                                                  decoration: const BoxDecoration(
-                                                    color: Colors.black26,
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons.shopping_cart_outlined,
-                                                    color: Colors.white,
-                                                    size: 22,
-                                                  ),
-                                                ),
-                                                Obx(() => cartController.totalItems.value > 0
-                                                    ? Positioned(
-                                                        right: -4,
-                                                        top: -4,
-                                                        child: Container(
-                                                          padding: const EdgeInsets.all(4),
-                                                          decoration: const BoxDecoration(
-                                                            color: Colors.red,
-                                                            shape: BoxShape.circle,
-                                                          ),
-                                                          constraints: const BoxConstraints(
-                                                            minWidth: 16,
-                                                            minHeight: 16,
-                                                          ),
-                                                          child: Text(
-                                                            '${cartController.totalItems.value}',
-                                                            style: const TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: 10,
-                                                              fontWeight: FontWeight.bold,
-                                                            ),
-                                                            textAlign: TextAlign.center,
-                                                          ),
-                                                        ),
-                                                      )
-                                                    : const SizedBox.shrink()),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                                       // Cart Icon (Visible on EVERY profile)
+                                         Positioned(
+                                           top: 40,
+                                           right: isOtherProfile ? 10 : 60,
+                                           child: GestureDetector(
+                                             onTap: () => Get.to(() => CartScreen()),
+                                             child: Stack(
+                                               clipBehavior: Clip.none,
+                                               children: [
+                                                 Container(
+                                                   padding: const EdgeInsets.all(6),
+                                                   decoration: const BoxDecoration(
+                                                     color: Colors.black26,
+                                                     shape: BoxShape.circle,
+                                                   ),
+                                                   child: const Icon(
+                                                     Icons.shopping_cart_outlined,
+                                                     color: Colors.white,
+                                                     size: 22,
+                                                   ),
+                                                 ),
+                                                 Obx(() => cartController.totalItems.value > 0
+                                                     ? Positioned(
+                                                         right: -4,
+                                                         top: -4,
+                                                         child: Container(
+                                                           padding: const EdgeInsets.all(4),
+                                                           decoration: const BoxDecoration(
+                                                             color: Colors.red,
+                                                             shape: BoxShape.circle,
+                                                           ),
+                                                           constraints: const BoxConstraints(
+                                                             minWidth: 16,
+                                                             minHeight: 16,
+                                                           ),
+                                                           child: Text(
+                                                             '${cartController.totalItems.value}',
+                                                             style: const TextStyle(
+                                                               color: Colors.white,
+                                                               fontSize: 10,
+                                                               fontWeight: FontWeight.bold,
+                                                             ),
+                                                             textAlign: TextAlign.center,
+                                                           ),
+                                                         ),
+                                                       )
+                                                     : const SizedBox.shrink()),
+                                               ],
+                                             ),
+                                           ),
+                                         ),
 
                                         // 3 Dot Menu
-                                      if (!isOtherProfile)
                                         Positioned(
                                           top: 40,
                                           right: 10,
@@ -283,6 +268,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             onSelected: (value) async {
                                               if (value == 'profile') {
                                                 Get.to(() => SettingsScreen());
+                                              } else if (value == 'bookmarks') {
+                                                profileController.openBookmarks();
+                                              } else if (value == 'block') {
+                                                // Show confirmation dialog for block
+                                                Get.dialog(
+                                                  CupertinoAlertDialog(
+                                                    title: Text(user.isBlocked == true ? "Unblock User?" : "Block User?"),
+                                                    content: Text(user.isBlocked == true 
+                                                      ? "Are you sure you want to unblock @${user.username}?" 
+                                                      : "Are you sure you want to block @${user.username}? They will no longer be able to see your content or interact with you."),
+                                                    actions: [
+                                                      CupertinoDialogAction(
+                                                        child: const Text("Cancel"),
+                                                        onPressed: () => Get.back(),
+                                                      ),
+                                                      CupertinoDialogAction(
+                                                        isDestructiveAction: true,
+                                                        child: Text(user.isBlocked == true ? "Unblock" : "Block"),
+                                                        onPressed: () {
+                                                          Get.back();
+                                                          profileController.toggleBlockUser(user.id!);
+                                                        },
+                                                      ),
+                                                    ],
+                                                  )
+                                                );
                                               } else if (value == 'enquiry') {
                                                 Get.to(() => EnquiriesListScreen());
                                               } else if (value == 'orders') {
@@ -305,80 +316,103 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               }
                                             },
                                             itemBuilder: (context) => [
-                                              const PopupMenuItem(
-                                                value: 'profile',
-                                                child: Row(
-                                                  children: [
-                                                    Icon(CupertinoIcons.person_add, size: 20),
-                                                    SizedBox(width: 10),
-                                                    Text("Profile Settings"),
-                                                  ],
-                                                ),
-                                              ),
-                                              const PopupMenuItem(
-                                                value: 'orders',
-                                                child: Row(
-                                                  children: [
-                                                    Icon(CupertinoIcons.bag, size: 20),
-                                                    SizedBox(width: 10),
-                                                    Text("My Orders"),
-                                                  ],
-                                                ),
-                                              ),
-                                              const PopupMenuItem(
-                                                value: 'enquiries',
-                                                child: Row(
-                                                  children: [
-                                                    Icon(CupertinoIcons.bag, size: 20),
-                                                    SizedBox(width: 10),
-                                                    Text("My Enquiries"),
-                                                  ],
-                                                ),
-                                              ),
-                                              if (user.isSeller == true)
+                                              if (!isOtherProfile) ...[
                                                 const PopupMenuItem(
-                                                  value: 'products',
+                                                  value: 'profile',
                                                   child: Row(
                                                     children: [
-                                                      Icon(CupertinoIcons.cube_box, size: 20),
+                                                      Icon(CupertinoIcons.person_add, size: 20),
                                                       SizedBox(width: 10),
-                                                      Text("Your Products"),
+                                                      Text("Profile Settings"),
                                                     ],
                                                   ),
                                                 ),
-                                              if (user.isSeller == true)
                                                 const PopupMenuItem(
-                                                  value: 'services',
+                                                  value: 'bookmarks',
                                                   child: Row(
                                                     children: [
-                                                      Icon(Icons.room_service_outlined, size: 20),
+                                                      Icon(CupertinoIcons.bookmark, size: 20),
                                                       SizedBox(width: 10),
-                                                      Text("Your Services"),
+                                                      Text("Bookmarks"),
                                                     ],
                                                   ),
                                                 ),
-                                              if (user.isSeller == true)
                                                 const PopupMenuItem(
-                                                  value: 'enquiry',
+                                                  value: 'orders',
                                                   child: Row(
                                                     children: [
-                                                      Icon(CupertinoIcons.chat_bubble_text, size: 20),
+                                                      Icon(CupertinoIcons.bag, size: 20),
                                                       SizedBox(width: 10),
-                                                      Text("Enquiry"),
+                                                      Text("My Orders"),
                                                     ],
                                                   ),
                                                 ),
-                                              if (user.isSeller == true)
                                                 const PopupMenuItem(
-                                                  value: 'dashboard',
+                                                  value: 'enquiries',
                                                   child: Row(
                                                     children: [
-                                                      Icon(CupertinoIcons.doc_append, size: 20),
+                                                      Icon(CupertinoIcons.bag, size: 20),
                                                       SizedBox(width: 10),
-                                                      Text("Dashboard"),
+                                                      Text("My Enquiries"),
                                                     ],
                                                   ),
                                                 ),
+                                                if (user.isSeller == true)
+                                                  const PopupMenuItem(
+                                                    value: 'products',
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(CupertinoIcons.cube_box, size: 20),
+                                                        SizedBox(width: 10),
+                                                        Text("Your Products"),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                if (user.isSeller == true)
+                                                  const PopupMenuItem(
+                                                    value: 'services',
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(Icons.room_service_outlined, size: 20),
+                                                        SizedBox(width: 10),
+                                                        Text("Your Services"),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                if (user.isSeller == true)
+                                                  const PopupMenuItem(
+                                                    value: 'enquiry',
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(CupertinoIcons.chat_bubble_text, size: 20),
+                                                        SizedBox(width: 10),
+                                                        Text("Enquiry"),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                if (user.isSeller == true)
+                                                  const PopupMenuItem(
+                                                    value: 'dashboard',
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(CupertinoIcons.doc_append, size: 20),
+                                                        SizedBox(width: 10),
+                                                        Text("Dashboard"),
+                                                      ],
+                                                    ),
+                                                  ),
+                                              ] else ...[
+                                                 PopupMenuItem(
+                                                  value: 'block',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(user.isBlocked == true ? Icons.person_off_outlined : Icons.block, size: 20, color: Colors.red),
+                                                      const SizedBox(width: 10),
+                                                      Text(user.isBlocked == true ? "Unblock User" : "Block User", style: const TextStyle(color: Colors.red)),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
                                             ],
                                             child: Container(
                                               padding: const EdgeInsets.all(6),
@@ -476,6 +510,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                       if (user.isVerified ?? false) ...[
                                                         const SizedBox(width: 4),
                                                         const Icon(Icons.verified, color: Colors.blue, size: 16),
+                                                      ],
+                                                      if (user.accountPrivacy?.toLowerCase() == "private") ...[
+                                                        const SizedBox(width: 4),
+                                                        const Icon(Icons.lock_outline, color: Colors.black54, size: 16),
                                                       ]
                                                     ],
                                                   ),
@@ -556,7 +594,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         _buildCreateOption(
                                                           icon: Icons.movie_creation_outlined,
                                                           color: Colors.pink,
-                                                          title: "Reel",
+                                                          title: "Clip",
                                                           subtitle: "Share a short video",
                                                           onTap: () { 
                                                             Get.back(); 
@@ -583,7 +621,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         _buildCreateOption(
                                                           icon: Icons.play_circle_outline,
                                                           color: Colors.purple,
-                                                          title: "Video",
+                                                          title: "I-Play",
                                                           subtitle: "Share a longer video",
                                                            onTap: () { 
                                                              Get.back();
@@ -696,82 +734,91 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                if (profileController.userProfile.value?.contactVisibility != 'none')
                                                  Expanded(
                                                    child: _buildActionButton("Contact", () {
-                                                     _showContactBottomSheet(user);
+                                                    _showContactBottomSheet(user);
                                                    }, isExpanded: true),
                                                  ),
                                              ],
                                            ],
                                          ),
                                        ],
-                                       SizedBox(height: 16),
                                        Obx(() {
-                                          final isFollowing = profileController.followController.isUserFollowing(user.id!).value;
-                                          final bool isPrivateHidden = isOtherProfile && 
-                                                                     user.accountPrivacy == "private" && 
-                                                                     !isFollowing;
-                                                                     
+                                           final bool isCurrentlyOtherHighlight = finalUserName != (SharedPrefManager().user?.username ?? "");
+                                           final isFollowing = profileController.followController.isUserFollowing(user.id!).value;
+                                           final bool isPrivateHidden = isCurrentlyOtherHighlight && 
+                                                                      (user.accountPrivacy?.toLowerCase() == "private") && 
+                                                                      !isFollowing;
+                                                                      
                                           if (controller.isLoading.value || isPrivateHidden) return const SizedBox.shrink();
-                                          return SizedBox(
-                                            height: 90,
-                                            child: ListView.builder(
-                                              scrollDirection: Axis.horizontal,
-                                              itemCount: isOtherProfile 
-                                                  ? controller.highlights.length 
-                                                  : controller.highlights.length + 1,
-                                              itemBuilder: (context, index) {
-                                                if (!isOtherProfile) {
-                                                  if (index == 0) {
-                                                    return GestureDetector(
-                                                      onTap: () {
-                                                        storyController.onCreateHighlightFromProfile();
-                                                      }, 
-                                                      child: _buildAddStory()
-                                                    );
-                                                  }
-                                                  
-                                                  final story = controller.highlights[index - 1];
-                                                  String? displayUrl = story.cover_media_url;
-                                                  if ((displayUrl == null || displayUrl.isEmpty) && story.stories.isNotEmpty) {
-                                                    displayUrl = story.stories.first.thumbnailUrl.isNotEmpty 
-                                                        ? story.stories.first.thumbnailUrl 
-                                                        : story.stories.first.mediaUrl;
-                                                  }
 
-                                                  return GestureDetector(
-                                                      onTap: () {
-                                                        if (story.stories.isNotEmpty) {
-                                                          Get.to(() => HighlightScreenStoryViewer(stories: story.stories, highlightId: story.id, initialIndex: 0));
-                                                        } else {
-                                                          CustomSnackBar.showError(message: "This highlight has no stories.");
-                                                        }
-                                                      },
-                                                      child: _buildStoryItem(story.title, displayUrl)
-                                                  );
-                                                } else {
-                                                  // Other profile: No "New" icon, index matches directly
-                                                  final story = controller.highlights[index];
-                                                  String? displayUrl = story.cover_media_url;
-                                                  if ((displayUrl == null || displayUrl.isEmpty) && story.stories.isNotEmpty) {
-                                                    displayUrl = story.stories.first.thumbnailUrl.isNotEmpty 
-                                                        ? story.stories.first.thumbnailUrl 
-                                                        : story.stories.first.mediaUrl;
-                                                  }
+                                          // Hide entire section (including space) if other profile has no highlights
+                                          if (isOtherProfile && controller.highlights.isEmpty) return const SizedBox.shrink();
 
-                                                  return GestureDetector(
-                                                      onTap: () {
-                                                        if (story.stories.isNotEmpty) {
-                                                          Get.to(() => HighlightScreenStoryViewer(stories: story.stories, highlightId: story.id, initialIndex: 0));
-                                                        } else {
-                                                          CustomSnackBar.showError(message: "This highlight has no stories.");
-                                                        }
-                                                      },
-                                                      child: _buildStoryItem(story.title, displayUrl)
-                                                  );
-                                                }
-                                              },
-                                            ),
+                                          return Column(
+                                            children: [
+                                              const SizedBox(height: 16),
+                                              SizedBox(
+                                                height: 90,
+                                                child: ListView.builder(
+                                                  scrollDirection: Axis.horizontal,
+                                                  itemCount: isOtherProfile 
+                                                      ? controller.highlights.length 
+                                                      : controller.highlights.length + 1,
+                                                  itemBuilder: (context, index) {
+                                                    if (!isOtherProfile) {
+                                                      if (index == 0) {
+                                                        return GestureDetector(
+                                                          onTap: () {
+                                                            storyController.onCreateHighlightFromProfile();
+                                                          }, 
+                                                          child: _buildAddStory()
+                                                        );
+                                                      }
+                                                      
+                                                      final story = controller.highlights[index - 1];
+                                                      String? displayUrl = story.cover_media_url;
+                                                      if ((displayUrl == null || displayUrl.isEmpty) && story.stories.isNotEmpty) {
+                                                        displayUrl = story.stories.first.thumbnailUrl.isNotEmpty 
+                                                            ? story.stories.first.thumbnailUrl 
+                                                            : story.stories.first.mediaUrl;
+                                                      }
+    
+                                                      return GestureDetector(
+                                                          onTap: () {
+                                                            if (story.stories.isNotEmpty) {
+                                                              Get.to(() => HighlightScreenStoryViewer(stories: story.stories, highlightId: story.id, initialIndex: 0));
+                                                            } else {
+                                                              CustomSnackBar.showError(message: "This highlight has no stories.");
+                                                            }
+                                                          },
+                                                          child: _buildStoryItem(story.title, displayUrl)
+                                                      );
+                                                    } else {
+                                                      // Other profile: No "New" icon, index matches directly
+                                                      final story = controller.highlights[index];
+                                                      String? displayUrl = story.cover_media_url;
+                                                      if ((displayUrl == null || displayUrl.isEmpty) && story.stories.isNotEmpty) {
+                                                        displayUrl = story.stories.first.thumbnailUrl.isNotEmpty 
+                                                            ? story.stories.first.thumbnailUrl 
+                                                            : story.stories.first.mediaUrl;
+                                                      }
+    
+                                                      return GestureDetector(
+                                                          onTap: () {
+                                                            if (story.stories.isNotEmpty) {
+                                                              Get.to(() => HighlightScreenStoryViewer(stories: story.stories, highlightId: story.id, initialIndex: 0));
+                                                            } else {
+                                                              CustomSnackBar.showError(message: "This highlight has no stories.");
+                                                            }
+                                                          },
+                                                          child: _buildStoryItem(story.title, displayUrl)
+                                                      );
+                                                    }
+                                                  },
+                                                ),
+                                              ),
+                                            ],
                                           );
-                                      }),
+                                       }),
                                     ],
                                   ),
                                 ),
@@ -813,14 +860,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       
-                        SliverToBoxAdapter(child: const SizedBox.shrink()),
-                      
                       if (!isPrivateHidden)
                         SliverAppBar(
                           pinned: true,
                           floating: false,
                           backgroundColor: AppColors.white,
                           automaticallyImplyLeading: false,
+                          primary: false,
                           toolbarHeight: 0,
                           elevation: 0,
                           bottom: TabBar(
@@ -859,7 +905,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           onTap: () {
                final isFollowing = profileController.followController.isUserFollowing(user.id!, initialValue: user.is_following).value;
                final bool isPrivateHidden = isOtherProfile && 
-                                          user.accountPrivacy == "private" && 
+                                          user.accountPrivacy?.toLowerCase() == "private" && 
                                           !isFollowing;
                
                if (isPrivateHidden) return;
@@ -1230,7 +1276,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //                               ),
   //                               GestureDetector(
   //                                 onTap: () {
-  //                                   if (user.accountPrivacy == "private" &&
+  //                                   if (user.accountPrivacy?.toLowerCase() == "private" &&
   //                                       (user.is_following ?? false) == false && (user.is_mine ?? false) == false) {
   //                                     CustomSnackBar.showSuccess(
   //                                       message: "First Follow User ",
@@ -1266,7 +1312,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //                               ),
   //                               GestureDetector(
   //                                 onTap: () {
-  //                                   if (user.accountPrivacy == "private" &&
+  //                                   if (user.accountPrivacy?.toLowerCase() == "private" &&
   //                                       (user.is_following ?? false) && (user.is_mine ?? false) == false) {
   //                                     CustomSnackBar.showSuccess(
   //                                       message: "First Follow User ",
@@ -1301,7 +1347,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //                           ),
   //                           SizedBox(height: 10),
   //                           isOtherProfile &&
-  //                                   (user.accountPrivacy) == "private" &&
+  //                                   (user.accountPrivacy?.toLowerCase()) == "private" &&
   //                                   (user.is_following ?? false) == false
   //                               ? GestureDetector(
   //                                 onTap: () {

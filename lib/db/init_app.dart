@@ -35,9 +35,10 @@ const String kDefaultChannelDescription =
     'This channel is used for general notifications.';
 
 Future<void> initApp() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  // HttpOverrides.global = MyHttpOverrides();
-  await Firebase.initializeApp();
+  // WidgetsFlutterBinding.ensureInitialized(); is now handled in main()
+  // Firebase.initializeApp() with options is now handled in main()
+  
+  // Register background messaging handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   await Future.wait([

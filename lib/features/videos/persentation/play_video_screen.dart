@@ -407,7 +407,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
 
               Positioned(
-                top: 50,
+                top: 0,
                 left: 16,
                 child: SafeArea(
                   child: GestureDetector(
@@ -1046,11 +1046,16 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   color: Colors.grey.shade700,
                   onPressed: () {},
                 ),
-                // Save Button
+                // Bookmark Button
                 IconButton(
-                  icon: const Icon(Icons.bookmark_border_rounded, size: 24),
-                  color: Colors.grey.shade700,
-                  onPressed: () {},
+                  icon: Icon(
+                    video.stats.isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                    size: 24,
+                    color: video.stats.isSaved ? Colors.black : Colors.grey.shade700,
+                  ),
+                  onPressed: () {
+                    controller.toggleBookmark(video.id);
+                  },
                 ),
               ],
             ),

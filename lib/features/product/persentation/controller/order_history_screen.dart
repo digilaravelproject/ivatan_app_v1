@@ -67,11 +67,6 @@ class SellerOrdersController extends GetxController {
         if (fetchedOrders.isEmpty && currentPage.value < lastPage.value) {
           fetchOrders(page: currentPage.value + 1);
         }
-
-        // Resolve product details (names) for the newly fetched orders
-        if (fetchedOrders.isNotEmpty) {
-          _resolveProductDetails(fetchedOrders);
-        }
       }
     } catch (e) {
       debugPrint('Error fetching seller orders: $e');
@@ -80,25 +75,6 @@ class SellerOrdersController extends GetxController {
       if (currentPage.value >= lastPage.value || orders.isNotEmpty) {
         isLoading.value = false;
         isMoreLoading.value = false;
-      }
-    }
-  }
-
-  Future<void> _resolveProductDetails(List<OrderModel> newOrders) async {
-    final MarketplaceRepository marketRepo = MarketplaceRepository(apiServices: Get.find<ApiServices>());
-    
-    for (var order in newOrders) {
-      if (order.items == null) continue;
-      
-      for (var item in order.items!) {
-        if (item.itemId != null && (item.title == null || item.image == null)) {
-          final product = await marketRepo.getProductById(item.itemId.toString());
-          if (product != null) {
-            item.title = product.title;
-            item.image = product.coverImage;
-            orders.refresh(); // Update UI as details come in
-          }
-        }
       }
     }
   }

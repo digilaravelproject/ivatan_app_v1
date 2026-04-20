@@ -147,7 +147,7 @@ class _ReelMediaPickerScreenState extends State<ReelMediaPickerScreen> {
           onPressed: () => Get.back(),
         ),
         title: const Text(
-          'New Reel',
+          'New Clip',
           style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
         ),
         actions: [
@@ -414,7 +414,7 @@ class _ReelMediaPickerScreenState extends State<ReelMediaPickerScreen> {
            // If photo captured for reel, maybe show error or treat as post?
            // For now, let's allow it but it might not be a "reel" effectively.
            // Or just treat as reel with image (slideshow potential).
-           Get.snackbar("Notice", "Reels are typically videos. Photo captured.");
+           Get.snackbar("Notice", "Clips are typically videos. Photo captured.");
            
            controller.imageFile.value = file;
            controller.videoFile.value = null;

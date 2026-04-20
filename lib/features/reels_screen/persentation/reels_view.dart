@@ -536,7 +536,7 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
               right: 0,
               child: Center(
                 child: Text(
-                  'Reels',
+                  'Clips',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,

@@ -5,7 +5,11 @@ import '../../../core/network/api_services.dart';
 import '../../dashboard/controller/follow_controller.dart';
 import '../../dashboard/controller/homeController.dart';
 import '../../dashboard/model/post_model.dart';
-import 'package:i_vatan_app/features/dashboard/controller/homeController.dart'; // Ensure absolute path if needed, or rely on relative.
+import 'package:i_vatan_app/features/dashboard/controller/homeController.dart';
+import '../../../core/network/app_urls.dart';
+import '../../../core/widgets/custom_dialog.dart';
+import '../../../core/helper/custom_snack_bar.dart';
+import 'package:flutter/material.dart';
 
 class OwnPostController extends GetxController {
 
@@ -162,12 +166,108 @@ class OwnPostController extends GetxController {
     }
   }
 
-  Future<void> toggleFollowForPostUser(int userId, int index) async {
-    // Implement follow logic or proxy to HomeController if feasible
+  Future<void> toggleFollowForPostUser(int userId) async {
+    final HomeController homeController = Get.find<HomeController>();
+    await homeController.toggleFollowForPostUser(userId);
+    posts.refresh();
+  }
+
+  Future<void> blockUser(int userId) async {
+    CustomDialog.showConfirmation(
+      title: "Block User",
+      message: "Are you sure you want to block this user? They will no longer see your content or interact with you.",
+      confirmText: "Block",
+      confirmColor: Colors.redAccent,
+      icon: Icons.block,
+      onConfirm: () async {
+        try {
+          final response = await api.callPost(AppUrls.blockUser(userId), data: {});
+          if (response != null && response["success"] == true) {
+            posts.removeWhere((p) => p.user.id == userId);
+            posts.refresh();
+            CustomSnackBar.showSuccess(message: response["message"] ?? "User blocked successfully.");
+          }
+        } catch (e) {
+          print("Block User Error: $e");
+        }
+      },
+    );
+  }
+
+  Future<void> markInterested(int postId) async {
+    CustomDialog.showConfirmation(
+      title: "Interested?",
+      message: "Would you like to see more content similar to this post?",
+      confirmText: "Yes",
+      icon: Icons.star_border_rounded,
+      onConfirm: () async {
+        try {
+          final response = await api.callPost(AppUrls.markInterested(postId), data: {});
+          if (response != null && response["success"] == true) {
+            CustomSnackBar.showSuccess(message: response["message"] ?? "Post marked as interested.");
+          }
+        } catch (e) {
+          print("Interested Error: $e");
+        }
+      },
+    );
+  }
+
+  Future<void> markNotInterested(int postId) async {
+    CustomDialog.showConfirmation(
+      title: "Not Interested?",
+      message: "Are you sure you want to hide this post? We will show you less content like this.",
+      confirmText: "Hide",
+      confirmColor: Colors.redAccent,
+      icon: Icons.visibility_off_outlined,
+      onConfirm: () async {
+        try {
+          final response = await api.callPost(AppUrls.markNotInterested(postId), data: {});
+          if (response != null && response["success"] == true) {
+            posts.removeWhere((p) => p.id == postId);
+            posts.refresh();
+            CustomSnackBar.showSuccess(message: response["message"] ?? "Post marked as not interested.");
+          }
+        } catch (e) {
+          print("Not Interested Error: $e");
+        }
+      },
+    );
   }
 
   void openReportBottomSheet({required int postId}) {
-     final HomeController homeController = Get.find<HomeController>();
-     homeController.openReportBottomSheet(postId: postId);
+    final HomeController homeController = Get.find<HomeController>();
+    homeController.openReportBottomSheet(postId: postId);
+  }
+
+  Future<void> toggleBookmark(int postId) async {
+    try {
+      final response = await api.callPost(AppUrls.bookmarkPost(postId), data: {});
+      
+      if (response != null && response["success"] == true) {
+        int index = posts.indexWhere((p) => p.id == postId);
+        if (index != -1) {
+          bool isBookmarked = response["is_bookmarked"] ?? !posts[index].stats.isSaved;
+          posts[index].stats.isSaved = isBookmarked;
+          posts.refresh();
+        }
+        
+        CustomSnackBar.showSuccess(
+          message: response["message"] ?? (response["is_bookmarked"] == true ? "Post bookmarked" : "Bookmark removed")
+        );
+
+        // Sync with HomeController feed if it exists to maintain global state
+        if (Get.isRegistered<HomeController>()) {
+          final home = Get.find<HomeController>();
+          int homeIndex = home.posts.indexWhere((p) => p.id == postId);
+          if (homeIndex != -1) {
+             home.posts[homeIndex].stats.isSaved = response["is_bookmarked"] ?? true;
+             home.posts.refresh();
+          }
+        }
+      }
+    } catch (e) {
+      print("Bookmark Error: $e");
+    }
   }
 }

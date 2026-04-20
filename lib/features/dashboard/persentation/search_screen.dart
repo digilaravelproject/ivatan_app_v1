@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -27,124 +28,115 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  // Removed unused sliderImages list
-  int selectedTab = 0;
-
   @override
   Widget build(BuildContext context) {
     final PostController controller = Get.put(PostController());
 
-    return Container(
-      color: Colors.white, // Plain White Background
+    return DefaultTabController(
+      length: 3,
       child: Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
-          child: Column(
-            children: [
-              // SizedBox(height: kToolbarHeight * 0.65), // Removed excessive top padding
-              CustomSearchBar(),
-              SizedBox(
-                height: 130,
-                child:Obx((){
-                  if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+          child: NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) {
+              return [
+                // 1. Search Bar
+                SliverToBoxAdapter(
+                  child: CustomSearchBar(),
+                ),
 
-                  if (controller.bannersList.isEmpty) {
-                    return const Center(child: Text("No banners found"));
-                  }
-                  return ImageSlider(
-                    images: controller.bannersList
-                        .map((banner) => banner.mediaUrl)
-                        .toList(),
-                    viewPort: 0.9, // size of each sliding item
-                    borderRadius: 16, // round corner
-                    autoScroll: true, // auto move the slider
-                    isIndicatorVisible: true, // show dots
-                    itemPadding: EdgeInsets.symmetric(horizontal: 8),
-                    indicatorAlignment: MainAxisAlignment.center,
-                  );
-                })
-
-              ),
-              Expanded(
-                child: DefaultTabController(
-                  length: 3,
-                  child: Column(
-                    children: [
-                      TabBar(
-                        //   controller: _tabController,
-                        isScrollable: true,
-                        dividerColor: Colors.transparent,
-                        indicatorColor: Colors.black, // Minimal black indicator
-                        indicatorSize: TabBarIndicatorSize.label,
-                        tabAlignment: TabAlignment.start,
-                        labelColor: Colors.black, // Selected Black
-                        unselectedLabelColor: Colors.grey, // Unselected Grey
-                        labelPadding: EdgeInsets.symmetric(horizontal: 16),
-                        labelStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        tabs: [
-                          Tab(text: "Trending"),
-                          Tab(text: "Live"),
-                          Tab(text: "For You"),
-                        ],
-                      ),
-
-                    ///  SizedBox(height: 20),
-
-                      /// ---------- TAB BAR VIEW (DIFFERENT SCREENS) ----------
-                      Expanded(
-                        // height: 500, // required
-                        child: TabBarView(
-                          children: [
-                          //  LiveScreen(),
-                           TrendingScreen(),
-                           CustomEmptyState(
-                             title: "Live Coming Soon",
-                             subTitle: "We are getting the stage ready for you!",
-                             icon: Icons.live_tv_rounded,
-                           ),
-                           CustomEmptyState(
-                             title: "For You Coming Soon",
-                             subTitle: "Personalized content is on its way!",
-                             icon: Icons.favorite_rounded,
-                           ),
-                          // LiveScreen(),
-                          // ForYouScreen(),
-                           // ReelsScreen()
-                          ],
-                        ),
-                      ),
-                    ],
+                // 2. Banner Slider
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 130,
+                    child: Obx(() {
+                      if (controller.isLoading.value && controller.bannersList.isEmpty) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (controller.bannersList.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+                      return ImageSlider(
+                        images: controller.bannersList
+                            .map((banner) => banner.mediaUrl)
+                            .toList(),
+                        viewPort: 0.9,
+                        borderRadius: 16,
+                        autoScroll: true,
+                        isIndicatorVisible: true,
+                        itemPadding: const EdgeInsets.symmetric(horizontal: 8),
+                        indicatorAlignment: MainAxisAlignment.center,
+                      );
+                    }),
                   ),
                 ),
-              ),
 
-              /*Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                  children: [
-                    Icon(Icons.trending_up_outlined),
-                    SizedBox(width: 5,),
-                    Text("Trending",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
-                    SizedBox(width: 10,),
-                    CustomImageView(imagePath: AppAssets.imgLive,height: 28,width: 28,),
-                    SizedBox(width: 5,),
-                    Text("Live",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
-                    SizedBox(width: 10,),
-                    Icon(Icons.keyboard_arrow_down_sharp),
-                    SizedBox(width: 5,),
-                    Text("For You",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
-                  ],
+                const SliverToBoxAdapter(child: SizedBox(height: 10)),
+
+                // 3. Pinned TabBar
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _SliverTabBarDelegate(
+                    TabBar(
+                      isScrollable: true,
+                      dividerColor: Colors.transparent,
+                      indicatorColor: Colors.black,
+                      indicatorSize: TabBarIndicatorSize.label,
+                      tabAlignment: TabAlignment.start,
+                      labelColor: Colors.black,
+                      unselectedLabelColor: Colors.grey,
+                      labelPadding: const EdgeInsets.symmetric(horizontal: 16),
+                      labelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      tabs: const [
+                        Tab(text: "Trending"),
+                        Tab(text: "Live"),
+                        Tab(text: "For You"),
+                      ],
+                    ),
+                  ),
                 ),
-              )*/
-            ],
+              ];
+            },
+            body: TabBarView(
+              children: [
+                TrendingScreen(),
+                CustomEmptyState(
+                  title: "Live Coming Soon",
+                  subTitle: "We are getting the stage ready for you!",
+                  icon: Icons.live_tv_rounded,
+                ),
+                ForYouGridScreen(),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+}
 
+class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverTabBarDelegate(this._tabBar);
+
+  final TabBar _tabBar;
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: Colors.white, // Ensure TabBar has solid background when pinned
+      child: _tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverTabBarDelegate oldDelegate) {
+    return false;
+  }
 }
 
 class TrendingScreen extends StatelessWidget {
@@ -163,29 +155,21 @@ class TrendingScreen extends StatelessWidget {
       "https://images.pexels.com/photos/34950/pexels-photo.jpg",
       "https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg",
     ];
-    return Container(
-      color: AppColors.transparent,
-        child: Column(
-          children: [
-           /* SizedBox(
-              height: 130,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.all(8),
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  return _buildStoryItem('https://images.pexels.com/photos/34950/pexels-photo.jpg');
-                },
-              ),
-            ),*/
-
-            Padding(
-             padding: const EdgeInsets.only(top: 10),
+    return RefreshIndicator(
+      onRefresh: () => controller.refreshAll(),
+      color: Colors.black,
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        slivers: [
+          // Interested posts horizontal list
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 10),
               child: SizedBox(
                 height: 130,
                 child: Obx(() {
                   if (controller.isLoading.value) {
-                    return Center(child: CircularProgressIndicator());
+                    return _buildStoryShimmer();
                   }
                   if (controller.intrestedPostList.isEmpty) {
                     return Center(
@@ -199,7 +183,7 @@ class TrendingScreen extends StatelessWidget {
                   }
                   return ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    padding:  const EdgeInsets.symmetric(horizontal: 12), // remove extra padding
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     itemCount: controller.intrestedPostList.length,
                     itemBuilder: (context, index) {
                       final story = controller.intrestedPostList[index];
@@ -215,121 +199,124 @@ class TrendingScreen extends StatelessWidget {
                 }),
               ),
             ),
+          ),
 
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Obx(() {
-                  if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (controller.posts.isEmpty) {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 50),
-                      child: CustomEmptyState(
-                        title: "No Posts Yet",
-                        subTitle: "Be the first to create something amazing!",
-                        icon: Icons.post_add_rounded,
-                      ),
-                    );
-                  }
-                  return MasonryGridView.count(
-                    shrinkWrap: true,
-                    physics: const BouncingScrollPhysics(),
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    itemCount: controller.posts.length,
-                    itemBuilder: (context, index) {
-                      final item = controller.posts[index];
+          // Spacing between stories and grid
+          const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
-                      // THUMBNAIL LOGIC
-                      final String thumb = (item.media.isNotEmpty)
-                          ? (item.media.first.thumbnail.isNotEmpty
-                          ? item.media.first.thumbnail
-                          : item.media.first.url) // fallback
-                          : "https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg";             // No image fallback
+          // Masonry grid
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            sliver: Obx(() {
+              if (controller.isLoading.value) {
+                return SliverToBoxAdapter(
+                  child: _buildGridShimmer(),
+                );
+              }
+              if (controller.posts.isEmpty) {
+                return SliverFillRemaining(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 50),
+                    child: CustomEmptyState(
+                      title: "No Posts Yet",
+                      subTitle: "Be the first to create something amazing!",
+                      icon: Icons.post_add_rounded,
+                    ),
+                  ),
+                );
+              }
+              return SliverMasonryGrid.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childCount: controller.posts.length,
+                itemBuilder: (context, index) {
+                  final item = controller.posts[index];
+                  final String thumb = (item.media.isNotEmpty)
+                      ? (item.media.first.thumbnail.isNotEmpty
+                      ? item.media.first.thumbnail
+                      : item.media.first.url)
+                      : "https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg";
 
-                      return GestureDetector(
-                        onTap: () {
-                          if (item.type == "video") {
-                            Get.to(() => VideoPlayerScreen(videoUrl: item.media.first.url, videoId: item.id, ));
-                          }
-                          else if (item.type == "reel") {
-                             // Convert current list of posts to ReelModels for swiping
-                             final List<rm.ReelModel> reelList = controller.posts
-                                 .where((p) => p.type == "reel" && p.media.isNotEmpty)
-                                 .map((p) => _convertToReelModel(p))
-                                 .toList();
-
-                             final int initialIndex = reelList.indexWhere((r) => r.id == item.id);
-
-                             if (reelList.isNotEmpty) {
-                               Get.to(() => ReelsView(
-                                 reels: reelList,
-                                 initialIndex: initialIndex >= 0 ? initialIndex : 0,
-                               ));
-                             }
-                          }
-                          else if (item.type == "image") {
-                            Get.to(()=>ImagePostScreen(postId: item.id,));
-                          }
-                        },
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Container(
+                  return GestureDetector(
+                    onTap: () {
+                      if (item.type == "video") {
+                        Get.to(() => VideoPlayerScreen(videoUrl: item.media.first.url, videoId: item.id));
+                      } else if (item.type == "reel") {
+                        final List<rm.ReelModel> reelList = controller.posts
+                            .where((p) => p.type == "reel" && p.media.isNotEmpty)
+                            .map((p) => _convertToReelModel(p))
+                            .toList();
+                        final int initialIndex = reelList.indexWhere((r) => r.id == item.id);
+                        if (reelList.isNotEmpty) {
+                          Get.to(() => ReelsView(
+                            reels: reelList,
+                            initialIndex: initialIndex >= 0 ? initialIndex : 0,
+                          ));
+                        }
+                      } else if (item.type == "image") {
+                        Get.to(() => ImagePostScreen(postId: item.id));
+                      }
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Stack(
+                        children: [
+                          SizedBox(
                             height: (index % 2 == 0) ? 220 : 150,
-                            color: Colors.grey.shade300,
-                            child: FadeInImage(
-                              image: NetworkImage(AppUrls.getFullImageUrl(thumb)),
-                              placeholder: const AssetImage(AppAssets.imgOnbording1),
-                              imageErrorBuilder: (context, error, stackTrace) {
-                                return Image.asset(
-                                  AppAssets.imgAppLogo,
-                                  fit: BoxFit.cover,
-                                );
-                              },
+                            width: double.infinity,
+                            child: CachedNetworkImage(
+                              imageUrl: AppUrls.getFullImageUrl(thumb),
                               fit: BoxFit.cover,
+                              placeholder: (context, url) => Shimmer.fromColors(
+                                baseColor: Colors.grey.shade300,
+                                highlightColor: Colors.grey.shade100,
+                                child: Container(color: Colors.grey.shade300),
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                color: Colors.grey.shade200,
+                                child: Image.asset(AppAssets.imgAppLogo, fit: BoxFit.contain),
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  );
-                }),
-              ),
-            ),
-
-
-            /* Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: MasonryGridView.count(
-                  crossAxisCount: 2,     // 2 columns
-                  mainAxisSpacing: 12,   // vertical spacing
-                  crossAxisSpacing: 12,  // horizontal spacing
-                  itemCount: sliderImages.length,
-                  itemBuilder: (context, index) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
-                          image: DecorationImage(
-                            image: NetworkImage(sliderImages[index]),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        height: (index % 2 == 0) ? 220 : 150, // DIFFERENT HEIGHTS
+                          // Type indicator
+                          if (item.type == "video" || item.type == "reel")
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      item.type == "reel" ? Icons.slow_motion_video : Icons.play_arrow_rounded,
+                                      color: Colors.white,
+                                      size: 14,
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      item.stats.viewCount > 0 ? '${item.stats.viewCount}' : '',
+                                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                    );
-                  },
-                ),
-              ),
-            ),*/
-          ],
-        ),
-
+                    ),
+                  );
+                },
+              );
+            }),
+          ),
+        ],
+      ),
     );
 
   }
@@ -381,9 +368,20 @@ class TrendingScreen extends StatelessWidget {
               },
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  thumbnailUrl,
+                child: CachedNetworkImage(
+                  imageUrl: thumbnailUrl,
                   fit: BoxFit.cover,
+                  width: 100,
+                  height: 130,
+                  placeholder: (context, url) => Shimmer.fromColors(
+                    baseColor: Colors.grey.shade300,
+                    highlightColor: Colors.grey.shade100,
+                    child: Container(color: Colors.grey.shade300),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey.shade200,
+                    child: Image.asset(AppAssets.imgAppLogo, fit: BoxFit.contain),
+                  ),
                 ),
               ),
             ),
@@ -411,6 +409,52 @@ class TrendingScreen extends StatelessWidget {
           const SizedBox(height: 4),
         ],
       ),
+    );
+  }
+
+  Widget _buildStoryShimmer() {
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      itemCount: 5,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.only(right: 6),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey.shade300,
+            highlightColor: Colors.grey.shade100,
+            child: Container(
+              width: 100,
+              height: 130,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildGridShimmer() {
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      children: List.generate(6, (index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.grey.shade100,
+          child: Container(
+            width: (MediaQuery.of(Get.context!).size.width - 36) / 2,
+            height: (index % 2 == 0) ? 220 : 150,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      }),
     );
   }
 
@@ -1112,4 +1156,186 @@ class VideoCard extends StatelessWidget {
     );
   }
 }*/
+
+class ForYouGridScreen extends StatelessWidget {
+  ForYouGridScreen({Key? key}) : super(key: key);
+
+  final PostController controller = Get.find<PostController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () => controller.fetchForYou(),
+      color: Colors.black,
+      child: Obx(() {
+        if (controller.isLoading.value && controller.forYouPosts.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.all(12),
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: List.generate(6, (index) {
+                return Shimmer.fromColors(
+                  baseColor: Colors.grey.shade300,
+                  highlightColor: Colors.grey.shade100,
+                  child: Container(
+                    width: (MediaQuery.of(context).size.width - 36) / 2,
+                    height: (index % 2 == 0) ? 220 : 150,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          );
+        }
+        if (controller.forYouPosts.isEmpty) {
+          return ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+              CustomEmptyState(
+                title: "No Personalized Content",
+                subTitle: "Pull down to refresh!",
+                icon: Icons.favorite_rounded,
+              ),
+            ],
+          );
+        }
+        return MasonryGridView.count(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          crossAxisCount: 2,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          padding: const EdgeInsets.all(12),
+          itemCount: controller.forYouPosts.length,
+          itemBuilder: (context, index) {
+            final item = controller.forYouPosts[index];
+            final String thumb = (item.media.isNotEmpty)
+                ? (item.media.first.thumbnail.isNotEmpty
+                    ? item.media.first.thumbnail
+                    : item.media.first.url)
+                : "";
+
+            return GestureDetector(
+              onTap: () {
+                if (item.type == "video") {
+                  Get.to(() => VideoPlayerScreen(videoUrl: item.media.first.url, videoId: item.id));
+                } else if (item.type == "reel") {
+                  final List<rm.ReelModel> reelList = controller.forYouPosts
+                      .where((p) => p.type == "reel" && p.media.isNotEmpty)
+                      .map((p) => _convertToReelModel(p))
+                      .toList();
+                  final int initialIndex = reelList.indexWhere((r) => r.id == item.id);
+                  if (reelList.isNotEmpty) {
+                    Get.to(() => ReelsView(
+                      reels: reelList,
+                      initialIndex: initialIndex >= 0 ? initialIndex : 0,
+                    ));
+                  }
+                } else if (item.type == "image") {
+                  Get.to(() => ImagePostScreen(postId: item.id));
+                }
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Stack(
+                  children: [
+                    SizedBox(
+                      height: (index % 2 == 0) ? 220 : 150,
+                      width: double.infinity,
+                      child: thumb.isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: AppUrls.getFullImageUrl(thumb),
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Shimmer.fromColors(
+                                baseColor: Colors.grey.shade300,
+                                highlightColor: Colors.grey.shade100,
+                                child: Container(color: Colors.grey.shade300),
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                color: Colors.grey.shade200,
+                                child: Image.asset(AppAssets.imgAppLogo, fit: BoxFit.contain),
+                              ),
+                            )
+                          : Container(
+                              color: Colors.grey.shade200,
+                              child: Image.asset(AppAssets.imgAppLogo, fit: BoxFit.contain),
+                            ),
+                    ),
+                    if (item.type == "video" || item.type == "reel")
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                item.type == "reel" ? Icons.slow_motion_video : Icons.play_arrow_rounded,
+                                color: Colors.white,
+                                size: 14,
+                              ),
+                              const SizedBox(width: 2),
+                              Text(
+                                item.stats.viewCount > 0 ? '${item.stats.viewCount}' : '',
+                                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      }),
+    );
+  }
+
+  rm.ReelModel _convertToReelModel(TrendingPost post) {
+    return rm.ReelModel(
+      id: post.id,
+      uuid: post.uuid,
+      caption: post.caption ?? "",
+      isMine: post.isMine,
+      isFollowing: post.isFollowing,
+      user: rm.UserModel(
+        id: post.user.id,
+        name: post.user.name,
+        username: post.user.username,
+        avatar: post.user.avatar,
+        isVerified: post.user.isVerified,
+        interests: post.user.interests,
+      ),
+      media: post.media.map((m) => rm.MediaModel(
+        id: m.id,
+        type: m.type,
+        url: m.url,
+        thumbnail: m.thumbnail,
+        mimeType: m.mimeType,
+      )).toList(),
+      stats: rm.ReelStats(
+        likeCount: post.stats.likeCount,
+        commentCount: post.stats.commentCount,
+        shareCount: post.stats.shareCount,
+        viewCount: post.stats.viewCount,
+        isLiked: post.stats.isLiked,
+        isSaved: post.stats.isSaved,
+      ),
+      createdAt: post.createdAt.toIso8601String(),
+      createdHuman: post.createdHuman,
+      likeStatus: post.stats.isLiked,
+    );
+  }
+}
 

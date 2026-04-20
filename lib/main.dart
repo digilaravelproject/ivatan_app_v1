@@ -14,11 +14,15 @@ import 'features/onbording/persentation/view/onboarding_page.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
-  await initApp();
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // 1. Initialize Firebase with options first
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // 2. Run other app initializations
+  await initApp();
   await SharedPrefManager().init();
   Get.put(ApiServices());
   runApp(const MyApp());

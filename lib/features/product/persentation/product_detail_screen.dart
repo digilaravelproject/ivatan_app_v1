@@ -152,7 +152,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildProductDetail(dynamic initialProduct) {
-    return Obx(() {
       dynamic product = initialProduct;
 
       // Reactively retrieve the freshest version from MyProductsController if it exists
@@ -582,6 +581,5 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ],
       ),
     );
-    });
   }
 }
