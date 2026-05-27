@@ -184,14 +184,13 @@ class HomePage extends StatelessWidget {
 
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 500),
-                    height: controller.showStories.value ? 110 : 0,
+                    height: controller.showStories.value ? 150 : 0,
                     curve: Curves.easeInOut,
                     child: AnimatedOpacity(
                       duration: const Duration(milliseconds: 500),
                       opacity: controller.showStories.value ? 1.0 : 0.0,
                       child: Container(
-                        height:
-                            110, // Increased height to accommodate circular design with text below
+                        height: 150,
                         color: Colors.white,
                         padding: EdgeInsets.only(top: 12, bottom: 8),
                         child: ListView.builder(
@@ -317,98 +316,84 @@ class HomePage extends StatelessWidget {
         }
       },
       child: Container(
-        width: 70,
+        width: 100,
         margin: EdgeInsets.only(right: 12),
-        child: Column(
-          children: [
-            // Circular Avatar with Gradient Border
-            Stack(
-              children: [
-                Container(
-                  width: 70,
-                  height: 70,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.grey.shade900,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Background Media
+              if (hasStory)
+                _buildStoryMedia(myStoryGroup.stories.last)
+              else if (userAvatar.isNotEmpty)
+                Image.network(
+                  userAvatar,
+                  fit: BoxFit.cover,
+                  errorBuilder: (ctx, err, stack) => Container(color: Colors.grey.shade800),
+                )
+              else
+                Container(color: Colors.grey.shade800),
+                
+              // Dark Gradient for Text
+              Positioned(
+                bottom: 0, left: 0, right: 0,
+                height: 60,
+                child: Container(
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
                     gradient: LinearGradient(
-                      colors: [
-                        Color(0xFFFBAA47),
-                        Color(0xFFD91A46),
-                        Color(0xFFA60F93),
-                      ],
-                      begin: Alignment.bottomLeft,
-                      end: Alignment.topRight,
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [Colors.black.withOpacity(0.8), Colors.transparent],
                     ),
                   ),
-                  padding: EdgeInsets.all(2),
-                  child:
-                      myStoryGroup != null && myStoryGroup.stories.isNotEmpty
-                          ? Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                            ),
-                            padding: EdgeInsets.all(2),
-                            child: ClipOval(
-                              child: _buildStoryMedia(
-                                myStoryGroup.stories.last,
-                              ),
-                            ),
-                          )
-                          : Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Icons.add_circle,
-                                color: Color(0xFFD91A46),
-                                size: 35,
-                              ),
-                            ),
-                          ),
                 ),
-                // Small plus icon on bottom-right when user has a story
-                if (myStoryGroup != null && myStoryGroup.stories.isNotEmpty)
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: GestureDetector(
-                      onTap: () {
-                        // Add new story
-                        final storyController = Get.put(StoryController());
-                        storyController.showPickerOptions();
-                      },
-                      child: Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.blue,
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                        child: Icon(Icons.add, color: Colors.white, size: 14),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            SizedBox(height: 2),
-            // Name below circle
-            Text(
-              myStoryGroup != null && myStoryGroup.stories.isNotEmpty
-                  ? "Your Story"
-                  : "Add Story",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.black87,
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+              
+              // Text
+              Positioned(
+                bottom: 12, left: 12, right: 12,
+                child: Text(
+                  hasStory ? "Your Story" : "Add Story",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.3,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+
+              // Badge
+              Positioned(
+                top: 10, left: 10,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFF05136), // Vibrant orange-red from screenshot
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (!hasStory) Icon(Icons.add, color: Colors.white, size: 12),
+                      if (!hasStory) SizedBox(width: 4),
+                      Text(
+                        hasStory ? "Story" : "Add",
+                        style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -431,63 +416,72 @@ class HomePage extends StatelessWidget {
                 FullScreenStoryViewer(stories: story.stories, initialIndex: 0),
           ),
       child: Container(
-        width: 70,
+        width: 100,
         margin: EdgeInsets.only(right: 12),
-        child: Column(
-          children: [
-            // Circular Avatar with Gradient Border
-            Container(
-              width: 70,
-              height: 70,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient:
-                    hasUnseen
-                        ? LinearGradient(
-                          colors: [
-                            Color(0xFFFBAA47),
-                            Color(0xFFD91A46),
-                            Color(0xFFA60F93),
-                          ],
-                          begin: Alignment.bottomLeft,
-                          end: Alignment.topRight,
-                        )
-                        : LinearGradient(
-                          // Seen Gradient (Grey)
-                          colors: [Colors.grey.shade400, Colors.grey.shade600],
-                          begin: Alignment.bottomLeft,
-                          end: Alignment.topRight,
-                        ),
-              ),
-              padding: EdgeInsets.all(2),
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                ),
-                padding: EdgeInsets.all(2),
-                child: ClipOval(
-                  child:
-                      story.stories.isNotEmpty
-                          ? _buildStoryMedia(story.stories.last)
-                          : _buildUserAvatar(story.user.avatar),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.grey.shade900,
+          border: hasUnseen ? Border.all(color: Color(0xFFF05136), width: 1.5) : null,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(hasUnseen ? 14 : 16),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Background Media
+              story.stories.isNotEmpty
+                  ? _buildStoryMedia(story.stories.last)
+                  : _buildUserAvatar(story.user.avatar),
+                  
+              // Dark Gradient for Text
+              Positioned(
+                bottom: 0, left: 0, right: 0,
+                height: 60,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [Colors.black.withOpacity(0.8), Colors.transparent],
+                    ),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 2),
-            // Name below circle
-            Text(
-              name,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.black87,
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
+              
+              // Text
+              Positioned(
+                bottom: 12, left: 12, right: 12,
+                child: Text(
+                  name,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.3,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+
+              // Badge
+              if (hasUnseen)
+                Positioned(
+                  top: 10, left: 10,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Color(0xFFF05136), // Vibrant orange-red from screenshot
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      "New",
+                      style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

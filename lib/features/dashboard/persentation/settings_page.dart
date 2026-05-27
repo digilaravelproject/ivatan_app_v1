@@ -323,6 +323,17 @@ class SettingsScreen extends StatelessWidget {
               )),
 
               const SizedBox(height: 16),
+              
+              _buildCleanField(
+                child: CustomSearchableDropdown(
+                  label: "Page Category",
+                  items: profileController.pageCategoryList,
+                  controller: profileController.pageCategoryController,
+                  onChanged: (value) {
+                    profileController.selectedPageCategory.value = value;
+                  },
+                ),
+              ),
 
               // SELLER TOGGLE
               Obx(() => Container(

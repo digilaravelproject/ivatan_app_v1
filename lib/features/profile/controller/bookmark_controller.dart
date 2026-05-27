@@ -35,7 +35,7 @@ class BookmarkController extends GetxController {
 
   Future<void> toggleBookmark(int postId) async {
      try {
-      final response = await api.callPost(AppUrls.bookmarkPost(postId));
+      final response = await api.callPost(AppUrls.bookmarkPost(postId), data: {});
       if (response != null && response['success'] == true) {
         // If un-bookmarked, remove from list
         if (response['is_bookmarked'] == false) {

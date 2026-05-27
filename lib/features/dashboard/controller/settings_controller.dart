@@ -317,6 +317,8 @@ import '../model/user_profile.dart';
 import 'follow_controller.dart';
 import '../../profile/controller/ownpostController.dart';
 import 'homeController.dart';
+import '../../../core/helper/custom_snack_bar.dart';
+
 
 class SettingsController extends GetxController {
   final String userName;
@@ -339,6 +341,7 @@ class SettingsController extends GetxController {
   final occupationController = TextEditingController();
   final bioController = TextEditingController();
   final languageController = TextEditingController();
+  final pageCategoryController = TextEditingController();
 
 
   String staticGender = "male";
@@ -360,6 +363,16 @@ class SettingsController extends GetxController {
   ].obs;
 
   RxString selectedOccupation = "".obs;
+
+  RxList<String> pageCategoryList = <String>[
+    "profile subscription",
+    "content creator",
+    "business store pages",
+    "business service pages",
+    "music pages",
+  ].obs;
+
+  RxString selectedPageCategory = "".obs;
 
   @override
   void onInit() {
@@ -417,6 +430,10 @@ class SettingsController extends GetxController {
       request.fields["language_preference"] = languageController.text.isNotEmpty
           ? languageController.text
           : (userProfile?.value?.languagePreference ?? "en");
+
+      request.fields["page_category"] = selectedPageCategory.value.isNotEmpty
+          ? selectedPageCategory.value
+          : (userProfile?.value?.pageCategory ?? "");
 
 
       request.fields["gender"] = staticGender;
@@ -599,7 +616,7 @@ class SettingsController extends GetxController {
   Future<void> toggleBlockUser(int userId) async {
     try {
       isLoading.value = true;
-      final response = await api.callPost(AppUrls.blockUser(userId));
+      final response = await api.callPost(AppUrls.blockUser(userId), data: {});
       isLoading.value = false;
 
       if (response != null && response['success'] == true) {
@@ -796,6 +813,8 @@ class SettingsController extends GetxController {
         phoneController.text = result.user!.phone ?? "";
         usernameController.text = result.user!.username ?? "";
         occupationController.text = result.user!.occupation ?? "";
+        pageCategoryController.text = result.user!.pageCategory ?? "";
+        selectedPageCategory.value = result.user!.pageCategory ?? "";
         selectedOccupation.value = result.user!.occupation ?? "";
         bioController.text = result.user!.bio ?? "";
         languageController.text = result.user!.languagePreference ?? "en";

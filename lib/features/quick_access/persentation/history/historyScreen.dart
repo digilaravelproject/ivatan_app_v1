@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:i_vatan_app/core/constants/app_sizer.dart';
 import '../../../../core/theme/app_colors.dart';
+import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
+import '../../controller/history_controller.dart';
+import '../../model/history_model.dart';
 
 /*
 class HistoryScreen extends StatelessWidget {
@@ -595,10 +599,12 @@ class VideoGridSection extends StatelessWidget {
 
 
 /// Enum for Video type
-enum VideoType { like, comment, share }
+enum VideoType { like, comment, product, service }
 
 class HistoryScreen extends StatelessWidget {
-  const HistoryScreen({super.key});
+  HistoryScreen({super.key});
+  
+  final HistoryController controller = Get.put(HistoryController());
 
   @override
   Widget build(BuildContext context) {
@@ -619,7 +625,7 @@ class HistoryScreen extends StatelessWidget {
 
       /// BODY WITH STICKY TABS
       body: DefaultTabController(
-        length: 3,
+        length: 4,
         child: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
@@ -670,113 +676,137 @@ class HistoryScreen extends StatelessWidget {
               SliverToBoxAdapter(
                 child: SizedBox(
                   height: 220, // Slider height adjust karo
-                  child: PageView.builder(
-                    itemCount: 10,
-                    controller: PageController(viewportFraction: 0.9),
-                    padEnds: false,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 8),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.shade300,
-                              blurRadius: 8,
-                              spreadRadius: 2,
-                            )
-                          ],
-                        ),
-                        child: Stack(
-                          children: [
-                            /// 🌄 IMAGE
-                            ClipRRect(
+                  child: Obx(() {
+                    if (controller.isLoadingVideoViews.value && controller.videoViews.isEmpty) {
+                      return _buildShimmerSlider();
+                    }
+                    if (controller.videoViews.isEmpty) {
+                      return _buildEmptyState("No video history available");
+                    }
+                    
+                    return NotificationListener<ScrollNotification>(
+                      onNotification: (ScrollNotification scrollInfo) {
+                        if (!controller.isLoadingVideoViews.value &&
+                            controller.hasMoreVideoViews &&
+                            scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+                          controller.fetchVideoViews(loadMore: true);
+                        }
+                        return false;
+                      },
+                      child: PageView.builder(
+                        itemCount: controller.videoViews.length,
+                        controller: PageController(viewportFraction: 0.9),
+                        padEnds: false,
+                        itemBuilder: (context, index) {
+                          final item = controller.videoViews[index];
+                          final preview = item.preview;
+                          final imageUrl = preview?.thumbnail ?? "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp";
+                          
+                          return Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 8),
+                            decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
-                              child: Image.network(
-                                "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp",
-                                width: double.infinity,
-                                height: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.shade300,
+                                  blurRadius: 8,
+                                  spreadRadius: 2,
+                                )
+                              ],
                             ),
-
-                            /// 🌑 GRADIENT OVERLAY
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.black.withOpacity(0.3),
-                                    Colors.black.withOpacity(0.0),
-                                  ],
-                                  begin: Alignment.bottomCenter,
-                                  end: Alignment.topCenter,
-                                ),
-                              ),
-                            ),
-
-                            /// 🕒 TIME LABEL
-                            Positioned(
-                              bottom: 10,
-                              right: 12,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.7),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: const Text(
-                                  "10:45",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
+                            child: Stack(
+                              children: [
+                                /// 🌄 IMAGE
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Image.network(
+                                    imageUrl,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (ctx, err, stack) => Container(color: Colors.grey),
                                   ),
                                 ),
-                              ),
-                            ),
 
-                            /// 📝 TITLE & VIEWS
-                            Positioned(
-                              bottom: 12,
-                              left: 16,
-                              right: 80, // thoda space for time
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    "The Best Nature Scenes in 4K Ultra HD",
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      shadows: [
-                                        Shadow(
-                                          color: Colors.black54,
-                                          offset: Offset(0, 1),
-                                          blurRadius: 2,
-                                        )
+                                /// 🌑 GRADIENT OVERLAY
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.black.withOpacity(0.3),
+                                        Colors.black.withOpacity(0.0),
                                       ],
+                                      begin: Alignment.bottomCenter,
+                                      end: Alignment.topCenter,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    "12.3K views • 2 days ago",
-                                    style: TextStyle(
-                                      color: Colors.white.withOpacity(0.9),
-                                      fontSize: 12,
+                                ),
+
+                                /// 🕒 TIME LABEL (Placeholder, can be updated later if API provides duration)
+                                Positioned(
+                                  bottom: 10,
+                                  right: 12,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.7),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: const Text(
+                                      "Video",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+
+                                /// 📝 TITLE & VIEWS
+                                Positioned(
+                                  bottom: 12,
+                                  left: 16,
+                                  right: 80, // thoda space for time
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        preview?.caption ?? "Nature Video",
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          shadows: [
+                                            Shadow(
+                                              color: Colors.black54,
+                                              offset: Offset(0, 1),
+                                              blurRadius: 2,
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        item.createdHuman,
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.9),
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                          );
+                        },
+                      ),
+                    );
+                  }),
                 ),
               ),
 
@@ -876,9 +906,10 @@ class HistoryScreen extends StatelessWidget {
                     ),                    unselectedLabelColor: Colors.grey,
                     labelStyle: TextStyle(fontWeight: FontWeight.w600),
                     tabs: [
-                      Tab(text: "Likes"),
-                      Tab(text: "Comments"),
-                      Tab(text: "Shares"),
+                      Tab(text: "Like"),
+                      Tab(text: "Comment"),
+                      Tab(text: "Product"),
+                      Tab(text: "Service"),
                     ],
                   ),
                 ),
@@ -892,10 +923,53 @@ class HistoryScreen extends StatelessWidget {
             children: [
               VideoGridSection(type: VideoType.like),
               VideoGridSection(type: VideoType.comment),
-              VideoGridSection(type: VideoType.share),
+              VideoGridSection(type: VideoType.product),
+              VideoGridSection(type: VideoType.service),
             ],
           ),
         ),
+      ),
+    );
+  }
+  Widget _buildShimmerSlider() {
+    return PageView.builder(
+      itemCount: 3,
+      controller: PageController(viewportFraction: 0.9),
+      padEnds: false,
+      itemBuilder: (context, index) {
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 8),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyState(String title) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.history_toggle_off, size: 64, color: Colors.grey.shade400),
+          const SizedBox(height: 16),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey.shade600,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1061,122 +1135,319 @@ class VideoGridSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final HistoryController controller = Get.find<HistoryController>();
+
+    return Obx(() {
+      bool isLoading = false;
+      List<dynamic> items = [];
+      Function() loadMore = () {};
+      bool hasMore = false;
+
+      switch (type) {
+        case VideoType.like:
+          isLoading = controller.isLoadingLikes.value;
+          items = controller.likes;
+          loadMore = () => controller.fetchLikes(loadMore: true);
+          hasMore = controller.hasMoreLikes;
+          break;
+        case VideoType.comment:
+          isLoading = controller.isLoadingComments.value;
+          items = controller.comments;
+          loadMore = () => controller.fetchComments(loadMore: true);
+          hasMore = controller.hasMoreComments;
+          break;
+        case VideoType.product:
+          isLoading = controller.isLoadingPurchases.value;
+          items = controller.purchases;
+          loadMore = () => controller.fetchPurchases(loadMore: true);
+          hasMore = controller.hasMorePurchases;
+          break;
+        case VideoType.service:
+          isLoading = controller.isLoadingServices.value;
+          items = controller.services;
+          loadMore = () => controller.fetchServices(loadMore: true);
+          hasMore = controller.hasMoreServices;
+          break;
+      }
+
+      if (isLoading && items.isEmpty) {
+        return (type == VideoType.product || type == VideoType.service) 
+            ? _buildShimmerList() 
+            : _buildShimmerGrid();
+      }
+      
+      if (items.isEmpty) {
+        return _buildEmptyState("No history found.");
+      }
+
+      return NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          if (!isLoading && hasMore && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+            loadMore();
+          }
+          return false;
+        },
+        child: (type == VideoType.product || type == VideoType.service)
+            ? ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: items.length + (hasMore ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index == items.length) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final item = items[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _buildOrderCard(item as PurchaseHistoryItem),
+                  );
+                },
+              )
+            : GridView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: items.length + (hasMore ? 1 : 0),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 1.0,
+                ),
+                itemBuilder: (context, index) {
+                  if (index == items.length) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final item = items[index];
+                  return _buildVideoCard(item, type);
+                },
+              ),
+      );
+    });
+  }
+
+  Widget _buildShimmerGrid() {
     return GridView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: 12,
+      itemCount: 6,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
-        childAspectRatio: 1.0, // 🔥 Slightly shorter cards
+        childAspectRatio: 1.0,
       ),
       itemBuilder: (context, index) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Stack(
-            children: [
-              /// 🔥 FULL IMAGE BACKGROUND
-              Positioned.fill(
-                child: Image.network(
-                  "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp",
-                  fit: BoxFit.cover,
-                ),
-              ),
-
-              /// 🔥 GRADIENT OVERLAY
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.6),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              /// 🔥 PLAY ICON TOP-RIGHT
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.play_arrow,
-                    size: 18,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-
-              /// 🔥 TITLE + ICONS BOTTOM OVERLAY
-              Positioned(
-                bottom: 8,
-                left: 8,
-                right: 8,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Amazing Nature Video",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                        color: Colors.white,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black54,
-                            offset: Offset(0, 1),
-                            blurRadius: 2,
-                          )
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    _buildBottomIcon(),
-                  ],
-                ),
-              ),
-            ],
+        return Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
           ),
         );
       },
     );
   }
 
-  /// 🔥 ICON BASED ON TAB TYPE
-  Widget _buildBottomIcon() {
+  Widget _buildShimmerList() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: 6,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyState(String title) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.history_toggle_off, size: 64, color: Colors.grey.shade400),
+          const SizedBox(height: 16),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey.shade600,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOrderCard(PurchaseHistoryItem order) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade300,
+            blurRadius: 6,
+            spreadRadius: 1,
+          )
+        ],
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Order #${order.orderId}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+          const SizedBox(height: 4),
+          Text(order.createdAt, style: TextStyle(color: Colors.grey.shade600, fontSize: 10)),
+          const SizedBox(height: 8),
+          Expanded(
+            child: Text(
+              order.items.isNotEmpty ? order.items.first.title : "No items",
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 12),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("\$${order.totalAmount}", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  order.status,
+                  style: TextStyle(fontSize: 10, color: Colors.blue.shade700, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVideoCard(dynamic item, VideoType type) {
+    String imageUrl = "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp";
+    String title = "Video";
+    String sub = "";
+
+    if (item is LikeHistoryItem) {
+      imageUrl = item.preview?.thumbnail ?? imageUrl;
+      title = item.preview?.caption ?? "Liked Video";
+      sub = item.createdHuman;
+    } else if (item is CommentHistoryItem) {
+      title = item.body;
+      sub = item.createdHuman;
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (ctx, err, stack) => Container(color: Colors.grey),
+            ),
+          ),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.6),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.play_arrow,
+                size: 18,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 8,
+            left: 8,
+            right: 8,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(color: Colors.black54, offset: Offset(0, 1), blurRadius: 2)
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 6),
+                _buildBottomIcon(type),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomIcon(VideoType type) {
     switch (type) {
       case VideoType.like:
-        return _iconWithText(Icons.favorite, "1.2K", color: Colors.red);
+        return _iconWithText(Icons.favorite, "Liked", color: Colors.red);
       case VideoType.comment:
-        return _iconWithText(Icons.comment, "340", color: Colors.white);
-      case VideoType.share:
-        return _iconWithText(
-          CupertinoIcons.arrowshape_turn_up_right_fill,
-          "120",
-          color: Colors.white,
-        );
+        return _iconWithText(Icons.comment, "Commented", color: Colors.white);
+      case VideoType.product:
+        return _iconWithText(Icons.shopping_bag, "Product", color: Colors.white);
+      case VideoType.service:
+        return _iconWithText(Icons.design_services, "Service", color: Colors.white);
     }
   }
 
-  Widget _iconWithText(IconData icon, String count, {Color color = Colors.white}) {
+  Widget _iconWithText(IconData icon, String text, {Color color = Colors.white}) {
     return Row(
       children: [
         Icon(icon, size: 16, color: color),
         const SizedBox(width: 6),
         Text(
-          count,
+          text,
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,
