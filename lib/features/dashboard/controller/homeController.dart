@@ -202,11 +202,22 @@ class HomeController extends GetxController {
       // Check for video and compress if needed
       File? videoToCompress;
       String? videoKey;
+      int? videoIndexInList;
 
       body.forEach((key, value) {
         if (value is File && (value.path.endsWith(".mp4") || value.path.endsWith(".mov") || value.path.endsWith(".m4v"))) {
           videoToCompress = value;
           videoKey = key;
+        } else if (value is List) {
+          for (int i = 0; i < value.length; i++) {
+            final item = value[i];
+            if (item is File && (item.path.endsWith(".mp4") || item.path.endsWith(".mov") || item.path.endsWith(".m4v"))) {
+              videoToCompress = item;
+              videoKey = key;
+              videoIndexInList = i;
+              break;
+            }
+          }
         }
       });
 
@@ -225,7 +236,12 @@ class HomeController extends GetxController {
         );
 
         if (info != null && info.path != null) {
-          body[videoKey!] = File(info.path!);
+          final compressedFile = File(info.path!);
+          if (videoIndexInList != null) {
+            (body[videoKey!] as List)[videoIndexInList!] = compressedFile;
+          } else {
+            body[videoKey!] = compressedFile;
+          }
           print("BACKGROUND COMPRESSION COMPLETE: ${info.path}");
         }
         isCompressing.value = false;

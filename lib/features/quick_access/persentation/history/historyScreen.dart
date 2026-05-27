@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../controller/history_controller.dart';
 import '../../model/history_model.dart';
+import '../../../dashboard/persentation/widgets/feed_video_player.dart';
+import '../../../videos/persentation/play_video_screen.dart';
 
 /*
 class HistoryScreen extends StatelessWidget {
@@ -627,6 +629,7 @@ class HistoryScreen extends StatelessWidget {
       body: DefaultTabController(
         length: 4,
         child: NestedScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
 
@@ -702,31 +705,39 @@ class HistoryScreen extends StatelessWidget {
                           final preview = item.preview;
                           final imageUrl = preview?.thumbnail ?? "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp";
                           
-                          return Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 8),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.shade300,
-                                  blurRadius: 8,
-                                  spreadRadius: 2,
-                                )
-                              ],
-                            ),
-                            child: Stack(
-                              children: [
-                                /// 🌄 IMAGE
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: Image.network(
-                                    imageUrl,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (ctx, err, stack) => Container(color: Colors.grey),
+                          return GestureDetector(
+                            onTap: () {
+                              if (imageUrl.toLowerCase().contains('.mp4')) {
+                                Get.to(() => VideoPlayerScreen(videoUrl: imageUrl, videoId: item.entityId));
+                              }
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 8),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.shade300,
+                                    blurRadius: 8,
+                                    spreadRadius: 2,
+                                  )
+                                ],
+                              ),
+                              child: Stack(
+                                children: [
+                                  /// 🌄 IMAGE/VIDEO
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: imageUrl.toLowerCase().contains('.mp4')
+                                        ? FeedVideoPlayer(videoUrl: imageUrl)
+                                        : Image.network(
+                                            imageUrl,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (ctx, err, stack) => Container(color: Colors.grey),
+                                          ),
                                   ),
-                                ),
 
                                 /// 🌑 GRADIENT OVERLAY
                                 Container(
@@ -802,8 +813,9 @@ class HistoryScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-                          );
-                        },
+                          ),
+                        );
+                      },
                       ),
                     );
                   }),
@@ -1176,49 +1188,62 @@ class VideoGridSection extends StatelessWidget {
             : _buildShimmerGrid();
       }
       
-      if (items.isEmpty) {
-        return _buildEmptyState("No history found.");
-      }
+      final Widget content = items.isEmpty
+          ? _buildEmptyState("No history found.")
+          : NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                if (!isLoading && hasMore && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+                  loadMore();
+                }
+                return false;
+              },
+              child: (type == VideoType.product || type == VideoType.service)
+                  ? ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(16),
+                      itemCount: items.length + (hasMore ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == items.length) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final item = items[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: _buildOrderCard(item as PurchaseHistoryItem),
+                        );
+                      },
+                    )
+                  : GridView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(16),
+                      itemCount: items.length + (hasMore ? 1 : 0),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 1.0,
+                      ),
+                      itemBuilder: (context, index) {
+                        if (index == items.length) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final item = items[index];
+                        return _buildVideoCard(item, type);
+                      },
+                    ),
+            );
 
-      return NotificationListener<ScrollNotification>(
-        onNotification: (ScrollNotification scrollInfo) {
-          if (!isLoading && hasMore && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-            loadMore();
-          }
-          return false;
+      return RefreshIndicator(
+        onRefresh: () async {
+          await Future.wait([
+            controller.fetchVideoViews(),
+            controller.fetchLikes(),
+            controller.fetchComments(),
+            controller.fetchPurchases(),
+            controller.fetchServices(),
+          ]);
         },
-        child: (type == VideoType.product || type == VideoType.service)
-            ? ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: items.length + (hasMore ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index == items.length) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final item = items[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: _buildOrderCard(item as PurchaseHistoryItem),
-                  );
-                },
-              )
-            : GridView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: items.length + (hasMore ? 1 : 0),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 1.0,
-                ),
-                itemBuilder: (context, index) {
-                  if (index == items.length) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final item = items[index];
-                  return _buildVideoCard(item, type);
-                },
-              ),
+        child: content,
       );
     });
   }
@@ -1272,22 +1297,30 @@ class VideoGridSection extends StatelessWidget {
   }
 
   Widget _buildEmptyState(String title) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.history_toggle_off, size: 64, color: Colors.grey.shade400),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w500,
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        SizedBox(
+          height: 350,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.history_toggle_off, size: 64, color: Colors.grey.shade400),
+                const SizedBox(height: 16),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -1347,27 +1380,38 @@ class VideoGridSection extends StatelessWidget {
     String imageUrl = "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp";
     String title = "Video";
     String sub = "";
+    int entityId = 0;
 
     if (item is LikeHistoryItem) {
       imageUrl = item.preview?.thumbnail ?? imageUrl;
       title = item.preview?.caption ?? "Liked Video";
       sub = item.createdHuman;
+      entityId = item.entityId;
     } else if (item is CommentHistoryItem) {
       title = item.body;
       sub = item.createdHuman;
+      entityId = item.entityId;
     }
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (ctx, err, stack) => Container(color: Colors.grey),
+    return GestureDetector(
+      onTap: () {
+        if (imageUrl.toLowerCase().contains('.mp4')) {
+          Get.to(() => VideoPlayerScreen(videoUrl: imageUrl, videoId: entityId));
+        }
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: imageUrl.toLowerCase().contains('.mp4')
+                  ? FeedVideoPlayer(videoUrl: imageUrl)
+                  : Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (ctx, err, stack) => Container(color: Colors.grey),
+                    ),
             ),
-          ),
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -1382,22 +1426,23 @@ class VideoGridSection extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            top: 8,
-            right: 8,
-            child: Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.play_arrow,
-                size: 18,
-                color: Colors.white,
+          if (imageUrl.toLowerCase().contains('.mp4'))
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.play_arrow,
+                  size: 18,
+                  color: Colors.white,
+                ),
               ),
             ),
-          ),
           Positioned(
             bottom: 8,
             left: 8,
@@ -1425,8 +1470,9 @@ class VideoGridSection extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildBottomIcon(VideoType type) {
     switch (type) {

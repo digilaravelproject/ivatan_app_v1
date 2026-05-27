@@ -6,7 +6,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/core/constants/app_assets.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
-import 'package:iconly/iconly.dart';
 import 'package:video_player/video_player.dart';
 import '../../../core/helper/custom_image_view.dart';
 import '../../../core/utils/app_icons.dart';

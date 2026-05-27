@@ -5,7 +5,6 @@ import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_rx/src/rx_workers/rx_workers.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:i_vatan_app/core/constants/app_sizer.dart';
-import 'package:iconly/iconly.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../core/helper/video_play.dart';

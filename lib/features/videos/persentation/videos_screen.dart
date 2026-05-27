@@ -433,25 +433,34 @@ class _VideosScreenState extends State<VideosScreen> {
               ),
               
               Expanded(
-                child: Obx(() {
-                  if (controller.isLoading.value && controller.posts.isEmpty) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (controller.posts.isEmpty) {
-                    return Center(
-                      child: CustomEmptyState(
-                        title: "No Videos Yet",
-                        subTitle: "Check back later for amazing content!",
-                        icon: Icons.video_library_rounded,
-                      ),
-                    );
-                  }
-                  return RefreshIndicator(
-                    onRefresh: () async {
-                      await controller.fetchVideo();
-                    },
-                    child: GridView.builder(
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    await controller.fetchVideo();
+                  },
+                  child: Obx(() {
+                    if (controller.isLoading.value && controller.posts.isEmpty) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (controller.posts.isEmpty) {
+                      return ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.6,
+                            child: Center(
+                              child: CustomEmptyState(
+                                title: "No Videos Yet",
+                                subTitle: "Check back later for amazing content!",
+                                icon: Icons.video_library_rounded,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                    return GridView.builder(
                       controller: scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(16),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
@@ -479,9 +488,9 @@ class _VideosScreenState extends State<VideosScreen> {
                               : const SizedBox.shrink();
                         }
                       },
-                    ),
-                  );
-                }),
+                    );
+                  }),
+                ),
               ),
             ],
           ),
