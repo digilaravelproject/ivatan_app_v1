@@ -78,6 +78,9 @@ class AppUrls {
   static String bookmarkPost(int id) => "api/v1/posts/$id/bookmark";
   static const myBookmarks = "api/v1/user/bookmarks";
   static const blockedUsers = "api/v1/user/blocked-users";
+  static const String chats = "api/v1/chats";
+  static const String liveChatGroups = "api/v1/live-chat-groups";
+  static String chatMessages(dynamic chatId) => "api/v1/chats/$chatId/messages";
 
   static const defaultApiKey =
       "1|1yCFcc7ahglUgOL3cftZZ7T83gcyFJreXGlQx0zud042e463";
