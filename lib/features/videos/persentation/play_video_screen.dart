@@ -235,6 +235,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             ),
                             SizedBox(width: 12),
                             PopupMenuButton(
+                              tooltip: '',
                               icon: Icon(Icons.more_vert, color: Colors.white),
                               color: Colors.white,
                               shape: RoundedRectangleBorder(
@@ -1319,6 +1320,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             ),
                             SizedBox(width: 12),
                             PopupMenuButton(
+                              tooltip: '',
                               icon: Icon(Icons.more_vert, color: Colors.white),
                               color: Colors.white,
                               shape: RoundedRectangleBorder(

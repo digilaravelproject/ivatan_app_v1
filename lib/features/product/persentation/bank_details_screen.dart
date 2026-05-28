@@ -122,32 +122,57 @@ class BankDetailsScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    PopupMenuButton(
-                      icon: const Icon(Icons.more_vert),
-                      itemBuilder: (context) => [
-                        const PopupMenuItem(
-                          value: 'edit',
-                          child: Row(
-                            children: [Icon(Icons.edit, size: 18), SizedBox(width: 8), Text('Edit')],
-                          ),
-                        ),
-                        const PopupMenuItem(
-                          value: 'delete',
-                          child: Row(
-                            children: [Icon(Icons.delete, size: 18, color: Colors.red), SizedBox(width: 8), Text('Delete')],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: 'default',
-                          child: Row(
-                            children: [
-                              Icon(Icons.star, size: 18, color: isDefault ? Colors.grey : Colors.amber),
-                              const SizedBox(width: 8),
-                              Text(isDefault ? 'Remove Default' : 'Set as Default'),
-                            ],
-                          ),
-                        ),
-                      ],
+                    Builder(
+                      builder: (context) {
+                        return IconButton(
+                          icon: const Icon(Icons.more_vert),
+                          onPressed: () {
+                            final RenderBox? button = context.findRenderObject() as RenderBox?;
+                            final RenderBox? overlay = Navigator.of(context).overlay?.context.findRenderObject() as RenderBox?;
+                            
+                            if (button == null || !button.hasSize || overlay == null || !overlay.hasSize) {
+                              return;
+                            }
+                            
+                            final RelativeRect position = RelativeRect.fromRect(
+                              Rect.fromPoints(
+                                button.localToGlobal(Offset.zero, ancestor: overlay),
+                                button.localToGlobal(button.size.bottomRight(Offset.zero), ancestor: overlay),
+                              ),
+                              Offset.zero & overlay.size,
+                            );
+
+                            showMenu(
+                              context: context,
+                              position: position,
+                              items: [
+                                const PopupMenuItem(
+                                  value: 'edit',
+                                  child: Row(
+                                    children: [Icon(Icons.edit, size: 18), SizedBox(width: 8), Text('Edit')],
+                                  ),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'delete',
+                                  child: Row(
+                                    children: [Icon(Icons.delete, size: 18, color: Colors.red), SizedBox(width: 8), Text('Delete')],
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: 'default',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.star, size: 18, color: isDefault ? Colors.grey : Colors.amber),
+                                      const SizedBox(width: 8),
+                                      Text(isDefault ? 'Remove Default' : 'Set as Default'),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
                     ),
                   ],
                 ),

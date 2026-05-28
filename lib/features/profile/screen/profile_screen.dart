@@ -264,168 +264,192 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         Positioned(
                                           top: 40,
                                           right: 10,
-                                          child: PopupMenuButton<String>(
-                                            onSelected: (value) async {
-                                              if (value == 'profile') {
-                                                Get.to(() => SettingsScreen());
-                                              } else if (value == 'bookmarks') {
-                                                profileController.openBookmarks();
-                                              } else if (value == 'block') {
-                                                // Show confirmation dialog for block
-                                                Get.dialog(
-                                                  CupertinoAlertDialog(
-                                                    title: Text(user.isBlocked == true ? "Unblock User?" : "Block User?"),
-                                                    content: Text(user.isBlocked == true 
-                                                      ? "Are you sure you want to unblock @${user.username}?" 
-                                                      : "Are you sure you want to block @${user.username}? They will no longer be able to see your content or interact with you."),
-                                                    actions: [
-                                                      CupertinoDialogAction(
-                                                        child: const Text("Cancel"),
-                                                        onPressed: () => Get.back(),
-                                                      ),
-                                                      CupertinoDialogAction(
-                                                        isDestructiveAction: true,
-                                                        child: Text(user.isBlocked == true ? "Unblock" : "Block"),
-                                                        onPressed: () {
-                                                          Get.back();
-                                                          profileController.toggleBlockUser(user.id!);
-                                                        },
-                                                      ),
+                                          child: Builder(
+                                            builder: (context) {
+                                              return GestureDetector(
+                                                onTap: () {
+                                                  final RenderBox? button = context.findRenderObject() as RenderBox?;
+                                                  final RenderBox? overlay = Navigator.of(context).overlay?.context.findRenderObject() as RenderBox?;
+                                                  
+                                                  if (button == null || !button.hasSize || overlay == null || !overlay.hasSize) {
+                                                    return;
+                                                  }
+                                                  
+                                                  final RelativeRect position = RelativeRect.fromRect(
+                                                    Rect.fromPoints(
+                                                      button.localToGlobal(Offset.zero, ancestor: overlay),
+                                                      button.localToGlobal(button.size.bottomRight(Offset.zero), ancestor: overlay),
+                                                    ),
+                                                    Offset.zero & overlay.size,
+                                                  );
+
+                                                  showMenu<String>(
+                                                    context: context,
+                                                    position: position,
+                                                    items: [
+                                                      if (!isOtherProfile) ...[
+                                                        const PopupMenuItem(
+                                                          value: 'profile',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(CupertinoIcons.person_add, size: 20),
+                                                              const SizedBox(width: 10),
+                                                              Text("Profile Settings"),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const PopupMenuItem(
+                                                          value: 'bookmarks',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(CupertinoIcons.bookmark, size: 20),
+                                                              const SizedBox(width: 10),
+                                                              Text("Bookmarks"),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const PopupMenuItem(
+                                                          value: 'orders',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(CupertinoIcons.bag, size: 20),
+                                                              const SizedBox(width: 10),
+                                                              Text("My Orders"),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const PopupMenuItem(
+                                                          value: 'enquiries',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(CupertinoIcons.bag, size: 20),
+                                                              const SizedBox(width: 10),
+                                                              Text("My Enquiries"),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        if (user.isSeller == true)
+                                                          const PopupMenuItem(
+                                                            value: 'products',
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(CupertinoIcons.cube_box, size: 20),
+                                                                const SizedBox(width: 10),
+                                                                Text("Your Products"),
+                                                               ],
+                                                            ),
+                                                          ),
+                                                        if (user.isSeller == true)
+                                                          const PopupMenuItem(
+                                                            value: 'services',
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(Icons.room_service_outlined, size: 20),
+                                                                const SizedBox(width: 10),
+                                                                Text("Your Services"),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        if (user.isSeller == true)
+                                                          const PopupMenuItem(
+                                                            value: 'enquiry',
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(CupertinoIcons.chat_bubble_text, size: 20),
+                                                                const SizedBox(width: 10),
+                                                                Text("Enquiry"),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        if (user.isSeller == true)
+                                                          const PopupMenuItem(
+                                                            value: 'dashboard',
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(CupertinoIcons.doc_append, size: 20),
+                                                                const SizedBox(width: 10),
+                                                                Text("Dashboard"),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                      ] else ...[
+                                                        PopupMenuItem(
+                                                          value: 'block',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(user.isBlocked == true ? Icons.person_off_outlined : Icons.block, size: 20, color: Colors.red),
+                                                              const SizedBox(width: 10),
+                                                              Text(user.isBlocked == true ? "Unblock User" : "Block User", style: const TextStyle(color: Colors.red)),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ],
-                                                  )
-                                                );
-                                              } else if (value == 'enquiry') {
-                                                Get.to(() => EnquiriesListScreen());
-                                              } else if (value == 'orders') {
-                                                Get.to(() => MyOrdersScreen());
-                                              } else if (value == 'enquiries') {
-                                                Get.to(() => MyEnquiryListScreen());
-                                              }
-                                              else if (value == 'products') {
-                                                await Get.to(() => MyProductsScreen());
-                                                if (Get.isRegistered<MarketplaceProductController>()) {
-                                                  Get.find<MarketplaceProductController>().fetchMarketplaceProducts(isRefresh: true);
-                                                }
-                                              } else if (value == 'services') {
-                                                await Get.to(() => MyServicesScreen());
-                                                if (Get.isRegistered<ServiceController>()) {
-                                                  Get.find<ServiceController>().fetchMarketplaceServices(isRefresh: true);
-                                                }
-                                              } else if (value == 'dashboard') {
-                                                Get.to(() => SellerDashboard());
-                                              }
+                                                  ).then((value) async {
+                                                    if (value == null) return;
+                                                    if (value == 'profile') {
+                                                      Get.to(() => SettingsScreen());
+                                                    } else if (value == 'bookmarks') {
+                                                      profileController.openBookmarks();
+                                                    } else if (value == 'block') {
+                                                      // Show confirmation dialog for block
+                                                      Get.dialog(
+                                                        CupertinoAlertDialog(
+                                                          title: Text(user.isBlocked == true ? "Unblock User?" : "Block User?"),
+                                                          content: Text(user.isBlocked == true 
+                                                            ? "Are you sure you want to unblock @${user.username}?" 
+                                                            : "Are you sure you want to block @${user.username}? They will no longer be able to see your content or interact with you."),
+                                                          actions: [
+                                                            CupertinoDialogAction(
+                                                              child: const Text("Cancel"),
+                                                              onPressed: () => Get.back(),
+                                                            ),
+                                                            CupertinoDialogAction(
+                                                              isDestructiveAction: true,
+                                                              child: Text(user.isBlocked == true ? "Unblock" : "Block"),
+                                                              onPressed: () {
+                                                                Get.back();
+                                                                profileController.toggleBlockUser(user.id!);
+                                                              },
+                                                            ),
+                                                          ],
+                                                        )
+                                                      );
+                                                    } else if (value == 'enquiry') {
+                                                      Get.to(() => EnquiriesListScreen());
+                                                    } else if (value == 'orders') {
+                                                      Get.to(() => MyOrdersScreen());
+                                                    } else if (value == 'enquiries') {
+                                                      Get.to(() => MyEnquiryListScreen());
+                                                    } else if (value == 'products') {
+                                                      await Get.to(() => MyProductsScreen());
+                                                      if (Get.isRegistered<MarketplaceProductController>()) {
+                                                        Get.find<MarketplaceProductController>().fetchMarketplaceProducts(isRefresh: true);
+                                                      }
+                                                    } else if (value == 'services') {
+                                                      await Get.to(() => MyServicesScreen());
+                                                      if (Get.isRegistered<ServiceController>()) {
+                                                        Get.find<ServiceController>().fetchMarketplaceServices(isRefresh: true);
+                                                      }
+                                                    } else if (value == 'dashboard') {
+                                                      Get.to(() => SellerDashboard());
+                                                    }
+                                                  });
+                                                },
+                                                child: Container(
+                                                  padding: const EdgeInsets.all(6),
+                                                  decoration: const BoxDecoration(
+                                                    color: Colors.black26,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.more_vert,
+                                                    color: Colors.white,
+                                                    size: 22,
+                                                  ),
+                                                ),
+                                              );
                                             },
-                                            itemBuilder: (context) => [
-                                              if (!isOtherProfile) ...[
-                                                const PopupMenuItem(
-                                                  value: 'profile',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(CupertinoIcons.person_add, size: 20),
-                                                      SizedBox(width: 10),
-                                                      Text("Profile Settings"),
-                                                    ],
-                                                  ),
-                                                ),
-                                                const PopupMenuItem(
-                                                  value: 'bookmarks',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(CupertinoIcons.bookmark, size: 20),
-                                                      SizedBox(width: 10),
-                                                      Text("Bookmarks"),
-                                                    ],
-                                                  ),
-                                                ),
-                                                const PopupMenuItem(
-                                                  value: 'orders',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(CupertinoIcons.bag, size: 20),
-                                                      SizedBox(width: 10),
-                                                      Text("My Orders"),
-                                                    ],
-                                                  ),
-                                                ),
-                                                const PopupMenuItem(
-                                                  value: 'enquiries',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(CupertinoIcons.bag, size: 20),
-                                                      SizedBox(width: 10),
-                                                      Text("My Enquiries"),
-                                                    ],
-                                                  ),
-                                                ),
-                                                if (user.isSeller == true)
-                                                  const PopupMenuItem(
-                                                    value: 'products',
-                                                    child: Row(
-                                                      children: [
-                                                        Icon(CupertinoIcons.cube_box, size: 20),
-                                                        SizedBox(width: 10),
-                                                        Text("Your Products"),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                if (user.isSeller == true)
-                                                  const PopupMenuItem(
-                                                    value: 'services',
-                                                    child: Row(
-                                                      children: [
-                                                        Icon(Icons.room_service_outlined, size: 20),
-                                                        SizedBox(width: 10),
-                                                        Text("Your Services"),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                if (user.isSeller == true)
-                                                  const PopupMenuItem(
-                                                    value: 'enquiry',
-                                                    child: Row(
-                                                      children: [
-                                                        Icon(CupertinoIcons.chat_bubble_text, size: 20),
-                                                        SizedBox(width: 10),
-                                                        Text("Enquiry"),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                if (user.isSeller == true)
-                                                  const PopupMenuItem(
-                                                    value: 'dashboard',
-                                                    child: Row(
-                                                      children: [
-                                                        Icon(CupertinoIcons.doc_append, size: 20),
-                                                        SizedBox(width: 10),
-                                                        Text("Dashboard"),
-                                                      ],
-                                                    ),
-                                                  ),
-                                              ] else ...[
-                                                 PopupMenuItem(
-                                                  value: 'block',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(user.isBlocked == true ? Icons.person_off_outlined : Icons.block, size: 20, color: Colors.red),
-                                                      const SizedBox(width: 10),
-                                                      Text(user.isBlocked == true ? "Unblock User" : "Block User", style: const TextStyle(color: Colors.red)),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ],
-                                            child: Container(
-                                              padding: const EdgeInsets.all(6),
-                                              decoration: const BoxDecoration(
-                                                color: Colors.black26,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(
-                                                Icons.more_vert,
-                                                color: Colors.white,
-                                                size: 22,
-                                              ),
-                                            ),
                                           ),
                                         ),
 
