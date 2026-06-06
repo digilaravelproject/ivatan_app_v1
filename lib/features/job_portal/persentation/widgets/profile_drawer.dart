@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 
 import '../../../../core/network/app_urls.dart';
 import '../../../../db/shared_pref_manager.dart';
-import '../../../dashboard/persentation/settings_page.dart';
+import '../../../dashboard/persentation/edit_profile_screen.dart';
 import '../../../profile/screen/profile_screen.dart';
 import '../pages/create_job_page.dart';
 import '../pages/delete_account_page.dart';
@@ -99,7 +99,7 @@ class ProfileDrawer extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Get.to(() => SettingsScreen());
+                        Get.to(() => EditProfileScreen());
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,

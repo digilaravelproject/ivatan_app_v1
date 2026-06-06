@@ -38,6 +38,7 @@ import '../../service/persentation/my_enquiries.dart';
 import '../../service/persentation/my_services_screen.dart';
 import '../../service/persentation/create_service_screen.dart';
 import '../../dashboard/persentation/service_screen.dart';
+import '../../dashboard/persentation/edit_profile_screen.dart';
 import '../../dashboard/persentation/settings_page.dart';
 import '../../messages/controller/chatt_controller.dart';
 import '../../messages/persentation/chatting_screen.dart';
@@ -725,7 +726,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                            children: [
                                              Expanded(
                                                child: _buildActionButton("Edit Profile", () {
-                                                  Get.to(() => SettingsScreen());
+                                                  Get.to(() => EditProfileScreen());
                                                }, isExpanded: true),
                                              ),
                                              const SizedBox(width: 10),
