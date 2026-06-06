@@ -72,6 +72,7 @@ class AppUrls {
   static const feedForYou = "api/v1/posts/feed/for-you";
   static const banners = "api/v1/banners";
   static const logout = "api/v1/auth/logout";
+  static const deleteAccount = "api/v1/auth/delete-account";
   static String blockUser(int id) => "api/v1/users/$id/block";
   static String markInterested(int id) => "api/v1/posts/$id/interested";
   static String markNotInterested(int id) => "api/v1/posts/$id/not-interested";
@@ -80,6 +81,7 @@ class AppUrls {
   static const blockedUsers = "api/v1/user/blocked-users";
   static const String chats = "api/v1/chats";
   static const String liveChatGroups = "api/v1/live-chat-groups";
+  static String liveChatGroupDetail(dynamic id) => "api/v1/live-chat-groups/$id";
   static String chatMessages(dynamic chatId) => "api/v1/chats/$chatId/messages";
 
   static const defaultApiKey =

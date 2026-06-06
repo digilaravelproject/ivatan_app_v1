@@ -1,5 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:get/get.dart';
+import 'package:i_vatan_app/core/network/api_services.dart';
+import 'package:i_vatan_app/core/network/app_urls.dart';
+import 'package:i_vatan_app/db/shared_pref_manager.dart';
+import 'package:i_vatan_app/core/helper/custom_snack_bar.dart';
+import 'package:i_vatan_app/route/app_pages.dart';
+
+// Top-level helper to dynamically mask the current logged-in user's email
+String _getMaskedEmail() {
+  final email = SharedPrefManager().user?.email ?? "";
+  if (email.isEmpty) return "your email";
+  final parts = email.split('@');
+  if (parts.length != 2) return email;
+  final name = parts[0];
+  final domain = parts[1];
+  if (name.length <= 2) {
+    return "${name}***@$domain";
+  }
+  return "${name.substring(0, 2)}***${name.substring(name.length - 1)}@$domain";
+}
 
 class AccountDeleteReasonScreen extends StatefulWidget {
   const AccountDeleteReasonScreen({super.key});
@@ -10,15 +30,30 @@ class AccountDeleteReasonScreen extends StatefulWidget {
 
 class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
   // Checkbox states
-  bool isNotUsing = true;
-  bool isBetterAlternative = true;
+  bool isNotUsing = false;
+  bool isBetterAlternative = false;
   bool isTooManyAds = false;
   bool isMissingFeatures = false;
   bool isNotSatisfied = false;
-  bool isDifficultNavigate = true;
+  bool isDifficultNavigate = false;
   bool isOther = false;
 
   TextEditingController otherController = TextEditingController();
+
+  String _getJoinedReasons() {
+    List<String> selected = [];
+    if (isNotUsing) selected.add("I'm not using the app.");
+    if (isBetterAlternative) selected.add("I found a better alternative.");
+    if (isTooManyAds) selected.add("The app contains too many ads.");
+    if (isMissingFeatures) selected.add("The app didn't have the features or functionality I was looking for.");
+    if (isNotSatisfied) selected.add("I'm not satisfied with the quality of content.");
+    if (isDifficultNavigate) selected.add("The app was difficult to navigate.");
+    if (isOther) {
+      String otherText = otherController.text.trim();
+      selected.add(otherText.isNotEmpty ? otherText : "Other");
+    }
+    return selected.join(', ');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +77,7 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24,vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -161,7 +196,7 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'user***@hotmail.com',
+                                _getMaskedEmail(),
                                 style: GoogleFonts.poppins(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
@@ -253,7 +288,6 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
 
             // Other Text Field
             if (isOther) ...[
-            //  const SizedBox(height: 16),
               Container(
                 margin: const EdgeInsets.only(left: 44),
                 child: TextField(
@@ -300,14 +334,19 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: _buildCustomButton(
-                    text: 'Delete account',
+                    text: 'Done',
                     isOutlined: false,
                     isDelete: true,
                     onPressed: () {
+                      final reasons = _getJoinedReasons();
+                      if (reasons.trim().isEmpty) {
+                        CustomSnackBar.showError(message: "Please select at least one reason.");
+                        return;
+                      }
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const AccountDeleteConfirmationScreen(),
+                          builder: (context) => AccountDeleteConfirmationScreen(reason: reasons),
                         ),
                       );
                     },
@@ -317,27 +356,6 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
             ),
 
             const SizedBox(height: 20),
-
-            // Done Button
-            // Center(
-            //   child: TextButton(
-            //     onPressed: () {
-            //       // Handle done action
-            //     },
-            //     style: TextButton.styleFrom(
-            //       foregroundColor: Colors.grey[600],
-            //       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            //     ),
-            //     child: Text(
-            //       'Done',
-            //       style: GoogleFonts.poppins(
-            //         fontSize: 16,
-            //         fontWeight: FontWeight.w500,
-            //         color: Colors.grey[600],
-            //       ),
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -349,57 +367,45 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
     required bool value,
     required Function(bool) onChanged,
   }) {
-    return Container(
-      //margin: const EdgeInsets.only(bottom: 5),
-      child: InkWell(
-        onTap: () => onChanged(!value),
-       // borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          /*decoration: BoxDecoration(
-            color: value ? Colors.grey[50] : Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: value ? Colors.black : Colors.grey[300]!,
-              width: value ? 1.5 : 1,
+    return InkWell(
+      onTap: () => onChanged(!value),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          children: [
+            // Custom Animated Checkbox
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: value ? Colors.black : Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: value ? Colors.black : Colors.grey[400]!,
+                  width: 2,
+                ),
+              ),
+              child: value
+                  ? const Icon(
+                      Icons.check_rounded,
+                      color: Colors.white,
+                      size: 18,
+                    )
+                  : null,
             ),
-          ),*/
-          child: Row(
-            children: [
-              // Custom Animated Checkbox
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: value ? Colors.black : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: value ? Colors.black : Colors.grey[400]!,
-                    width: 2,
-                  ),
-                ),
-                child: value
-                    ? const Icon(
-                  Icons.check_rounded,
-                  color: Colors.white,
-                  size: 18,
-                )
-                    : null,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    fontWeight: value ? FontWeight.w600 : FontWeight.normal,
-                    color: value ? Colors.black87 : Colors.grey[700],
-                  ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  fontWeight: value ? FontWeight.w600 : FontWeight.normal,
+                  color: value ? Colors.black87 : Colors.grey[700],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -457,7 +463,8 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
 
 // Screen 2: Account Delete Confirmation Screen
 class AccountDeleteConfirmationScreen extends StatefulWidget {
-  const AccountDeleteConfirmationScreen({super.key});
+  final String reason;
+  const AccountDeleteConfirmationScreen({super.key, required this.reason});
 
   @override
   State<AccountDeleteConfirmationScreen> createState() => _AccountDeleteConfirmationScreenState();
@@ -465,6 +472,58 @@ class AccountDeleteConfirmationScreen extends StatefulWidget {
 
 class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmationScreen> {
   bool isConfirmed = false;
+  final ApiServices _api = Get.put(ApiServices());
+
+  Future<void> _deleteAccount(BuildContext context) async {
+    print("Delete Account API triggered! Reason: ${widget.reason}");
+    
+    // Show loading indicator dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+        ),
+      ),
+    );
+
+    try {
+      final response = await _api.callPost(
+        AppUrls.deleteAccount,
+        data: {
+          "reason": widget.reason,
+        },
+        showErrorToast: true,
+      );
+
+      // Dismiss loading dialog
+      Navigator.pop(context);
+
+      if (response != null && response['status'] == true) {
+        // Clear local user credentials
+        await SharedPrefManager().userLogOut();
+        
+        CustomSnackBar.showSuccess(
+          message: response['message'] ?? "Your account has been scheduled for deletion."
+        );
+        
+        // Directly navigate to login screen
+        Future.delayed(const Duration(milliseconds: 200), () {
+          Get.offAllNamed(AppRoutes.login);
+        });
+      } else {
+        CustomSnackBar.showError(
+          message: response?['message'] ?? "Account deletion failed. Please try again."
+        );
+      }
+    } catch (e) {
+      // Dismiss loading dialog
+      Navigator.pop(context);
+      print("Error deleting account: $e");
+      CustomSnackBar.showError(message: "An error occurred. Please try again.");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -488,7 +547,7 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24,vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -653,34 +712,13 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
                     isOutlined: false,
                     isDelete: true,
                     isEnabled: isConfirmed,
-                    onPressed: isConfirmed ? () => _showDeletionDialog(context) : null,
+                    onPressed: isConfirmed ? () => _deleteAccount(context) : null,
                   ),
                 ),
               ],
             ),
 
             const SizedBox(height: 12),
-
-            // Done Button
-            // Center(
-            //   child: TextButton(
-            //     onPressed: () {
-            //       Navigator.popUntil(context, (route) => route.isFirst);
-            //     },
-            //     style: TextButton.styleFrom(
-            //       foregroundColor: Colors.grey[600],
-            //       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            //     ),
-            //     child: Text(
-            //       'Done',
-            //       style: GoogleFonts.poppins(
-            //         fontSize: 16,
-            //         fontWeight: FontWeight.w500,
-            //         color: Colors.grey[600],
-            //       ),
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -715,10 +753,10 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
               ),
               child: isConfirmed
                   ? const Icon(
-                Icons.check_rounded,
-                color: Colors.white,
-                size: 20,
-              )
+                      Icons.check_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    )
                   : null,
             ),
             const SizedBox(width: 16),
@@ -798,109 +836,6 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
           fontSize: 15,
           fontWeight: FontWeight.w600,
           color: Colors.white,
-        ),
-      ),
-    );
-  }
-
-  void _showDeletionDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.green[50],
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.check_circle_rounded,
-                  color: Colors.green[700],
-                  size: 64,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Account Deleted',
-                style: GoogleFonts.poppins(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Your account has been successfully deleted.',
-                style: GoogleFonts.poppins(
-                  fontSize: 15,
-                  color: Colors.grey[700],
-                  height: 1.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.email_outlined,
-                      size: 16,
-                      color: Colors.blue[700],
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'user***@hotmail.com',
-                      style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.blue[900],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.popUntil(context, (route) => route.isFirst);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: Text(
-                    'Done',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

@@ -331,7 +331,11 @@ class RegisterController extends GetxController {
       Get.offAll(() =>  DashboardPage());
       CustomSnackBar.showSuccess(message: msg);
     } catch (e) {
-      CustomSnackBar.showError(message: e.toString());
+      String errMsg = e.toString();
+      if (errMsg.startsWith("Exception: ")) {
+        errMsg = errMsg.replaceFirst("Exception: ", "");
+      }
+      CustomSnackBar.showError(message: errMsg);
     } finally {
       isLoading.value = false;
     }

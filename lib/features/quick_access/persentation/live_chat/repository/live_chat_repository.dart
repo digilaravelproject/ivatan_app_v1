@@ -4,6 +4,7 @@ import 'package:i_vatan_app/core/network/api_services.dart';
 import 'package:i_vatan_app/core/network/app_urls.dart';
 import '../model/chat_inbox_model.dart';
 import '../model/chat_message_model.dart';
+import '../model/live_chat_group_details_model.dart';
 
 // =========================================================================
 // 🚀 DEDICATED REPOSITORY PATTERN LAYER FOR LIVE CHAT ENDPOINTS
@@ -49,6 +50,23 @@ class LiveChatRepository {
       }
     } catch (e) {
       print("Error in LiveChatRepository.fetchMessages: $e");
+    }
+    return null;
+  }
+
+  /// Fetch details of a live chat group
+  Future<LiveChatGroupModel?> fetchGroupDetails(dynamic chatId) async {
+    try {
+      final response = await _api.callGet(AppUrls.liveChatGroupDetail(chatId), showErrorToast: false);
+
+      if (response != null && response['status'] == true && response['data'] != null) {
+        final groupData = response['data']['group'];
+        if (groupData != null) {
+          return LiveChatGroupModel.fromJson(Map<String, dynamic>.from(groupData));
+        }
+      }
+    } catch (e) {
+      print("Error in LiveChatRepository.fetchGroupDetails: $e");
     }
     return null;
   }
