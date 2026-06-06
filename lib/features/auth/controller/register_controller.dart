@@ -8,6 +8,7 @@ import '../../../route/app_pages.dart';
 import '../../dashboard/persentation/dashboard_page.dart';
 import '../data/data_source/auth_remote_data_source.dart';
 import '../data/model/req/register_req_model.dart';
+import 'package:i_vatan_app/features/Notification/controller/notification_controller.dart';
 
 /*class RegisterController extends GetxController {
   final AuthRemoteDataSource dataSource;
@@ -327,6 +328,12 @@ class RegisterController extends GetxController {
 
       final modal = await dataSource.makeUserRegister(req);
       final msg = "Registration successful! Welcome ${modal.name}";
+
+      try {
+        Get.find<NotificationController>().initNotification();
+      } catch (e) {
+        print("Notification init error on register: $e");
+      }
 
       Get.offAll(() =>  DashboardPage());
       CustomSnackBar.showSuccess(message: msg);

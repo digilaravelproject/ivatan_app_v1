@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/features/auth/persentation/splash_page.dart';
@@ -12,10 +13,31 @@ import 'features/auth/persentation/google_login_page.dart';
 import 'features/dashboard/persentation/dashboard_page.dart';
 import 'features/onbording/persentation/view/onboarding_page.dart';
 import 'firebase_options.dart';
+import 'features/Notification/binding/notification_binding.dart';
+
+
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(
+    RemoteMessage message,
+    ) async {
+  await Firebase.initializeApp();
+
+  print("Background Notification");
+  print("Title: ${message.notification?.title}");
+  print("Body: ${message.notification?.body}");
+  print("Data: ${message.data}");
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+  await Firebase.initializeApp();
+
+
+  FirebaseMessaging.onBackgroundMessage(
+    firebaseMessagingBackgroundHandler,
+  );
+
+
   // 1. Initialize Firebase with options first
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -44,6 +66,7 @@ class MyApp extends StatelessWidget {
           ),
           initialRoute: AppRoutes.splash,
           getPages: AppRoutes.appPages,
+          initialBinding: NotificationBinding(),
          // home: const SplashPage(),
          // getPages: AppRoutes.appPages,
         );

@@ -21,6 +21,7 @@ import '../model/post_model.dart';
 import '../model/story_model.dart';
 import 'widgets/feed_media_widget.dart';
 import '../../../core/network/app_urls.dart';
+import '../../../route/app_pages.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({Key? key}) : super(key: key);
@@ -59,6 +60,7 @@ class HomePage extends StatelessWidget {
           onRefresh: () async {
             await controller.fetchPosts();
             await controller.fetchStories();
+            await controller.fetchUnreadNotificationCount();
           },
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -112,9 +114,56 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
                 actions: [
+                  Obx(() {
+                    final count = controller.unreadNotificationCount.value;
+                    return Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.notifications,
+                            color: Colors.black87,
+                            size: 26,
+                          ),
+                          onPressed: () async {
+                            await Get.toNamed(AppRoutes.notifications);
+                            controller.fetchUnreadNotificationCount();
+                          },
+                        ),
+                        if (count > 0)
+                          Positioned(
+                            top: 10,
+                            right: 10,
+                            child: Container(
+                              padding: const EdgeInsets.all(3),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 1.5),
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  count > 99 ? '99+' : '$count',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  }),
                   Stack(
                     alignment: Alignment.center,
                     children: [
+
                       IconButton(
                         icon: Icon(
                           Icons.chat_bubble_outline,

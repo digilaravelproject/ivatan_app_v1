@@ -18,6 +18,7 @@ import '../persentation/verifyOtp.dart';
 import 'intrest_controller.dart';
 import '../persentation/interest_screen.dart';
 import '../controller/register_controller.dart';
+import 'package:i_vatan_app/features/Notification/controller/notification_controller.dart';
 
 class LoginController extends GetxController {
   final AuthRemoteDataSource authDataSource;
@@ -149,6 +150,12 @@ class LoginController extends GetxController {
       final msg =
           "Congratulations ${modal.name}, you have successfully logged in!";
 
+      try {
+        Get.find<NotificationController>().initNotification();
+      } catch (e) {
+        print("Notification init error on password login: $e");
+      }
+
       Get.offAllNamed(AppRoutes.navigationScreen);
 
       CustomSnackBar.showSuccess(message: msg);
@@ -172,6 +179,12 @@ class LoginController extends GetxController {
       print("firebaseToken : "+firebaseToken.toString());
       printMessage("callLoginAPI : " + modal.name);
       final msg = "Congratulations ${modal.name}, you have successfully logged in!";
+
+      try {
+        Get.find<NotificationController>().initNotification();
+      } catch (e) {
+        print("Notification init error on OTP login: $e");
+      }
 
       Get.offAllNamed(AppRoutes.navigationScreen);
 
@@ -369,6 +382,11 @@ class LoginController extends GetxController {
       if (response['status'] == true && response['data'] != null) {
         final pref = SharedPrefManager();
         await pref.saveUserData(response['data']);
+        try {
+          Get.find<NotificationController>().initNotification();
+        } catch (e) {
+          print("Notification init error on Google login: $e");
+        }
         Get.offAllNamed(AppRoutes.navigationScreen);
 
         final msg = "Welcome ${user.displayName ?? 'User'}!";

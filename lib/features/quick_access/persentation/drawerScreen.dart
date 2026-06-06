@@ -80,7 +80,7 @@ class DrawerScreen extends StatelessWidget {
                           context: context,
                           icon: CupertinoIcons.bell_fill,
                           label: null,
-                          onTap: () => showComingSoonDialog(context, title: "Notifications", message: "Your notification center is being redesigned for a better experience."),
+                          onTap: () => Get.toNamed(AppRoutes.notifications),
                         ),
                         const SizedBox(width: 12),
                         Expanded(

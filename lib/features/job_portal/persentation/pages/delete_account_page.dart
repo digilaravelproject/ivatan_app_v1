@@ -6,6 +6,7 @@ import 'package:i_vatan_app/core/network/app_urls.dart';
 import 'package:i_vatan_app/db/shared_pref_manager.dart';
 import 'package:i_vatan_app/core/helper/custom_snack_bar.dart';
 import 'package:i_vatan_app/route/app_pages.dart';
+import 'package:i_vatan_app/features/Notification/controller/notification_controller.dart';
 
 // Top-level helper to dynamically mask the current logged-in user's email
 String _getMaskedEmail() {
@@ -501,6 +502,11 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
       Navigator.pop(context);
 
       if (response != null && response['status'] == true) {
+        try {
+          await Get.find<NotificationController>().deleteTokenOnLogout();
+        } catch (e) {
+          print("Error deleting token on delete account: $e");
+        }
         // Clear local user credentials
         await SharedPrefManager().userLogOut();
         

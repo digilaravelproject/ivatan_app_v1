@@ -84,6 +84,17 @@ class AppUrls {
   static String liveChatGroupDetail(dynamic id) => "api/v1/live-chat-groups/$id";
   static String chatMessages(dynamic chatId) => "api/v1/chats/$chatId/messages";
 
+
+  //    NOTIFICATIONS
+
+  static const String registerDeviceToken = "api/v1/notifications/device-tokens";
+
+  static const String deleteDeviceToken = "api/v1/notifications/device-tokens";
+  static const String getNotifications = "api/v1/notifications";
+  static const String unreadCount = "api/v1/notifications/unread-count";
+  static const String markNotificationRead = "api/v1/notifications/mark-read";
+  static const String markAllNotificationsRead = "api/v1/notifications/mark-all-read";
+
   static const defaultApiKey =
       "1|1yCFcc7ahglUgOL3cftZZ7T83gcyFJreXGlQx0zud042e463";
 }

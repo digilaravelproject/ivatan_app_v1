@@ -19,6 +19,8 @@ import '../features/job_portal/binding/applicant_binding.dart';
 import '../features/job_portal/persentation/pages/applicant_list.dart';
 import '../features/job_portal/persentation/pages/applicant_details.dart';
 import '../features/product/binding/address_binding.dart';
+import '../features/Notification/persentation/notifications_screen.dart';
+import '../features/Notification/binding/notification_binding.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -36,6 +38,7 @@ class AppRoutes {
   static const String dashboard = '/dashboard';
   static const String navigationScreen = '/navigationScreen';
   static const String chattingScreen = '/chattingScreen';
+  static const String notifications = '/notifications';
 
 
 
@@ -74,6 +77,12 @@ class AppRoutes {
       name: AppRoutes.chattingScreen,
       page: () => ChattingScreen(),
       binding: ChatBinding(),
+      transition: Transition.cupertino,
+    ),
+    GetPage(
+      name: AppRoutes.notifications,
+      page: () => const NotificationsScreen(),
+      binding: NotificationBinding(),
       transition: Transition.cupertino,
     ),
 

@@ -11,6 +11,7 @@ import '../../../../core/helper/custom_image_view.dart';
 import '../../../core/utils/app_decoration.dart';
 import '../../../db/shared_pref_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:i_vatan_app/features/Notification/controller/notification_controller.dart';
 
 
 /*class SplashPage extends StatefulWidget {
@@ -183,6 +184,14 @@ class _SplashPageState extends State<SplashPage>
 
     // Check login status
     final isLoggedIn = SharedPrefManager().isUserLogin;
+
+    if (isLoggedIn) {
+      try {
+        Get.find<NotificationController>().initNotification();
+      } catch (e) {
+        print("Notification init error on Splash: $e");
+      }
+    }
 
     if (!mounted) return;
 

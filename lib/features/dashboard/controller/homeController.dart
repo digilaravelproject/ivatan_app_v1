@@ -17,6 +17,7 @@ import '../../reels_screen/controller/short_play_controller.dart';
 import 'settings_controller.dart';
 import '../../../core/network/app_urls.dart';
 import '../../../core/widgets/custom_dialog.dart';
+import 'package:i_vatan_app/features/Notification/controller/notification_controller.dart';
 
 class HomeController extends GetxController {
   RxBool isLoading = false.obs;
@@ -51,13 +52,26 @@ class HomeController extends GetxController {
   RxDouble trimStartTime = 0.0.obs; // In milliseconds
   RxDouble trimDuration = 0.0.obs;  // In milliseconds
 
+  RxInt unreadNotificationCount = 0.obs;
+
+  Future<void> fetchUnreadNotificationCount() async {
+    try {
+      final response = await api.callGet(AppUrls.unreadCount);
+      if (response != null && response['success'] == true) {
+        unreadNotificationCount.value = response['unread'] as int? ?? 0;
+      }
+    } catch (e) {
+      print("Error fetching unread count in HomeController: $e");
+    }
+  }
+
   @override
   void onInit() {
     super.onInit();
     loadCurrentUser();
     fetchPosts();
     fetchStories();
-
+    fetchUnreadNotificationCount();
   }
 
 
@@ -409,6 +423,11 @@ class HomeController extends GetxController {
   }
 
   Future<void> logout() async {
+    try {
+      await Get.find<NotificationController>().deleteTokenOnLogout();
+    } catch (e) {
+      print("Error deleting token on logout: $e");
+    }
     final response = await api.callDelete("api/v1/auth/logout");
     print("logout response : $response");
 
