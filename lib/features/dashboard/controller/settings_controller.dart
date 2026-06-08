@@ -312,6 +312,7 @@ import '../../../core/network/api_services.dart';
 import '../../../core/network/app_urls.dart';
 import '../../../db/shared_pref_manager.dart';
 import '../../auth/data/model/res/user_model.dart';
+import '../../auth/data/model/res/profile_type_model.dart';
 import '../../search/controller/mixed_feed_controller.dart';
 import '../model/user_profile.dart';
 import 'follow_controller.dart';
@@ -374,14 +375,218 @@ class SettingsController extends GetxController {
 
   RxString selectedPageCategory = "".obs;
 
+  RxList<ProfileType> profileTypes = <ProfileType>[].obs;
+  Rx<ProfileType?> selectedProfileType = Rx<ProfileType?>(null);
+  RxString selectedSellerType = "".obs;
+
+  final profileTypeController = TextEditingController();
+  final sellerTypeController = TextEditingController();
+
   @override
   void onInit() {
     super.onInit();
+    profileTypes.value = _fallbackProfileTypes
+        .map((json) => ProfileType.fromJson(json))
+        .toList();
+    fetchProfileTypes();
 
     String finalUserName = userName.isNotEmpty ? userName : (SharedPrefManager().user?.username ?? "");
 
     fetchUserDetails(finalUserName);
+  }
 
+  Future<void> fetchProfileTypes() async {
+    try {
+      final response = await api.callGet("api/profile-types");
+      if (response != null && response["status"] == true) {
+        final List<dynamic> typesJson = response["data"]["types"];
+        profileTypes.value = typesJson.map((x) => ProfileType.fromJson(x)).toList();
+        
+        // Re-run matching after profile types are fetched from API
+        _matchProfileType();
+      }
+    } catch (e) {
+      print("⚠️ Silent background fetch of profile types failed: $e");
+    }
+  }
+
+  final List<Map<String, dynamic>> _fallbackProfileTypes = [
+    {
+      "type": "personal",
+      "label": "Personal Profile",
+      "description": "Default personal profile with basic features.",
+      "is_default": true,
+      "requires_approval": false,
+      "has_subscription": true
+    },
+    {
+      "type": "employer",
+      "label": "Employer Profile",
+      "description": "Post job openings and manage recruitment.",
+      "is_default": false,
+      "requires_approval": true,
+      "has_subscription": false
+    },
+    {
+      "type": "seller",
+      "label": "Product & Service Seller",
+      "description": "Sell products, services, or both.",
+      "is_default": false,
+      "requires_approval": true,
+      "has_subscription": true,
+      "seller_types": [
+        "products",
+        "services",
+        "both"
+      ]
+    },
+    {
+      "type": "music",
+      "label": "Music Playlist Profile",
+      "description": "Create and manage music playlists.",
+      "is_default": false,
+      "requires_approval": true,
+      "has_subscription": false
+    },
+    {
+      "type": "creator",
+      "label": "Content Creator Profile",
+      "description": "Upload content, manage monetization.",
+      "is_default": false,
+      "requires_approval": true,
+      "has_subscription": true
+    }
+  ];
+
+  void _matchProfileType() {
+    final userProfileType = userProfile.value?.profileType;
+    final userProfileSubType = userProfile.value?.profileSubType;
+
+    if (userProfileType != null && userProfileType.isNotEmpty) {
+      final matchedType = profileTypes.firstWhereOrNull((e) => e.type == userProfileType);
+      if (matchedType != null) {
+        selectedProfileType.value = matchedType;
+        if (userProfileType == 'seller' && userProfileSubType != null && userProfileSubType.isNotEmpty) {
+          // Map backend subtype back to UI selection string (e.g. 'product' -> 'products')
+          String mappedSub = userProfileSubType;
+          if (userProfileSubType == 'product') {
+            mappedSub = 'products';
+          } else if (userProfileSubType == 'service') {
+            mappedSub = 'services';
+          } else if (userProfileSubType == 'both') {
+            mappedSub = 'both';
+          }
+          selectedSellerType.value = mappedSub;
+          profileTypeController.text = "${matchedType.label} (${mappedSub.capitalizeFirst ?? mappedSub})";
+          sellerTypeController.text = mappedSub;
+        } else {
+          profileTypeController.text = matchedType.label;
+          sellerTypeController.clear();
+        }
+        return;
+      }
+    }
+
+    if (isSeller.value) {
+      final sellerType = profileTypes.firstWhereOrNull((e) => e.type == "seller");
+      selectedProfileType.value = sellerType;
+      profileTypeController.text = sellerType?.label ?? "";
+    } else if (isEmployer.value) {
+      final employerType = profileTypes.firstWhereOrNull((e) => e.type == "employer");
+      selectedProfileType.value = employerType;
+      profileTypeController.text = employerType?.label ?? "";
+    } else {
+      final personalType = profileTypes.firstWhereOrNull((e) => e.type == "personal");
+      selectedProfileType.value = personalType;
+      profileTypeController.text = personalType?.label ?? "";
+    }
+  }
+
+
+  Future<void> switchProfileType(ProfileType profileType, String sellerType) async {
+    try {
+      isLoading.value = true;
+
+      String? apiProfileSubType;
+      if (profileType.type == 'seller') {
+        if (sellerType == 'products') {
+          apiProfileSubType = 'product';
+        } else if (sellerType == 'services') {
+          apiProfileSubType = 'service';
+        } else if (sellerType == 'both') {
+          apiProfileSubType = 'both';
+        }
+      }
+
+      final Map<String, dynamic> body = {
+        "to_profile_type": profileType.type,
+        "notes": "I want to switch to ${profileType.type}.",
+      };
+      if (apiProfileSubType != null) {
+        body["profile_sub_type"] = apiProfileSubType;
+      }
+
+      final response = await api.callPost(
+        "api/v1/profiles/switch",
+        data: body,
+      );
+
+      if (response != null && response["status"] == true) {
+        selectedProfileType.value = profileType;
+        selectedSellerType.value = sellerType;
+
+        if (profileType.type == 'seller') {
+          isSeller.value = true;
+          isEmployer.value = false;
+        } else if (profileType.type == 'employer') {
+          isSeller.value = false;
+          isEmployer.value = true;
+        } else {
+          isSeller.value = false;
+          isEmployer.value = false;
+        }
+
+        if (profileType.type == 'seller' && sellerType.isNotEmpty) {
+          profileTypeController.text = "${profileType.label} (${sellerType.capitalizeFirst ?? sellerType})";
+          sellerTypeController.text = sellerType;
+        } else {
+          profileTypeController.text = profileType.label;
+          sellerTypeController.clear();
+        }
+
+        Get.snackbar(
+          "Success",
+          response["message"] ?? "Switch request submitted successfully.",
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 3),
+        );
+
+        fetchUserDetails(userName.isNotEmpty ? userName : (SharedPrefManager().user?.username ?? ""));
+      } else {
+        Get.snackbar(
+          "Error",
+          response != null ? (response["message"] ?? "Switch failed") : "Switch failed",
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 3),
+        );
+      }
+    } catch (e) {
+      print("❌ SWITCH PROFILE ERROR: $e");
+      Get.snackbar(
+        "Error",
+        "Something went wrong: ${e.toString()}",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 3),
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
 
@@ -450,6 +655,28 @@ class SettingsController extends GetxController {
       // Employer and Seller values
       request.fields["is_employer"] = isEmployer.value ? "1" : "0";
       request.fields["is_seller"] = isSeller.value ? "1" : "0";
+
+      // Profile Type and Sub Type
+      String? apiProfileType = selectedProfileType.value?.type;
+      String? apiProfileSubType;
+
+      if (apiProfileType == 'seller') {
+        final sub = selectedSellerType.value;
+        if (sub == 'products') {
+          apiProfileSubType = 'product';
+        } else if (sub == 'services') {
+          apiProfileSubType = 'service';
+        } else if (sub == 'both') {
+          apiProfileSubType = 'both';
+        }
+      }
+
+      if (apiProfileType != null) {
+        request.fields["profile_type"] = apiProfileType;
+      }
+      if (apiProfileSubType != null) {
+        request.fields["profile_sub_type"] = apiProfileSubType;
+      }
 
       // Interests array
       // final interests = userProfile.value?.interests ?? [];
@@ -822,6 +1049,7 @@ class SettingsController extends GetxController {
         contactVisibility.value = result.user!.contactVisibility ?? 'both';
         isEmployer.value = result.user!.isEmployer ?? false;
         isSeller.value = result.user!.isSeller ?? false;
+        _matchProfileType();
         
         // SYNC FOLLOW STATUS
         if (result.user?.id != null) {

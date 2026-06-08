@@ -393,102 +393,56 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             padding: const EdgeInsets.all(3),
-            height: 38,
+            height: 42,
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE5E7EB),
-              borderRadius: BorderRadius.circular(20),
+              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade200,
+                width: 1,
+              ),
             ),
             child: TabBar(
               controller: _tabController,
               dividerColor: Colors.transparent,
               indicator: BoxDecoration(
-                color: isDark ? const Color(0xFF111827) : Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
+                    color: Colors.black.withOpacity(0.06),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
-              labelColor: isDark ? const Color(0xFF22D3EE) : const Color(0xFF0E7490),
-              unselectedLabelColor: isDark ? Colors.white70 : Colors.black54,
+              labelColor: isDark ? const Color(0xFF22D3EE) : const Color(0xFF0F766E),
+              unselectedLabelColor: isDark ? Colors.white60 : Colors.black45,
               indicatorSize: TabBarIndicatorSize.tab,
               labelStyle: GoogleFonts.outfit(
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.bold,
                 fontSize: 13,
               ),
               unselectedLabelStyle: GoogleFonts.outfit(
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
                 fontSize: 13,
               ),
               tabs: [
                 Tab(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('All'),
-                      const SizedBox(width: 4),
-                      Obx(() {
-                        final count = _controller.notificationsList.length;
-                        if (count == 0) return const SizedBox.shrink();
-                        final isActive = _tabController.index == 0;
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                          decoration: BoxDecoration(
-                            color: isActive
-                                ? (isDark ? const Color(0xFF22D3EE).withOpacity(0.15) : const Color(0xFFECFEFF))
-                                : (isDark ? const Color(0xFF334155) : const Color(0xFFD1D5DB)),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            '$count',
-                            style: TextStyle(
-                              color: isActive
-                                  ? (isDark ? const Color(0xFF22D3EE) : const Color(0xFF0891B2))
-                                  : (isDark ? Colors.white70 : Colors.black54),
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      }),
-                    ],
-                  ),
+                  child: Obx(() {
+                    final count = _controller.notificationsList.length;
+                    return Text(
+                      count > 0 ? 'All ($count)' : 'All',
+                    );
+                  }),
                 ),
                 Tab(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('Unread'),
-                      const SizedBox(width: 4),
-                      Obx(() {
-                        final count = _controller.unreadNotificationsList.length;
-                        if (count == 0) return const SizedBox.shrink();
-                        final isActive = _tabController.index == 1;
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                          decoration: BoxDecoration(
-                            color: isActive
-                                ? (isDark ? const Color(0xFF22D3EE).withOpacity(0.15) : const Color(0xFFECFEFF))
-                                : (isDark ? const Color(0xFF7F1D1D) : const Color(0xFFFECACA)),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            '$count',
-                            style: TextStyle(
-                              color: isActive
-                                  ? (isDark ? const Color(0xFF22D3EE) : const Color(0xFF0891B2))
-                                  : (isDark ? Colors.red.shade200 : Colors.red.shade800),
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      }),
-                    ],
-                  ),
+                  child: Obx(() {
+                    final count = _controller.unreadNotificationsList.length;
+                    return Text(
+                      count > 0 ? 'Unread ($count)' : 'Unread',
+                    );
+                  }),
                 ),
               ],
             ),
@@ -589,112 +543,120 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
     return GestureDetector(
       onTap: () => _showNotificationDetail(item),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E293B).withOpacity(0.3) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
             color: isRead 
-                ? (isDark ? const Color(0xFF1E1E1E) : Colors.white)
-                : (isDark ? const Color(0xFF262626) : const Color(0xFFF0FDF4)), // Soft green highlight for unread
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isRead 
-                  ? (isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade100)
-                  : (isDark ? AppColors.accent.withOpacity(0.3) : AppColors.accent.withOpacity(0.2)),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.02),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+                ? (isDark ? Colors.white.withOpacity(0.04) : Colors.grey.shade100)
+                : (isDark ? AppColors.secondary.withOpacity(0.15) : AppColors.secondary.withOpacity(0.1)),
+            width: isRead ? 1 : 1.2,
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Unread indicator dot
-              if (!isRead)
-                Container(
-                  margin: const EdgeInsets.only(top: 14, right: 8),
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: AppColors.accent,
-                    shape: BoxShape.circle,
-                  ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.01),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Premium left vertical indicator stripe for unread
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 4,
+                  color: isRead ? Colors.transparent : AppColors.secondary,
                 ),
-              
-              // Category Icon
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: details['bg'],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  details['icon'],
-                  color: details['color'],
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 14),
-
-              // Content Block
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          details['label'].toString().toUpperCase(),
-                          style: GoogleFonts.outfit(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+                        // Category Icon
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: details['bg'],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            details['icon'],
                             color: details['color'],
-                            letterSpacing: 0.8,
+                            size: 18,
                           ),
                         ),
-                        Text(
-                          _formatRelativeTime(item.createdAt),
-                          style: GoogleFonts.outfit(
-                            fontSize: 11,
-                            color: isDark ? AppColors.darkTextDisabled : AppColors.lightTextDisabled,
+                        const SizedBox(width: 12),
+
+                        // Content Block
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    details['label'].toString().toUpperCase(),
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                      color: details['color'],
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                  Text(
+                                    _formatRelativeTime(item.createdAt),
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 10,
+                                      color: isDark ? AppColors.darkTextDisabled : AppColors.lightTextDisabled,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                payload.title,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 14,
+                                  fontWeight: isRead ? FontWeight.w600 : FontWeight.bold,
+                                  color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                payload.message,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 12,
+                                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                        const SizedBox(width: 8),
                       ],
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      payload.title,
-                      style: GoogleFonts.outfit(
-                        fontSize: 15,
-                        fontWeight: isRead ? FontWeight.w600 : FontWeight.bold,
-                        color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      payload.message,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.outfit(
-                        fontSize: 13,
-                        color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                        height: 1.4,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      );
+      ),
+    );
   }
 
   Widget _buildEmptyState(bool isDark) {

@@ -8,6 +8,7 @@ import '../../../core/network/app_urls.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../db/shared_pref_manager.dart';
 import '../../job_portal/persentation/pages/delete_account_page.dart';
+import '../../auth/widgets/profile_type_selector.dart';
 import '../controller/settings_controller.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -71,7 +72,7 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 16),
 
               // CONTACT VISIBILITY
-              Container(
+              /*Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade200,
@@ -121,10 +122,10 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 16,),
+              const SizedBox(height: 16,),*/
 
               // EMPLOYER TOGGLE
-              Obx(() => Container(
+            /*  Obx(() => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12,),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade200,
@@ -155,20 +156,32 @@ class SettingsScreen extends StatelessWidget {
               )),
 
               const SizedBox(height: 16),
-              
+              */
+
+              // _buildCleanField(
+              //   child: CustomSearchableDropdown(
+              //     label: "Page Category",
+              //     items: profileController.pageCategoryList,
+              //     controller: profileController.pageCategoryController,
+              //     onChanged: (value) {
+              //       profileController.selectedPageCategory.value = value;
+              //     },
+              //   ),
+              // ),
+
               _buildCleanField(
-                child: CustomSearchableDropdown(
-                  label: "Page Category",
-                  items: profileController.pageCategoryList,
-                  controller: profileController.pageCategoryController,
-                  onChanged: (value) {
-                    profileController.selectedPageCategory.value = value;
+                child: ProfileTypeSelector(
+                  label: "Profile Type",
+                  controller: profileController.profileTypeController,
+                  profileTypes: profileController.profileTypes,
+                  onSelected: (profileType, sellerType) {
+                    profileController.switchProfileType(profileType, sellerType);
                   },
                 ),
               ),
 
               // SELLER TOGGLE
-              Obx(() => Container(
+              /*Obx(() => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12,),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade200,
@@ -196,9 +209,9 @@ class SettingsScreen extends StatelessWidget {
                     )
                   ],
                 ),
-              )),
+              )),*/
 
-              const SizedBox(height: 16,),
+            //  const SizedBox(height: 16,),
 
               GestureDetector(
                 onTap: (){

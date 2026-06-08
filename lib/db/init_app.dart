@@ -14,7 +14,13 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 /// ✅ Background FCM handler — must be top-level & annotated
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
+  if (Firebase.apps.isEmpty) {
+    try {
+      await Firebase.initializeApp();
+    } catch (e) {
+      debugPrint("🔔 Firebase init background exception: $e");
+    }
+  }
   debugPrint("🔔 [background] Message received: ${message.messageId}");
 }
 

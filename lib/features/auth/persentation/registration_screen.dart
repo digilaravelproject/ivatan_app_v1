@@ -11,6 +11,7 @@ import '../../../core/helper/custom_buttons.dart';
 import '../../../core/helper/custom_dropdown.dart';
 import '../../../core/theme/app_colors.dart';
 import '../widgets/auth_input_fields.dart';
+import '../widgets/profile_type_selector.dart';
 
 class RegistrationScreen extends GetWidget<RegisterController> {
   RegistrationScreen({super.key});
@@ -203,6 +204,32 @@ class RegistrationScreen extends GetWidget<RegisterController> {
                     controller.selectedOccupation.value = value;
                   },
                   validator: controller.validateOccupation,
+                ),
+
+                const SizedBox(height: 20),
+
+                // Profile Type Selection
+                ProfileTypeSelector(
+                  label: "Profile Type",
+                  controller: controller.profileTypeController,
+                  profileTypes: controller.profileTypes,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return "Please select a profile type";
+                    }
+                    return null;
+                  },
+                  onSelected: (profileType, sellerType) {
+                    controller.selectedProfileType.value = profileType;
+                    controller.selectedSellerType.value = sellerType;
+                    if (profileType.type == 'seller' && sellerType.isNotEmpty) {
+                      controller.profileTypeController.text = "${profileType.label} (${sellerType.capitalizeFirst ?? sellerType})";
+                      controller.sellerTypeController.text = sellerType;
+                    } else {
+                      controller.profileTypeController.text = profileType.label;
+                      controller.sellerTypeController.clear();
+                    }
+                  },
                 ),
 
                 const SizedBox(height: 40),

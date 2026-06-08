@@ -36,6 +36,8 @@ class RegisterReqModel {
   String dateOfBirth;
   String occupation;
   List<String> interests;
+  String? profileType;
+  String? profileSubType;
 
   RegisterReqModel({
     required this.name,
@@ -46,6 +48,8 @@ class RegisterReqModel {
     required this.dateOfBirth,
     required this.occupation,
     required this.interests,
+    this.profileType,
+    this.profileSubType,
   });
 
   Map<String, dynamic> toMap() {
@@ -58,6 +62,8 @@ class RegisterReqModel {
       "date_of_birth": dateOfBirth,
       "occupation": occupation,
       "interests": interests,
+      "profile_type": profileType,
+      "profile_sub_type": profileSubType,
     };
   }
 }

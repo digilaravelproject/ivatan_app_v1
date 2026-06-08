@@ -142,6 +142,8 @@ class UserData {
   int? chat_id;
   String? contactVisibility; // 'both', 'phone', 'email', 'none'
   String? pageCategory;
+  String? profileType;
+  String? profileSubType;
 
   UserData({
     this.id,
@@ -184,7 +186,9 @@ class UserData {
     this.is_follower,
     this.chat_id,
     this.contactVisibility,
-    this.pageCategory
+    this.pageCategory,
+    this.profileType,
+    this.profileSubType,
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) {
@@ -231,7 +235,9 @@ class UserData {
       is_follower: json["is_follower"],
       chat_id: json["chat_id"],
       contactVisibility: json["contact_visibility"] ?? 'both',
-      pageCategory: json["page_category"]
+      pageCategory: json["page_category"],
+      profileType: json["profile_type"],
+      profileSubType: json["profile_sub_type"],
     );
   }
 
@@ -278,6 +284,8 @@ class UserData {
       "chat_id": chat_id,
       "contact_visibility": contactVisibility,
       "page_category": pageCategory,
+      "profile_type": profileType,
+      "profile_sub_type": profileSubType,
     };
   }
 }

@@ -37,6 +37,8 @@ class UserModel {
   final bool hidePhone;
   final String? countryCode;
   final String? isoCode;
+  final String? profileType;
+  final String? profileSubType;
 
   /// FIX: Interests should be List<Map>
   final List<Map<String, dynamic>> interests;
@@ -83,6 +85,8 @@ class UserModel {
     this.hidePhone = false,
     this.countryCode,
     this.isoCode,
+    this.profileType,
+    this.profileSubType,
     required this.interests,
     required this.token,
   });
@@ -136,6 +140,8 @@ class UserModel {
       hidePhone: _toBool(data["hide_phone"]),
       countryCode: data["country_code"],
       isoCode: data["iso_code"],
+      profileType: data["profile_type"],
+      profileSubType: data["profile_sub_type"],
 
       interests: List<Map<String, dynamic>>.from(data["interests"] ?? []),
 
@@ -164,7 +170,7 @@ class UserModel {
     "reputation_score": reputationScore,
     "email_notification_preferences": emailNotificationPreferences,
     "account_privacy": accountPrivacy,
-    "profile_photo_path": profilePhotoPath,
+    "profile_photo_url": profilePhotoPath,
     "bio": bio,
     "status": status,
     "is_blocked": isBlocked,
@@ -182,6 +188,8 @@ class UserModel {
     "hide_phone": hidePhone,
     "country_code": countryCode,
     "iso_code": isoCode,
+    "profile_type": profileType,
+    "profile_sub_type": profileSubType,
     "interests": interests,
     "token": token,
   };

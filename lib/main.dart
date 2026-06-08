@@ -20,7 +20,13 @@ import 'features/Notification/binding/notification_binding.dart';
 Future<void> firebaseMessagingBackgroundHandler(
     RemoteMessage message,
     ) async {
-  await Firebase.initializeApp();
+  if (Firebase.apps.isEmpty) {
+    try {
+      await Firebase.initializeApp();
+    } catch (e) {
+      print("Firebase background init exception: $e");
+    }
+  }
 
   print("Background Notification");
   print("Title: ${message.notification?.title}");
@@ -30,17 +36,19 @@ Future<void> firebaseMessagingBackgroundHandler(
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-
+  
+  if (Firebase.apps.isEmpty) {
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } catch (e) {
+      print("Firebase main init exception: $e");
+    }
+  }
 
   FirebaseMessaging.onBackgroundMessage(
     firebaseMessagingBackgroundHandler,
-  );
-
-
-  // 1. Initialize Firebase with options first
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
   );
 
   // 2. Run other app initializations
