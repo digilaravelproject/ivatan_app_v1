@@ -221,15 +221,15 @@ class RegisterController extends GetxController {
       "has_subscription": false
     },
     {
-      "type": "seller",
-      "label": "Product & Service Seller",
+      "type": "ecommerce",
+      "label": "Ecommerce Profile",
       "description": "Sell products, services, or both.",
       "is_default": false,
       "requires_approval": true,
       "has_subscription": true,
-      "seller_types": [
-        "products",
-        "services",
+      "sub_types": [
+        "product",
+        "service",
         "both"
       ]
     },
@@ -392,19 +392,11 @@ class RegisterController extends GetxController {
           .where((e) => e.isNotEmpty)
           .toList();
 
-      String? apiProfileType = selectedProfileType.value?.type;
-      String? apiProfileSubType;
-
-      if (apiProfileType == 'seller') {
-        final sub = selectedSellerType.value;
-        if (sub == 'products') {
-          apiProfileSubType = 'product';
-        } else if (sub == 'services') {
-          apiProfileSubType = 'service';
-        } else if (sub == 'both') {
-          apiProfileSubType = 'both';
-        }
-      }
+      // Send exactly what the API returned — no custom mapping
+      final String? apiProfileType = selectedProfileType.value?.type;
+      final String? apiProfileSubType = selectedSellerType.value.isNotEmpty
+          ? selectedSellerType.value
+          : null;
 
       final req = RegisterReqModel(
         name: nameController.text.trim(),

@@ -319,6 +319,9 @@ import 'follow_controller.dart';
 import '../../profile/controller/ownpostController.dart';
 import 'homeController.dart';
 import '../../../core/helper/custom_snack_bar.dart';
+import '../../subscription/controller/subscription_controller.dart';
+import '../../subscription/persentation/profile_plans_screen.dart';
+import '../../subscription/data/model/profile_switch_request.dart';
 
 
 class SettingsController extends GetxController {
@@ -334,6 +337,8 @@ class SettingsController extends GetxController {
   RxString contactVisibility = 'both'.obs; // 'both', 'phone', 'email', 'none'
   RxBool isEmployer = false.obs;
   RxBool isSeller = false.obs;
+  var switchRequests = <ProfileSwitchRequest>[].obs;
+  var isLoadingSwitchRequests = false.obs;
 
   final nameController = TextEditingController();
   final emailController = TextEditingController();
@@ -389,6 +394,7 @@ class SettingsController extends GetxController {
         .map((json) => ProfileType.fromJson(json))
         .toList();
     fetchProfileTypes();
+    fetchProfileSwitchRequests();
 
     String finalUserName = userName.isNotEmpty ? userName : (SharedPrefManager().user?.username ?? "");
 
@@ -410,6 +416,91 @@ class SettingsController extends GetxController {
     }
   }
 
+  Future<void> fetchProfileSwitchRequests() async {
+    try {
+      isLoadingSwitchRequests.value = true;
+      final response = await api.callGet("api/v1/profile-switch-requests");
+      if (response != null && response["status"] == true) {
+        final rawData = response["data"];
+        if (rawData != null && rawData["switch_requests"] is List) {
+          final List<dynamic> requestsJson = rawData["switch_requests"];
+          switchRequests.value = requestsJson.map((x) => ProfileSwitchRequest.fromJson(x)).toList();
+        }
+      }
+    } catch (e) {
+      print("⚠️ Error fetching profile switch requests: $e");
+    } finally {
+      isLoadingSwitchRequests.value = false;
+    }
+  }
+
+  void showAdminApprovalDialog(String profileName) {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFEF3C7),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.hourglass_top_rounded,
+                  color: Color(0xFFD97706),
+                  size: 28,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                "Awaiting Admin Approval",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Switching to $profileName does not require any subscription. Your request is currently pending review by the admin team.",
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.black54,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: ElevatedButton(
+                  onPressed: () => Get.back(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    "Okay",
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   final List<Map<String, dynamic>> _fallbackProfileTypes = [
     {
       "type": "personal",
@@ -428,15 +519,15 @@ class SettingsController extends GetxController {
       "has_subscription": false
     },
     {
-      "type": "seller",
-      "label": "Product & Service Seller",
+      "type": "ecommerce",
+      "label": "Ecommerce Profile",
       "description": "Sell products, services, or both.",
       "is_default": false,
       "requires_approval": true,
       "has_subscription": true,
-      "seller_types": [
-        "products",
-        "services",
+      "sub_types": [
+        "product",
+        "service",
         "both"
       ]
     },
@@ -466,19 +557,11 @@ class SettingsController extends GetxController {
       final matchedType = profileTypes.firstWhereOrNull((e) => e.type == userProfileType);
       if (matchedType != null) {
         selectedProfileType.value = matchedType;
-        if (userProfileType == 'seller' && userProfileSubType != null && userProfileSubType.isNotEmpty) {
-          // Map backend subtype back to UI selection string (e.g. 'product' -> 'products')
-          String mappedSub = userProfileSubType;
-          if (userProfileSubType == 'product') {
-            mappedSub = 'products';
-          } else if (userProfileSubType == 'service') {
-            mappedSub = 'services';
-          } else if (userProfileSubType == 'both') {
-            mappedSub = 'both';
-          }
-          selectedSellerType.value = mappedSub;
-          profileTypeController.text = "${matchedType.label} (${mappedSub.capitalizeFirst ?? mappedSub})";
-          sellerTypeController.text = mappedSub;
+        // For any type that has subtypes, show the selected subtype in the controller label
+        if (userProfileSubType != null && userProfileSubType.isNotEmpty) {
+          selectedSellerType.value = userProfileSubType;
+          profileTypeController.text = "${matchedType.label} (${userProfileSubType.capitalizeFirst ?? userProfileSubType})";
+          sellerTypeController.text = userProfileSubType;
         } else {
           profileTypeController.text = matchedType.label;
           sellerTypeController.clear();
@@ -507,16 +590,8 @@ class SettingsController extends GetxController {
     try {
       isLoading.value = true;
 
-      String? apiProfileSubType;
-      if (profileType.type == 'seller') {
-        if (sellerType == 'products') {
-          apiProfileSubType = 'product';
-        } else if (sellerType == 'services') {
-          apiProfileSubType = 'service';
-        } else if (sellerType == 'both') {
-          apiProfileSubType = 'both';
-        }
-      }
+      // Send exactly what the API returned — no custom mapping
+      final String? apiProfileSubType = sellerType.isNotEmpty ? sellerType : null;
 
       final Map<String, dynamic> body = {
         "to_profile_type": profileType.type,
@@ -546,7 +621,8 @@ class SettingsController extends GetxController {
           isEmployer.value = false;
         }
 
-        if (profileType.type == 'seller' && sellerType.isNotEmpty) {
+        // Update text label — show subtype in parentheses for any type that has one
+        if (sellerType.isNotEmpty) {
           profileTypeController.text = "${profileType.label} (${sellerType.capitalizeFirst ?? sellerType})";
           sellerTypeController.text = sellerType;
         } else {
@@ -564,6 +640,29 @@ class SettingsController extends GetxController {
         );
 
         fetchUserDetails(userName.isNotEmpty ? userName : (SharedPrefManager().user?.username ?? ""));
+        fetchProfileSwitchRequests();
+
+        // Fetch subscription plans dynamically and navigate to ProfilePlansScreen ONLY if required
+        final toType = profileType.type;
+        final subType = apiProfileSubType;
+
+        // Show admin approval dialog for types that require approval and have no subscription plans
+        // (employer and any ecommerce/seller subtype-only flows)
+        if (toType == 'employer' || 
+            (profileType.sellerTypes.isNotEmpty && subType != null && subType!.isNotEmpty &&
+             !profileType.hasSubscription)) {
+          showAdminApprovalDialog(profileType.label);
+        } else {
+          try {
+            final subscriptionController = Get.put(SubscriptionController());
+            final updatedSub = await subscriptionController.fetchPlansForProfileType(profileType.type);
+            if (updatedSub != null) {
+              Get.to(() => ProfilePlansScreen(profileTypeSub: updatedSub));
+            }
+          } catch (e) {
+            print("⚠️ Error loading plans: $e");
+          }
+        }
       } else {
         Get.snackbar(
           "Error",
@@ -657,19 +756,11 @@ class SettingsController extends GetxController {
       request.fields["is_seller"] = isSeller.value ? "1" : "0";
 
       // Profile Type and Sub Type
-      String? apiProfileType = selectedProfileType.value?.type;
-      String? apiProfileSubType;
-
-      if (apiProfileType == 'seller') {
-        final sub = selectedSellerType.value;
-        if (sub == 'products') {
-          apiProfileSubType = 'product';
-        } else if (sub == 'services') {
-          apiProfileSubType = 'service';
-        } else if (sub == 'both') {
-          apiProfileSubType = 'both';
-        }
-      }
+      // Send exactly what the API returned — no custom mapping
+      final String? apiProfileType = selectedProfileType.value?.type;
+      final String? apiProfileSubType = selectedSellerType.value.isNotEmpty
+          ? selectedSellerType.value
+          : null;
 
       if (apiProfileType != null) {
         request.fields["profile_type"] = apiProfileType;

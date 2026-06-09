@@ -81,7 +81,10 @@ class ProfileTypeSelector extends StatelessWidget {
   }
 
   void _showProfileTypeBottomSheet(BuildContext context) {
-    bool isSellerExpanded = controller.text.contains("Seller");
+    // Track which type is currently expanded (any type with subtypes)
+    String? expandedType = profileTypes
+        .firstWhereOrNull((t) => t.sellerTypes.isNotEmpty && controller.text.startsWith(t.label))
+        ?.type;
 
     showModalBottomSheet(
       context: context,
@@ -127,27 +130,29 @@ class ProfileTypeSelector extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
 
-                      Expanded(
+                       Expanded(
                         child: ListView.separated(
                           controller: scrollController,
                           itemCount: profileTypes.length,
                           separatorBuilder: (c, i) => const SizedBox(height: 12),
                           itemBuilder: (context, index) {
                             final pType = profileTypes[index];
-                            final isSeller = pType.type == 'seller';
+                            // Any profile type that has subtypes from the API gets expanded
+                            final hasSubTypes = pType.sellerTypes.isNotEmpty;
                             final isSelected = controller.text.startsWith(pType.label);
+                            final isExpanded = expandedType == pType.type;
 
-                            if (isSeller) {
+                            if (hasSubTypes) {
                               return _buildProfileTypeCard(
                                 pType: pType,
                                 isSelected: isSelected,
-                                isSellerExpanded: isSellerExpanded,
+                                isSellerExpanded: isExpanded,
                                 onTap: () {
                                   setModalState(() {
-                                    isSellerExpanded = !isSellerExpanded;
+                                    expandedType = isExpanded ? null : pType.type;
                                   });
                                 },
-                                child: isSellerExpanded
+                                child: isExpanded
                                     ? _buildSellerSubtypes(pType, isSelected, context)
                                     : null,
                               );
@@ -241,7 +246,8 @@ class ProfileTypeSelector extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (pType.type == 'seller')
+                  // Show expand arrow for any type that has subtypes from the API
+                  if (pType.sellerTypes.isNotEmpty)
                     Icon(
                       isSellerExpanded 
                           ? Icons.keyboard_arrow_up_rounded 

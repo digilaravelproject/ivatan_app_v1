@@ -14,6 +14,7 @@ import '../../messages/persentation/dashboard.dart';
 import '../../profile/screen/profile_screen.dart';
 import '../../quick_access/persentation/drawerScreen.dart';
 import '../../story/persentation/storyfullview.dart';
+import '../../subscription/persentation/profile_types_screen.dart';
 import '../controller/comment_controller.dart';
 import '../controller/homeController.dart';
 import '../controller/create_story_controller.dart';
@@ -114,6 +115,12 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
                 actions: [
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 1.0),
+                      child: const AnimatedProBadge(),
+                    ),
+                  ),
                   Obx(() {
                     final count = controller.unreadNotificationCount.value;
                     return Stack(
@@ -4244,3 +4251,242 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //
 //
 //
+
+class AnimatedProBadge extends StatefulWidget {
+  const AnimatedProBadge({Key? key}) : super(key: key);
+
+  @override
+  State<AnimatedProBadge> createState() => _AnimatedProBadgeState();
+}
+
+class _AnimatedProBadgeState extends State<AnimatedProBadge>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _glowAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.08).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+
+    _glowAnimation = Tween<double>(begin: 4.0, end: 12.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: GestureDetector(
+            onTap: () {
+              Get.to(() => const ProfileTypesScreen());
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFFFFF099),
+                    Color(0xFFD4AF37),
+                    Color(0xFF9F7A1A),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFD4AF37).withOpacity(0.5),
+                    blurRadius: _glowAnimation.value,
+                    spreadRadius: 1,
+                  ),
+                ],
+                border: Border.all(
+                  color: const Color(0xFFFFF7C2),
+                  width: 1.5,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.workspace_premium_rounded,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 4),
+                  const Text(
+                    "PRO",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.8,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black26,
+                          blurRadius: 2,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSubscriptionModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFF151515),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade800,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD4AF37).withOpacity(0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.workspace_premium_rounded,
+                  color: Color(0xFFD4AF37),
+                  size: 48,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                "Upgrade to IVatan PRO",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Unlock all premium features, badges, and services.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey.shade400,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildFeatureRow(Icons.check_circle_rounded, "Golden Verified Profile Badge"),
+              _buildFeatureRow(Icons.check_circle_rounded, "Priority Support & Approval"),
+              _buildFeatureRow(Icons.check_circle_rounded, "Unlimited Product & Service Listings"),
+              _buildFeatureRow(Icons.check_circle_rounded, "Access to Exclusive Music Playlists"),
+              const SizedBox(height: 32),
+              Container(
+                width: double.infinity,
+                height: 52,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFFF099),
+                      Color(0xFFD4AF37),
+                      Color(0xFF9F7A1A),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(26),
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Get.snackbar(
+                      "Premium",
+                      "Subscription processing is coming soon!",
+                      snackPosition: SnackPosition.TOP,
+                      backgroundColor: Colors.black87,
+                      colorText: Colors.white,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(26),
+                    ),
+                  ),
+                  child: const Text(
+                    "Subscribe Now - 9.99/mo",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildFeatureRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Icon(icon, color: const Color(0xFFD4AF37), size: 20),
+          const SizedBox(width: 12),
+          Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

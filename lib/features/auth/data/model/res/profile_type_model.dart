@@ -5,6 +5,7 @@ class ProfileType {
   final bool isDefault;
   final bool requiresApproval;
   final bool hasSubscription;
+  // Subtypes from API — key is 'sub_types' (new) or 'seller_types' (legacy fallback)
   final List<String> sellerTypes;
 
   ProfileType({
@@ -18,6 +19,8 @@ class ProfileType {
   });
 
   factory ProfileType.fromJson(Map<String, dynamic> json) {
+    // API sends 'sub_types'; old fallback data uses 'seller_types'
+    final rawSubTypes = json['sub_types'] ?? json['seller_types'];
     return ProfileType(
       type: json['type'] ?? '',
       label: json['label'] ?? '',
@@ -25,9 +28,7 @@ class ProfileType {
       isDefault: json['is_default'] ?? false,
       requiresApproval: json['requires_approval'] ?? false,
       hasSubscription: json['has_subscription'] ?? false,
-      sellerTypes: json['seller_types'] != null
-          ? List<String>.from(json['seller_types'])
-          : [],
+      sellerTypes: rawSubTypes != null ? List<String>.from(rawSubTypes) : [],
     );
   }
 
@@ -39,7 +40,7 @@ class ProfileType {
       'is_default': isDefault,
       'requires_approval': requiresApproval,
       'has_subscription': hasSubscription,
-      'seller_types': sellerTypes,
+      'sub_types': sellerTypes,
     };
   }
 }
