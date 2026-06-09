@@ -308,8 +308,8 @@ class SubscriptionController extends GetxController {
         );
 
         // Update settings controller if registered to sync settings view
-        if (Get.isRegistered<SettingsController>()) {
-          final settingsController = Get.find<SettingsController>();
+        final settingsController = _getSettingsController();
+        if (settingsController != null) {
           settingsController.fetchUserDetails(settingsController.userName);
         }
       } else {
@@ -455,6 +455,19 @@ class SubscriptionController extends GetxController {
       print("⚠️ Error fetching subscription plans: $e");
     } finally {
       isLoading.value = false;
+    }
+    return null;
+  }
+
+  SettingsController? _getSettingsController() {
+    final String? username = SharedPrefManager().user?.username;
+    if (username != null && username.isNotEmpty) {
+      if (Get.isRegistered<SettingsController>(tag: username)) {
+        return Get.find<SettingsController>(tag: username);
+      }
+    }
+    if (Get.isRegistered<SettingsController>()) {
+      return Get.find<SettingsController>();
     }
     return null;
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../controller/subscription_controller.dart';
+import '../controller/subscription_payment_controller.dart';
 import '../data/model/subscription_models.dart';
 
 class PlanDetailsScreen extends StatefulWidget {
@@ -20,6 +20,7 @@ class PlanDetailsScreen extends StatefulWidget {
 
 class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
   late SubscriptionController _controller;
+  late SubscriptionPaymentController _paymentController;
   late SubscriptionPlan _plan;
   bool _isLoadingDetails = true;
   String? _errorMsg;
@@ -29,6 +30,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
     super.initState();
     _plan = widget.plan;
     _controller = Get.find<SubscriptionController>();
+    _paymentController = Get.put(SubscriptionPaymentController());
     _fetchDetails();
   }
 
@@ -191,7 +193,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
         // Subscribe button — shown only if NOT active/pending
         if (!isAnyStatus)
           Obx(() {
-            final loading = _controller.isLoading.value;
+            final loading = _paymentController.isLoading.value;
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: SizedBox(
@@ -201,8 +203,10 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
                   onPressed: loading
                       ? null
                       : () async {
-                          await _controller.subscribeToPlan(widget.profileTypeSub, _plan);
-                          Get.back();
+                          await _paymentController.initiateSubscriptionPayment(
+                            profileTypeSub: widget.profileTypeSub,
+                            plan: _plan,
+                          );
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
