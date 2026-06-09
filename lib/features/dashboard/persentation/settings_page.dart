@@ -369,12 +369,15 @@ class SettingsScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         final toType = req.toProfileType;
-        // Employer has no subscription plan — show admin approval dialog
-        if (toType == 'employer') {
+        final subType = req.profileSubType;
+        
+        bool isFreeFlow = toType == 'employer' || 
+            (toType == 'seller' && (subType == 'product' || subType == 'service'));
+            
+        if (isFreeFlow) {
           profileController.showAdminApprovalDialog(profileLabel);
         } else {
-          // For all other types (including ecommerce, seller, music, etc.)
-          // try to fetch their subscription plans from the API
+          // For all other types (including ecommerce seller-both, music, creator)
           try {
             final subscriptionController = Get.put(SubscriptionController());
             final updatedSub = await subscriptionController.fetchPlansForProfileType(toType);

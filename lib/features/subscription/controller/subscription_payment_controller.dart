@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart' as rzp;
 import '../../../../core/network/api_services.dart';
-import '../../../../core/network/api_keys.dart';
 import '../../../../db/shared_pref_manager.dart';
 import '../../dashboard/controller/settings_controller.dart';
 import '../data/model/subscription_models.dart';
@@ -18,6 +17,7 @@ class SubscriptionPaymentController extends GetxController {
   int? _currentProfileId;
   SubscriptionPlan? _currentPlan;
   ProfileTypeSubscription? _currentProfileTypeSub;
+  String? _currentGatewaySubId;
 
   @override
   void onInit() {
@@ -41,11 +41,7 @@ class SubscriptionPaymentController extends GetxController {
     _currentPlan = plan;
     _currentProfileTypeSub = profileTypeSub;
     
-    // 1. Calculate price/amount
-    final cleanPrice = plan.price.replaceAll(RegExp(r'[^0-9.]'), '');
-    final price = double.tryParse(cleanPrice) ?? 0.0;
-    
-    // 2. Fetch/Determine profile_id
+    // 1. Fetch/Determine profile_id
     int? profileId = _getProfileId(profileTypeSub.type);
     
     if (profileId == null) {
@@ -75,24 +71,70 @@ class SubscriptionPaymentController extends GetxController {
     
     _currentProfileId = profileId;
 
-    // 3. For Free plans, skip Razorpay checkout and buy directly
-    if (price <= 0.0) {
-      await _purchaseSubscription(
-        profileId: profileId,
-        planId: int.tryParse(plan.id) ?? 0,
-        paymentMethod: "free",
-        gatewaySubId: "",
+    // 2. Call initiate subscriptions API: POST api/v1/profiles/{profileId}/subscriptions/initiate
+    try {
+      isLoading.value = true;
+      Get.dialog(
+        const Center(child: CircularProgressIndicator(color: Colors.black)),
+        barrierDismissible: false,
       );
-      return;
-    }
 
-    // 4. Open Razorpay Checkout for paid plans
-    final amountPaise = (price * 100).toInt();
-    _openCheckout(
-      amountPaise: amountPaise,
-      planName: plan.name,
-      description: plan.description,
-    );
+      final planId = int.tryParse(plan.id) ?? 0;
+      final initiateResponse = await api.callPost(
+        "api/v1/profiles/$profileId/subscriptions/initiate",
+        data: {
+          "subscription_plan_id": planId,
+        },
+      );
+
+      // Close loading dialog
+      Get.back();
+
+      if (initiateResponse != null && initiateResponse['status'] == true) {
+        final data = initiateResponse['data'];
+        final requiresPayment = data['requires_payment'] ?? false;
+        final gateway = data['gateway'] ?? '';
+        final gatewaySubId = data['gateway_subscription_id'] ?? '';
+        final razorpayKey = data['razorpay_key'] ?? '';
+        
+        _currentGatewaySubId = gatewaySubId;
+
+        if (requiresPayment && gateway == 'razorpay') {
+          // Open Razorpay Checkout using the subscription_id and key returned by backend
+          _openCheckout(
+            razorpayKey: razorpayKey,
+            subscriptionId: gatewaySubId,
+            planName: plan.name,
+          );
+        } else {
+          // If no payment required (Free plan), complete it immediately
+          await _purchaseSubscription(
+            profileId: profileId,
+            planId: planId,
+            paymentMethod: "free",
+            gatewaySubId: gatewaySubId,
+          );
+        }
+      } else {
+        final errorMsg = initiateResponse != null ? (initiateResponse['message'] ?? "Initiation failed") : "Initiation failed";
+        Get.snackbar(
+          "Initiation Failed",
+          errorMsg,
+          backgroundColor: Colors.red.shade600,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      Get.back(); // Close dialog on error
+      Get.snackbar(
+        "Error",
+        "Something went wrong: $e",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   int? _getProfileId(String type) {
@@ -110,16 +152,15 @@ class SubscriptionPaymentController extends GetxController {
   }
 
   void _openCheckout({
-    required int amountPaise,
+    required String razorpayKey,
+    required String subscriptionId,
     required String planName,
-    required String description,
   }) {
     final user = SharedPrefManager().user;
     
     var options = {
-      'key': ApiKeys.razorpayKey,
-      'amount': amountPaise,
-      'currency': 'INR',
+      'key': razorpayKey,
+      'subscription_id': subscriptionId,
       'name': 'Ivatan',
       'description': 'Subscription to $planName',
       'prefill': {
@@ -155,14 +196,13 @@ class SubscriptionPaymentController extends GetxController {
       return;
     }
 
-    final paymentId = response.paymentId ?? "";
     final planId = int.tryParse(_currentPlan!.id) ?? 0;
     
     await _purchaseSubscription(
       profileId: _currentProfileId!,
       planId: planId,
       paymentMethod: "razorpay",
-      gatewaySubId: paymentId,
+      gatewaySubId: _currentGatewaySubId ?? "",
     );
   }
 

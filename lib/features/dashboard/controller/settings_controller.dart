@@ -646,11 +646,10 @@ class SettingsController extends GetxController {
         final toType = profileType.type;
         final subType = apiProfileSubType;
 
-        // Show admin approval dialog for types that require approval and have no subscription plans
-        // (employer and any ecommerce/seller subtype-only flows)
-        if (toType == 'employer' || 
-            (profileType.sellerTypes.isNotEmpty && subType != null && subType!.isNotEmpty &&
-             !profileType.hasSubscription)) {
+        bool isFreeFlow = toType == 'employer' || 
+            (toType == 'seller' && (subType == 'product' || subType == 'service'));
+
+        if (isFreeFlow) {
           showAdminApprovalDialog(profileType.label);
         } else {
           try {
