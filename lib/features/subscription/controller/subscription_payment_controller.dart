@@ -168,6 +168,9 @@ class SubscriptionPaymentController extends GetxController {
         'contact': user?.phone ?? '',
         'email': user?.email ?? '',
       },
+      'theme': {
+        'color': AppColors.primary,
+      },
       'external': {
         'wallets': ['paytm']
       }
