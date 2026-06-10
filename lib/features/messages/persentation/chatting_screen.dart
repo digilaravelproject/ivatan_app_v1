@@ -152,10 +152,10 @@ class ChattingScreen extends GetView<ChatMessagesController> {
             ComingSoonDialog.show(context);
           },
         ),
-        IconButton(
-          icon: const Icon(Icons.more_vert, color: Colors.black),
-          onPressed: () {},
-        ),
+        // IconButton(
+        //   icon: const Icon(Icons.more_vert, color: Colors.black),
+        //   onPressed: () {},
+        // ),
       ],
     );
   }

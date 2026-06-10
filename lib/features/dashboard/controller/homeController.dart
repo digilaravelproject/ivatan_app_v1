@@ -15,6 +15,8 @@ import '../model/story_model.dart';
 import '../persentation/greetingDialog.dart';
 import 'follow_controller.dart';
 import '../../reels_screen/controller/short_play_controller.dart';
+import '../../videos/controller/video_controller.dart';
+import '../../profile/controller/ownpostController.dart';
 import 'settings_controller.dart';
 import '../../../core/network/app_urls.dart';
 import '../../../core/widgets/custom_dialog.dart';
@@ -303,6 +305,37 @@ class HomeController extends GetxController {
       if (response != null && response.statusCode! >= 200 && response.statusCode! < 300) {
         CustomSnackBar.showSuccess(message: response.data["message"] ?? "Upload successful!");
         fetchPosts(); // Refresh home feed
+        
+        // Refresh Discover videos list if VideoController is registered
+        if (Get.isRegistered<VideoController>()) {
+          Get.find<VideoController>().fetchVideo();
+        }
+        
+        // Refresh reels/clips list if ShortPlayController is registered
+        if (Get.isRegistered<ShortPlayController>()) {
+          Get.find<ShortPlayController>().fetchReels();
+        }
+        
+        // Refresh user's own profile post/video tabs if registered
+        final currentUsername = SharedPrefManager().user?.username;
+        if (currentUsername != null && currentUsername.isNotEmpty) {
+          final List<String> filters = ["posts", "videos"];
+          for (var filter in filters) {
+            final tag = "${currentUsername}_$filter";
+            if (Get.isRegistered<OwnPostController>(tag: tag)) {
+              Get.find<OwnPostController>(tag: tag).fetchOwnPosts(
+                username: currentUsername,
+                filterType: filter,
+              );
+            }
+          }
+          if (Get.isRegistered<OwnPostController>(tag: currentUsername)) {
+            Get.find<OwnPostController>(tag: currentUsername).fetchOwnPosts(
+              username: currentUsername,
+              filterType: "posts",
+            );
+          }
+        }
       } else {
         CustomSnackBar.showError(message: "Upload failed. Please try again.");
       }

@@ -153,6 +153,52 @@ class ProfileController extends GetxController {
 
   RxList<HighlightStoryModel> highlights = <HighlightStoryModel>[].obs;
   final HomeController homeController = Get.put(HomeController());
+
+  Future<File> _compressImage(File file) async {
+    final filePath = file.absolute.path;
+    final outPath = "${filePath}_compressed.jpg";
+
+    try {
+      final compressedXFile = await FlutterImageCompress.compressAndGetFile(
+        filePath,
+        outPath,
+        quality: 70,
+        minWidth: 1080,
+        minHeight: 1920,
+      );
+
+      if (compressedXFile == null) {
+        print("❌ Image compression failed, using original file");
+        return file;
+      }
+
+      File compressedFile = File(compressedXFile.path);
+      double sizeKB = compressedFile.lengthSync() / 1024;
+      print("📉 Compressed image size: ${sizeKB.toStringAsFixed(2)} KB");
+
+      if (sizeKB > 2048) {
+        final outPath2 = "${filePath}_compressed2.jpg";
+        final compressedXFile2 = await FlutterImageCompress.compressAndGetFile(
+          compressedFile.path,
+          outPath2,
+          quality: 50,
+          minWidth: 720,
+          minHeight: 1280,
+        );
+
+        if (compressedXFile2 != null) {
+          File compressedAgain = File(compressedXFile2.path);
+          print("📉 Secondary compressed image size: ${(compressedAgain.lengthSync() / 1024).toStringAsFixed(2)} KB");
+          return compressedAgain;
+        }
+      }
+
+      return compressedFile;
+    } catch (e) {
+      print("❌ Error compressing image: $e");
+      return file;
+    }
+  }
   // Redundant global controller removed to prevent conflicts in profile tabs.
 
 
@@ -451,9 +497,13 @@ class ProfileController extends GetxController {
       List<File> mediaFiles = [];
 
       if (imageFiles.isNotEmpty) {
-        mediaFiles.addAll(imageFiles);
+        for (var file in imageFiles) {
+          File compressed = await _compressImage(file);
+          mediaFiles.add(compressed);
+        }
       } else if (imageFile.value != null) {
-        mediaFiles.add(imageFile.value!);
+        File compressed = await _compressImage(imageFile.value!);
+        mediaFiles.add(compressed);
       } else if (videoFile.value != null) {
         mediaFiles.add(videoFile.value!);
       }
@@ -591,6 +641,7 @@ class ProfileController extends GetxController {
 
       if (response != null) {
         CustomSnackBar.showSuccess(message: '${response["message"]}');
+        homeController.fetchStories();
         Get.back();
       }
 

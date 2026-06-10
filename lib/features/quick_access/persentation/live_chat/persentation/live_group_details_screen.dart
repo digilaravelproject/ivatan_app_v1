@@ -296,12 +296,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
             size: 20,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert_rounded, color: Colors.black54),
-            onPressed: () {},
-          ),
-        ],
+
       ),
       body: Obx(() {
         return Stack(
@@ -324,8 +319,8 @@ class LiveGroupDetailsScreen extends StatelessWidget {
                   const SizedBox(height: 12),
 
                   // 4. Switches Block
-                  _buildSwitchesBlock(controller),
-                  const SizedBox(height: 12),
+                  // _buildSwitchesBlock(controller),
+                  // const SizedBox(height: 12),
 
                   // 5. Participants List Block
                   _buildParticipantsBlock(context, controller),
@@ -400,44 +395,44 @@ class LiveGroupDetailsScreen extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 20),
-
-          // Actions row (Mute, Add, Search)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildHeaderAction(
-                icon: controller.isMuted.value ? Icons.volume_off_rounded : Icons.notifications_none_rounded,
-                label: controller.isMuted.value ? "Unmute" : "Mute",
-                onTap: () => controller.toggleMuted(!controller.isMuted.value),
-                color: controller.isMuted.value ? Colors.redAccent : AppColors.accent,
-              ),
-              const SizedBox(width: 32),
-              _buildHeaderAction(
-                icon: Icons.person_add_alt_1_rounded,
-                label: "Add",
-                onTap: () {
-                  CustomSnackBar.showInfo(message: "Add participant feature is coming soon!");
-                },
-                color: AppColors.accent,
-              ),
-              const SizedBox(width: 32),
-              _buildHeaderAction(
-                icon: Icons.search_rounded,
-                label: "Search",
-                onTap: () {
-                  controller.isSearchExpanded.value = !controller.isSearchExpanded.value;
-                  if (controller.isSearchExpanded.value) {
-                    controller.focusNode.requestFocus();
-                  } else {
-                    controller.searchQuery.value = "";
-                    controller.searchController.clear();
-                  }
-                },
-                color: AppColors.accent,
-              ),
-            ],
-          ),
+          // const SizedBox(height: 20),
+          //
+          // // Actions row (Mute, Add, Search)
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.center,
+          //   children: [
+          //     _buildHeaderAction(
+          //       icon: controller.isMuted.value ? Icons.volume_off_rounded : Icons.notifications_none_rounded,
+          //       label: controller.isMuted.value ? "Unmute" : "Mute",
+          //       onTap: () => controller.toggleMuted(!controller.isMuted.value),
+          //       color: controller.isMuted.value ? Colors.redAccent : AppColors.accent,
+          //     ),
+          //     const SizedBox(width: 32),
+          //     _buildHeaderAction(
+          //       icon: Icons.person_add_alt_1_rounded,
+          //       label: "Add",
+          //       onTap: () {
+          //         CustomSnackBar.showInfo(message: "Add participant feature is coming soon!");
+          //       },
+          //       color: AppColors.accent,
+          //     ),
+          //     const SizedBox(width: 32),
+          //     _buildHeaderAction(
+          //       icon: Icons.search_rounded,
+          //       label: "Search",
+          //       onTap: () {
+          //         controller.isSearchExpanded.value = !controller.isSearchExpanded.value;
+          //         if (controller.isSearchExpanded.value) {
+          //           controller.focusNode.requestFocus();
+          //         } else {
+          //           controller.searchQuery.value = "";
+          //           controller.searchController.clear();
+          //         }
+          //       },
+          //       color: AppColors.accent,
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );
@@ -813,36 +808,36 @@ class LiveGroupDetailsScreen extends StatelessWidget {
               ),
               onTap: () => Navigator.of(context).pop(),
             ),
-            _buildDivider(),
-            ListTile(
-              leading: const Icon(Icons.exit_to_app_rounded, color: Colors.red),
-              title: Text(
-                "Exit Group",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w600,
-                  color: Colors.red,
-                ),
-              ),
-              onTap: () {
-                Get.defaultDialog(
-                  title: "Exit Group",
-                  titleStyle: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16),
-                  middleText: "Are you sure you want to exit this group?",
-                  middleTextStyle: GoogleFonts.poppins(fontSize: 14),
-                  textConfirm: "Exit",
-                  confirmTextColor: Colors.white,
-                  buttonColor: Colors.red,
-                  textCancel: "Cancel",
-                  cancelTextColor: Colors.grey,
-                  onConfirm: () {
-                    Get.back(); // Close dialog
-                    Get.back(); // Exit details screen
-                    Get.back(); // Exit chat screen
-                    CustomSnackBar.showSuccess(message: "You exited the group (Simulation)");
-                  },
-                );
-              },
-            ),
+            // _buildDivider(),
+            // ListTile(
+            //   leading: const Icon(Icons.exit_to_app_rounded, color: Colors.red),
+            //   title: Text(
+            //     "Exit Group",
+            //     style: GoogleFonts.poppins(
+            //       fontWeight: FontWeight.w600,
+            //       color: Colors.red,
+            //     ),
+            //   ),
+            //   onTap: () {
+            //     Get.defaultDialog(
+            //       title: "Exit Group",
+            //       titleStyle: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16),
+            //       middleText: "Are you sure you want to exit this group?",
+            //       middleTextStyle: GoogleFonts.poppins(fontSize: 14),
+            //       textConfirm: "Exit",
+            //       confirmTextColor: Colors.white,
+            //       buttonColor: Colors.red,
+            //       textCancel: "Cancel",
+            //       cancelTextColor: Colors.grey,
+            //       onConfirm: () {
+            //         Get.back(); // Close dialog
+            //         Get.back(); // Exit details screen
+            //         Get.back(); // Exit chat screen
+            //         CustomSnackBar.showSuccess(message: "You exited the group (Simulation)");
+            //       },
+            //     );
+            //   },
+            // ),
           ],
         ),
       ),

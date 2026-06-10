@@ -36,6 +36,7 @@ class LiveGroupChatController extends GetxController {
   RxList<ChatMessageModel> messages = <ChatMessageModel>[].obs;
   RxBool isSendingMessage = false.obs;
   RxBool isLoading = false.obs;
+  RxBool isEmojiVisible = false.obs;
 
   // Active message we are currently replying to
   Rx<ChatMessageModel?> replyingToMessage = Rx<ChatMessageModel?>(null);
@@ -50,6 +51,11 @@ class LiveGroupChatController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    focusNode.addListener(() {
+      if (focusNode.hasFocus) {
+        isEmojiVisible.value = false;
+      }
+    });
     fetchMessages();
   }
 
@@ -67,8 +73,7 @@ class LiveGroupChatController extends GetxController {
       final list = await _repository.fetchMessages(chatId);
 
       if (list != null) {
-        messages.assignAll(list.reversed.toList());
-        _scrollToBottom(delayMs: 200);
+        messages.assignAll(list);
         markAsRead();
       }
       // If list is null or empty → messages stays [] (empty chat)
@@ -122,9 +127,8 @@ class LiveGroupChatController extends GetxController {
       sender: MessageSenderModel(name: "You"),
     );
 
-    messages.add(tempMsg);
+    messages.insert(0, tempMsg);
     messages.refresh();
-    _scrollToBottom();
 
     ChatMessageModel? responseModel;
     if (attachmentFile != null) {
@@ -149,7 +153,7 @@ class LiveGroupChatController extends GetxController {
       if (idx != -1) {
         messages[idx] = responseModel;
       } else {
-        messages.add(responseModel);
+        messages.insert(0, responseModel);
       }
     } else {
       final idx = messages.indexWhere((m) => m.id == tempId);
@@ -158,7 +162,6 @@ class LiveGroupChatController extends GetxController {
       }
     }
     messages.refresh();
-    _scrollToBottom();
   }
 
   Future<void> pickAttachment(String fileType) async {
@@ -204,23 +207,12 @@ class LiveGroupChatController extends GetxController {
 
     if (!success && removedMsg != null) {
       // Rollback if API failed
-      messages.add(removedMsg);
-      messages.sort((a, b) => a.id.compareTo(b.id));
+      messages.insert(0, removedMsg);
+      messages.sort((a, b) => b.id.compareTo(a.id));
       messages.refresh();
     }
   }
 
-  void _scrollToBottom({int delayMs = 100}) {
-    Future.delayed(Duration(milliseconds: delayMs), () {
-      if (scrollController.hasClients) {
-        scrollController.animateTo(
-          scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
-  }
 
   Color getSenderColor(String name) {
     final colors = [

@@ -242,15 +242,15 @@ class HomePage extends StatelessWidget {
 
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 500),
-                    height: controller.showStories.value ? 150 : 0,
+                    height: controller.showStories.value ? 130 : 0,
                     curve: Curves.easeInOut,
                     child: AnimatedOpacity(
                       duration: const Duration(milliseconds: 500),
                       opacity: controller.showStories.value ? 1.0 : 0.0,
                       child: Container(
-                        height: 150,
+                        height: 130,
                         color: Colors.white,
-                        padding: EdgeInsets.only(top: 12, bottom: 8),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           padding: EdgeInsets.symmetric(horizontal: 16),
@@ -374,14 +374,14 @@ class HomePage extends StatelessWidget {
         }
       },
       child: Container(
-        width: 100,
-        margin: EdgeInsets.only(right: 12),
+        width: 80,
+        margin: const EdgeInsets.only(right: 10),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           color: Colors.grey.shade900,
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -400,13 +400,13 @@ class HomePage extends StatelessWidget {
               // Dark Gradient for Text
               Positioned(
                 bottom: 0, left: 0, right: 0,
-                height: 60,
+                height: 45,
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
-                      colors: [Colors.black.withOpacity(0.8), Colors.transparent],
+                      colors: [Colors.black.withOpacity(0.75), Colors.transparent],
                     ),
                   ),
                 ),
@@ -414,14 +414,15 @@ class HomePage extends StatelessWidget {
               
               // Text
               Positioned(
-                bottom: 12, left: 12, right: 12,
+                bottom: 8, left: 6, right: 6,
                 child: Text(
                   hasStory ? "Your Story" : "Add Story",
-                  style: TextStyle(
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 13,
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    letterSpacing: 0.3,
+                    letterSpacing: 0.2,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -430,26 +431,62 @@ class HomePage extends StatelessWidget {
 
               // Badge
               Positioned(
-                top: 10, left: 10,
+                top: 6, left: 6,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                   decoration: BoxDecoration(
-                    color: Color(0xFFF05136), // Vibrant orange-red from screenshot
-                    borderRadius: BorderRadius.circular(12),
+                    color: const Color(0xFFF05136),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (!hasStory) Icon(Icons.add, color: Colors.white, size: 12),
-                      if (!hasStory) SizedBox(width: 4),
+                      if (!hasStory) const Icon(Icons.add, color: Colors.white, size: 10),
+                      if (!hasStory) const SizedBox(width: 2),
                       Text(
                         hasStory ? "Story" : "Add",
-                        style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                 ),
               ),
+
+              // Floating Plus Button to add more stories when they already have active stories
+              if (hasStory)
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: GestureDetector(
+                    onTap: () {
+                      final storyController = Get.put(StoryController());
+                      storyController.showPickerOptions();
+                    },
+                    child: Container(
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1.5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.25),
+                            blurRadius: 3,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -474,15 +511,15 @@ class HomePage extends StatelessWidget {
                 FullScreenStoryViewer(stories: story.stories, initialIndex: 0),
           ),
       child: Container(
-        width: 100,
-        margin: EdgeInsets.only(right: 12),
+        width: 80,
+        margin: const EdgeInsets.only(right: 10),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           color: Colors.grey.shade900,
-          border: hasUnseen ? Border.all(color: Color(0xFFF05136), width: 1.5) : null,
+          border: hasUnseen ? Border.all(color: const Color(0xFFF05136), width: 1.5) : null,
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(hasUnseen ? 14 : 16),
+          borderRadius: BorderRadius.circular(hasUnseen ? 10 : 12),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -494,13 +531,13 @@ class HomePage extends StatelessWidget {
               // Dark Gradient for Text
               Positioned(
                 bottom: 0, left: 0, right: 0,
-                height: 60,
+                height: 45,
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
-                      colors: [Colors.black.withOpacity(0.8), Colors.transparent],
+                      colors: [Colors.black.withOpacity(0.75), Colors.transparent],
                     ),
                   ),
                 ),
@@ -508,14 +545,15 @@ class HomePage extends StatelessWidget {
               
               // Text
               Positioned(
-                bottom: 12, left: 12, right: 12,
+                bottom: 8, left: 6, right: 6,
                 child: Text(
                   name,
-                  style: TextStyle(
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 13,
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    letterSpacing: 0.3,
+                    letterSpacing: 0.2,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -525,16 +563,16 @@ class HomePage extends StatelessWidget {
               // Badge
               if (hasUnseen)
                 Positioned(
-                  top: 10, left: 10,
+                  top: 6, left: 6,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                     decoration: BoxDecoration(
-                      color: Color(0xFFF05136), // Vibrant orange-red from screenshot
-                      borderRadius: BorderRadius.circular(12),
+                      color: const Color(0xFFF05136),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text(
+                    child: const Text(
                       "New",
-                      style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

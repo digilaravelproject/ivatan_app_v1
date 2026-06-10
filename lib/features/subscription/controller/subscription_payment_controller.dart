@@ -169,7 +169,7 @@ class SubscriptionPaymentController extends GetxController {
         'email': user?.email ?? '',
       },
       'theme': {
-        'color': AppColors.primary,
+        'color': '#${AppColors.primary.value.toRadixString(16).padLeft(8, '0').substring(2)}',
       },
       'external': {
         'wallets': ['paytm']

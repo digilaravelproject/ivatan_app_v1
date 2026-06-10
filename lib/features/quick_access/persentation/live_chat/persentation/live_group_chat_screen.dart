@@ -2,8 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:google_fonts/google_fonts.dart' hide Config;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:flutter/foundation.dart' as foundation;
 
 import 'package:i_vatan_app/core/helper/custom_snack_bar.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
@@ -41,103 +43,135 @@ class LiveGroupChatScreen extends StatelessWidget {
       tag: chatId.toString(),
     );
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
-      appBar: _buildAppBar(context, controller),
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.01),
+    return WillPopScope(
+      onWillPop: () async {
+        if (controller.isEmojiVisible.value) {
+          controller.isEmojiVisible.value = false;
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFFAFAFA),
+        appBar: _buildAppBar(context, controller),
+        body: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.01),
+              ),
             ),
-          ),
-          
-          Column(
-            children: [
-              // 💬 Messages Feed
-              Expanded(
-                child: Obx(() {
-                  if (controller.isLoading.value && controller.messages.isEmpty) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                      ),
-                    );
-                  }
-
-                  if (controller.messages.isEmpty) {
-                    return _buildEmptyState();
-                  }
-
-                  return ListView.builder(
-                    controller: controller.scrollController,
-                    reverse: false,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                    itemCount: controller.messages.length,
-                    itemBuilder: (context, index) {
-                      final message = controller.messages[index];
-                      final isMe = message.isMine;
-                      
-                      bool showDate = false;
-                      if (index == 0) {
-                        showDate = true;
-                      } else {
-                        final prevMessage = controller.messages[index - 1];
-                        if (controller.formatMessageDate(prevMessage.createdAt) != controller.formatMessageDate(message.createdAt)) {
+            
+            Column(
+              children: [
+                // 💬 Messages Feed
+                Expanded(
+                  child: Obx(() {
+                    if (controller.isLoading.value && controller.messages.isEmpty) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                        ),
+                      );
+                    }
+  
+                    if (controller.messages.isEmpty) {
+                      return _buildEmptyState();
+                    }
+  
+                    return ListView.builder(
+                      controller: controller.scrollController,
+                      reverse: true,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      itemCount: controller.messages.length,
+                      itemBuilder: (context, index) {
+                        final message = controller.messages[index];
+                        final isMe = message.isMine;
+                        
+                        bool showDate = false;
+                        if (index == controller.messages.length - 1) {
                           showDate = true;
+                        } else {
+                          final nextMessage = controller.messages[index + 1];
+                          if (controller.formatMessageDate(nextMessage.createdAt) != controller.formatMessageDate(message.createdAt)) {
+                            showDate = true;
+                          }
                         }
-                      }
-
-                      // System messages styling
-                      if (message.messageType == 'system' || message.sender?.name == 'System') {
+  
+                        // System messages styling
+                        if (message.messageType == 'system' || message.sender?.name == 'System') {
+                          return Column(
+                             children: [
+                              if (showDate) _buildDateBubble(controller.formatMessageDate(message.createdAt)),
+                              _buildSystemBubble(message.content),
+                            ],
+                          );
+                        }
+  
                         return Column(
-                           children: [
+                          children: [
                             if (showDate) _buildDateBubble(controller.formatMessageDate(message.createdAt)),
-                            _buildSystemBubble(message.content),
+                            _SwipeToReplyWrapper(
+                              key: ValueKey(message.id),
+                              onReply: () {
+                                controller.replyingToMessage.value = message;
+                                controller.focusNode.requestFocus();
+                              },
+                              child: _buildChatBubble(context, controller, message, isMe),
+                            ),
                           ],
                         );
-                      }
-
-                      return Column(
-                        children: [
-                          if (showDate) _buildDateBubble(controller.formatMessageDate(message.createdAt)),
-                          _SwipeToReplyWrapper(
-                            key: ValueKey(message.id),
-                            onReply: () {
-                              controller.replyingToMessage.value = message;
-                              controller.focusNode.requestFocus();
-                            },
-                            child: _buildChatBubble(context, controller, message, isMe),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                      },
+                    );
+                  }),
+                ),
+  
+                // 📝 Reply Preview Bar
+                Obx(() {
+                  if (controller.replyingToMessage.value != null) {
+                    return _buildReplyPreviewBar(controller);
+                  }
+                  return const SizedBox.shrink();
                 }),
-              ),
-
-              // 📝 Reply Preview Bar
-              Obx(() {
-                if (controller.replyingToMessage.value != null) {
-                  return _buildReplyPreviewBar(controller);
-                }
-                return const SizedBox.shrink();
-              }),
-
-              // 📷 Pending Attachment Preview Bar
-              Obx(() {
-                if (controller.selectedAttachment.value != null) {
-                  return _buildAttachmentPreviewBar(controller);
-                }
-                return const SizedBox.shrink();
-              }),
-
-
-              // ✍️ Input message bar
-              _buildInputBar(context, controller),
-            ],
-          ),
-        ],
+  
+                // 📷 Pending Attachment Preview Bar
+                Obx(() {
+                  if (controller.selectedAttachment.value != null) {
+                    return _buildAttachmentPreviewBar(controller);
+                  }
+                  return const SizedBox.shrink();
+                }),
+  
+  
+                // ✍️ Input message bar
+                _buildInputBar(context, controller),
+  
+                // Emoji Picker
+                Obx(() => Offstage(
+                  offstage: !controller.isEmojiVisible.value,
+                  child: SizedBox(
+                    height: 250,
+                    child: EmojiPicker(
+                      textEditingController: controller.messageController,
+                      onEmojiSelected: (category, emoji) {
+                         // Controller updates automatically
+                      },
+                      config: Config(
+                        height: 250,
+                        checkPlatformCompatibility: true,
+                        emojiViewConfig: EmojiViewConfig(
+                          columns: 7,
+                          emojiSizeMax: 32 * (foundation.defaultTargetPlatform == TargetPlatform.iOS ? 1.30 : 1.0),
+                          backgroundColor: const Color(0xFFF2F2F2),
+                        ),
+                      ),
+                    ),
+                  ),
+                )),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -155,40 +189,56 @@ class LiveGroupChatScreen extends StatelessWidget {
           child: Icon(Icons.arrow_back_rounded, color: Colors.black54, size: 24),
         ),
       ),
-      title: Row(
-        children: [
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: controller.avatarColor,
-            child: const Icon(Icons.groups_rounded, color: Colors.white, size: 22),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  controller.groupName,
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-                Text(
-                  "${controller.participantsCount} participants",
-                  style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    color: Colors.grey[500],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+      title: GestureDetector(
+        onTap: () {
+          Get.to(
+                () => const LiveGroupDetailsScreen(),
+            arguments: {
+              'chat_id': controller.chatId,
+              'name': controller.groupName,
+              'avatar_color': controller.avatarColor,
+              'participants_count': controller.participantsCount,
+              'chat_mode': controller.chatMode,
+              'is_admin': controller.isAdmin,
+              'description': controller.description,
+            },
+          );
+        },
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: controller.avatarColor,
+              child: const Icon(Icons.groups_rounded, color: Colors.white, size: 22),
             ),
-          ),
-        ],
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    controller.groupName,
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  Text(
+                    "${controller.participantsCount} participants",
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      color: Colors.grey[500],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-      actions: [
+    /*  actions: [
         IconButton(
           icon: const Icon(Icons.more_vert_rounded, color: Colors.black54),
           onPressed: () {
@@ -206,7 +256,7 @@ class LiveGroupChatScreen extends StatelessWidget {
             );
           },
         ),
-      ],
+      ],*/
     );
   }
 
@@ -740,13 +790,30 @@ class LiveGroupChatScreen extends StatelessWidget {
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(vertical: 8),
                         ),
+                        onTap: () {
+                          if (controller.isEmojiVisible.value) {
+                            controller.isEmojiVisible.value = false;
+                          }
+                        },
                       ),
                     ),
 
                     IconButton(
-                      icon: const Icon(Icons.sentiment_satisfied_alt_rounded, color: Colors.black54, size: 24),
+                      icon: Obx(() => Icon(
+                        controller.isEmojiVisible.value
+                            ? Icons.keyboard_rounded
+                            : Icons.sentiment_satisfied_alt_rounded,
+                        color: Colors.black54,
+                        size: 24,
+                      )),
                       onPressed: () {
-                        CustomSnackBar.showInfo(message: "Emoji Keyboard Coming Soon!");
+                        if (controller.isEmojiVisible.value) {
+                          controller.focusNode.requestFocus();
+                          controller.isEmojiVisible.value = false;
+                        } else {
+                          controller.focusNode.unfocus();
+                          controller.isEmojiVisible.value = true;
+                        }
                       },
                     ),
                   ],

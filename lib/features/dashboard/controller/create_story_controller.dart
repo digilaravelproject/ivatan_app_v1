@@ -17,6 +17,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_compress/video_compress.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 import '../../../core/helper/custom_snack_bar.dart';
 import '../../../core/helper/story_widget.dart';
@@ -214,6 +215,52 @@ class StoryController extends GetxController {
   }
 
 
+  Future<File> _compressImage(File file) async {
+    final filePath = file.absolute.path;
+    final outPath = "${filePath}_compressed.jpg";
+
+    try {
+      final compressedXFile = await FlutterImageCompress.compressAndGetFile(
+        filePath,
+        outPath,
+        quality: 70,
+        minWidth: 1080,
+        minHeight: 1920,
+      );
+
+      if (compressedXFile == null) {
+        print("❌ Image compression failed, using original file");
+        return file;
+      }
+
+      File compressedFile = File(compressedXFile.path);
+      double sizeKB = compressedFile.lengthSync() / 1024;
+      print("📉 Compressed image size: ${sizeKB.toStringAsFixed(2)} KB");
+
+      if (sizeKB > 2048) {
+        final outPath2 = "${filePath}_compressed2.jpg";
+        final compressedXFile2 = await FlutterImageCompress.compressAndGetFile(
+          compressedFile.path,
+          outPath2,
+          quality: 50,
+          minWidth: 720,
+          minHeight: 1280,
+        );
+
+        if (compressedXFile2 != null) {
+          File compressedAgain = File(compressedXFile2.path);
+          print("📉 Secondary compressed image size: ${(compressedAgain.lengthSync() / 1024).toStringAsFixed(2)} KB");
+          return compressedAgain;
+        }
+      }
+
+      return compressedFile;
+    } catch (e) {
+      print("❌ Error compressing image: $e");
+      return file;
+    }
+  }
+
   Future<void> createStory() async {
     try {
       isLoading.value = true;
@@ -221,7 +268,8 @@ class StoryController extends GetxController {
       List<File> mediaFiles = [];
 
       if (imageFile.value != null) {
-        mediaFiles.add(imageFile.value!);
+        File compressedFile = await _compressImage(imageFile.value!);
+        mediaFiles.add(compressedFile);
       } else if (videoFile.value != null) {
         mediaFiles.add(videoFile.value!);
       }
@@ -321,9 +369,10 @@ class StoryController extends GetxController {
 
       // 👉 OPTIONAL cover_media (image/video)
       if (imageFile.value != null) {
+        File compressedFile = await _compressImage(imageFile.value!);
         body["cover_media"] = await MultipartFile.fromFile(
-          imageFile.value!.path,
-          filename: imageFile.value!.path.split("/").last,
+          compressedFile.path,
+          filename: compressedFile.path.split("/").last,
         );
       } else if (videoFile.value != null) {
         body["cover_media"] = await MultipartFile.fromFile(
@@ -367,8 +416,8 @@ class StoryController extends GetxController {
     }
   }
 
-  void showMoreOption() {
-    Get.bottomSheet(
+  Future<void> showMoreOption() async {
+    await Get.bottomSheet(
       Container(
         padding: const EdgeInsets.symmetric(vertical: 20),
         decoration: const BoxDecoration(

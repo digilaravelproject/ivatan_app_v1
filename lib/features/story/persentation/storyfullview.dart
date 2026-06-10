@@ -42,6 +42,11 @@ class _FullScreenStoryViewerState extends State<FullScreenStoryViewer> {
   bool showSend = false;
   final FocusNode commentFocus = FocusNode();
   bool imageLoaded = false; // Track if current image is loaded
+  dynamic _listenedVideoController;
+  int _totalDurationMs = 4000;
+  int _elapsedMs = 0;
+  bool _isPaused = false;
+  bool isMediaLoading = true;
 
   @override
   void initState() {
@@ -50,9 +55,17 @@ class _FullScreenStoryViewerState extends State<FullScreenStoryViewer> {
     _pageController = PageController(initialPage: currentIndex);
     _loadStory(currentIndex);
     commentFocus.addListener(() {
+      if (!mounted) return;
       if (commentFocus.hasFocus) {
         _betterPlayerController?.pause();
-        _progressTimer?.cancel();
+        setState(() {
+          _isPaused = true;
+        });
+      } else {
+        _betterPlayerController?.play();
+        setState(() {
+          _isPaused = false;
+        });
       }
     });
     messageController.addListener(() {
@@ -64,17 +77,29 @@ class _FullScreenStoryViewerState extends State<FullScreenStoryViewer> {
 
   void _loadStory(int index) async {
     _progressTimer?.cancel();
-    progress = 0;
-    imageLoaded = false; // Reset for new story
+    _progressTimer = null;
+    progress = 0.0;
+    _elapsedMs = 0;
+    _isPaused = false;
+    isMediaLoading = true;
+    imageLoaded = false;
+
+    // Remove listener from previous video controller
+    if (_listenedVideoController != null) {
+      try {
+        _listenedVideoController!.removeListener(_videoPlayerListener);
+      } catch (e) {}
+      _listenedVideoController = null;
+    }
 
     final story = widget.stories[index];
 
     if (story.type == "video") {
       // Dispose previous controller
       _betterPlayerController?.dispose();
+      _betterPlayerController = null;
 
-      // Create new controller
-      BetterPlayerConfiguration config = BetterPlayerConfiguration(
+      BetterPlayerConfiguration config = const BetterPlayerConfiguration(
         autoPlay: true,
         looping: false,
         fit: BoxFit.contain,
@@ -98,35 +123,73 @@ class _FullScreenStoryViewerState extends State<FullScreenStoryViewer> {
       _betterPlayerController =
           BetterPlayerController(config, betterPlayerDataSource: source);
 
-      // Video duration detect karenge
-      Future.delayed(const Duration(milliseconds: 500), () async {
-        final duration = await _betterPlayerController!
-            .videoPlayerController!.value.duration;
+      _listenedVideoController = _betterPlayerController!.videoPlayerController;
+      if (_listenedVideoController != null) {
+        _listenedVideoController!.addListener(_videoPlayerListener);
+      }
 
-        _startProgress(duration: duration!.inMilliseconds);
-      });
-
-      setState(() {});
+      if (mounted) setState(() {});
     } else {
-      // For images, timer will start when image loads (via CachedNetworkImage callback)
-      setState(() {});
+      if (mounted) setState(() {});
     }
   }
 
-  void _startProgress({required int duration}) {
-    int ms = 0;
+  void _videoPlayerListener() {
+    if (!mounted || _betterPlayerController == null) return;
+
+    final dynamic vpController = _betterPlayerController!.videoPlayerController;
+    if (vpController == null) return;
+
+    final dynamic value = vpController.value;
+
+    if (value != null && value.isInitialized) {
+      final bool isBuffering = value.isBuffering;
+      final bool isPlaying = value.isPlaying;
+      final Duration position = value.position ?? Duration.zero;
+
+      // Media is loading if buffering, not playing, or has not rendered the first frames yet
+      final bool isCurrentlyLoading = isBuffering || !isPlaying || position.inMilliseconds == 0;
+
+      if (isCurrentlyLoading != isMediaLoading) {
+        setState(() {
+          isMediaLoading = isCurrentlyLoading;
+        });
+      }
+
+      if (!isCurrentlyLoading && _progressTimer == null) {
+        final Duration? duration = value.duration;
+        _startProgressTimer(durationMs: (duration != null && duration.inMilliseconds > 0) ? duration.inMilliseconds : 5000);
+      }
+    } else {
+      if (!isMediaLoading) {
+        setState(() {
+          isMediaLoading = true;
+        });
+      }
+    }
+  }
+
+  void _startProgressTimer({required int durationMs}) {
+    _progressTimer?.cancel();
+    _totalDurationMs = durationMs;
 
     _progressTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
-      ms += 50;
-      progress = ms / duration;
+      if (_isPaused || isMediaLoading) {
+        return;
+      }
 
-      if (progress >= 1) {
-        progress = 1;
+      _elapsedMs += 50;
+      progress = _elapsedMs / _totalDurationMs;
+
+      if (progress >= 1.0) {
+        progress = 1.0;
         timer.cancel();
         _nextStory();
       }
 
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
 
@@ -158,6 +221,11 @@ class _FullScreenStoryViewerState extends State<FullScreenStoryViewer> {
 
   @override
   void dispose() {
+    if (_listenedVideoController != null) {
+      try {
+        _listenedVideoController!.removeListener(_videoPlayerListener);
+      } catch (e) {}
+    }
     _betterPlayerController?.dispose();
     _progressTimer?.cancel();
     super.dispose();
@@ -184,19 +252,21 @@ class _FullScreenStoryViewerState extends State<FullScreenStoryViewer> {
 
               if (story.type == "video") {
                 return Center(
-                  child: _betterPlayerController != null
-                      ? AspectRatio(
-                    aspectRatio: 9 / 16,
-                    child: BetterPlayer(controller: _betterPlayerController!),
-                  )
-                      : const CircularProgressIndicator(),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      if (_betterPlayerController != null)
+                        AspectRatio(
+                          aspectRatio: 9 / 16,
+                          child: BetterPlayer(controller: _betterPlayerController!),
+                        ),
+                      if (isMediaLoading)
+                        const CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
+                    ],
+                  ),
                 );
-                // return SizedBox.expand(
-                //   child: _betterPlayerController != null
-                //       ? BetterPlayer(controller: _betterPlayerController!)
-                //       : const Center(child: CircularProgressIndicator()),
-                // );
-
               }
 
               return Center(
@@ -204,25 +274,38 @@ class _FullScreenStoryViewerState extends State<FullScreenStoryViewer> {
                   imageUrl: story.mediaUrl,
                   fit: BoxFit.cover,
                   imageBuilder: (context, imageProvider) {
-                    // Image loaded successfully, start timer if not already started
-                    if (!imageLoaded) {
-                      imageLoaded = true;
+                    if (isMediaLoading) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        _startProgress(duration: 4000);
+                        if (mounted) {
+                          setState(() {
+                            isMediaLoading = false;
+                          });
+                          _startProgressTimer(durationMs: 4000);
+                        }
                       });
                     }
                     return Image(image: imageProvider, fit: BoxFit.cover);
                   },
-                  placeholder: (context, url) => Center(
+                  placeholder: (context, url) => const Center(
                     child: CircularProgressIndicator(
                       color: Colors.white,
                     ),
                   ),
-                  errorWidget: (context, url, error) => Icon(
-                    Icons.error,
-                    color: Colors.white,
-                    size: 50,
-                  ),
+                  errorWidget: (context, url, error) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (mounted && isMediaLoading) {
+                        setState(() {
+                          isMediaLoading = false;
+                        });
+                        _startProgressTimer(durationMs: 4000);
+                      }
+                    });
+                    return const Icon(
+                      Icons.error,
+                      color: Colors.white,
+                      size: 50,
+                    );
+                  },
                 ),
               );
 
@@ -319,20 +402,20 @@ class _FullScreenStoryViewerState extends State<FullScreenStoryViewer> {
                 }
               },
               onLongPressStart: (_) {
-                _betterPlayerController?.pause();
-                _progressTimer?.cancel();
-              },
-              onLongPressEnd: (_) async {
-                if (widget.stories[currentIndex].type == "video") {
-                  _betterPlayerController?.play();
-
-                  final duration = await _betterPlayerController!
-                      .videoPlayerController!.value.duration;
-
-                  _startProgress(duration: duration!.inMilliseconds);
-                } else {
-                  _startProgress(duration: 20000);
+                if (mounted) {
+                  setState(() {
+                    _isPaused = true;
+                  });
                 }
+                _betterPlayerController?.pause();
+              },
+              onLongPressEnd: (_) {
+                if (mounted) {
+                  setState(() {
+                    _isPaused = false;
+                  });
+                }
+                _betterPlayerController?.play();
               },
             ),
           ),
@@ -354,12 +437,23 @@ class _FullScreenStoryViewerState extends State<FullScreenStoryViewer> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     InkWell(
-                      onTap: () {
-                        //Get.back(closeOverlays: true);
-                        storyController.currentStoryId = widget.stories[currentIndex].id;
-                        storyController.showMoreOption();
+                      onTap: () async {
+                        if (mounted) {
+                          setState(() {
+                            _isPaused = true;
+                          });
+                        }
                         _betterPlayerController?.pause();
-                        _progressTimer?.cancel();
+                        
+                        storyController.currentStoryId = widget.stories[currentIndex].id;
+                        await storyController.showMoreOption();
+                        
+                        if (mounted) {
+                          setState(() {
+                            _isPaused = false;
+                          });
+                          _betterPlayerController?.play();
+                        }
                       },
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
