@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart' as rzp;
 import '../../../../core/network/api_services.dart';
 import '../../../../db/shared_pref_manager.dart';
@@ -42,7 +43,7 @@ class SubscriptionPaymentController extends GetxController {
     _currentProfileTypeSub = profileTypeSub;
     
     // 1. Fetch/Determine profile_id
-    int? profileId = _getProfileId(profileTypeSub.type);
+    int? profileId = profileTypeSub.profileId ?? _getProfileId(profileTypeSub.type);
     
     if (profileId == null) {
       isLoading.value = true;
@@ -50,7 +51,7 @@ class SubscriptionPaymentController extends GetxController {
         final settingsController = _getSettingsController();
         if (settingsController != null) {
           await settingsController.fetchProfileSwitchRequests();
-          profileId = _getProfileId(profileTypeSub.type);
+          profileId = profileTypeSub.profileId ?? _getProfileId(profileTypeSub.type);
         }
       } catch (e) {
         debugPrint("⚠️ Error fetching switch requests for profile_id lookup: $e");
@@ -260,7 +261,9 @@ class SubscriptionPaymentController extends GetxController {
                   
                   // Sync subscription view in ProfileTypes list
                   if (_currentPlan != null && _currentProfileTypeSub != null) {
-                    final subscriptionController = Get.find<SubscriptionController>();
+                    final subscriptionController = Get.isRegistered<SubscriptionController>()
+                        ? Get.find<SubscriptionController>()
+                        : Get.put(SubscriptionController());
                     final updatedList = subscriptionController.subscriptions.map((sub) {
                       if (sub.id == _currentProfileTypeSub!.id) {
                         final updatedPlans = sub.plans.map((p) {
@@ -335,7 +338,7 @@ class SubscriptionPaymentController extends GetxController {
     Get.snackbar(
       "Wallet Selected",
       "Wallet: ${response.walletName}",
-      backgroundColor: Colors.blue,
+      backgroundColor: AppColors.primary,
       colorText: Colors.white,
     );
   }

@@ -51,6 +51,7 @@ class SharedPrefManager {
   /// Logout
   Future<void> userLogOut() async {
     await _prefs.remove(_keyUserData);
+    await _prefs.remove("_profileConfig");
   }
 
   Future<void> updateUserOnly(Map<String, dynamic> updatedUser) async {
@@ -60,5 +61,23 @@ class SharedPrefManager {
       existing["user"] = updatedUser;
       await _prefs.setString(_keyUserData, jsonEncode(existing));
     }
+  }
+
+  /// Save Profile Config JSON
+  Future<void> saveProfileConfig(Map<String, dynamic> config) async {
+    await _prefs.setString("_profileConfig", jsonEncode(config));
+  }
+
+  /// Get Profile Config JSON map
+  Map<String, dynamic>? get profileConfig {
+    String? data = _prefs.getString("_profileConfig");
+    if (data != null) {
+      try {
+        return jsonDecode(data) as Map<String, dynamic>?;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
   }
 }

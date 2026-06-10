@@ -653,7 +653,9 @@ class SettingsController extends GetxController {
           showAdminApprovalDialog(profileType.label);
         } else {
           try {
-            final subscriptionController = Get.put(SubscriptionController());
+            final subscriptionController = Get.isRegistered<SubscriptionController>()
+                ? Get.find<SubscriptionController>()
+                : Get.put(SubscriptionController());
             final updatedSub = await subscriptionController.fetchPlansForProfileType(profileType.type);
             if (updatedSub != null) {
               Get.to(() => ProfilePlansScreen(profileTypeSub: updatedSub));

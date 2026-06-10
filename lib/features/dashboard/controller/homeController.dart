@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/db/shared_pref_manager.dart';
+import '../../subscription/data/model/profile_config_model.dart';
 
 import '../../../core/helper/custom_snack_bar.dart';
 import 'package:video_compress/video_compress.dart';
@@ -53,6 +54,32 @@ class HomeController extends GetxController {
   RxDouble trimDuration = 0.0.obs;  // In milliseconds
 
   RxInt unreadNotificationCount = 0.obs;
+  Rxn<ProfileConfigModel> profileConfig = Rxn<ProfileConfigModel>();
+
+  void loadCachedProfileConfig() {
+    final cached = SharedPrefManager().profileConfig;
+    if (cached != null) {
+      try {
+        profileConfig.value = ProfileConfigModel.fromJson(cached);
+      } catch (e) {
+        print("Error loading cached profile config: $e");
+      }
+    }
+  }
+
+  Future<void> fetchProfileConfig() async {
+    try {
+      final response = await api.callGet(AppUrls.profileConfig);
+      print("Profile Config API Response: $response");
+      if (response != null && response['status'] == true) {
+        final configModel = ProfileConfigModel.fromJson(response);
+        profileConfig.value = configModel;
+        await SharedPrefManager().saveProfileConfig(response);
+      }
+    } catch (e) {
+      print("Error fetching profile config in HomeController: $e");
+    }
+  }
 
   Future<void> fetchUnreadNotificationCount() async {
     try {
@@ -69,9 +96,11 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     loadCurrentUser();
+    loadCachedProfileConfig();
     fetchPosts();
     fetchStories();
     fetchUnreadNotificationCount();
+    fetchProfileConfig();
   }
 
 

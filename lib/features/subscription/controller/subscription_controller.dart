@@ -350,7 +350,12 @@ class SubscriptionController extends GetxController {
     return null;
   }
 
-  Future<ProfileTypeSubscription?> fetchPlansForProfileType(String profileType) async {
+  Future<ProfileTypeSubscription?> fetchPlansForProfileType(
+    String profileType, {
+    String? activePlanSlug,
+    bool isSubscribedActive = false,
+    int? profileId,
+  }) async {
     try {
       isLoading.value = true;
       final response = await api.callGet(
@@ -389,6 +394,8 @@ class SubscriptionController extends GetxController {
             if (profileType == 'seller') {
               // Match seller entries, but distinguish by subType if present
               isMatch = (sub.type == 'seller');
+            } else if (profileType == 'creator') {
+              isMatch = (sub.type == 'music');
             }
 
             if (isMatch) {
@@ -400,15 +407,25 @@ class SubscriptionController extends GetxController {
                 subStatus = 'none';
               }
 
+              if (activePlanSlug != null && activePlanSlug.isNotEmpty) {
+                subStatus = isSubscribedActive ? 'active' : 'pending';
+              }
+
               final plansForSub = plansList.map((plan) {
                 String planStatus = 'none';
-                if (subStatus == 'active') {
-                  if (plan.isPopular || plansList.first.id == plan.id) {
-                    planStatus = 'active';
+                if (activePlanSlug != null && activePlanSlug.isNotEmpty) {
+                  if (plan.slug == activePlanSlug) {
+                    planStatus = isSubscribedActive ? 'active' : 'pending';
                   }
-                } else if (subStatus == 'pending') {
-                  if (plan.isPopular || plansList.first.id == plan.id) {
-                    planStatus = 'pending';
+                } else {
+                  if (subStatus == 'active') {
+                    if (plan.isPopular || plansList.first.id == plan.id) {
+                      planStatus = 'active';
+                    }
+                  } else if (subStatus == 'pending') {
+                    if (plan.isPopular || plansList.first.id == plan.id) {
+                      planStatus = 'pending';
+                    }
                   }
                 }
                 return plan.copyWith(status: planStatus);
@@ -417,6 +434,7 @@ class SubscriptionController extends GetxController {
               return sub.copyWith(
                 status: subStatus,
                 plans: plansForSub,
+                profileId: profileId,
               );
             }
             return sub;
@@ -430,6 +448,9 @@ class SubscriptionController extends GetxController {
                 return sub.type == 'seller' && sub.subType == 'service';
               }
               return sub.type == 'seller' && (sub.subType == null || sub.subType == 'product');
+            }
+            if (profileType == 'creator') {
+              return sub.type == 'music';
             }
             return sub.type == profileType;
           });
@@ -446,6 +467,7 @@ class SubscriptionController extends GetxController {
               status: returnedSub.status,
               plansCount: plansList.length,
               plans: returnedSub.plans.isNotEmpty ? returnedSub.plans : plansList,
+              profileId: profileId ?? returnedSub.profileId,
             );
           }
           return returnedSub;

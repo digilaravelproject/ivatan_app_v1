@@ -21,6 +21,7 @@ class SubscriptionPlan {
   final bool isPopular;
   final String status; // 'active', 'pending', 'none'
   final List<PlanFeature> features;
+  final String? slug; // plan slug from API
 
   SubscriptionPlan({
     required this.id,
@@ -31,6 +32,7 @@ class SubscriptionPlan {
     this.isPopular = false,
     this.status = 'none',
     required this.features,
+    this.slug,
   });
 
   bool get isSubscribed => status != 'none';
@@ -64,15 +66,18 @@ class SubscriptionPlan {
       periodStr = "$durationDays days";
     }
 
+    final String? rawSlug = json['slug']?.toString();
+
     return SubscriptionPlan(
       id: (json['id'] ?? '').toString(),
       name: json['name'] ?? '',
       price: priceStr,
       period: periodStr,
       description: json['description'] ?? '',
-      isPopular: json['slug']?.toString().contains('pro') ?? false,
+      isPopular: rawSlug?.contains('pro') ?? false,
       status: 'none',
       features: parsedFeatures,
+      slug: rawSlug,
     );
   }
 
@@ -88,6 +93,7 @@ class SubscriptionPlan {
       isPopular: isPopular,
       status: status ?? this.status,
       features: features,
+      slug: slug,
     );
   }
 }
@@ -101,6 +107,7 @@ class ProfileTypeSubscription {
   final String status; // 'active', 'pending', 'none'
   final int plansCount;
   final List<SubscriptionPlan> plans;
+  final int? profileId; // Dynamic profile ID from config API
 
   ProfileTypeSubscription({
     required this.id,
@@ -111,11 +118,13 @@ class ProfileTypeSubscription {
     required this.status,
     required this.plansCount,
     required this.plans,
+    this.profileId,
   });
 
   ProfileTypeSubscription copyWith({
     String? status,
     List<SubscriptionPlan>? plans,
+    int? profileId,
   }) {
     return ProfileTypeSubscription(
       id: id,
@@ -126,6 +135,7 @@ class ProfileTypeSubscription {
       status: status ?? this.status,
       plansCount: plansCount,
       plans: plans ?? this.plans,
+      profileId: profileId ?? this.profileId,
     );
   }
 }

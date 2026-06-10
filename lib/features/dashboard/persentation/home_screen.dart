@@ -14,7 +14,9 @@ import '../../messages/persentation/dashboard.dart';
 import '../../profile/screen/profile_screen.dart';
 import '../../quick_access/persentation/drawerScreen.dart';
 import '../../story/persentation/storyfullview.dart';
-import '../../subscription/persentation/profile_types_screen.dart';
+import '../../subscription/persentation/profile_plans_screen.dart';
+import '../../subscription/controller/subscription_controller.dart';
+import '../../subscription/data/model/profile_config_model.dart';
 import '../controller/comment_controller.dart';
 import '../controller/homeController.dart';
 import '../controller/create_story_controller.dart';
@@ -4296,8 +4298,136 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
         return Transform.scale(
           scale: _scaleAnimation.value,
           child: GestureDetector(
-            onTap: () {
-              Get.to(() => const ProfileTypesScreen());
+            onTap: () async {
+              final homeController = Get.find<HomeController>();
+              var config = homeController.profileConfig.value;
+              
+              if (config == null) {
+                // Try reading from SharedPreferences
+                final cached = SharedPrefManager().profileConfig;
+                if (cached != null) {
+                  try {
+                    config = ProfileConfigModel.fromJson(cached);
+                  } catch (e) {
+                    debugPrint("Error reading cached config: $e");
+                  }
+                }
+              }
+
+              if (config == null) {
+                // Show loading spinner
+                Get.dialog(
+                  const Center(child: CircularProgressIndicator(color: Colors.black)),
+                  barrierDismissible: false,
+                );
+                
+                try {
+                  await homeController.fetchProfileConfig();
+                  config = homeController.profileConfig.value;
+                } catch (e) {
+                  debugPrint("Error fetching profile config: $e");
+                }
+                
+                Get.back(); // close loading dialog
+              }
+
+              if (config == null) {
+                Get.snackbar(
+                  "Error",
+                  "Failed to retrieve profile configuration. Please check your internet connection.",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+                return;
+              }
+
+              // Resolve current active profile from config
+              final currentProfileName = config.data?.userProfile?.currentProfileName;
+              if (currentProfileName == null || currentProfileName.isEmpty) {
+                Get.snackbar(
+                  "Error",
+                  "Current active profile name is not set.",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+                return;
+              }
+
+              String mappedProfileType = 'personal';
+              int? profileId;
+              String? activePlanSlug;
+              bool isSubscribedActive = false;
+
+              if (currentProfileName == 'personal') {
+                mappedProfileType = 'personal';
+                final profileObj = config.data?.personalProfile;
+                profileId = profileObj?.profileId;
+                activePlanSlug = profileObj?.subscription?.planSlug;
+                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'employer') {
+                mappedProfileType = 'employer';
+                final profileObj = config.data?.employer;
+                profileId = profileObj?.profileId;
+                activePlanSlug = profileObj?.subscription?.planSlug;
+                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'ecommerce') {
+                mappedProfileType = 'seller';
+                final profileObj = config.data?.ecommerce;
+                profileId = profileObj?.profileId;
+                activePlanSlug = profileObj?.subscription?.planSlug;
+                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'music_play') {
+                mappedProfileType = 'music';
+                final profileObj = config.data?.musicPlay;
+                profileId = profileObj?.profileId;
+                activePlanSlug = profileObj?.subscription?.planSlug;
+                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'content_creation') {
+                mappedProfileType = 'creator';
+                final profileObj = config.data?.contentCreation;
+                profileId = profileObj?.profileId;
+                activePlanSlug = profileObj?.subscriptionDetails?.planSlug;
+                isSubscribedActive = profileObj?.subscriptionDetails?.isActive ?? false;
+              }
+
+              try {
+                final subscriptionController = Get.isRegistered<SubscriptionController>()
+                    ? Get.find<SubscriptionController>()
+                    : Get.put(SubscriptionController());
+
+                Get.dialog(
+                  const Center(child: CircularProgressIndicator(color: Colors.black)),
+                  barrierDismissible: false,
+                );
+
+                final resolvedSub = await subscriptionController.fetchPlansForProfileType(
+                  mappedProfileType,
+                  activePlanSlug: activePlanSlug,
+                  isSubscribedActive: isSubscribedActive,
+                  profileId: profileId,
+                );
+
+                Get.back(); // Close loading dialog
+
+                if (resolvedSub != null) {
+                  Get.to(() => ProfilePlansScreen(profileTypeSub: resolvedSub));
+                } else {
+                  Get.snackbar(
+                    "Error",
+                    "Failed to load plans for profile type: $mappedProfileType",
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                  );
+                }
+              } catch (e) {
+                Get.back(); // Close loading dialog in case of error
+                Get.snackbar(
+                  "Error",
+                  "Something went wrong while loading plans: $e",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+              }
             },
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 4),

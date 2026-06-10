@@ -33,6 +33,7 @@ class AppUrls {
   static const loginOtp = "api/auth/mobile_login";
   static const register = "api/auth/register";
   static const posts  ="api/v1/posts";
+  static const profileConfig = "api/v1/profiles/config";
 
   static const verifyForgetPassword  ="api/forgot-password/verify";
   static const changePassword  ="api/forgot-password/reset";

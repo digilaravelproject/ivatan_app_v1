@@ -379,7 +379,9 @@ class SettingsScreen extends StatelessWidget {
         } else {
           // For all other types (including ecommerce seller-both, music, creator)
           try {
-            final subscriptionController = Get.put(SubscriptionController());
+            final subscriptionController = Get.isRegistered<SubscriptionController>()
+                ? Get.find<SubscriptionController>()
+                : Get.put(SubscriptionController());
             final updatedSub = await subscriptionController.fetchPlansForProfileType(toType);
             if (updatedSub != null) {
               Get.to(() => ProfilePlansScreen(profileTypeSub: updatedSub));

@@ -29,7 +29,9 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
   void initState() {
     super.initState();
     _plan = widget.plan;
-    _controller = Get.find<SubscriptionController>();
+    _controller = Get.isRegistered<SubscriptionController>()
+        ? Get.find<SubscriptionController>()
+        : Get.put(SubscriptionController());
     _paymentController = Get.put(SubscriptionPaymentController());
     _fetchDetails();
   }
