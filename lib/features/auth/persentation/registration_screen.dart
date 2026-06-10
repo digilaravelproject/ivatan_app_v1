@@ -235,19 +235,22 @@ class RegistrationScreen extends GetWidget<RegisterController> {
                 const SizedBox(height: 40),
 
                 // Submit Button
-                MyButton(
-                  title: "Create Account",
-                  onPressed: () {
-                    HapticFeedback.mediumImpact();
-                    if (controller.formKey.currentState!.validate()) {
-                      registerController.onRegister();
-                    }
-                  },
-                  gradient: const LinearGradient(
-                    colors: [AppColors.primary, AppColors.primaryDark], // Black Gradient
+                Obx(
+                  () => MyButton(
+                    title: "Create Account",
+                    isLoading: controller.isLoading.value,
+                    onPressed: () {
+                      HapticFeedback.mediumImpact();
+                      if (controller.formKey.currentState!.validate()) {
+                        registerController.onRegister();
+                      }
+                    },
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, AppColors.primaryDark], // Black Gradient
+                    ),
+                    height: 52,
+                    borderRadius: 12,
                   ),
-                  height: 52,
-                  borderRadius: 12,
                 ),
 
                 const SizedBox(height: 24),

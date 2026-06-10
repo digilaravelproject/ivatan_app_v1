@@ -94,7 +94,7 @@ class ApiServices extends GetxService {
   }) async {
     final dioClient = dio.Dio();
     dioClient.options.baseUrl = AppUrls.apiBaseUrl;
-    dioClient.options.headers = _defaultHeaders();
+    dioClient.options.headers = _multipartHeaders();
     dioClient.options.connectTimeout = _timeout;
     dioClient.options.receiveTimeout = const Duration(minutes: 30);
     dioClient.options.sendTimeout = const Duration(minutes: 30);

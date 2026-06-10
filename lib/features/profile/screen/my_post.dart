@@ -4,6 +4,8 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
+import 'package:shimmer/shimmer.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../search/controller/mixed_feed_controller.dart';
@@ -159,15 +161,19 @@ class MyPostScreen extends StatelessWidget {
                     child: Container(
                       height: (index % 2 == 0) ? 220 : 150,
                       color: Colors.grey.shade300,
-                      child: FadeInImage(
-                        image: NetworkImage(thumb),
-                        placeholder: const AssetImage(AppAssets.imgOnbording1),
-                        imageErrorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                            AppAssets.imgAppLogo,
-                            fit: BoxFit.cover,
-                          );
-                        },
+                      child: CachedNetworkImage(
+                        imageUrl: thumb,
+                        placeholder: (context, url) => Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            color: Colors.white,
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Image.asset(
+                          AppAssets.imgAppLogo,
+                          fit: BoxFit.cover,
+                        ),
                         fit: BoxFit.cover,
                       ),
                     ),

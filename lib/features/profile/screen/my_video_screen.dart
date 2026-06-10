@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../videos/persentation/play_video_screen.dart';
 import '../../reels_screen/model/reel_model.dart' as rm;
@@ -145,17 +147,25 @@ class MyVideoScreen extends StatelessWidget {
 
   Widget _buildVideoItem(String imageUrl, int viewCount) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.black12,
-        image: imageUrl.isNotEmpty ? DecorationImage(
-          image: NetworkImage(imageUrl),
-          fit: BoxFit.cover,
-          onError: (_, __) {}
-        ) : null,
-      ),
+      color: Colors.black12,
       child: Stack(
         children: [
-          if(imageUrl.isEmpty) const Center(child: Icon(Icons.videocam_off, color: Colors.grey)),
+          Positioned.fill(
+            child: imageUrl.isNotEmpty
+                ? CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(color: Colors.white),
+                    ),
+                    errorWidget: (context, url, error) => const Center(
+                      child: Icon(Icons.videocam_off, color: Colors.grey),
+                    ),
+                  )
+                : const Center(child: Icon(Icons.videocam_off, color: Colors.grey)),
+          ),
           
           // Gradient Overlay
           Positioned.fill(

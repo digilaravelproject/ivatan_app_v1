@@ -132,7 +132,7 @@ class _ReelMediaPickerScreenState extends State<ReelMediaPickerScreen> {
 
     // Navigate to preview screen for reel creation
     if (Get.isOverlaysOpen) Get.back(); // Close picker bottom sheet if open
-    Get.to(() => PreviewScreen(userName: currentUserName ?? ""));
+    Get.off(() => PreviewScreen(userName: currentUserName ?? ""));
   }
 
   @override

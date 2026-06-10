@@ -250,17 +250,33 @@ class HomeController extends GetxController {
       int? videoIndexInList;
 
       body.forEach((key, value) {
-        if (value is File && (value.path.endsWith(".mp4") || value.path.endsWith(".mov") || value.path.endsWith(".m4v"))) {
-          videoToCompress = value;
-          videoKey = key;
+        if (value is File) {
+          final pathLower = value.path.toLowerCase();
+          if (pathLower.endsWith(".mp4") ||
+              pathLower.endsWith(".mov") ||
+              pathLower.endsWith(".m4v") ||
+              pathLower.endsWith(".3gp") ||
+              pathLower.endsWith(".mkv") ||
+              pathLower.endsWith(".avi")) {
+            videoToCompress = value;
+            videoKey = key;
+          }
         } else if (value is List) {
           for (int i = 0; i < value.length; i++) {
             final item = value[i];
-            if (item is File && (item.path.endsWith(".mp4") || item.path.endsWith(".mov") || item.path.endsWith(".m4v"))) {
-              videoToCompress = item;
-              videoKey = key;
-              videoIndexInList = i;
-              break;
+            if (item is File) {
+              final pathLower = item.path.toLowerCase();
+              if (pathLower.endsWith(".mp4") ||
+                  pathLower.endsWith(".mov") ||
+                  pathLower.endsWith(".m4v") ||
+                  pathLower.endsWith(".3gp") ||
+                  pathLower.endsWith(".mkv") ||
+                  pathLower.endsWith(".avi")) {
+                videoToCompress = item;
+                videoKey = key;
+                videoIndexInList = i;
+                break;
+              }
             }
           }
         }

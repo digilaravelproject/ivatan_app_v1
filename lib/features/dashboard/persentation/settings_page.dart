@@ -128,7 +128,7 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 16,),*/
 
               // EMPLOYER TOGGLE
-              Obx(() => Container(
+             /* Obx(() => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12,),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade200,
@@ -156,7 +156,7 @@ class SettingsScreen extends StatelessWidget {
                     )
                   ],
                 ),
-              )),
+              )),*/
 
               const SizedBox(height: 16),
 

@@ -618,9 +618,25 @@ class ProfileController extends GetxController {
       List<File> mediaFiles = [];
 
       if (imageFile.value != null) {
-        mediaFiles.add(imageFile.value!);
+        File compressedFile = await _compressImage(imageFile.value!);
+        mediaFiles.add(compressedFile);
       } else if (videoFile.value != null) {
-        mediaFiles.add(videoFile.value!);
+        File videoToUpload = videoFile.value!;
+        
+        CustomSnackBar.showInfo(message: "Compressing video, please wait...");
+        
+        final info = await VideoCompress.compressVideo(
+          videoToUpload.path,
+          quality: VideoQuality.MediumQuality,
+          deleteOrigin: false,
+        );
+        
+        if (info != null && info.path != null) {
+          videoToUpload = File(info.path!);
+          print("Compressed profile story video size: ${(videoToUpload.lengthSync() / 1024).toStringAsFixed(2)} KB");
+        }
+        
+        mediaFiles.add(videoToUpload);
       }
 
       Map<String, dynamic> body = {
