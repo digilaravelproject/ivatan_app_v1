@@ -9,6 +9,7 @@ class ProfileTypeSelector extends StatelessWidget {
   final List<ProfileType> profileTypes;
   final Function(ProfileType, String) onSelected;
   final String? Function(String?)? validator;
+  final bool enabled;
 
   const ProfileTypeSelector({
     super.key,
@@ -17,12 +18,13 @@ class ProfileTypeSelector extends StatelessWidget {
     required this.profileTypes,
     required this.onSelected,
     this.validator,
+    this.enabled = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => _showProfileTypeBottomSheet(context),
+      onTap: enabled ? () => _showProfileTypeBottomSheet(context) : null,
       child: AbsorbPointer(
         child: TextFormField(
           controller: controller,
@@ -35,7 +37,9 @@ class ProfileTypeSelector extends StatelessWidget {
               color: AppColors.primary,
               fontWeight: FontWeight.w600,
             ),
-            suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary),
+            suffixIcon: enabled
+                ? const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary)
+                : null,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: Colors.grey.shade300),
@@ -56,7 +60,7 @@ class ProfileTypeSelector extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: enabled ? Colors.grey.shade50 : Colors.grey.shade200,
           ),
         ),
       ),

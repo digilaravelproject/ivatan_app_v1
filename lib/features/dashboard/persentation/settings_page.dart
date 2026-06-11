@@ -176,6 +176,7 @@ class SettingsScreen extends StatelessWidget {
                   label: "Profile Type",
                   controller: profileController.profileTypeController,
                   profileTypes: profileController.profileTypes,
+                  enabled: !profileController.hasPendingRequest,
                   onSelected: (profileType, sellerType) {
                     profileController.switchProfileType(profileType, sellerType);
                   },

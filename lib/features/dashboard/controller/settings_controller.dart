@@ -341,6 +341,8 @@ class SettingsController extends GetxController {
   var switchRequests = <ProfileSwitchRequest>[].obs;
   var isLoadingSwitchRequests = false.obs;
 
+  bool get hasPendingRequest => switchRequests.any((req) => req.status.toLowerCase() == 'pending');
+
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
