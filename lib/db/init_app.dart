@@ -65,6 +65,8 @@ Future<void> initApp() async {
     statusBarIconBrightness: Brightness.dark,
     systemNavigationBarColor: Colors.transparent,
     systemNavigationBarIconBrightness: Brightness.dark,
+    systemNavigationBarContrastEnforced: false,
+    systemStatusBarContrastEnforced: false,
   );
   SystemChrome.setSystemUIOverlayStyle(uiStyle);
 }

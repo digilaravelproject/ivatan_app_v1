@@ -163,13 +163,14 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: SystemUiOverlay.values);
 
-    // ✅ Status bar color transparent
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         systemNavigationBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
         systemNavigationBarIconBrightness: Brightness.light,
+        systemNavigationBarContrastEnforced: false,
+        systemStatusBarContrastEnforced: false,
       ),
     );
     _currentPage = widget.initialIndex;
