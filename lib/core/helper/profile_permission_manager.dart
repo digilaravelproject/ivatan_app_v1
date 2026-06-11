@@ -164,7 +164,7 @@ class ProfilePermissionManager {
       return false;
     }
     final type = _config?.data?.ecommerce?.type?.toLowerCase();
-    if (type == 'product' || type == 'prodcut') return true;
+    if (type == 'product' || type == 'products' || type == 'prodcut') return true;
     if (type == 'both') {
       return hasActiveSubscription(ProfileType.ecommerce);
     }
@@ -177,7 +177,7 @@ class ProfilePermissionManager {
       return false;
     }
     final type = _config?.data?.ecommerce?.type?.toLowerCase();
-    if (type == 'service') return true;
+    if (type == 'service' || type == 'services') return true;
     if (type == 'both') {
       return hasActiveSubscription(ProfileType.ecommerce);
     }
@@ -198,7 +198,7 @@ class ProfilePermissionManager {
           user.isSeller == true;
       if (!isSellerProfile) return false;
       final subType = user.profileSubType?.toLowerCase();
-      return subType == null || subType.isEmpty || subType == 'product' || subType == 'prodcut' || subType == 'both';
+      return subType == null || subType.isEmpty || subType == 'product' || subType == 'products' || subType == 'prodcut' || subType == 'both';
     }
     return canSellProducts;
   }
@@ -211,7 +211,7 @@ class ProfilePermissionManager {
           user.isSeller == true;
       if (!isSellerProfile) return false;
       final subType = user.profileSubType?.toLowerCase();
-      return subType == null || subType.isEmpty || subType == 'service' || subType == 'both';
+      return subType == null || subType.isEmpty || subType == 'service' || subType == 'services' || subType == 'both';
     }
     return canProvideServices;
   }
