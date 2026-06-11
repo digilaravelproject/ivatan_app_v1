@@ -42,12 +42,18 @@ class HomePage extends StatelessWidget {
       endDrawer: DrawerScreen(),
       endDrawerEnableOpenDragGesture: false,
 
-      // ============= MODERN APP BAR =============
       body: NotificationListener<ScrollNotification>(
         onNotification: (notification) {
-          if (notification.metrics.pixels > 20 &&
-              !controller.showStories.value) {
-            controller.showStories.value = true;
+          if (notification is UserScrollNotification) {
+            if (notification.direction == ScrollDirection.reverse) {
+              if (controller.showStories.value) {
+                controller.showStories.value = false;
+              }
+            } else if (notification.direction == ScrollDirection.forward) {
+              if (!controller.showStories.value) {
+                controller.showStories.value = true;
+              }
+            }
           }
 
           // Pagination Logic only
@@ -60,8 +66,13 @@ class HomePage extends StatelessWidget {
           }
           return false;
         },
-        child: RefreshIndicator(
-          onRefresh: () async {
+        child: Obx(() {
+          final isStoriesShown = controller.showStories.value;
+          return RefreshIndicator(
+            notificationPredicate: (notification) {
+              return isStoriesShown;
+            },
+            onRefresh: () async {
             await controller.fetchPosts();
             await controller.fetchStories();
             await controller.fetchUnreadNotificationCount();
@@ -69,11 +80,10 @@ class HomePage extends StatelessWidget {
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
-              // ============= SLIVER APP BAR (Hide/Show on Scroll) =============
-              SliverAppBar(
+              Obx(() => SliverAppBar(
                 floating: true,
                 snap: true,
-                pinned: false,
+                pinned: controller.showStories.value,
                 backgroundColor: Colors.white,
                 elevation: 0,
                 automaticallyImplyLeading: false,
@@ -209,7 +219,7 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
+              )),
 
               // ============= STORIES SECTION (Always Visible) =============
               SliverToBoxAdapter(
@@ -341,49 +351,34 @@ class HomePage extends StatelessWidget {
               }),
             ],
           ),
-        ),
-      ),
+        );
+      })),
     );
   }
 
   Widget _buildStoriesShimmer() {
-    return SizedBox(
-      height: 100,
+    return Container(
+      height: 130,
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: 6,
         itemBuilder: (context, index) {
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-            child: Column(
-              children: [
-                Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
-                  child: Container(
-                    width: 60,
-                    height: 60,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
+            padding: const EdgeInsets.only(right: 10),
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                width: 80,
+                height: 114,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                const SizedBox(height: 6),
-                Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
-                  child: Container(
-                    width: 40,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           );
         },
@@ -815,20 +810,19 @@ class HomePage extends StatelessWidget {
                     height: 40,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.grey.shade100,
+                      color: Colors.grey.shade200,
                     ),
                     child: ClipOval(
-                      child:
-                          post.user.avatar != null &&
-                                  post.user.avatar!.isNotEmpty
-                              ? Image.network(
-                                AppUrls.getFullImageUrl(post.user.avatar!),
-                                fit: BoxFit.cover,
-                              )
-                              : Image.asset(
-                                AppAssets.imgAppLogo,
-                                fit: BoxFit.cover,
-                              ),
+                      child: (post.user.avatar != null &&
+                              post.user.avatar!.isNotEmpty &&
+                              post.user.avatar != "null")
+                          ? Image.network(
+                              AppUrls.getFullImageUrl(post.user.avatar!),
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Icon(Icons.person, color: Colors.grey.shade600, size: 24),
+                            )
+                          : Icon(Icons.person, color: Colors.grey.shade600, size: 24),
                     ),
                   ),
                 ),
@@ -1496,25 +1490,25 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                   // Avatar with online indicator
                   Stack(
                     children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.grey.shade100,
-                        backgroundImage:
-                            (comment.user?.avtar != null &&
-                                    comment.user?.avtar != "")
-                                ? NetworkImage(
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.grey.shade200,
+                        ),
+                        child: ClipOval(
+                          child: (comment.user?.avtar != null &&
+                                  comment.user!.avtar!.isNotEmpty &&
+                                  comment.user!.avtar != "null")
+                              ? Image.network(
                                   AppUrls.getFullImageUrl(comment.user!.avtar!),
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Icon(Icons.person, color: Colors.grey.shade600, size: 24),
                                 )
-                                : null,
-                        child:
-                            (comment.user?.avtar == null ||
-                                    comment.user?.avtar == "")
-                                ? Icon(
-                                  Icons.person,
-                                  color: Colors.grey.shade700,
-                                  size: 24,
-                                )
-                                : null,
+                              : Icon(Icons.person, color: Colors.grey.shade600, size: 24),
+                        ),
                       ),
                     ],
                   ),
@@ -1655,23 +1649,25 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: Colors.grey.shade100,
-              backgroundImage:
-                  (reply.user?.avtar != null && reply.user?.avtar != "")
-                      ? NetworkImage(
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey.shade200,
+              ),
+              child: ClipOval(
+                child: (reply.user?.avtar != null &&
+                        reply.user!.avtar!.isNotEmpty &&
+                        reply.user!.avtar != "null")
+                    ? Image.network(
                         AppUrls.getFullImageUrl(reply.user!.avtar!),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Icon(Icons.person, color: Colors.grey.shade600, size: 20),
                       )
-                      : null,
-              child:
-                  (reply.user?.avtar == null || reply.user?.avtar == "")
-                      ? Icon(
-                        Icons.person,
-                        color: Colors.grey.shade700,
-                        size: 20,
-                      )
-                      : null,
+                    : Icon(Icons.person, color: Colors.grey.shade600, size: 20),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
+import '../../../core/helper/profile_permission_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -128,29 +129,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
           final bool isPrivateHidden = isCurrentlyOther && 
                                      (user.accountPrivacy?.toLowerCase() == "private") && 
                                      !isFollowing;
-            // Build dynamic tabs and views
-            List<Tab> tabs = [
-              Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 
-              Tab(child: Image.asset(AppAssets.icVideo, width: 24, height: 24)),
-              Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)), // Products - always visible
-              Tab(child: Icon(Icons.miscellaneous_services_outlined, color: Colors.black, size: 26)), // Services - always visible
-            ];
-            
-            List<Widget> tabViews = [
-              MyPostScreen(username: finalUserName),
-              MyVideoScreen(username: finalUserName),
-              (user.isSeller == true && !isOtherProfile)
-                ? ProductGridScreen(isOwnProfile: true)
-              // Seller viewing their own products
-                : ProductGridScreen(isOwnProfile: false), // Non-seller or viewing other profile - browse mode
-              // Services tab: Show seller's services if they're a seller, otherwise show browsable services
-              (user.isSeller == true && !isOtherProfile)
-                ? DigitalProductListScreen(isOwnProfile: true) // Seller viewing their own services
-                : DigitalProductListScreen(isOwnProfile: false), // Non-seller or viewing other profile - browse mode
-            ];
-            return DefaultTabController(
-              key: ValueKey("${user.id}_${user.isSeller}"), // Force recreate when owner or seller status changes
-              length: 4, // Always 4 tabs now
+              debugPrint("Profile Debug: user=${user.username}, isOtherProfile=$isOtherProfile, isCurrentlyOther=$isCurrentlyOther, isSeller=${user.isSeller}, profileType=${user.profileType}, profileSubType=${user.profileSubType}");
+             // Build dynamic tabs and views
+             final bool showProductTab = ProfilePermissionManager.canProfileSellProducts(user, isCurrentlyOther);
+             final bool showServiceTab = ProfilePermissionManager.canProfileProvideServices(user, isCurrentlyOther);
+
+             List<Tab> tabs = [
+               Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 
+               Tab(child: Image.asset(AppAssets.icVideo, width: 24, height: 24)),
+             ];
+             
+             List<Widget> tabViews = [
+               MyPostScreen(username: finalUserName),
+               MyVideoScreen(username: finalUserName),
+             ];
+
+             if (showProductTab) {
+               tabs.add(Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)));
+               tabViews.add(
+                 (!isOtherProfile && ProfilePermissionManager.canSellProducts)
+                   ? ProductGridScreen(isOwnProfile: true)
+                   : ProductGridScreen(isOwnProfile: false),
+               );
+             }
+
+             if (showServiceTab) {
+               tabs.add(Tab(child: Icon(Icons.miscellaneous_services_outlined, color: Colors.black, size: 26)));
+               tabViews.add(
+                 (!isOtherProfile && ProfilePermissionManager.canProvideServices)
+                   ? DigitalProductListScreen(isOwnProfile: true)
+                   : DigitalProductListScreen(isOwnProfile: false),
+               );
+             }
+
+             return DefaultTabController(
+               key: ValueKey("${user.id}_${showProductTab}_${showServiceTab}"),
+               length: tabs.length,
               child: Stack(
                 children: [
                   NestedScrollView(
@@ -863,19 +877,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4)),
                                   ],
                                 ),
-                                child: CircleAvatar(
-                                  radius: 45,
-                                  backgroundColor: Colors.grey.shade200,
-                                  backgroundImage: NetworkImage(
-                                      AppUrls.getFullImageUrl(user.profilePhotoPath)
-                                  ),
-                                  onBackgroundImageError: (error, stackTrace) {
-                                    print("Image Load Error: $error");
-                                  },
-                                  child: (user.profilePhotoPath == null || user.profilePhotoPath!.isEmpty)
-                                      ? Icon(Icons.person, color: Colors.grey.shade400, size: 60)
-                                      : null,
-                                ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+                                child: Container(
+                                   width: 90,
+                                   height: 90,
+                                   decoration: BoxDecoration(
+                                     color: Colors.grey.shade200,
+                                     shape: BoxShape.circle,
+                                   ),
+                                   child: ClipOval(
+                                     child: (user.profilePhotoPath != null &&
+                                             user.profilePhotoPath!.isNotEmpty &&
+                                             user.profilePhotoPath != "null")
+                                         ? Image.network(
+                                             AppUrls.getFullImageUrl(user.profilePhotoPath),
+                                             fit: BoxFit.cover,
+                                             errorBuilder: (context, error, stackTrace) {
+                                               return Icon(Icons.person, color: Colors.grey.shade600, size: 60);
+                                             },
+                                           )
+                                         : Icon(Icons.person, color: Colors.grey.shade600, size: 60),
+                                   ),
+                                 ).animate(onPlay: (controller) => controller.repeat(reverse: true))
                                  .scale(duration: 600.ms, curve: Curves.easeOutBack)
                                  .fadeIn()
                                     .then(delay: 500.ms)

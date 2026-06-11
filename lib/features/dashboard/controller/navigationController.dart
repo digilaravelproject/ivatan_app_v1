@@ -259,6 +259,8 @@ class DashboardController extends GetxController {
       try {
         final homeController = Get.find<HomeController>();
         homeController.fetchPosts();
+        homeController.fetchStories();
+        homeController.fetchUnreadNotificationCount();
       } catch (_) {}
       return;
     }

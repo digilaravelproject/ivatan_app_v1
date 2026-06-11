@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:i_vatan_app/features/auth/persentation/login_screen.dart';
+import '../../../core/helper/profile_permission_manager.dart';
 import '../../../core/helper/custom_buttons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../db/shared_pref_manager.dart';
@@ -142,14 +143,29 @@ class DrawerScreen extends StatelessWidget {
                 child: Column(
                   children: [
                       Row(
-                      children: [
-                       Expanded(child:_buildBottomCard(context, "i-QuickHire", CupertinoIcons.briefcase_fill, "Job Board", onTap: () {
-                         Get.toNamed(AppRoutes.jobSearchScreen);
-                       })),
-                        const SizedBox(width: 12),
-                        Expanded(child: _buildBottomCard(context, "Universal App", CupertinoIcons.app_badge_fill, "Mini Apps")),
-                      ],
-                     ),
+                        children: [
+                          Expanded(
+                            child: _buildBottomCard(
+                              context,
+                              "i-QuickHire",
+                              CupertinoIcons.briefcase_fill,
+                              "Job Board",
+                              onTap: () {
+                                Get.toNamed(AppRoutes.jobSearchScreen);
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildBottomCard(
+                              context,
+                              "Universal App",
+                              CupertinoIcons.app_badge_fill,
+                              "Mini Apps",
+                            ),
+                          ),
+                        ],
+                      ),
                      const SizedBox(height: 16),
                      GestureDetector(
                       onTap: () => Get.to(HelpCenter()),

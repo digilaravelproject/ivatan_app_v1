@@ -7,6 +7,7 @@ import 'package:i_vatan_app/core/network/app_urls.dart';
 import 'package:i_vatan_app/features/job_portal/data/model/job_model.dart';
 import 'package:i_vatan_app/route/app_pages.dart';
 
+import '../../../../core/helper/profile_permission_manager.dart';
 import '../../../../db/shared_pref_manager.dart';
 import '../controller/job_controller.dart';
 import '../controller/job_portal_controller.dart';
@@ -23,7 +24,8 @@ class JobSearchScreen extends GetView<JobController> {
   Widget build(BuildContext context) {
     final isEmployer = SharedPrefManager().user?.isEmployer ?? false;
     final isSeller = SharedPrefManager().user?.isSeller ?? false;
-    final isRecruiter = isEmployer || isSeller;
+    final isRecruiter = ProfilePermissionManager.isProfileActive(ProfileType.employer) ;
+
 
     return Scaffold(
       key: _scaffoldKey,

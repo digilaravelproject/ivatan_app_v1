@@ -24,7 +24,7 @@ class FeedVideoPlayer extends StatefulWidget {
 class _FeedVideoPlayerState extends State<FeedVideoPlayer> {
   late VideoPlayerController _controller;
   bool _initialized = false;
-  bool _isMuted = false;
+  bool _isMuted = true;
   final Key _visibilityKey = UniqueKey();
 
   @override
@@ -40,6 +40,7 @@ class _FeedVideoPlayerState extends State<FeedVideoPlayer> {
           setState(() {
             _initialized = true;
             _controller.setLooping(true);
+            _controller.setVolume(_isMuted ? 0.0 : 1.0);
             if (widget.isPlay) {
               _controller.play();
             }

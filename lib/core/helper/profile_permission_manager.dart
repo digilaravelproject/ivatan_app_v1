@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../db/shared_pref_manager.dart';
+import '../../db/shared_pref_manager.dart';
 import '../../features/dashboard/controller/homeController.dart';
+import '../../features/dashboard/model/user_profile.dart';
 import '../../features/subscription/data/model/profile_config_model.dart';
 
 enum ProfileType {
@@ -167,15 +168,43 @@ class ProfilePermissionManager {
         hasActiveSubscription(ProfileType.employer);
   }
 
-  /// Specific helper: Check if ecommerce seller profile is active and subscribed
+  /// Specific helper: Check if ecommerce seller profile is active, subscribed, and type supports products
   static bool get canSellProducts {
-    return isProfileActive(ProfileType.ecommerce) &&
-        hasActiveSubscription(ProfileType.ecommerce);
+    if (!isProfileActive(ProfileType.ecommerce) || !hasActiveSubscription(ProfileType.ecommerce)) {
+      return false;
+    }
+    final type = _config?.data?.ecommerce?.type?.toLowerCase();
+    return type == 'product' || type == 'both';
+  }
+
+  /// Specific helper: Check if ecommerce seller profile is active, subscribed, and type supports services
+  static bool get canProvideServices {
+    if (!isProfileActive(ProfileType.ecommerce) || !hasActiveSubscription(ProfileType.ecommerce)) {
+      return false;
+    }
+    final type = _config?.data?.ecommerce?.type?.toLowerCase();
+    return type == 'service' || type == 'both';
   }
 
   /// Specific helper: Check if music creator profile is active and subscribed
   static bool get canUploadMusic {
     return isProfileActive(ProfileType.musicPlay) &&
         hasActiveSubscription(ProfileType.musicPlay);
+  }
+
+  /// Check if a given UserData profile supports selling products (handles both own and other profiles)
+  static bool canProfileSellProducts(UserData user, bool isOtherProfile) {
+    if (isOtherProfile) {
+      return true; // Always show on other users' profiles
+    }
+    return canSellProducts;
+  }
+
+  /// Check if a given UserData profile supports providing services (handles both own and other profiles)
+  static bool canProfileProvideServices(UserData user, bool isOtherProfile) {
+    if (isOtherProfile) {
+      return true; // Always show on other users' profiles
+    }
+    return canProvideServices;
   }
 }
