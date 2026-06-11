@@ -1330,6 +1330,7 @@ class VideoGridSection extends StatelessWidget {
       entityId = item.entityId;
       entityType = item.entityType;
     } else if (item is CommentHistoryItem) {
+      imageUrl = item.preview?.thumbnail;
       title = item.body;
       sub = item.createdHuman;
       entityId = item.entityId;

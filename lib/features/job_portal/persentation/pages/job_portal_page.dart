@@ -26,6 +26,8 @@ class JobSearchScreen extends GetView<JobController> {
     final isSeller = SharedPrefManager().user?.isSeller ?? false;
     final isRecruiter = ProfilePermissionManager.isProfileActive(ProfileType.employer) ;
 
+    print("ProfilePermissionManager : "+isRecruiter.toString());
+
 
     return Scaffold(
       key: _scaffoldKey,
