@@ -156,8 +156,11 @@ class ProductController extends GetxController {
 
 class MarketplaceProductController extends GetxController {
   final ApiServices apiServices = Get.find<ApiServices>();
+  final String? userId;
   RxList<dynamic> products = <dynamic>[].obs;
   RxBool isLoading = false.obs;
+
+  MarketplaceProductController({this.userId});
 
   @override
   void onInit() {
@@ -169,7 +172,10 @@ class MarketplaceProductController extends GetxController {
     if (isLoading.value && !isRefresh) return;
     try {
       isLoading.value = true;
-      final response = await apiServices.callGet('api/v1/marketplace/products');
+      final url = userId != null 
+          ? 'api/v1/marketplace/product/$userId'
+          : 'api/v1/marketplace/products';
+      final response = await apiServices.callGet(url);
 
       if (response != null && response['success'] == true) {
         final data = response['data'];
