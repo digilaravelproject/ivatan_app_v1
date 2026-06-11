@@ -11,6 +11,7 @@ import '../../core/network/app_urls.dart';
 import '../../db/shared_pref_manager.dart';
 import '../helper/logger_helper.dart';
 import 'api_keys.dart';
+import '../../route/app_pages.dart';
 
 class ApiServices extends GetxService {
   final Duration _timeout = const Duration(seconds: 300);
@@ -152,7 +153,13 @@ class ApiServices extends GetxService {
       
       logApiError("DIO POST ERROR: ${e.message}");
       if (e.response != null) {
-        _handleError(e.response?.data['message'] ?? e.message);
+        final data = e.response?.data;
+        if (e.response?.statusCode == 401 ||
+            (data is Map && data['message']?.toString().toLowerCase().contains('unauthenticated') == true)) {
+          _performAutoLogout();
+        } else {
+          _handleError(data?['message'] ?? e.message);
+        }
       } else {
         _handleError(e.message ?? "Unknown network error");
       }
@@ -499,11 +506,33 @@ class ApiServices extends GetxService {
     return null;
   }
 
+  bool _isLoggingOut = false;
+
+  void _performAutoLogout() {
+    if (_isLoggingOut) return;
+    _isLoggingOut = true;
+    printMessage("Auto Logout Triggered due to Unauthenticated session.");
+    SharedPrefManager().userLogOut();
+    CustomSnackBar.showError(message: "Session expired. Please log in again.");
+    Future.delayed(const Duration(milliseconds: 200), () {
+      _isLoggingOut = false;
+      Get.offAllNamed(AppRoutes.login);
+    });
+  }
+
   /// Parse response body safely
   Map<String, dynamic>? _parseResponse(http.Response response, {bool showErrorToast = true}) {
     try {
       final body = response.body.isNotEmpty ? jsonDecode(response.body) : {};
       logApiMessage(" Response --> $body  ${response.statusCode}");
+
+      // Auto logout if unauthenticated or session expired
+      if (response.statusCode == 401 ||
+          (body is Map && body['message']?.toString().toLowerCase().contains('unauthenticated') == true)) {
+        _performAutoLogout();
+        return body is Map<String, dynamic> ? body : {"data": body};
+      }
+
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return body is Map<String, dynamic> ? body : {"data": body};
       } else if (response.statusCode == 400 || response.statusCode == 401 || response.statusCode == 403 || response.statusCode == 404) {
