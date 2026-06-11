@@ -682,7 +682,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           },
                                                         ),
                                                         const SizedBox(height: 10),
-                                                        if (user.isSeller == true)
+                                                        if (ProfilePermissionManager.canSellProducts)
                                                           _buildCreateOption(
                                                             icon: Icons.shopping_bag,
                                                             color: Colors.orange,
@@ -696,9 +696,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                               }
                                                             },
                                                           ),
-                                                        if (user.isSeller == true)
+                                                        if (ProfilePermissionManager.canProvideServices)
                                                           const SizedBox(height: 10),
-                                                        if (user.isSeller == true)
+                                                        if (ProfilePermissionManager.canProvideServices)
                                                           _buildCreateOption(
                                                             icon: Icons.miscellaneous_services,
                                                             color: Colors.orange,
