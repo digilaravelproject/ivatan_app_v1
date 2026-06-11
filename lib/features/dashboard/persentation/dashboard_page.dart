@@ -42,7 +42,7 @@ class DashboardPage extends StatelessWidget {
         return true;
       },
       child: Scaffold(
-        extendBody: true,
+        extendBody: false,
         backgroundColor: AppColors.white,
         body: Stack(
           children: [

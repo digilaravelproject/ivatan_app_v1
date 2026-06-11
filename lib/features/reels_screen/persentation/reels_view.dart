@@ -944,7 +944,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Flexible(child: _buildBottomSection(context)),
-            SizedBox(height: 60 + MediaQuery.of(context).padding.bottom), // Bottom spacing for navigation bar
+            const SizedBox(height: 20), // Bottom spacing for navigation bar
           ],
         ),
       ),
@@ -1509,7 +1509,7 @@ class VideoProgressBar extends GetWidget<ShortPlayController> {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      bottom: 60 + MediaQuery.of(context).padding.bottom,
+      bottom: 0,
       left: 0,
       right: 0,
       child: ValueListenableBuilder(
