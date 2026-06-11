@@ -4466,7 +4466,7 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
 
-    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.08).animate(
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.04).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
 
@@ -4633,7 +4633,7 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
             },
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 4),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [
@@ -4654,7 +4654,7 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
                 ],
                 border: Border.all(
                   color: const Color(0xFFFFF7C2),
-                  width: 1.5,
+                  width: 1.2,
                 ),
               ),
               child: Row(
@@ -4663,16 +4663,16 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
                   const Icon(
                     Icons.workspace_premium_rounded,
                     color: Colors.white,
-                    size: 16,
+                    size: 13,
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 3),
                   const Text(
                     "PRO",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 11,
+                      fontSize: 9.5,
                       fontWeight: FontWeight.w900,
-                      letterSpacing: 0.8,
+                      letterSpacing: 0.6,
                       shadows: [
                         Shadow(
                           color: Colors.black26,

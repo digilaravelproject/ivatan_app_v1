@@ -12,6 +12,7 @@ import '../../db/shared_pref_manager.dart';
 import '../helper/logger_helper.dart';
 import 'api_keys.dart';
 import '../../route/app_pages.dart';
+import '../../features/auth/controller/login_controller.dart';
 
 class ApiServices extends GetxService {
   final Duration _timeout = const Duration(seconds: 300);
@@ -518,6 +519,11 @@ class ApiServices extends GetxService {
     printMessage("Auto Logout Triggered due to Unauthenticated session.");
     SharedPrefManager().userLogOut();
     CustomSnackBar.showError(message: "Session expired. Please log in again.");
+    try {
+      Get.delete<LoginController>(force: true);
+    } catch (e) {
+      printMessage("Error deleting LoginController: $e");
+    }
     Future.delayed(const Duration(milliseconds: 200), () {
       _isLoggingOut = false;
       Get.offAllNamed(AppRoutes.login);

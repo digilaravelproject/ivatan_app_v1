@@ -42,6 +42,7 @@ class DashboardPage extends StatelessWidget {
         return true;
       },
       child: Scaffold(
+        extendBody: true,
         backgroundColor: AppColors.white,
         body: Stack(
           children: [
@@ -57,7 +58,7 @@ class DashboardPage extends StatelessWidget {
           ],
         ),
         bottomNavigationBar: Container(
-          margin: const EdgeInsets.only(bottom: 18, left: 20, right: 20),
+          margin: const EdgeInsets.only(bottom: 26, left: 12, right: 12),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.82),
             borderRadius: BorderRadius.circular(28),
@@ -177,107 +178,62 @@ class DashboardPage extends StatelessWidget {
         child: GestureDetector(
           onTap: () => controller.changeIndex(index),
           behavior: HitTestBehavior.opaque,
-          child: Center(
-            child: AnimatedScale(
-              duration: const Duration(milliseconds: 200),
-              scale: isSelected ? 1.05 : 1.0,
-              child: index == 4
-                  ? AnimatedContainer(
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.easeInOut,
-                      width: 50,
-                      height: 42,
-                      alignment: Alignment.center,
-                      child: isSelected
-                          ? Container(
-                              width: 28,
-                              height: 28,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.black,
-                                  width: 1.5,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.15),
-                                    blurRadius: 8,
-                                    spreadRadius: 1,
-                                    offset: const Offset(0, 1),
-                                  ),
-                                ],
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(1.5),
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white,
-                                  ),
-                                  child: ClipOval(
-                                    child: (imageUrl != null && imageUrl.isNotEmpty)
-                                        ? Image.network(
-                                            AppUrls.getFullImageUrl(imageUrl),
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
-                                          )
-                                        : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
-                                  ),
-                                ),
-                              ),
-                            )
-                          : Container(
-                              width: 24,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.black.withOpacity(0.2),
-                                  width: 1.2,
-                                ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(1.0),
-                                child: ClipOval(
-                                  child: (imageUrl != null && imageUrl.isNotEmpty)
-                                      ? Image.network(
-                                          AppUrls.getFullImageUrl(imageUrl),
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
-                                        )
-                                      : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
-                                ),
-                              ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedScale(
+                duration: const Duration(milliseconds: 200),
+                scale: isSelected ? 1.15 : 1.0,
+                child: index == 4
+                    ? AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeInOut,
+                        width: 30,
+                        height: 30,
+                        alignment: Alignment.center,
+                        child: Container(
+                          width: 26,
+                          height: 26,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected ? Colors.black : Colors.black.withOpacity(0.2),
+                              width: isSelected ? 1.8 : 1.2,
                             ),
-                    )
-                  : AnimatedContainer(
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.easeInOut,
-                      width: 50,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: isSelected ? Colors.black : Colors.transparent,
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.15),
-                                  blurRadius: 8,
-                                  spreadRadius: 1,
-                                  offset: const Offset(0, 2),
-                                )
-                              ]
-                            : [],
-                      ),
-                      child: Center(
-                        child: Icon(
-                          isSelected ? iconDataSelected : iconDataUnselected,
-                          size: 22,
-                          color: isSelected ? Colors.white : const Color(0xFF64748B),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(1.0),
+                            child: ClipOval(
+                              child: (imageUrl != null && imageUrl.isNotEmpty)
+                                  ? Image.network(
+                                      AppUrls.getFullImageUrl(imageUrl),
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                                    )
+                                  : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                            ),
+                          ),
                         ),
+                      )
+                    : Icon(
+                        isSelected ? iconDataSelected : iconDataUnselected,
+                        size: 24,
+                        color: isSelected ? Colors.black : const Color(0xFF94A3B8),
                       ),
-                    ),
-            ),
+              ),
+              const SizedBox(height: 5),
+              // Animated dot/indicator below the active item
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: isSelected ? 5 : 0,
+                height: 5,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.black,
+                ),
+              ),
+            ],
           ),
         ),
       );

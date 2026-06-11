@@ -330,7 +330,6 @@ class LoginController extends GetxController {
 
   @override
   void dispose() {
-    mobileController.dispose();
     super.dispose();
   }
 
@@ -478,8 +477,6 @@ class LoginController extends GetxController {
   /// Dispose controllers
   @override
   void onClose() {
-    mobileController.dispose();
-    passwordController.dispose();
     super.onClose();
   }
 }
