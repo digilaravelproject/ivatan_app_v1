@@ -58,7 +58,7 @@ class CartController extends GetxController {
   Future<void> fetchAddresses() async {
     isLoadingAddresses.value = true;
     try {
-      final response = await apiServices.callGet('api/v1/addresses');
+      final response = await apiServices.callGet(AppUrls.addresses);
       
       if (response != null && response['success'] == true) {
         final List<dynamic> data = response['data'] ?? [];

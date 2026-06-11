@@ -1,4 +1,5 @@
 import 'package:i_vatan_app/core/network/api_services.dart';
+import 'package:i_vatan_app/core/network/app_urls.dart';
 import '../model/marketplace_product_model.dart';
 
 class MarketplaceRepository {
@@ -12,7 +13,7 @@ class MarketplaceRepository {
   }) async {
     try {
       final response = await apiServices.callGet(
-        'api/v1/marketplace/products',
+        AppUrls.marketplaceProducts,
         queryParams: {
           'page': page.toString(),
           'per_page': perPage.toString(),
@@ -30,7 +31,7 @@ class MarketplaceRepository {
   }
   Future<MarketplaceProduct?> getProductById(String id) async {
     try {
-      final response = await apiServices.callGet('api/v1/marketplace/products/$id');
+      final response = await apiServices.callGet(AppUrls.marketplaceProductDetailItem(id));
       if (response != null && response['success'] == true) {
         return MarketplaceProduct.fromJson(response['data'] ?? {});
       }

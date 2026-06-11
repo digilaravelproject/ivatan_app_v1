@@ -56,6 +56,9 @@ class AppUrls {
   static const marketplaceProducts = "api/v1/marketplace/products";
   static String marketplaceProductDetail(dynamic userId) => "api/v1/marketplace/product/$userId";
   static String marketplaceServiceDetail(dynamic userId) => "api/v1/marketplace/service/$userId";
+  static String marketplaceProductDetailItem(dynamic id) => "api/v1/marketplace/products/$id";
+  static String sellerServiceDetail(dynamic id) => "api/v1/services/$id";
+  static const addresses = "api/v1/addresses";
   static const cart = "api/v1/cart";
   static const checkout = "api/v1/checkout";
   static const razorpayOrder = "api/v1/payment/razorpay/order";

@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:i_vatan_app/core/network/api_services.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:i_vatan_app/core/network/app_urls.dart';
 import '../cart_screen.dart';
 import 'cart_controller.dart';
 
@@ -110,7 +111,7 @@ class AddAddressController extends GetxController {
       };
 
       final response = await apiServices.callPost(
-        'api/v1/addresses',
+        AppUrls.addresses,
         data: body,
       );
 

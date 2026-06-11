@@ -48,7 +48,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Future<dynamic> _fetchProductDetails(String productId) async {
     try {
       // Use marketplace endpoint as it usually works for all products
-      final response = await apiServices.callGet('api/v1/marketplace/products/$productId');
+      final response = await apiServices.callGet(AppUrls.marketplaceProductDetailItem(productId));
       
       if (response != null && response['success'] == true) {
         final data = response['data'] ?? {};
