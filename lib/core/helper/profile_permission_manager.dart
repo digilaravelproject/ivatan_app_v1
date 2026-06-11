@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../db/shared_pref_manager.dart';
-import '../../dashboard/controller/homeController.dart';
-import '../../subscription/data/model/profile_config_model.dart';
+import '../../features/dashboard/controller/homeController.dart';
+import '../../features/subscription/data/model/profile_config_model.dart';
 
 enum ProfileType {
   personal,
