@@ -608,12 +608,23 @@ class SettingsController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Send exactly what the API returned — no custom mapping
+      // Map UI types to Backend/API expected strings
+      String apiProfileType = profileType.type;
+      if (apiProfileType == 'personal') {
+        apiProfileType = 'personal_profile';
+      } else if (apiProfileType == 'seller') {
+        apiProfileType = 'ecommerce';
+      } else if (apiProfileType == 'music') {
+        apiProfileType = 'music_play';
+      } else if (apiProfileType == 'creator') {
+        apiProfileType = 'content_creation';
+      }
+
       final String? apiProfileSubType = sellerType.isNotEmpty ? sellerType : null;
 
       final Map<String, dynamic> body = {
-        "to_profile_type": profileType.type,
-        "notes": "I want to switch to ${profileType.type}.",
+        "to_profile_type": apiProfileType,
+        "notes": "I want to switch to $apiProfileType.",
       };
       if (apiProfileSubType != null) {
         body["profile_sub_type"] = apiProfileSubType;
