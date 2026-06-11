@@ -72,7 +72,10 @@ class HomePage extends StatelessWidget {
           }
           return false;
         },
-        child: RefreshIndicator(
+        child: Obx(() => RefreshIndicator(
+          notificationPredicate: (notification) {
+            return controller.showStories.value;
+          },
           onRefresh: () async {
             await controller.fetchPosts();
             await controller.fetchStories();
@@ -352,7 +355,7 @@ class HomePage extends StatelessWidget {
               }),
             ],
           ),
-        ),
+        )),
       ),
     );
   }
