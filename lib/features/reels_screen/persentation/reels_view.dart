@@ -696,9 +696,7 @@ class VideoReel extends StatelessWidget {
       onTap: onToggleSound,
       // Use the callback
       child: Container(
-        margin: EdgeInsets.only(
-          bottom: 60 + MediaQuery.of(context).padding.bottom,
-        ),
+        margin: EdgeInsets.zero,
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -946,7 +944,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Flexible(child: _buildBottomSection(context)),
-            const SizedBox(height: 20), // Bottom spacing for navigation bar
+            SizedBox(height: 60 + MediaQuery.of(context).padding.bottom), // Bottom spacing for navigation bar
           ],
         ),
       ),
@@ -1511,7 +1509,7 @@ class VideoProgressBar extends GetWidget<ShortPlayController> {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      bottom: 0,
+      bottom: 60 + MediaQuery.of(context).padding.bottom,
       left: 0,
       right: 0,
       child: ValueListenableBuilder(
