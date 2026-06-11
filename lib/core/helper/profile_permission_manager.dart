@@ -42,6 +42,11 @@ class ProfilePermissionManager {
     return _config?.data?.userProfile?.currentProfileName;
   }
 
+  /// Get the current ecommerce subtype (e.g. 'product', 'service', 'both')
+  static String? get ecommerceSubType {
+    return _config?.data?.ecommerce?.type;
+  }
+
   /// Check if the user is currently using a specific profile type
   static bool isCurrentProfile(ProfileType type) {
     final name = currentProfileName?.toLowerCase();

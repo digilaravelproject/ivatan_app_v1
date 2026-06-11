@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import '../../profile/screen/avatar_customizer_screen.dart';
 import '../../profile/screen/bookmarks_screen.dart';
+import '../../../../core/helper/profile_permission_manager.dart';
 
 /*
 class ProfileController extends GetxController {
@@ -550,8 +551,25 @@ class SettingsController extends GetxController {
   ];
 
   void _matchProfileType() {
-    final userProfileType = userProfile.value?.profileType;
-    final userProfileSubType = userProfile.value?.profileSubType;
+    String? userProfileType = ProfilePermissionManager.currentProfileName?.toLowerCase();
+    
+    // Normalize type strings to match backend/controller types
+    if (userProfileType == 'ecommerce') {
+      userProfileType = 'seller';
+    } else if (userProfileType == 'music_play') {
+      userProfileType = 'music';
+    } else if (userProfileType == 'content_creation') {
+      userProfileType = 'creator';
+    }
+
+    if (userProfileType == null || userProfileType.isEmpty) {
+      userProfileType = userProfile.value?.profileType;
+    }
+
+    String? userProfileSubType = ProfilePermissionManager.ecommerceSubType;
+    if (userProfileSubType == null || userProfileSubType.isEmpty) {
+      userProfileSubType = userProfile.value?.profileSubType;
+    }
 
     if (userProfileType != null && userProfileType.isNotEmpty) {
       final matchedType = profileTypes.firstWhereOrNull((e) => e.type == userProfileType);
