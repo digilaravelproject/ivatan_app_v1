@@ -608,17 +608,7 @@ class SettingsController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Map UI types to Backend/API expected strings
-      String apiProfileType = profileType.type;
-      if (apiProfileType == 'personal') {
-        apiProfileType = 'personal_profile';
-      } else if (apiProfileType == 'seller') {
-        apiProfileType = 'ecommerce';
-      } else if (apiProfileType == 'music') {
-        apiProfileType = 'music_play';
-      } else if (apiProfileType == 'creator') {
-        apiProfileType = 'content_creation';
-      }
+      final String apiProfileType = profileType.type;
 
       final String? apiProfileSubType = sellerType.isNotEmpty ? sellerType : null;
 
