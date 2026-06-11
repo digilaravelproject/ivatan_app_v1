@@ -61,9 +61,9 @@ class DashboardPage extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.white.withOpacity(0.0),
-                Colors.white.withOpacity(0.6),
-                Colors.white.withOpacity(0.95),
+                Colors.white.withOpacity(0.35),
+                Colors.white.withOpacity(0.75),
+                Colors.white.withOpacity(0.98),
                 Colors.white,
               ],
               begin: Alignment.topCenter,
