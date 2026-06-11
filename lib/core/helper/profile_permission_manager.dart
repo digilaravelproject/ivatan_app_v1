@@ -164,7 +164,11 @@ class ProfilePermissionManager {
       return false;
     }
     final type = _config?.data?.ecommerce?.type?.toLowerCase();
-    return type == 'product' || type == 'both';
+    if (type == 'product') return true;
+    if (type == 'both') {
+      return hasActiveSubscription(ProfileType.ecommerce);
+    }
+    return false;
   }
 
   /// Specific helper: Check if ecommerce seller profile is active, subscribed, and type supports services
@@ -173,7 +177,11 @@ class ProfilePermissionManager {
       return false;
     }
     final type = _config?.data?.ecommerce?.type?.toLowerCase();
-    return type == 'service' || type == 'both';
+    if (type == 'service') return true;
+    if (type == 'both') {
+      return hasActiveSubscription(ProfileType.ecommerce);
+    }
+    return false;
   }
 
   /// Specific helper: Check if music creator profile is active and subscribed
