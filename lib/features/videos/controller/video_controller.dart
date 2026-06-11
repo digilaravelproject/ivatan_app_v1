@@ -62,11 +62,11 @@ class VideoController extends GetxController {
         } else {
           posts.value = model.data;
           filteredList.value = model.data;
-          if (posts.isNotEmpty) {
-            currentVideo.value = posts.firstWhere(
-                  (video) => video.id == videoId,
-              orElse: () => posts.first,
-            );
+          final int videoIndex = posts.indexWhere((video) => video.id == videoId);
+          if (videoIndex != -1) {
+            currentVideo.value = posts[videoIndex];
+          } else {
+            fetchSingleVideo();
           }
         }
 
@@ -81,6 +81,19 @@ class VideoController extends GetxController {
     } finally {
       isLoading.value = false;
       isMoreLoading.value = false;
+    }
+  }
+
+  Future<void> fetchSingleVideo() async {
+    try {
+      final response = await api.callGet("api/v1/posts/$videoId");
+      if (response != null) {
+        final map = response["data"] is Map<String, dynamic> ? response["data"] : response;
+        final postItem = PostItem.fromJson(map);
+        currentVideo.value = postItem;
+      }
+    } catch (e) {
+      print("Fetch Single Video Error: $e");
     }
   }
 
