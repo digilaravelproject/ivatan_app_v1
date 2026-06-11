@@ -334,11 +334,6 @@ class _BrowseProductsView extends StatelessWidget {
                 'No products available',
                 style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => marketplaceController.fetchMarketplaceProducts(isRefresh: true),
-                child: const Text('Retry'),
-              ),
             ],
           ),
         );

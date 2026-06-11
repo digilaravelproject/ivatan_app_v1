@@ -67,11 +67,6 @@ class _DigitalProductListScreenState extends State<DigitalProductListScreen> {
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.red),
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => controller.fetchMarketplaceServices(isRefresh: true),
-                child: const Text('Retry'),
-              ),
             ],
           ),
         );
