@@ -58,51 +58,58 @@ class DashboardPage extends StatelessWidget {
           ],
         ),
         bottomNavigationBar: Container(
-          margin: const EdgeInsets.only(bottom: 14, left: 12, right: 12),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.white.withOpacity(0.15),
-                Colors.white.withOpacity(0.85),
+                Colors.white.withOpacity(0.0),
+                Colors.white.withOpacity(0.6),
+                Colors.white.withOpacity(0.95),
+                Colors.white,
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(
-              color: Colors.black.withOpacity(0.06),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.08),
-                blurRadius: 25,
-                spreadRadius: 1,
-                offset: const Offset(0, 8),
-              ),
-            ],
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(28),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-              child: SafeArea(
-                top: false,
-                left: false,
-                right: false,
-                bottom: false,
-                child: Container(
-                  height: 60,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _item(context, Icons.home_rounded, Icons.home_outlined, 0),
-                      _item(context, Icons.search_rounded, Icons.search_rounded, 1),
-                      _item(context, Icons.play_circle_fill_rounded, Icons.play_circle_outline_rounded, 2),
-                      _item(context, Icons.video_library_rounded, Icons.video_library_outlined, 3),
-                      _item(context, Icons.account_circle_rounded, Icons.account_circle_outlined, 4, imageUrl: controller.userProfileImage),
-                    ],
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: Colors.black.withOpacity(0.06),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 25,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                child: SafeArea(
+                  top: false,
+                  left: false,
+                  right: false,
+                  bottom: false,
+                  child: Container(
+                    height: 60,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _item(context, Icons.home_rounded, Icons.home_outlined, 0),
+                        _item(context, Icons.search_rounded, Icons.search_rounded, 1),
+                        _item(context, Icons.play_circle_fill_rounded, Icons.play_circle_outline_rounded, 2),
+                        _item(context, Icons.video_library_rounded, Icons.video_library_outlined, 3),
+                        _item(context, Icons.account_circle_rounded, Icons.account_circle_outlined, 4, imageUrl: controller.userProfileImage),
+                      ],
+                    ),
                   ),
                 ),
               ),
