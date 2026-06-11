@@ -88,21 +88,7 @@ class ProfilePermissionManager {
 
   /// Check if a specific profile type is currently set as active
   static bool isProfileActive(ProfileType type) {
-    final data = _config?.data;
-    if (data == null) return false;
-
-    switch (type) {
-      case ProfileType.personal:
-        return data.personalProfile?.isActive ?? false;
-      case ProfileType.contentCreation:
-        return data.contentCreation?.isActive ?? false;
-      case ProfileType.employer:
-        return data.employer?.isActive ?? false;
-      case ProfileType.musicPlay:
-        return data.musicPlay?.isActive ?? false;
-      case ProfileType.ecommerce:
-        return data.ecommerce?.isActive ?? false;
-    }
+    return isCurrentProfile(type);
   }
 
   /// Check if a specific profile has an active subscription
