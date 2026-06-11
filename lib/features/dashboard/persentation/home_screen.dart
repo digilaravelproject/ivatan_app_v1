@@ -45,19 +45,13 @@ class HomePage extends StatelessWidget {
       body: NotificationListener<ScrollNotification>(
         onNotification: (notification) {
           if (notification is UserScrollNotification) {
-            if (notification.metrics.pixels <= 20) {
+            if (notification.direction == ScrollDirection.reverse) {
               if (controller.showStories.value) {
                 controller.showStories.value = false;
               }
-            } else {
-              if (notification.direction == ScrollDirection.reverse) {
-                if (controller.showStories.value) {
-                  controller.showStories.value = false;
-                }
-              } else if (notification.direction == ScrollDirection.forward) {
-                if (!controller.showStories.value) {
-                  controller.showStories.value = true;
-                }
+            } else if (notification.direction == ScrollDirection.forward) {
+              if (!controller.showStories.value) {
+                controller.showStories.value = true;
               }
             }
           }
