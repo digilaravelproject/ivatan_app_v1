@@ -72,11 +72,13 @@ class HomePage extends StatelessWidget {
           }
           return false;
         },
-        child: Obx(() => RefreshIndicator(
-          notificationPredicate: (notification) {
-            return controller.showStories.value;
-          },
-          onRefresh: () async {
+        child: Obx(() {
+          final isStoriesShown = controller.showStories.value;
+          return RefreshIndicator(
+            notificationPredicate: (notification) {
+              return isStoriesShown;
+            },
+            onRefresh: () async {
             await controller.fetchPosts();
             await controller.fetchStories();
             await controller.fetchUnreadNotificationCount();
