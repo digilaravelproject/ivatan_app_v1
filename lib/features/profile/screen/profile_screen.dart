@@ -146,7 +146,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
              if (showProductTab) {
                tabs.add(Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)));
                tabViews.add(
-                 (user.isSeller == true && !isOtherProfile)
+                 (!isOtherProfile && ProfilePermissionManager.canSellProducts)
                    ? ProductGridScreen(isOwnProfile: true)
                    : ProductGridScreen(isOwnProfile: false),
                );
@@ -155,7 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
              if (showServiceTab) {
                tabs.add(Tab(child: Icon(Icons.miscellaneous_services_outlined, color: Colors.black, size: 26)));
                tabViews.add(
-                 (user.isSeller == true && !isOtherProfile)
+                 (!isOtherProfile && ProfilePermissionManager.canProvideServices)
                    ? DigitalProductListScreen(isOwnProfile: true)
                    : DigitalProductListScreen(isOwnProfile: false),
                );
