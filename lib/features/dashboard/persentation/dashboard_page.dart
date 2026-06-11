@@ -58,9 +58,16 @@ class DashboardPage extends StatelessWidget {
           ],
         ),
         bottomNavigationBar: Container(
-          margin: const EdgeInsets.only(bottom: 26, left: 12, right: 12),
+          margin: const EdgeInsets.only(bottom: 14, left: 12, right: 12),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.82),
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withOpacity(0.15),
+                Colors.white.withOpacity(0.85),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
               color: Colors.black.withOpacity(0.06),
