@@ -173,7 +173,7 @@ class SettingsScreen extends StatelessWidget {
 
               _buildCleanField(
                 child: ProfileTypeSelector(
-                  label: "Profile Type",
+                  label: "Current Profile",
                   controller: profileController.profileTypeController,
                   profileTypes: profileController.profileTypes,
                   enabled: !profileController.hasPendingRequest,
