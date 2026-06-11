@@ -195,12 +195,7 @@ class ProfilePermissionManager {
   /// Check if a given UserData profile supports selling products (handles both own and other profiles)
   static bool canProfileSellProducts(UserData user, bool isOtherProfile) {
     if (isOtherProfile) {
-      final isEcommerce = user.profileType?.toLowerCase() == 'ecommerce' || user.isSeller == true;
-      return isEcommerce &&
-          (user.profileSubType?.toLowerCase() == 'product' ||
-              user.profileSubType?.toLowerCase() == 'both' ||
-              user.profileSubType == null ||
-              user.profileSubType!.trim().isEmpty);
+      return true; // Always show on other users' profiles
     }
     return canSellProducts;
   }
@@ -208,12 +203,7 @@ class ProfilePermissionManager {
   /// Check if a given UserData profile supports providing services (handles both own and other profiles)
   static bool canProfileProvideServices(UserData user, bool isOtherProfile) {
     if (isOtherProfile) {
-      final isEcommerce = user.profileType?.toLowerCase() == 'ecommerce' || user.isSeller == true;
-      return isEcommerce &&
-          (user.profileSubType?.toLowerCase() == 'service' ||
-              user.profileSubType?.toLowerCase() == 'both' ||
-              user.profileSubType == null ||
-              user.profileSubType!.trim().isEmpty);
+      return true; // Always show on other users' profiles
     }
     return canProvideServices;
   }
