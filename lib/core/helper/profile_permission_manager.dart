@@ -131,6 +131,11 @@ class ProfilePermissionManager {
     return subscription?.isActive ?? false;
   }
 
+  /// Check if a specific profile is active AND has an active subscription
+  static bool hasAccess(ProfileType type) {
+    return isProfileActive(type) && hasActiveSubscription(type);
+  }
+
   /// Get active subscription details for a profile type
   static ProfileSubscriptionDetails? getSubscriptionDetails(ProfileType type) {
     final data = _config?.data;
