@@ -51,8 +51,10 @@ class AppUrls {
   static const careerProfile = "api/v1/jobs/my/profile";
 
   static const sellerProducts = "api/v1/seller/products";
-  static const sellerServices = "api/v1/services";
-  static const marketplaceServices = "api/v1/marketplace/services";
+  static const sellerServices = "api/v1/services";                  // marketplace services list (GET)
+  static const marketplaceServices = "api/v1/marketplace/services"; // marketplace browse (GET)
+  static const sellerManageServices = "api/v1/seller/services";     // seller CRUD: GET list / POST create
+  static String sellerManageServiceDetail(dynamic id) => "api/v1/seller/services/$id"; // PUT/DELETE
   static const marketplaceProducts = "api/v1/marketplace/products";
   static String marketplaceProductDetail(dynamic userId) => "api/v1/marketplace/product/$userId";
   static String marketplaceServiceDetail(dynamic userId) => "api/v1/marketplace/service/$userId";

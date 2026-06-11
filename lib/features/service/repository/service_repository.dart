@@ -71,7 +71,7 @@ class ServiceRepositoryImpl implements ServiceRepository {
 
   @override
   Future<List<ServiceModel>> getServices({int page = 1}) async {
-    const String endpoint = AppUrls.sellerServices;
+    const String endpoint = AppUrls.sellerManageServices;
     final response = await apiServices.callGet(endpoint, queryParams: {'page': page.toString()});
 
     if (response != null && response['success'] == true) {
@@ -95,7 +95,7 @@ class ServiceRepositoryImpl implements ServiceRepository {
     List<File>? additionalImages,
     List<String>? deletedImageIds,
   }) async {
-    final String endpoint = AppUrls.sellerServiceDetail(id);
+    final String endpoint = AppUrls.sellerManageServiceDetail(id);
     debugPrint("Repository Update Service - Endpoint: $endpoint");
     
     Map<String, dynamic> body = {
@@ -139,7 +139,7 @@ class ServiceRepositoryImpl implements ServiceRepository {
 
   @override
   Future<Map<String, dynamic>?> deleteService(int id) async {
-    final String endpoint = AppUrls.sellerServiceDetail(id);
+    final String endpoint = AppUrls.sellerManageServiceDetail(id);
     final response = await apiServices.callDelete(endpoint);
     return response;
   }

@@ -130,7 +130,7 @@ class CreateServiceController extends GetxController {
         }
 
         response = await apiServices.callPost(
-          AppUrls.sellerServices,
+          AppUrls.sellerManageServices,
           data: body,
           isFormData: true,
         );
