@@ -574,11 +574,17 @@ class SettingsController extends GetxController {
     }
 
     if (userProfileType != null && userProfileType.isNotEmpty) {
-      final matchedType = profileTypes.firstWhereOrNull((e) => e.type == userProfileType);
+      final matchedType = profileTypes.firstWhereOrNull((e) {
+        final t = e.type.toLowerCase();
+        return t == userProfileType ||
+            (t == 'ecommerce' && userProfileType == 'seller') ||
+            (t == 'seller' && userProfileType == 'ecommerce');
+      });
       if (matchedType != null) {
         selectedProfileType.value = matchedType;
-        // Only show the selected subtype in the controller label if it is a seller type
-        if (matchedType.type == 'seller' && userProfileSubType != null && userProfileSubType.isNotEmpty) {
+        // Only show the selected subtype in the controller label if it is a seller/ecommerce type
+        final isSellerType = matchedType.type == 'seller' || matchedType.type == 'ecommerce';
+        if (isSellerType && userProfileSubType != null && userProfileSubType.isNotEmpty) {
           selectedSellerType.value = userProfileSubType;
           profileTypeController.text = "${matchedType.label} (${userProfileSubType.capitalizeFirst ?? userProfileSubType})";
           sellerTypeController.text = userProfileSubType;
@@ -591,7 +597,7 @@ class SettingsController extends GetxController {
     }
 
     if (isSeller.value) {
-      final sellerType = profileTypes.firstWhereOrNull((e) => e.type == "seller");
+      final sellerType = profileTypes.firstWhereOrNull((e) => e.type == "seller" || e.type == "ecommerce");
       selectedProfileType.value = sellerType;
       profileTypeController.text = sellerType?.label ?? "";
     } else if (isEmployer.value) {

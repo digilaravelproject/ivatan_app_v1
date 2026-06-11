@@ -47,20 +47,19 @@ class ProfilePermissionManager {
     return _config?.data?.ecommerce?.type;
   }
 
-  /// Check if the user is currently using a specific profile type
   static bool isCurrentProfile(ProfileType type) {
     final name = currentProfileName?.toLowerCase();
     switch (type) {
       case ProfileType.personal:
         return name == 'personal' || name == 'personal_profile';
       case ProfileType.contentCreation:
-        return name == 'content_creation';
+        return name == 'content_creation' || name == 'creator';
       case ProfileType.employer:
         return name == 'employer';
       case ProfileType.musicPlay:
-        return name == 'music_play';
+        return name == 'music_play' || name == 'music';
       case ProfileType.ecommerce:
-        return name == 'ecommerce';
+        return name == 'ecommerce' || name == 'seller';
     }
   }
 
