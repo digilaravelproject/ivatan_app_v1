@@ -520,16 +520,23 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     } catch (e) {
       print("Error deleting token on logout: $e");
     }
-    final response = await api.callDelete("api/v1/auth/logout");
-    print("logout response : $response");
 
-    if (response == null) return;
-
-    final msg = response["message"] ?? "Logout successful";
+    // Always clear local storage first (before API call)
+    // This ensures user is logged out even if API fails
     SharedPrefManager().userLogOut();
-    CustomSnackBar.showSuccess(message: msg);
 
-    // Login page par navigate
+    // Try API logout (fire and forget — don't block on result)
+    try {
+      final response = await api.callDelete(AppUrls.logout);
+      print("logout response : $response");
+      final msg = response?["message"] ?? "Logout successful";
+      CustomSnackBar.showSuccess(message: msg);
+    } catch (e) {
+      print("Logout API error (ignored): $e");
+      CustomSnackBar.showSuccess(message: "Logged out successfully");
+    }
+
+    // Navigate to login
     Future.delayed(const Duration(milliseconds: 200), () {
       Get.offAllNamed(AppRoutes.login);
     });
