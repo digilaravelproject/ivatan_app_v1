@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../../core/network/api_services.dart';
 import '../../repository/cart_repository.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/network/app_urls.dart';
 import 'cart_controller.dart';
 
 class ProductController extends GetxController {
@@ -173,8 +174,8 @@ class MarketplaceProductController extends GetxController {
     try {
       isLoading.value = true;
       final url = userId != null 
-          ? 'api/v1/marketplace/product/$userId'
-          : 'api/v1/marketplace/products';
+          ? AppUrls.marketplaceProductDetail(userId)
+          : AppUrls.marketplaceProducts;
       final response = await apiServices.callGet(url);
 
       if (response != null && response['success'] == true) {

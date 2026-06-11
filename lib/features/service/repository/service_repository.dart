@@ -57,7 +57,7 @@ class ServiceRepositoryImpl implements ServiceRepository {
   @override
   Future<List<ServiceModel>> getMarketplaceServices({int page = 1, String? userId}) async {
     final String endpoint = userId != null
-        ? "api/v1/marketplace/service/$userId"
+        ? AppUrls.marketplaceServiceDetail(userId)
         : AppUrls.marketplaceServices;
     final response = await apiServices.callGet(endpoint, queryParams: {'page': page.toString()});
 
