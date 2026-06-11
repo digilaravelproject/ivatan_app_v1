@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart' hide MultipartFile;
 import 'package:i_vatan_app/core/helper/custom_snack_bar.dart';
@@ -830,13 +829,11 @@ class ChatMessagesController extends GetxController {
       var p = chatProfile.value;
       if (p == null) return;
 
-      String fileName = file.path.split('/').last;
-      
       // Prepare FormData
       // distinct for file upload vs text
       Map<String, dynamic> data = {
         "message_type": messageType,
-        "file": await MultipartFile.fromFile(file.path, filename: fileName),
+        "attachment": file,
       };
 
       final response = await api.callPost(

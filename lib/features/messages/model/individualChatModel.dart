@@ -33,6 +33,22 @@ class ChatMessagesData {
   }
 }
 
+class MessageMeta {
+  final String? mime;
+  final int? size;
+  final String? originalName;
+
+  MessageMeta({this.mime, this.size, this.originalName});
+
+  factory MessageMeta.fromJson(Map<String, dynamic> json) {
+    return MessageMeta(
+      mime: json['mime'],
+      size: json['size'],
+      originalName: json['original_name'],
+    );
+  }
+}
+
 class ChatMessage {
   final int id;
   final int chatId;
@@ -44,6 +60,7 @@ class ChatMessage {
   final String createdAt;
   final Sender? sender;
   final ReplyTo? replyTo;
+  final MessageMeta? meta;
 
   ChatMessage({
     required this.id,
@@ -56,6 +73,7 @@ class ChatMessage {
     required this.createdAt,
     this.sender,
     this.replyTo,
+    this.meta,
   });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
@@ -71,6 +89,7 @@ class ChatMessage {
       sender: json['sender'] != null ? Sender.fromJson(json['sender']) : null,
       replyTo:
           json['reply_to'] != null ? ReplyTo.fromJson(json['reply_to']) : null,
+      meta: json['meta'] != null ? MessageMeta.fromJson(json['meta']) : null,
     );
   }
 }

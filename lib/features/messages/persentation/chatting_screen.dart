@@ -8,9 +8,13 @@ import 'package:intl/intl.dart';
 import 'package:i_vatan_app/core/constants/app_assets.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:i_vatan_app/core/helper/custom_snack_bar.dart';
 import '../../../../core/widgets/coming_soon_dialog.dart';
 import '../controller/chat_message_controller.dart';
+import '../model/individualChatModel.dart';
 import 'package:flutter/foundation.dart' as foundation;
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChattingScreen extends GetView<ChatMessagesController> {
   const ChattingScreen({super.key});
@@ -137,7 +141,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
           ],
         );
       }),
-      actions: [
+      /*actions: [
         IconButton(
           icon: const Icon(Icons.videocam_outlined, color: Colors.black),
           onPressed: () {
@@ -156,7 +160,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
         //   icon: const Icon(Icons.more_vert, color: Colors.black),
         //   onPressed: () {},
         // ),
-      ],
+      ],*/
     );
   }
 
@@ -184,56 +188,109 @@ class ChattingScreen extends GetView<ChatMessagesController> {
     );
   }
 
-  Widget _buildMessageBubble(BuildContext context, dynamic message, bool isMe) {
-    return Align(
-      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 2), // Tighter spacing
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
-        ),
-        decoration: BoxDecoration(
-          color: isMe ? AppColors.black : Colors.grey.shade100, // Black vs Grey
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(18),
-            topRight: const Radius.circular(18),
-            bottomLeft: Radius.circular(isMe ? 18 : 4),
-            bottomRight: Radius.circular(isMe ? 4 : 18),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              message.content,
-              style: TextStyle(
-                fontSize: 15, 
-                color: isMe ? Colors.white : Colors.black87,
-                height: 1.3
-              ),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  formatChatTime(message.createdAt.toString()),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: isMe ? Colors.grey.shade400 : Colors.grey.shade500,
-                  ),
-                ),
-                if (isMe) ...[
-                  const SizedBox(width: 4),
-                  const Icon(Icons.done_all, size: 14, color: Colors.blueAccent),
-                ],
-              ],
-            ),
-          ],
+  Widget _buildMessageBubble(BuildContext context, ChatMessage message, bool isMe) {
+    final avatarUrl = message.sender?.avatar;
+    final senderName = message.sender?.name;
+
+    Widget bubble = Container(
+      margin: const EdgeInsets.symmetric(vertical: 2), // Tighter spacing
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.75,
+      ),
+      decoration: BoxDecoration(
+        color: isMe ? AppColors.black : Colors.grey.shade100, // Black vs Grey
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(18),
+          topRight: const Radius.circular(18),
+          bottomLeft: Radius.circular(isMe ? 18 : 4),
+          bottomRight: Radius.circular(isMe ? 4 : 18),
         ),
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          _buildMessageContent(context, message, isMe),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                formatChatTime(message.createdAt.toString()),
+                style: TextStyle(
+                  fontSize: 10,
+                  color: isMe ? Colors.grey.shade400 : Colors.grey.shade500,
+                ),
+              ),
+              if (isMe) ...[
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.done_all, 
+                  size: 14, 
+                  color: message.status == "read" ? Colors.blueAccent : Colors.grey.shade500,
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
     );
+
+    if (isMe) {
+      return Align(
+        alignment: Alignment.centerRight,
+        child: bubble,
+      );
+    } else {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              if (avatarUrl != null && avatarUrl.isNotEmpty) ...[
+                CircleAvatar(
+                  radius: 16,
+                  backgroundImage: NetworkImage(avatarUrl),
+                ),
+                const SizedBox(width: 8),
+              ] else ...[
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor: Colors.grey[200],
+                  child: const Icon(Icons.person, size: 18, color: Colors.grey),
+                ),
+                const SizedBox(width: 8),
+              ],
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (senderName != null && senderName.isNotEmpty) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4, bottom: 2),
+                        child: Text(
+                          senderName,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                      ),
+                    ],
+                    bubble,
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildInputArea(BuildContext context) {
@@ -487,5 +544,168 @@ class ChattingScreen extends GetView<ChatMessagesController> {
     } catch (e) {
       return "";
     }
+  }
+
+  Widget _buildMessageContent(BuildContext context, ChatMessage message, bool isMe) {
+    if (message.messageType == "image") {
+      final String url = message.attachmentUrl ?? "";
+      final String? caption = message.content;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (url.isNotEmpty)
+            GestureDetector(
+              onTap: () {
+                Get.to(() => FullImagePreview(imageUrl: url));
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: CachedNetworkImage(
+                  imageUrl: url,
+                  placeholder: (context, url) => const SizedBox(
+                    width: 150,
+                    height: 150,
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                  errorWidget: (context, url, error) => const SizedBox(
+                    width: 150,
+                    height: 150,
+                    child: Center(child: Icon(Icons.broken_image, size: 50, color: Colors.grey)),
+                  ),
+                  fit: BoxFit.cover,
+                  width: 200,
+                  height: 200,
+                ),
+              ),
+            ),
+          if (caption != null && caption.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(
+              caption,
+              style: TextStyle(
+                fontSize: 15,
+                color: isMe ? Colors.white : Colors.black87,
+                height: 1.3,
+              ),
+            ),
+          ],
+        ],
+      );
+    } else if (message.messageType == "file" || message.messageType == "audio") {
+      final String url = message.attachmentUrl ?? "";
+      final String originalName = message.meta?.originalName ?? url.split('/').last;
+      final int? bytes = message.meta?.size;
+      final String sizeStr = bytes != null ? _formatBytes(bytes) : "";
+      final isAudio = message.messageType == "audio";
+
+      return InkWell(
+        onTap: () async {
+          if (url.isNotEmpty) {
+            final Uri uri = Uri.parse(url);
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            } else {
+              CustomSnackBar.showError(message: "Could not open attachment URL");
+            }
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: isMe ? Colors.white24 : Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isAudio ? Icons.audiotrack : Icons.insert_drive_file,
+                color: isMe ? Colors.white : Colors.black87,
+                size: 28,
+              ),
+              const SizedBox(width: 10),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      originalName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: isMe ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    if (sizeStr.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        sizeStr,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isMe ? Colors.white70 : Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.download_rounded,
+                color: isMe ? Colors.white70 : Colors.grey.shade600,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      // Default / Text type
+      return Text(
+        message.content,
+        style: TextStyle(
+          fontSize: 15,
+          color: isMe ? Colors.white : Colors.black87,
+          height: 1.3,
+        ),
+      );
+    }
+  }
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) return "$bytes B";
+    if (bytes < 1024 * 1024) return "${(bytes / 1024).toStringAsFixed(1)} KB";
+    return "${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB";
+  }
+}
+
+class FullImagePreview extends StatelessWidget {
+  final String imageUrl;
+
+  const FullImagePreview({super.key, required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Center(
+        child: InteractiveViewer(
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            placeholder: (context, url) => const CircularProgressIndicator(color: Colors.white),
+            errorWidget: (context, url, error) => const Icon(Icons.error, color: Colors.white, size: 50),
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
   }
 }
