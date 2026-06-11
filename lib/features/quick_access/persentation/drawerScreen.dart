@@ -142,14 +142,31 @@ class DrawerScreen extends StatelessWidget {
                 child: Column(
                   children: [
                       Row(
-                      children: [
-                       Expanded(child:_buildBottomCard(context, "i-QuickHire", CupertinoIcons.briefcase_fill, "Job Board", onTap: () {
-                         Get.toNamed(AppRoutes.jobSearchScreen);
-                       })),
-                        const SizedBox(width: 12),
-                        Expanded(child: _buildBottomCard(context, "Universal App", CupertinoIcons.app_badge_fill, "Mini Apps")),
-                      ],
-                     ),
+                        children: [
+                          if (SharedPrefManager().user?.isEmployer == true) ...[
+                            Expanded(
+                              child: _buildBottomCard(
+                                context,
+                                "i-QuickHire",
+                                CupertinoIcons.briefcase_fill,
+                                "Job Board",
+                                onTap: () {
+                                  Get.toNamed(AppRoutes.jobSearchScreen);
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+                          Expanded(
+                            child: _buildBottomCard(
+                              context,
+                              "Universal App",
+                              CupertinoIcons.app_badge_fill,
+                              "Mini Apps",
+                            ),
+                          ),
+                        ],
+                      ),
                      const SizedBox(height: 16),
                      GestureDetector(
                       onTap: () => Get.to(HelpCenter()),
