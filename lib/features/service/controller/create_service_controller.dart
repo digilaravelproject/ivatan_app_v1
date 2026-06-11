@@ -130,7 +130,7 @@ class CreateServiceController extends GetxController {
         }
 
         response = await apiServices.callPost(
-          AppUrls.sellerManageServices,
+          AppUrls.sellerServices,
           data: body,
           isFormData: true,
         );
@@ -139,7 +139,13 @@ class CreateServiceController extends GetxController {
       if (response != null) {
         if (response['success'] == true) {
           debugPrint("Service operation successful");
-          Get.find<ServiceController>().fetchServices();
+          final ServiceController serviceController = Get.isRegistered<ServiceController>()
+              ? Get.find<ServiceController>()
+              : Get.put(ServiceController());
+          serviceController.fetchServices();
+          if (Get.isRegistered<ServiceController>(tag: 'global')) {
+            Get.find<ServiceController>(tag: 'global').fetchMarketplaceServices(isRefresh: true);
+          }
           Get.back();
           Get.snackbar("Success", response['message'] ?? "Operation successful",
               backgroundColor: AppColors.success, colorText: Colors.white);

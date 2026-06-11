@@ -339,137 +339,127 @@ class _MyServicesTabView extends StatelessWidget {
         itemCount: controller.services.length,
         itemBuilder: (context, index) {
           final service = controller.services[index];
-          return _buildServiceCard(service, controller);
+          return _buildServiceCard(context, service, controller);
         },
       );
     });
   }
 
-  Widget _buildServiceCard(ServiceModel service, ServiceController controller) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Service Image
-          Expanded(
-            flex: 3,
-            child: Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                  child: Image.network(
-                    AppUrls.getFullImageUrl(service.coverImage),
-                    width: double.infinity,
-                    height: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: Colors.grey.shade200,
-                      child: const Icon(Icons.room_service, size: 40, color: Colors.grey),
-                    ),
-                  ),
-                ),
-                // Status Badge
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: service.status == 'active' ? Colors.green : Colors.orange,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      service.status.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+  Widget _buildServiceCard(BuildContext context, ServiceModel service, ServiceController controller) {
+    return GestureDetector(
+      onTap: () {
+        showServiceDetailBottomSheet(context, service.id, isOwnService: true);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
             ),
-          ),
-          // Service Info
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Service Image
+            Expanded(
+              flex: 3,
+              child: Stack(
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        service.title,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                    child: Image.network(
+                      AppUrls.getFullImageUrl(service.coverImage),
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        color: Colors.grey.shade200,
+                        child: const Icon(Icons.room_service, size: 40, color: Colors.grey),
                       ),
-                      const SizedBox(height: 4),
-                      // Container(
-                      //   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      //   decoration: BoxDecoration(
-                      //     color: Colors.blue.shade50,
-                      //     borderRadius: BorderRadius.circular(4),
-                      //   ),
-                      //   child: Text(
-                      //     'Service',
-                      //     style: TextStyle(
-                      //       color: Colors.blue.shade700,
-                      //       fontSize: 9,
-                      //       fontWeight: FontWeight.w500,
-                      //     ),
-                      //   ),
-                      // ),
-                    ],
+                    ),
                   ),
-                  Row(
-                    children: [
-                      Text(
-                        '₹${service.price}',
+                  // Status Badge
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: service.status == 'active' ? Colors.green : Colors.orange,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        service.status.toUpperCase(),
                         style: const TextStyle(
-                          fontSize: 12,
+                          color: Colors.white,
+                          fontSize: 9,
                           fontWeight: FontWeight.bold,
-                          color: Colors.green,
                         ),
                       ),
-                      if (service.discountPrice != null) ...[
-                        const SizedBox(width: 4),
-                        Text(
-                          '₹${service.discountPrice}',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.grey.shade500,
-                            decoration: TextDecoration.lineThrough,
-                          ),
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            // Service Info
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          service.title,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          '₹${service.price}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
+                        ),
+                        if (service.discountPrice != null) ...[
+                          const SizedBox(width: 4),
+                          Text(
+                            '₹${service.discountPrice}',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey.shade500,
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

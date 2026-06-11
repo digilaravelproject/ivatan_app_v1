@@ -3,8 +3,10 @@ import 'package:get/get.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/network/app_urls.dart';
 import '../../../../core/widgets/custom_dialog.dart';
+import '../../../../db/shared_pref_manager.dart';
 import '../../controller/service_controller.dart';
 import '../../model/service_model.dart';
+import '../../repository/service_repository.dart';
 import '../create_service_screen.dart';
 import '../service_enquire_form.dart';
 
@@ -20,7 +22,10 @@ void _showEnquiryBottomSheet(BuildContext context, int sellerId, int serviceId) 
 }
 
 void showServiceDetailBottomSheet(BuildContext context, int serviceId, {bool isOwnService = false}) {
-  final ServiceController controller = Get.find<ServiceController>();
+  // Use putIfAbsent pattern: register if not already registered
+  final ServiceController controller = Get.isRegistered<ServiceController>()
+      ? Get.find<ServiceController>()
+      : Get.put(ServiceController());
   controller.fetchServiceDetail(serviceId);
 
   showModalBottomSheet(
@@ -36,6 +41,9 @@ void showServiceDetailBottomSheet(BuildContext context, int serviceId, {bool isO
       if (service == null) {
         return _buildErrorSheet(context);
       }
+
+      final bool ownService = isOwnService || 
+          (SharedPrefManager().user?.id != null && service.sellerId == SharedPrefManager().user!.id);
 
       return DraggableScrollableSheet(
         initialChildSize: 0.9,
@@ -58,7 +66,7 @@ void showServiceDetailBottomSheet(BuildContext context, int serviceId, {bool isO
                     child: _buildServiceDetailContent(context, service),
                   ),
                 ),
-                _buildActionButtons(context, service, isOwnService),
+                _buildActionButtons(context, service, ownService),
               ],
             ),
           );
@@ -367,7 +375,9 @@ Widget _buildServiceDetailContent(BuildContext context, ServiceModel service) {
 }
 
 Widget _buildActionButtons(BuildContext context, ServiceModel service, bool isOwnService) {
-  final ServiceController controller = Get.find<ServiceController>();
+  final ServiceController controller = Get.isRegistered<ServiceController>()
+      ? Get.find<ServiceController>()
+      : Get.put(ServiceController());
 
   return Container(
     padding: const EdgeInsets.all(20),
