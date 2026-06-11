@@ -98,10 +98,24 @@ class JobSearchScreen extends GetView<JobController> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.black, width: 2),
-                image: DecorationImage(
-                  image: NetworkImage(SharedPrefManager().user!.profilePhotoPath.toString()),
-                  fit: BoxFit.cover,
-                ),
+              ),
+              child: ClipOval(
+                child: SharedPrefManager().user!.profilePhotoPath != null &&
+                        SharedPrefManager().user!.profilePhotoPath!.toString().isNotEmpty
+                    ? Image.network(
+                        AppUrls.getFullImageUrl(SharedPrefManager().user!.profilePhotoPath!.toString()),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => const Icon(
+                          Icons.person,
+                          color: Colors.black,
+                          size: 22,
+                        ),
+                      )
+                    : const Icon(
+                        Icons.person,
+                        color: Colors.black,
+                        size: 22,
+                      ),
               ),
             ),
           ),
