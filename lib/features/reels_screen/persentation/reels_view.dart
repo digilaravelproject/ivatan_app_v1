@@ -161,7 +161,7 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: []);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: SystemUiOverlay.values);
 
     // ✅ Status bar color transparent
     SystemChrome.setSystemUIOverlayStyle(
@@ -914,7 +914,7 @@ class VideoGradient extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.black.withValues(alpha: .3),
+            Colors.black.withValues(alpha: 0.55),
             Colors.transparent,
             Colors.black.withValues(alpha: 0.3),
           ],

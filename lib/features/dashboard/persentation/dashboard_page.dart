@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -56,29 +57,46 @@ class DashboardPage extends StatelessWidget {
           ],
         ),
         bottomNavigationBar: Container(
+          margin: const EdgeInsets.only(bottom: 18, left: 20, right: 20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.white.withOpacity(0.82),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(
+              color: Colors.black.withOpacity(0.06),
+              width: 1.5,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.08),
-                blurRadius: 8,
-                offset: const Offset(0, -2),
+                blurRadius: 25,
+                spreadRadius: 1,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
-          child: SafeArea(
-            child: Container(
-              height: 65,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _item(context, Icons.home_outlined, 0),
-                  _item(context, Icons.search_sharp, 1),
-                  _item(context, Icons.slow_motion_video_outlined, 2),
-                  _item(context, Icons.video_library_outlined, 3),
-                  _item(context, Icons.account_circle_outlined, 4, imageUrl: controller.userProfileImage),
-                ],
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: SafeArea(
+                top: false,
+                left: false,
+                right: false,
+                bottom: false,
+                child: Container(
+                  height: 60,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _item(context, Icons.home_rounded, Icons.home_outlined, 0),
+                      _item(context, Icons.search_rounded, Icons.search_rounded, 1),
+                      _item(context, Icons.play_circle_fill_rounded, Icons.play_circle_outline_rounded, 2),
+                      _item(context, Icons.video_library_rounded, Icons.video_library_outlined, 3),
+                      _item(context, Icons.account_circle_rounded, Icons.account_circle_outlined, 4, imageUrl: controller.userProfileImage),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -103,7 +121,7 @@ class DashboardPage extends StatelessWidget {
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
                 blurRadius: 10,
-                offset: const Offset(0, -2),
+                offset: const Offset(0, -5),
               ),
             ],
           ),
@@ -151,67 +169,115 @@ class DashboardPage extends StatelessWidget {
     });
   }
 
-  Widget _item(BuildContext context, dynamic iconData, int index, {String? imageUrl}) {
+  Widget _item(BuildContext context, dynamic iconDataSelected, dynamic iconDataUnselected, int index, {String? imageUrl}) {
     return Obx(() {
       final isSelected = controller.selectedIndex.value == index;
 
-      return InkWell(
-        onTap: () => controller.changeIndex(index),
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Specific logic for Profile Image (Index 4)
-              if (index == 4)
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isSelected ? AppColors.primary : Colors.grey.shade400, 
-                      width: 1.5
+      return Expanded(
+        child: GestureDetector(
+          onTap: () => controller.changeIndex(index),
+          behavior: HitTestBehavior.opaque,
+          child: Center(
+            child: AnimatedScale(
+              duration: const Duration(milliseconds: 200),
+              scale: isSelected ? 1.05 : 1.0,
+              child: index == 4
+                  ? AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeInOut,
+                      width: 50,
+                      height: 42,
+                      alignment: Alignment.center,
+                      child: isSelected
+                          ? Container(
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 1.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.15),
+                                    blurRadius: 8,
+                                    spreadRadius: 1,
+                                    offset: const Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(1.5),
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                  ),
+                                  child: ClipOval(
+                                    child: (imageUrl != null && imageUrl.isNotEmpty)
+                                        ? Image.network(
+                                            AppUrls.getFullImageUrl(imageUrl),
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                                          )
+                                        : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(
+                              width: 24,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.black.withOpacity(0.2),
+                                  width: 1.2,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(1.0),
+                                child: ClipOval(
+                                  child: (imageUrl != null && imageUrl.isNotEmpty)
+                                      ? Image.network(
+                                          AppUrls.getFullImageUrl(imageUrl),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, __, ___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                                        )
+                                      : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                                ),
+                              ),
+                            ),
+                    )
+                  : AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeInOut,
+                      width: 50,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: isSelected ? Colors.black : Colors.transparent,
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.15),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                  offset: const Offset(0, 2),
+                                )
+                              ]
+                            : [],
+                      ),
+                      child: Center(
+                        child: Icon(
+                          isSelected ? iconDataSelected : iconDataUnselected,
+                          size: 22,
+                          color: isSelected ? Colors.white : const Color(0xFF64748B),
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Padding(
-                     padding: const EdgeInsets.all(1.5),
-                     child: ClipOval(
-                      child: (imageUrl != null && imageUrl.isNotEmpty)
-                        ? Image.network(
-                            AppUrls.getFullImageUrl(imageUrl), // Use getFullImageUrl helper
-                            fit: BoxFit.cover,
-                            errorBuilder: (_,__,___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
-                          )
-                        : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
-                    ),
-                  )
-                )
-              else if (iconData is String)
-                Iconify(
-                  iconData,
-                  size: 28,
-                  color: isSelected ? AppColors.primary : Colors.grey.shade400,
-                )
-              else
-                Icon(
-                  iconData,
-                  size: 28,
-                  color: isSelected ? AppColors.primary : Colors.grey.shade400,
-                ),
-              const SizedBox(height: 6),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 5,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary : Colors.transparent,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       );

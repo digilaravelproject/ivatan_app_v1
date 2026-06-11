@@ -118,9 +118,35 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
       isValid = false;
     }
 
+    // Validate website
+    final websiteText = companyWebsiteController.text.trim();
+    if (websiteText.isEmpty || websiteText == "https://") {
+      websiteError.value = 'Company website is required';
+      isValid = false;
+    } else {
+      final urlPattern = r'^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$';
+      final websiteRegExp = RegExp(urlPattern, caseSensitive: false);
+      if (!websiteRegExp.hasMatch(websiteText)) {
+        websiteError.value = 'Please enter a valid website URL';
+        isValid = false;
+      }
+    }
+
     // Validate description
     if (descriptionFormController.text.trim().isEmpty) {
       descriptionError.value = 'Job description is required';
+      isValid = false;
+    }
+
+    // Validate responsibilities
+    if (responsibilitiesController.text.trim().isEmpty) {
+      responsibilitiesError.value = 'Responsibilities are required';
+      isValid = false;
+    }
+
+    // Validate requirements
+    if (requirementsController.text.trim().isEmpty) {
+      requirementsError.value = 'Requirements are required';
       isValid = false;
     }
 
