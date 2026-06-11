@@ -242,11 +242,16 @@ class JobHistoryScreen extends StatelessWidget {
                         color: Colors.grey[700],
                       ),
                     ),
-                    Text(
-                      _getStatusCountText(controller),
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: Colors.grey[600],
+                    Expanded(
+                      child: Text(
+                        _getStatusCountText(controller),
+                        textAlign: TextAlign.end,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
                       ),
                     ),
                   ],
