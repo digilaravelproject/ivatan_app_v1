@@ -160,7 +160,7 @@ class ProfilePermissionManager {
 
   /// Specific helper: Check if ecommerce seller profile is active, subscribed, and type supports products
   static bool get canSellProducts {
-    if (!isProfileActive(ProfileType.ecommerce) || !hasActiveSubscription(ProfileType.ecommerce)) {
+    if (!isProfileActive(ProfileType.ecommerce)) {
       return false;
     }
     final type = _config?.data?.ecommerce?.type?.toLowerCase();
@@ -169,7 +169,7 @@ class ProfilePermissionManager {
 
   /// Specific helper: Check if ecommerce seller profile is active, subscribed, and type supports services
   static bool get canProvideServices {
-    if (!isProfileActive(ProfileType.ecommerce) || !hasActiveSubscription(ProfileType.ecommerce)) {
+    if (!isProfileActive(ProfileType.ecommerce)) {
       return false;
     }
     final type = _config?.data?.ecommerce?.type?.toLowerCase();
