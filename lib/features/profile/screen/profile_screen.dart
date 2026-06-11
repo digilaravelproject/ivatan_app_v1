@@ -129,9 +129,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           final bool isPrivateHidden = isCurrentlyOther && 
                                      (user.accountPrivacy?.toLowerCase() == "private") && 
                                      !isFollowing;
+              debugPrint("Profile Debug: user=${user.username}, isOtherProfile=$isOtherProfile, isCurrentlyOther=$isCurrentlyOther, isSeller=${user.isSeller}, profileType=${user.profileType}, profileSubType=${user.profileSubType}");
              // Build dynamic tabs and views
-             final bool showProductTab = ProfilePermissionManager.canProfileSellProducts(user, isOtherProfile);
-             final bool showServiceTab = ProfilePermissionManager.canProfileProvideServices(user, isOtherProfile);
+             final bool showProductTab = ProfilePermissionManager.canProfileSellProducts(user, isCurrentlyOther);
+             final bool showServiceTab = ProfilePermissionManager.canProfileProvideServices(user, isCurrentlyOther);
 
              List<Tab> tabs = [
                Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 

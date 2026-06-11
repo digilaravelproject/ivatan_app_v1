@@ -199,7 +199,8 @@ class ProfilePermissionManager {
       return isEcommerce &&
           (user.profileSubType?.toLowerCase() == 'product' ||
               user.profileSubType?.toLowerCase() == 'both' ||
-              user.profileSubType == null);
+              user.profileSubType == null ||
+              user.profileSubType!.trim().isEmpty);
     }
     return canSellProducts;
   }
@@ -211,7 +212,8 @@ class ProfilePermissionManager {
       return isEcommerce &&
           (user.profileSubType?.toLowerCase() == 'service' ||
               user.profileSubType?.toLowerCase() == 'both' ||
-              user.profileSubType == null);
+              user.profileSubType == null ||
+              user.profileSubType!.trim().isEmpty);
     }
     return canProvideServices;
   }
