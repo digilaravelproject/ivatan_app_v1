@@ -33,49 +33,73 @@ class ProfileDrawer extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () =>  Get.to(ProfileScreen(viewUserName: SharedPrefManager().user!.username.toString(),)),
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.black, width: 2),
-                                image: DecorationImage(
-                                  image: NetworkImage(SharedPrefManager().user!.profilePhotoPath.toString()),
-                                  fit: BoxFit.cover,
+                      Expanded(
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () =>  Get.to(ProfileScreen(viewUserName: SharedPrefManager().user!.username.toString(),)),
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.black, width: 2),
+                                ),
+                                child: ClipOval(
+                                  child: SharedPrefManager().user!.profilePhotoPath != null &&
+                                          SharedPrefManager().user!.profilePhotoPath!.toString().isNotEmpty
+                                      ? Image.network(
+                                          AppUrls.getFullImageUrl(SharedPrefManager().user!.profilePhotoPath!.toString()),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) => const Icon(
+                                            Icons.person,
+                                            color: Colors.black,
+                                            size: 24,
+                                          ),
+                                        )
+                                      : const Icon(
+                                          Icons.person,
+                                          color: Colors.black,
+                                          size: 24,
+                                        ),
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(width: 10,),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Name
-                              Text(
-                                SharedPrefManager().user!.name.toString(),
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.black,
-                                ),
+                            const SizedBox(width: 10,),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // Name
+                                  Text(
+                                    SharedPrefManager().user!.name.toString(),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+    
+                                  // Title
+                                  Text(
+                                    SharedPrefManager().user!.occupation.toString(),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
                               ),
-
-                              // Title
-                              Text(
-                                SharedPrefManager().user!.occupation.toString(),
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                            ),
+                          ],
+                        ),
                       ),
+                      const SizedBox(width: 10,),
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
                         child: Container(
@@ -85,7 +109,7 @@ class ProfileDrawer extends StatelessWidget {
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.grey[300]!),
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.close,
                             color: Colors.black,
                             size: 20,

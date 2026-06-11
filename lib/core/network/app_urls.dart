@@ -34,6 +34,11 @@ class AppUrls {
   static const register = "api/auth/register";
   static const posts  ="api/v1/posts";
   static const profileConfig = "api/v1/profiles/config";
+  static const profileSwitch = "api/v1/profiles/switch";
+  static const profileTypes = "api/profile-types";
+  static const profileSwitchRequests = "api/v1/profile-switch-requests";
+  static const updateProfile = "api/v1/auth/update";
+  static String userProfileUrl(String username) => "api/v1/users/$username";
 
   static const verifyForgetPassword  ="api/forgot-password/verify";
   static const changePassword  ="api/forgot-password/reset";

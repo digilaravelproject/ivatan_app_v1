@@ -12,7 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import '../../profile/screen/avatar_customizer_screen.dart';
 import '../../profile/screen/bookmarks_screen.dart';
-import '../../../../core/helper/profile_permission_manager.dart';
+import '../../../../core/helper/profile_permission_manager.dart' as ppm;
 
 /*
 class ProfileController extends GetxController {
@@ -284,7 +284,7 @@ class ProfileController extends GetxController {
     }
 
     final result = await api.callPost(
-      "api/v1/auth/update",
+      AppUrls.updateProfile,
       data: payload,
       isFormData: true,
     );
@@ -404,7 +404,7 @@ class SettingsController extends GetxController {
 
   Future<void> fetchProfileTypes() async {
     try {
-      final response = await api.callGet("api/profile-types");
+      final response = await api.callGet(AppUrls.profileTypes);
       if (response != null && response["status"] == true) {
         final List<dynamic> typesJson = response["data"]["types"];
         profileTypes.value = typesJson.map((x) => ProfileType.fromJson(x)).toList();
@@ -420,7 +420,7 @@ class SettingsController extends GetxController {
   Future<void> fetchProfileSwitchRequests() async {
     try {
       isLoadingSwitchRequests.value = true;
-      final response = await api.callGet("api/v1/profile-switch-requests");
+      final response = await api.callGet(AppUrls.profileSwitchRequests);
       if (response != null && response["status"] == true) {
         final rawData = response["data"];
         if (rawData != null && rawData["switch_requests"] is List) {
@@ -551,8 +551,12 @@ class SettingsController extends GetxController {
   ];
 
   void _matchProfileType() {
-    String? userProfileType = ProfilePermissionManager.currentProfileName?.toLowerCase();
+    String? userProfileType = ppm.ProfilePermissionManager.currentProfileName?.toLowerCase();
     
+    if (userProfileType == null || userProfileType.isEmpty) {
+      userProfileType = userProfile.value?.profileType?.toLowerCase();
+    }
+
     // Normalize type strings to match backend/controller types
     if (userProfileType == 'ecommerce') {
       userProfileType = 'seller';
@@ -562,11 +566,7 @@ class SettingsController extends GetxController {
       userProfileType = 'creator';
     }
 
-    if (userProfileType == null || userProfileType.isEmpty) {
-      userProfileType = userProfile.value?.profileType;
-    }
-
-    String? userProfileSubType = ProfilePermissionManager.ecommerceSubType;
+    String? userProfileSubType = ppm.ProfilePermissionManager.ecommerceSubType;
     if (userProfileSubType == null || userProfileSubType.isEmpty) {
       userProfileSubType = userProfile.value?.profileSubType;
     }
@@ -620,7 +620,7 @@ class SettingsController extends GetxController {
       }
 
       final response = await api.callPost(
-        "api/v1/profiles/switch",
+        AppUrls.profileSwitch,
         data: body,
       );
 
@@ -1157,8 +1157,8 @@ class SettingsController extends GetxController {
         languageController.text = result.user!.languagePreference ?? "en";
         isPrivate.value = result.user!.accountPrivacy == "private";
         contactVisibility.value = result.user!.contactVisibility ?? 'both';
-        isEmployer.value = result.user!.isEmployer ?? false;
-        isSeller.value = result.user!.isSeller ?? false;
+        isEmployer.value = ppm.ProfilePermissionManager.isProfileActive(ppm.ProfileType.employer);
+        isSeller.value = ppm.ProfilePermissionManager.isProfileActive(ppm.ProfileType.ecommerce);
         _matchProfileType();
         
         // SYNC FOLLOW STATUS
@@ -1230,7 +1230,7 @@ class SettingsController extends GetxController {
   }
 
   Future<UserDetailsModel?> getUserDetails(String username) async {
-    final response = await api.callGet("api/v1/users/$username", showErrorToast: false);
+    final response = await api.callGet(AppUrls.userProfileUrl(username), showErrorToast: false);
 
     print("getUserDetails : "+response!.values.toString());
     if (response == null) return null;
