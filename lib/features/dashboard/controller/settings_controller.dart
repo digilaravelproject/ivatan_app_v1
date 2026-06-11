@@ -1135,7 +1135,14 @@ class SettingsController extends GetxController {
   Future<void> fetchUserDetails(String userName) async {
     try {
       isLoading.value = true;
-      print("fetchuserdetails for: $userName");
+      // Sync the latest profile configuration so ProfilePermissionManager states are updated
+      try {
+        if (Get.isRegistered<HomeController>()) {
+          await Get.find<HomeController>().fetchProfileConfig();
+        }
+      } catch (e) {
+        print("⚠️ Failed to refresh profile config: $e");
+      }
 
       final result = await getUserDetails(userName);
       
