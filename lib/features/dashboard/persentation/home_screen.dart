@@ -45,9 +45,16 @@ class HomePage extends StatelessWidget {
       // ============= MODERN APP BAR =============
       body: NotificationListener<ScrollNotification>(
         onNotification: (notification) {
-          if (notification.metrics.pixels > 20 &&
-              !controller.showStories.value) {
-            controller.showStories.value = true;
+          if (notification is UserScrollNotification) {
+            if (notification.direction == ScrollDirection.reverse) {
+              if (controller.showStories.value) {
+                controller.showStories.value = false;
+              }
+            } else if (notification.direction == ScrollDirection.forward) {
+              if (!controller.showStories.value) {
+                controller.showStories.value = true;
+              }
+            }
           }
 
           // Pagination Logic only
