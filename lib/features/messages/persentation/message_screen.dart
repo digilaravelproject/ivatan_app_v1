@@ -298,14 +298,29 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                                 color: Colors.grey.shade200,
                               ),
                               child: ClipOval(
-                                child: message.type == "group"
-                                    ? Center(child: Icon(Icons.group, color: Colors.grey))
-                                    : Center(
-                                        child: Text(
-                                          message.name.isNotEmpty ? message.name[0].toUpperCase() : "?",
-                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
-                                        ),
-                                      ),
+                                child: (message.avatar != null && message.avatar.toString().isNotEmpty)
+                                    ? Image.network(
+                                        message.avatar.toString(),
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return message.type == "group"
+                                              ? const Center(child: Icon(Icons.group, color: Colors.grey, size: 26))
+                                              : Center(
+                                                  child: Text(
+                                                    message.name.isNotEmpty ? message.name[0].toUpperCase() : "?",
+                                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
+                                                  ),
+                                                );
+                                        },
+                                      )
+                                    : (message.type == "group"
+                                        ? const Center(child: Icon(Icons.group, color: Colors.grey, size: 26))
+                                        : Center(
+                                            child: Text(
+                                              message.name.isNotEmpty ? message.name[0].toUpperCase() : "?",
+                                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
+                                            ),
+                                          )),
                               ),
                             ),
                             
@@ -347,7 +362,17 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          message.lastMessage?.content ?? "No messages",
+                                          message.lastMessage == null
+                                              ? "No messages"
+                                              : (message.lastMessage!.messageType == "image"
+                                                  ? "📷 Image"
+                                                  : (message.lastMessage!.messageType == "file"
+                                                      ? "📁 File"
+                                                      : (message.lastMessage!.messageType == "audio"
+                                                          ? "🎵 Audio"
+                                                          : (message.lastMessage!.content.isNotEmpty
+                                                              ? message.lastMessage!.content
+                                                              : "No messages")))),
                                           style: TextStyle(
                                             color: hasUnread ? Colors.black87 : Colors.grey.shade500,
                                             fontSize: 14,
