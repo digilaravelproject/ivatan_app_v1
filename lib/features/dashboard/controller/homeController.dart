@@ -36,7 +36,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   RxBool isSubmitting = false.obs;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  RxBool showStories = true.obs;
+  RxBool showStories = false.obs;
   var currentUser = Rxn<UserModel>();
 
   final ApiServices api = Get.put(ApiServices());
