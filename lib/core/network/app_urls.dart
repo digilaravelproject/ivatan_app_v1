@@ -78,6 +78,12 @@ class AppUrls {
   static String sellerOrderStatusUpdate(int id) => "api/v1/seller/orders/$id/status";
   static const sellerStats = "api/v1/seller/dashboard/stats";
 
+  static const feedPostImages = "api/v1/posts/feed/images";
+  static const storyFeed = "api/v1/stories/feed";
+  static String likePost(int id) => "api/v1/posts/$id/like";
+  static String likeStory(int id) => "api/v1/stories/$id/like";
+  static String reportPost(int id) => "api/v1/posts/$id/report";
+
   // --------- FEED / SEARCH -----------//
   static const feedTrending = "api/v1/posts/feed/trending";
   static const feedTrendingInterests = "api/v1/posts/feed/trending/interests";

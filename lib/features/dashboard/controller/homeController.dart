@@ -202,7 +202,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
 
     if (!loadMore) {
       posts.clear();
-      nextPageUrl = "api/v1/posts/feed/images?page=1";
+      nextPageUrl = "${AppUrls.feedPostImages}?page=1";
       isMoreDataAvailable.value = true;
     } else {
       if (!isMoreDataAvailable.value || nextPageUrl == null) return;
@@ -382,7 +382,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   Future<void> fetchStories() async {
     isStoryLoading.value = true;
 
-    final response = await api.callGet("api/v1/stories/feed");
+    final response = await api.callGet(AppUrls.storyFeed);
     print("storydata : " + response.toString());
 
     if (response != null &&
@@ -410,7 +410,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   Future<void> likePost(int postId, int index) async {
     try {
       final response = await api.callPost(
-        "api/v1/posts/$postId/like",
+        AppUrls.likePost(postId),
         data: {},
       );
 
@@ -544,7 +544,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   Future<void> likeStory(int storyId) async {
     try {
       final response = await api.callPost(
-        "api/v1/stories/$storyId/like",
+        AppUrls.likeStory(storyId),
         data: {},
       );
 
@@ -785,7 +785,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       };
 
       final response = await api.callPost(
-        "api/v1/posts/$postId/report",
+        AppUrls.reportPost(postId),
         data: body,
       );
 
