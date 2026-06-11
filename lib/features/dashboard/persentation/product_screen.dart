@@ -326,10 +326,10 @@ class _BrowseProductsView extends StatelessWidget {
             children: [
               Icon(
                 Icons.shopping_bag_outlined,
-                size: 80,
+                size: 40,
                 color: Colors.grey.shade300,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
               Text(
                 'No products available',
                 style: TextStyle(fontSize: 16, color: Colors.grey.shade600),

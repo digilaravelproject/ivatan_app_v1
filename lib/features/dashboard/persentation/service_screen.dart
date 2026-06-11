@@ -77,8 +77,8 @@ class _DigitalProductListScreenState extends State<DigitalProductListScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.room_service_outlined, size: 80, color: Colors.grey.shade300),
-              const SizedBox(height: 16),
+              Icon(Icons.room_service_outlined, size: 40, color: Colors.grey.shade300),
+              const SizedBox(height: 8),
               const Text('No products found', style: TextStyle(color: Colors.grey)),
             ],
           ),
