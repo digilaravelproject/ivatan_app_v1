@@ -329,8 +329,10 @@ class _VideosScreenState extends State<VideosScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        extendBody: true,
         backgroundColor: const Color(0xFFF8F9FA),
         body: SafeArea(
+          bottom: false,
           child: Column(
             children: [
               // Custom Header
@@ -461,7 +463,7 @@ class _VideosScreenState extends State<VideosScreen> {
                     return GridView.builder(
                       controller: scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 90),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         childAspectRatio: 0.7,

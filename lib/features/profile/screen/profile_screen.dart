@@ -114,6 +114,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Container(
       child: Scaffold(
+        extendBody: true,
         backgroundColor: AppColors.white,
         body: Obx(() {
           final user = profileController.userProfile.value;

@@ -35,8 +35,10 @@ class _SearchScreenState extends State<SearchScreen> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
+        extendBody: true,
         backgroundColor: Colors.white,
         body: SafeArea(
+          bottom: false,
           child: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               return [
@@ -206,7 +208,7 @@ class TrendingScreen extends StatelessWidget {
 
           // Masonry grid
           SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.only(left: 12, right: 12, bottom: 90),
             sliver: Obx(() {
               if (controller.isLoading.value) {
                 return SliverToBoxAdapter(
@@ -1209,7 +1211,7 @@ class ForYouGridScreen extends StatelessWidget {
           crossAxisCount: 2,
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 90),
           itemCount: controller.forYouPosts.length,
           itemBuilder: (context, index) {
             final item = controller.forYouPosts[index];
