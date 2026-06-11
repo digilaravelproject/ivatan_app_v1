@@ -78,9 +78,9 @@ class HomePage extends StatelessWidget {
             slivers: [
               // ============= SLIVER APP BAR (Hide/Show on Scroll) =============
               SliverAppBar(
-                floating: true,
-                snap: true,
-                pinned: false,
+                floating: false,
+                snap: false,
+                pinned: true,
                 backgroundColor: Colors.white,
                 elevation: 0,
                 automaticallyImplyLeading: false,
