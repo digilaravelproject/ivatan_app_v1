@@ -577,8 +577,8 @@ class SettingsController extends GetxController {
       final matchedType = profileTypes.firstWhereOrNull((e) => e.type == userProfileType);
       if (matchedType != null) {
         selectedProfileType.value = matchedType;
-        // For any type that has subtypes, show the selected subtype in the controller label
-        if (userProfileSubType != null && userProfileSubType.isNotEmpty) {
+        // Only show the selected subtype in the controller label if it is a seller type
+        if (matchedType.type == 'seller' && userProfileSubType != null && userProfileSubType.isNotEmpty) {
           selectedSellerType.value = userProfileSubType;
           profileTypeController.text = "${matchedType.label} (${userProfileSubType.capitalizeFirst ?? userProfileSubType})";
           sellerTypeController.text = userProfileSubType;
@@ -642,8 +642,8 @@ class SettingsController extends GetxController {
           isEmployer.value = false;
         }
 
-        // Update text label — show subtype in parentheses for any type that has one
-        if (sellerType.isNotEmpty) {
+        // Update text label — show subtype in parentheses for seller type only
+        if (profileType.type == 'seller' && sellerType.isNotEmpty) {
           profileTypeController.text = "${profileType.label} (${sellerType.capitalizeFirst ?? sellerType})";
           sellerTypeController.text = sellerType;
         } else {
