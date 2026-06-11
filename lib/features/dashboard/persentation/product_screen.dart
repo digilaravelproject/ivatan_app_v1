@@ -16,8 +16,9 @@ import '../../product/persentation/my_products_screen.dart';
 
 class ProductGridScreen extends StatelessWidget {
   final bool isOwnProfile;
+  final String? userId;
 
-  const ProductGridScreen({super.key, this.isOwnProfile = false});
+  const ProductGridScreen({super.key, this.isOwnProfile = false, this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +28,7 @@ class ProductGridScreen extends StatelessWidget {
     // }
 
     // Otherwise show products with Add to Cart buttons
-    return _BrowseProductsView();
+    return _BrowseProductsView(userId: userId);
   }
 }
 
@@ -299,9 +300,15 @@ class Product {
 
 // Browse Products View - Fetches from Marketplace API
 class _BrowseProductsView extends StatelessWidget {
+  final String? userId;
+  const _BrowseProductsView({this.userId});
+
   @override
   Widget build(BuildContext context) {
-    final MarketplaceProductController marketplaceController = Get.put(MarketplaceProductController());
+    final MarketplaceProductController marketplaceController = Get.put(
+      MarketplaceProductController(userId: userId),
+      tag: userId ?? 'global',
+    );
 
     return Obx(() {
       if (marketplaceController.isLoading.value && marketplaceController.products.isEmpty) {

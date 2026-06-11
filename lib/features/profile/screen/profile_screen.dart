@@ -148,8 +148,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                tabs.add(Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)));
                tabViews.add(
                  (!isOtherProfile && ProfilePermissionManager.canSellProducts)
-                   ? ProductGridScreen(isOwnProfile: true)
-                   : ProductGridScreen(isOwnProfile: false),
+                   ? ProductGridScreen(isOwnProfile: true, userId: user.id?.toString())
+                   : ProductGridScreen(isOwnProfile: false, userId: user.id?.toString()),
                );
              }
 
@@ -157,8 +157,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                tabs.add(Tab(child: Icon(Icons.miscellaneous_services_outlined, color: Colors.black, size: 26)));
                tabViews.add(
                  (!isOtherProfile && ProfilePermissionManager.canProvideServices)
-                   ? DigitalProductListScreen(isOwnProfile: true)
-                   : DigitalProductListScreen(isOwnProfile: false),
+                   ? DigitalProductListScreen(isOwnProfile: true, userId: user.id?.toString())
+                   : DigitalProductListScreen(isOwnProfile: false, userId: user.id?.toString()),
                );
              }
 

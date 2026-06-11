@@ -11,20 +11,25 @@ import '../../service/persentation/widgets/service_detail_bottom_sheet.dart';
 
 class DigitalProductListScreen extends StatefulWidget {
   final bool isOwnProfile;
+  final String? userId;
   
-  const DigitalProductListScreen({super.key, this.isOwnProfile = false});
+  const DigitalProductListScreen({super.key, this.isOwnProfile = false, this.userId});
 
   @override
   State<DigitalProductListScreen> createState() => _DigitalProductListScreenState();
 }
 
 class _DigitalProductListScreenState extends State<DigitalProductListScreen> {
-  final ServiceController controller = Get.put(ServiceController());
+  late final ServiceController controller;
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    controller = Get.put(
+      ServiceController(userId: widget.userId),
+      tag: widget.userId ?? 'global',
+    );
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
         controller.fetchMarketplaceServices();
@@ -100,7 +105,7 @@ class _DigitalProductListScreenState extends State<DigitalProductListScreen> {
                   )
                 : const SizedBox.shrink());
             }
-            return DigitalProductListItem(product: controller.marketplaceServices[index]);
+            return DigitalProductListItem(product: controller.marketplaceServices[index], userId: widget.userId);
           },
         ),
       );
@@ -129,12 +134,13 @@ void _showEnquiryBottomSheet(BuildContext context) {
 
 class DigitalProductListItem extends StatelessWidget {
   final ServiceModel product;
+  final String? userId;
 
-  const DigitalProductListItem({super.key, required this.product});
+  const DigitalProductListItem({super.key, required this.product, this.userId});
 
   @override
   Widget build(BuildContext context) {
-    final ServiceController controller = Get.find<ServiceController>();
+    final ServiceController controller = Get.find<ServiceController>(tag: userId ?? 'global');
     
     return GestureDetector(
       onTap: () {

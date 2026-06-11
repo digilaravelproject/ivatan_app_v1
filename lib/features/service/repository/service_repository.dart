@@ -21,7 +21,7 @@ abstract class ServiceRepository {
     List<String>? deletedImageIds,
   });
   Future<Map<String, dynamic>?> deleteService(int id);
-  Future<List<ServiceModel>> getMarketplaceServices({int page = 1});
+  Future<List<ServiceModel>> getMarketplaceServices({int page = 1, String? userId});
   Future<ServiceModel?> getMarketplaceServiceDetail(int id);
   Future<Map<String, dynamic>?> submitEnquiry({
     required int sellerId,
@@ -55,8 +55,10 @@ class ServiceRepositoryImpl implements ServiceRepository {
   }
 
   @override
-  Future<List<ServiceModel>> getMarketplaceServices({int page = 1}) async {
-    const String endpoint = AppUrls.marketplaceServices;
+  Future<List<ServiceModel>> getMarketplaceServices({int page = 1, String? userId}) async {
+    final String endpoint = userId != null
+        ? "api/v1/marketplace/service/$userId"
+        : AppUrls.marketplaceServices;
     final response = await apiServices.callGet(endpoint, queryParams: {'page': page.toString()});
 
     if (response != null && response['success'] == true) {

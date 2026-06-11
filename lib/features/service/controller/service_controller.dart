@@ -7,6 +7,9 @@ import '../repository/service_repository.dart';
 
 class ServiceController extends GetxController {
   final ServiceRepository repository = Get.put(ServiceRepositoryImpl());
+  final String? userId;
+
+  ServiceController({this.userId});
 
   var services = <ServiceModel>[].obs;
   var isLoading = false.obs;
@@ -40,7 +43,9 @@ class ServiceController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchServices();
+    if (userId == null) {
+      fetchServices();
+    }
     fetchMarketplaceServices();
   }
 
@@ -81,7 +86,7 @@ class ServiceController extends GetxController {
     try {
       isMarketplaceLoading(true);
       errorMessage('');
-      final fetchedServices = await repository.getMarketplaceServices(page: marketplacePage);
+      final fetchedServices = await repository.getMarketplaceServices(page: marketplacePage, userId: userId);
       
       if (isRefresh) {
         marketplaceServices.assignAll(fetchedServices);
