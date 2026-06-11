@@ -286,7 +286,7 @@ class ProfileTypeSelector extends StatelessWidget {
       child: Column(
         children: pType.sellerTypes.map((subType) {
           final subTypeLabel = subType.capitalizeFirst ?? subType;
-          final isSubSelected = isSelected && controller.text.contains(subType);
+          final isSubSelected = isSelected && controller.text.toLowerCase().contains(subType.toLowerCase());
 
           return Material(
             color: Colors.transparent,
