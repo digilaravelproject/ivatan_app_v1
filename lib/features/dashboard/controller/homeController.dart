@@ -521,12 +521,8 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       print("Error deleting token on logout: $e");
     }
 
-    // Always clear local storage first (before API call)
-    // This ensures user is logged out even if API fails
-    SharedPrefManager().userLogOut();
-
-    // Try API logout (fire and forget — don't block on result)
     try {
+      // API call pehle
       final response = await api.callDelete(AppUrls.logout);
       print("logout response : $response");
       final msg = response?["message"] ?? "Logout successful";
@@ -534,12 +530,15 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     } catch (e) {
       print("Logout API error (ignored): $e");
       CustomSnackBar.showSuccess(message: "Logged out successfully");
-    }
+    } finally {
+      // API success ho ya fail — local data hamesha clear hoga
+      SharedPrefManager().userLogOut();
 
-    // Navigate to login
-    Future.delayed(const Duration(milliseconds: 200), () {
-      Get.offAllNamed(AppRoutes.login);
-    });
+      // Navigate to login
+      Future.delayed(const Duration(milliseconds: 200), () {
+        Get.offAllNamed(AppRoutes.login);
+      });
+    }
   }
 
   Future<void> likeStory(int storyId) async {
