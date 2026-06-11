@@ -866,14 +866,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: CircleAvatar(
                                   radius: 45,
                                   backgroundColor: Colors.grey.shade200,
-                                  backgroundImage: NetworkImage(
-                                      AppUrls.getFullImageUrl(user.profilePhotoPath)
-                                  ),
-                                  onBackgroundImageError: (error, stackTrace) {
-                                    print("Image Load Error: $error");
-                                  },
+                                  backgroundImage: (user.profilePhotoPath != null && user.profilePhotoPath!.isNotEmpty)
+                                      ? NetworkImage(AppUrls.getFullImageUrl(user.profilePhotoPath))
+                                      : null,
+                                  onBackgroundImageError: (user.profilePhotoPath != null && user.profilePhotoPath!.isNotEmpty)
+                                      ? (error, stackTrace) {
+                                          print("Image Load Error: $error");
+                                        }
+                                      : null,
                                   child: (user.profilePhotoPath == null || user.profilePhotoPath!.isEmpty)
-                                      ? Icon(Icons.person, color: Colors.grey.shade400, size: 60)
+                                      ? Icon(Icons.person, color: Colors.grey.shade600, size: 60)
                                       : null,
                                 ).animate(onPlay: (controller) => controller.repeat(reverse: true))
                                  .scale(duration: 600.ms, curve: Curves.easeOutBack)
