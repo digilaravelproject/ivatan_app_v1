@@ -76,11 +76,10 @@ class HomePage extends StatelessWidget {
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
-              // ============= SLIVER APP BAR (Hide/Show on Scroll) =============
-              SliverAppBar(
-                floating: false,
-                snap: false,
-                pinned: true,
+              Obx(() => SliverAppBar(
+                floating: true,
+                snap: true,
+                pinned: controller.showStories.value,
                 backgroundColor: Colors.white,
                 elevation: 0,
                 automaticallyImplyLeading: false,
@@ -216,7 +215,7 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
+              )),
 
               // ============= STORIES SECTION (Always Visible) =============
               SliverToBoxAdapter(
