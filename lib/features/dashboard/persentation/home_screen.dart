@@ -4548,37 +4548,48 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
               int? profileId;
               String? activePlanSlug;
               bool isSubscribedActive = false;
+              dynamic profileObj;
 
-              if (currentProfileName == 'personal') {
+              if (currentProfileName == 'personal' || currentProfileName == 'personal_profile') {
                 mappedProfileType = 'personal';
-                final profileObj = config.data?.personalProfile;
+                profileObj = config.data?.personalProfile;
                 profileId = profileObj?.profileId;
                 activePlanSlug = profileObj?.subscription?.planSlug;
                 isSubscribedActive = profileObj?.subscription?.isActive ?? false;
               } else if (currentProfileName == 'employer') {
                 mappedProfileType = 'employer';
-                final profileObj = config.data?.employer;
+                profileObj = config.data?.employer;
                 profileId = profileObj?.profileId;
                 activePlanSlug = profileObj?.subscription?.planSlug;
                 isSubscribedActive = profileObj?.subscription?.isActive ?? false;
-              } else if (currentProfileName == 'ecommerce') {
+              } else if (currentProfileName == 'ecommerce' || currentProfileName == 'seller') {
                 mappedProfileType = 'seller';
-                final profileObj = config.data?.ecommerce;
+                profileObj = config.data?.ecommerce;
                 profileId = profileObj?.profileId;
                 activePlanSlug = profileObj?.subscription?.planSlug;
                 isSubscribedActive = profileObj?.subscription?.isActive ?? false;
-              } else if (currentProfileName == 'music_play') {
+              } else if (currentProfileName == 'music_play' || currentProfileName == 'music') {
                 mappedProfileType = 'music';
-                final profileObj = config.data?.musicPlay;
+                profileObj = config.data?.musicPlay;
                 profileId = profileObj?.profileId;
                 activePlanSlug = profileObj?.subscription?.planSlug;
                 isSubscribedActive = profileObj?.subscription?.isActive ?? false;
-              } else if (currentProfileName == 'content_creation') {
+              } else if (currentProfileName == 'content_creation' || currentProfileName == 'creator') {
                 mappedProfileType = 'creator';
-                final profileObj = config.data?.contentCreation;
+                profileObj = config.data?.contentCreation;
                 profileId = profileObj?.profileId;
                 activePlanSlug = profileObj?.subscriptionDetails?.planSlug;
                 isSubscribedActive = profileObj?.subscriptionDetails?.isActive ?? false;
+              }
+
+              if (profileObj == null) {
+                Get.snackbar(
+                  "Error",
+                  "Profile configuration details are missing for: $currentProfileName",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+                return;
               }
 
               try {

@@ -22,7 +22,7 @@ import '../../../core/network/app_urls.dart';
 import '../../../core/widgets/custom_dialog.dart';
 import 'package:i_vatan_app/features/Notification/controller/notification_controller.dart';
 
-class HomeController extends GetxController {
+class HomeController extends GetxController with WidgetsBindingObserver {
   RxBool isLoading = false.obs;
   RxList<PostItem> posts = <PostItem>[].obs;
   RxBool isStoryLoading = false.obs;
@@ -97,12 +97,26 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     loadCurrentUser();
     loadCachedProfileConfig();
     fetchPosts();
     fetchStories();
     fetchUnreadNotificationCount();
     fetchProfileConfig();
+  }
+
+  @override
+  void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      fetchProfileConfig();
+    }
   }
 
 
