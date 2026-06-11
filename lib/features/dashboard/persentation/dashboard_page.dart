@@ -62,9 +62,9 @@ class DashboardPage extends StatelessWidget {
             gradient: LinearGradient(
               colors: [
                 Colors.white.withOpacity(0.0),
-                Colors.white.withOpacity(0.2),
+                Colors.white.withOpacity(0.25),
                 Colors.white.withOpacity(0.5),
-                Colors.white,
+                Colors.white.withOpacity(0.75),
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -73,7 +73,7 @@ class DashboardPage extends StatelessWidget {
           child: Container(
             margin: EdgeInsets.zero,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Colors.white.withOpacity(0.65),
               border: Border(
                 top: BorderSide(
                   color: Colors.black.withOpacity(0.06),
