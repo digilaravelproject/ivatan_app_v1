@@ -472,7 +472,7 @@ class ShortPlayController extends GetxController {
   final isMuted = false.obs; // Global mute state
 
   // Per-reel comments cache for instant preview
-  final Map<int, RxList<CommentModel>> reelComments = {};
+  final RxMap<int, RxList<CommentModel>> reelComments = <int, RxList<CommentModel>>{}.obs;
 
   @override
   void onInit() {
