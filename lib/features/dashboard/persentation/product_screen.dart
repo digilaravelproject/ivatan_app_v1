@@ -13,6 +13,7 @@ import '../../product/persentation/controller/product_Controller.dart';
 import '../../product/persentation/cart_screen.dart';
 import '../../product/persentation/product_detail_screen.dart';
 import '../../product/persentation/my_products_screen.dart';
+import '../../product/persentation/create_product_screen.dart';
 
 class ProductGridScreen extends StatelessWidget {
   final bool isOwnProfile;
@@ -22,19 +23,14 @@ class ProductGridScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // If it's own profile, show management view (without AppBar)
-    // if (isOwnProfile) {
-    //   return _MyProductsTabView();
-    // }
-
-    // Otherwise show products with Add to Cart buttons
-    return _BrowseProductsView(userId: userId);
+    return _BrowseProductsView(userId: userId, isOwnProfile: isOwnProfile);
   }
 }
 
 class ProductCard extends GetWidget<ProductController> {
   final Product product;
-  const ProductCard({super.key, required this.product});
+  final bool isOwnProfile;
+  const ProductCard({super.key, required this.product, this.isOwnProfile = false});
 
   @override
   Widget build(BuildContext context) {
@@ -141,119 +137,122 @@ class ProductCard extends GetWidget<ProductController> {
                       ),
                       const SizedBox(height: 8),
 
-                      // Quantity and Add to Cart Section
-                      Obx(() {
-                        final String productId = product.id;
-                        final cartQty = controller.getCartQuantity(productId);
-                        final displayQty = cartQty == 0 ? 1 : cartQty;
-                        final isLoading = controller.loadingIds.contains(
-                          productId,
-                        );
+                      // Own profile: Edit button | Other: Add to Cart
+                      if (isOwnProfile)
+                        _buildEditButton(product)
+                      else
+                        Obx(() {
+                          final String productId = product.id;
+                          final cartQty = controller.getCartQuantity(productId);
+                          final displayQty = cartQty == 0 ? 1 : cartQty;
+                          final isLoading = controller.loadingIds.contains(
+                            productId,
+                          );
 
-                        return Column(
-                          children: [
-                            // Circular Quantity Controls
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                GestureDetector(
-                                  onTap:
-                                      () => controller.decreaseCartQuantity(
-                                        productId,
+                          return Column(
+                            children: [
+                              // Circular Quantity Controls
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap:
+                                        () => controller.decreaseCartQuantity(
+                                          productId,
+                                        ),
+                                    child: Container(
+                                      width: 28,
+                                      height: 28,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        shape: BoxShape.circle,
                                       ),
-                                  child: Container(
-                                    width: 28,
-                                    height: 28,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.shade200,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.remove,
-                                      size: 18,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
-                                  child: Text(
-                                    '$displayQty',
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap:
-                                      () => controller.increaseCartQuantity(
-                                        productId,
+                                      child: const Icon(
+                                        Icons.remove,
+                                        size: 18,
+                                        color: Colors.black87,
                                       ),
-                                  child: Container(
-                                    width: 28,
-                                    height: 28,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.add,
-                                      size: 18,
-                                      color: Colors.white,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
+                                    child: Text(
+                                      '$displayQty',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap:
+                                        () => controller.increaseCartQuantity(
+                                          productId,
+                                        ),
+                                    child: Container(
+                                      width: 28,
+                                      height: 28,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.add,
+                                        size: 18,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
 
-                            // ADD TO CART Button
-                            InkWell(
-                              onTap: () {
-                                if (isLoading) return;
+                              // ADD TO CART Button
+                              InkWell(
+                                onTap: () {
+                                  if (isLoading) return;
 
-                                // If not in cartItems, it needs to be initialized
-                                if (cartQty == 0) {
-                                  controller.addToCart(productId);
-                                }
-                                controller.addToCartApi(productId);
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                height: 32,
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Center(
-                                  child:
-                                      isLoading
-                                          ? const SizedBox(
-                                            height: 16,
-                                            width: 16,
-                                            child: CircularProgressIndicator(
-                                              color: Colors.white,
-                                              strokeWidth: 2,
+                                  // If not in cartItems, it needs to be initialized
+                                  if (cartQty == 0) {
+                                    controller.addToCart(productId);
+                                  }
+                                  controller.addToCartApi(productId);
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Center(
+                                    child:
+                                        isLoading
+                                            ? const SizedBox(
+                                              height: 16,
+                                              width: 16,
+                                              child: CircularProgressIndicator(
+                                                color: Colors.white,
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                            : const Text(
+                                              'ADD TO CART',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 11,
+                                              ),
                                             ),
-                                          )
-                                          : const Text(
-                                            'ADD TO CART',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 11,
-                                            ),
-                                          ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        );
-                      }),
+                            ],
+                          );
+                        }),
                     ],
                   ),
                 ),
@@ -261,6 +260,52 @@ class ProductCard extends GetWidget<ProductController> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildEditButton(Product prod) {
+    return InkWell(
+      onTap: () {
+        // Convert Product to ProductModel for editing
+        final productModel = ProductModel(
+          id: prod.id,
+          uuid: '',
+          title: prod.title,
+          description: prod.description,
+          price: prod.price,
+          discountPrice: prod.originalPrice,
+          stock: 0,
+          coverImage: prod.coverImage,
+          status: 'active',
+          images: [],
+        );
+        Get.to(() => CreateProductScreen(product: productModel));
+      },
+      child: Container(
+        width: double.infinity,
+        height: 32,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: const Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.edit_outlined, color: Colors.white, size: 14),
+              SizedBox(width: 6),
+              Text(
+                'EDIT',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -301,7 +346,8 @@ class Product {
 // Browse Products View - Fetches from Marketplace API
 class _BrowseProductsView extends StatelessWidget {
   final String? userId;
-  const _BrowseProductsView({this.userId});
+  final bool isOwnProfile;
+  const _BrowseProductsView({this.userId, this.isOwnProfile = false});
 
   @override
   Widget build(BuildContext context) {
@@ -349,13 +395,16 @@ class _BrowseProductsView extends StatelessWidget {
             padding: EdgeInsets.zero,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 0.68,
+              childAspectRatio: isOwnProfile ? 0.75 : 0.68,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
             ),
             itemCount: products.length,
             itemBuilder: (context, index) {
-              return ProductCard(product: products[index]);
+              return ProductCard(
+                product: products[index],
+                isOwnProfile: isOwnProfile,
+              );
             },
           ),
         ),
