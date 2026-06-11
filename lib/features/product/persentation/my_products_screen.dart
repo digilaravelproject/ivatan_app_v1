@@ -258,6 +258,12 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
     );
   }
 
+  /// Returns true if status should be shown as green (active or approved)
+  bool _isPositiveStatus(String status) {
+    final s = status.toLowerCase();
+    return s == 'active' || s == 'approved';
+  }
+
   Widget _buildProductCard(ProductModel product) {
     final imageUrl = product.coverImage != null 
         ? AppUrls.getFullImageUrl(product.coverImage!)
@@ -325,22 +331,21 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                               ),
                             ),
                           ),
-                          // Active/Inactive Badge
+                          // Active/Inactive/Approved Badge
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: product.status.contains("active")
+                              color: _isPositiveStatus(product.status)
                                   ? AppColors.success.withOpacity(0.1)
                                   : Colors.grey.shade300,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
                               product.status.toString().toUpperCase(),
-                              //contains("active") ? "Active" : "Inactive",
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: product.status.contains("active") ? AppColors.success : Colors.grey.shade700,
+                                color: _isPositiveStatus(product.status) ? AppColors.success : Colors.grey.shade700,
                               ),
                             ),
                           ),

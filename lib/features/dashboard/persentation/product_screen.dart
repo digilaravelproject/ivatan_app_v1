@@ -275,9 +275,9 @@ class ProductCard extends GetWidget<ProductController> {
           description: prod.description,
           price: prod.price,
           discountPrice: prod.originalPrice,
-          stock: 0,
+          stock: prod.stock,
           coverImage: prod.coverImage,
-          status: 'active',
+          status: prod.status,
           images: [],
         );
         Get.to(() => CreateProductScreen(product: productModel));
@@ -318,6 +318,8 @@ class Product {
   final double price;
   final double? originalPrice;
   final String? coverImage;
+  final String status;
+  final int stock;
 
   Product({
     required this.id,
@@ -326,6 +328,8 @@ class Product {
     required this.price,
     this.originalPrice,
     this.coverImage,
+    this.status = 'active',
+    this.stock = 0,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -339,6 +343,8 @@ class Product {
               ? double.tryParse(json['discount_price'].toString())
               : null,
       coverImage: json['cover_image'],
+      status: json['status'] ?? 'active',
+      stock: json['stock'] ?? 0,
     );
   }
 }
@@ -393,7 +399,7 @@ class _BrowseProductsView extends StatelessWidget {
           padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
           child: GridView.builder(
             padding: EdgeInsets.zero,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               childAspectRatio: isOwnProfile ? 0.75 : 0.68,
               crossAxisSpacing: 10,
@@ -529,7 +535,7 @@ class _MyProductsTabView extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color:
-                            product.status.toLowerCase() == 'active'
+                            (product.status.toLowerCase() == 'active' || product.status.toLowerCase() == 'approved')
                                 ? Colors.green
                                 : Colors.red,
                         borderRadius: BorderRadius.circular(4),
