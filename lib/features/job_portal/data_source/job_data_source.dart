@@ -239,7 +239,7 @@ class JobRemoteDataSourceImpl implements JobRemoteDataSource {
       url += "&search=$search&title=$search";
     }
 
-    final response = await apiServices.callGet(url);
+    final response = await apiServices.callGet(url, showErrorToast: false);
 
     if (response != null && response['status'] == true) {
       final List dataList = response['data']['data'];
