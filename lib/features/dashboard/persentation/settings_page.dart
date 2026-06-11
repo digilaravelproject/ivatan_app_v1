@@ -367,7 +367,7 @@ class SettingsScreen extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: () async {
+      onTap: isApproved ? null : () async {
         final toType = req.toProfileType;
         final subType = req.profileSubType;
         
@@ -466,7 +466,7 @@ class SettingsScreen extends StatelessWidget {
                                     color: Colors.grey.shade500,
                                   ),
                                 )
-                              else
+                              else if (!isApproved)
                                 Text(
                                   'Tap to view details',
                                   style: TextStyle(
@@ -509,12 +509,14 @@ class SettingsScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 6),
-                            Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              color: Colors.grey.shade400,
-                              size: 11,
-                            ),
+                             if (!isApproved) ...[
+                               const SizedBox(height: 6),
+                               Icon(
+                                 Icons.arrow_forward_ios_rounded,
+                                 color: Colors.grey.shade400,
+                                 size: 11,
+                               ),
+                             ],
                           ],
                         ),
                       ],
