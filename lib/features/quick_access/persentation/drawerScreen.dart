@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:i_vatan_app/features/auth/persentation/login_screen.dart';
+import '../../../core/helper/profile_permission_manager.dart';
 import '../../../core/helper/custom_buttons.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../db/shared_pref_manager.dart';
@@ -141,9 +142,9 @@ class DrawerScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                      Row(
+                      Obx(() => Row(
                         children: [
-                          if (SharedPrefManager().user?.isEmployer == true) ...[
+                          if (ProfilePermissionManager.isProfileActive(ProfileType.employer)) ...[
                             Expanded(
                               child: _buildBottomCard(
                                 context,
@@ -166,7 +167,7 @@ class DrawerScreen extends StatelessWidget {
                             ),
                           ),
                         ],
-                      ),
+                      )),
                      const SizedBox(height: 16),
                      GestureDetector(
                       onTap: () => Get.to(HelpCenter()),
