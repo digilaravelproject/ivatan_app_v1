@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../db/shared_pref_manager.dart';
 import '../../features/dashboard/controller/homeController.dart';
+import '../../features/dashboard/model/user_profile.dart';
 import '../../features/subscription/data/model/profile_config_model.dart';
 
 enum ProfileType {
@@ -189,5 +190,27 @@ class ProfilePermissionManager {
   static bool get canUploadMusic {
     return isProfileActive(ProfileType.musicPlay) &&
         hasActiveSubscription(ProfileType.musicPlay);
+  }
+
+  /// Check if a given UserData profile supports selling products (handles both own and other profiles)
+  static bool canProfileSellProducts(UserData user, bool isOtherProfile) {
+    if (isOtherProfile) {
+      return user.isSeller == true &&
+          (user.profileSubType?.toLowerCase() == 'product' ||
+              user.profileSubType?.toLowerCase() == 'both' ||
+              user.profileSubType == null);
+    }
+    return canSellProducts;
+  }
+
+  /// Check if a given UserData profile supports providing services (handles both own and other profiles)
+  static bool canProfileProvideServices(UserData user, bool isOtherProfile) {
+    if (isOtherProfile) {
+      return user.isSeller == true &&
+          (user.profileSubType?.toLowerCase() == 'service' ||
+              user.profileSubType?.toLowerCase() == 'both' ||
+              user.profileSubType == null);
+    }
+    return canProvideServices;
   }
 }

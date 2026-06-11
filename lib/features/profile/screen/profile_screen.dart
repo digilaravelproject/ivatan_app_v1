@@ -130,13 +130,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                      (user.accountPrivacy?.toLowerCase() == "private") && 
                                      !isFollowing;
              // Build dynamic tabs and views
-             final bool showProductTab = isOtherProfile
-                 ? (user.isSeller == true && (user.profileSubType?.toLowerCase() == 'product' || user.profileSubType?.toLowerCase() == 'both' || user.profileSubType == null))
-                 : ProfilePermissionManager.canSellProducts;
-
-             final bool showServiceTab = isOtherProfile
-                 ? (user.isSeller == true && (user.profileSubType?.toLowerCase() == 'service' || user.profileSubType?.toLowerCase() == 'both' || user.profileSubType == null))
-                 : ProfilePermissionManager.canProvideServices;
+             final bool showProductTab = ProfilePermissionManager.canProfileSellProducts(user, isOtherProfile);
+             final bool showServiceTab = ProfilePermissionManager.canProfileProvideServices(user, isOtherProfile);
 
              List<Tab> tabs = [
                Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 
