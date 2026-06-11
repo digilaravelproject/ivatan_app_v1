@@ -18,4 +18,5 @@ class ApiKeys {
   static const String response = "Response";
   static const String message = "Message";
 
+  static const String razorpayKey = "rzp_test_S9yXFuXcf0S6Ll";
 }

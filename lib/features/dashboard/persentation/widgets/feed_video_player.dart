@@ -6,11 +6,15 @@ import '../../../../core/network/app_urls.dart';
 class FeedVideoPlayer extends StatefulWidget {
   final String videoUrl;
   final bool isPlay;
+  final ValueChanged<double>? onRatioLoaded;
+  final BoxFit fit;
 
   const FeedVideoPlayer({
     Key? key,
     required this.videoUrl,
     this.isPlay = false,
+    this.onRatioLoaded,
+    this.fit = BoxFit.contain,
   }) : super(key: key);
 
   @override
@@ -26,24 +30,37 @@ class _FeedVideoPlayerState extends State<FeedVideoPlayer> {
   @override
   void initState() {
     super.initState();
-    // Initialize controller but don't play yet unless visible
+    _initializeController();
+  }
+
+  void _initializeController() {
     _controller = VideoPlayerController.networkUrl(Uri.parse(AppUrls.getFullImageUrl(widget.videoUrl)))
       ..initialize().then((_) {
-        setState(() {
-          _initialized = true;
-          _controller.setLooping(true);
-          // Initial play state will be handled by visibility detector or widget.isPlay
-          if (widget.isPlay) {
-            _controller.play();
+        if (mounted) {
+          setState(() {
+            _initialized = true;
+            _controller.setLooping(true);
+            if (widget.isPlay) {
+              _controller.play();
+            }
+          });
+          if (widget.onRatioLoaded != null) {
+            widget.onRatioLoaded!(_controller.value.aspectRatio);
           }
-        });
+        }
       });
   }
 
   @override
   void didUpdateWidget(covariant FeedVideoPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.isPlay != oldWidget.isPlay) {
+    if (widget.videoUrl != oldWidget.videoUrl) {
+      setState(() {
+        _initialized = false;
+      });
+      _controller.dispose();
+      _initializeController();
+    } else if (widget.isPlay != oldWidget.isPlay) {
       if (widget.isPlay) {
         _controller.play();
       } else {
@@ -77,6 +94,24 @@ class _FeedVideoPlayerState extends State<FeedVideoPlayer> {
       );
     }
 
+    Widget videoWidget = AspectRatio(
+      aspectRatio: _controller.value.aspectRatio,
+      child: VideoPlayer(_controller),
+    );
+
+    if (widget.fit == BoxFit.cover) {
+      videoWidget = SizedBox.expand(
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: _controller.value.size.width > 0 ? _controller.value.size.width : 16,
+            height: _controller.value.size.height > 0 ? _controller.value.size.height : 9,
+            child: VideoPlayer(_controller),
+          ),
+        ),
+      );
+    }
+
     return VisibilityDetector(
       key: _visibilityKey,
       onVisibilityChanged: (visibilityInfo) {
@@ -98,10 +133,7 @@ class _FeedVideoPlayerState extends State<FeedVideoPlayer> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller),
-          ),
+          videoWidget,
           
           // Mute Button (Bottom Right)
           Positioned(

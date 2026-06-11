@@ -95,7 +95,7 @@ class ApiServices extends GetxService {
   }) async {
     final dioClient = dio.Dio();
     dioClient.options.baseUrl = AppUrls.apiBaseUrl;
-    dioClient.options.headers = _defaultHeaders();
+    dioClient.options.headers = _multipartHeaders();
     dioClient.options.connectTimeout = _timeout;
     dioClient.options.receiveTimeout = const Duration(minutes: 30);
     dioClient.options.sendTimeout = const Duration(minutes: 30);
@@ -115,15 +115,17 @@ class ApiServices extends GetxService {
             filename: value.path.split("/").last,
           ),
         ));
-      } else if (value is List<File>) {
+      } else if (value is List && value.isNotEmpty && value.first is File) {
         for (var file in value) {
-          formData.files.add(MapEntry(
-            key, // Usually "media[]"
-            dio.MultipartFile.fromFileSync(
-              file.path,
-              filename: file.path.split("/").last,
-            ),
-          ));
+          if (file is File) {
+            formData.files.add(MapEntry(
+              key, // Usually "media[]"
+              dio.MultipartFile.fromFileSync(
+                file.path,
+                filename: file.path.split("/").last,
+              ),
+            ));
+          }
         }
       } else if (value != null) {
         if (value is Map || value is List) {
@@ -240,15 +242,17 @@ class ApiServices extends GetxService {
               filename: file.path.split("/").last,
             );
             request.files.add(multipartFile);
-          } else if (entry.value is List<File>) {
-            final files = entry.value as List<File>;
+          } else if (entry.value is List && (entry.value as List).isNotEmpty && (entry.value as List).first is File) {
+            final files = entry.value as List;
             for (var file in files) {
-              final multipartFile = await http.MultipartFile.fromPath(
-                entry.key,
-                file.path,
-                filename: file.path.split("/").last,
-              );
-              request.files.add(multipartFile);
+              if (file is File) {
+                final multipartFile = await http.MultipartFile.fromPath(
+                  entry.key,
+                  file.path,
+                  filename: file.path.split("/").last,
+                );
+                request.files.add(multipartFile);
+              }
             }
           }
         }

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/db/shared_pref_manager.dart';
+import '../../subscription/data/model/profile_config_model.dart';
 
 import '../../../core/helper/custom_snack_bar.dart';
 import 'package:video_compress/video_compress.dart';
@@ -14,11 +15,14 @@ import '../model/story_model.dart';
 import '../persentation/greetingDialog.dart';
 import 'follow_controller.dart';
 import '../../reels_screen/controller/short_play_controller.dart';
+import '../../videos/controller/video_controller.dart';
+import '../../profile/controller/ownpostController.dart';
 import 'settings_controller.dart';
 import '../../../core/network/app_urls.dart';
 import '../../../core/widgets/custom_dialog.dart';
+import 'package:i_vatan_app/features/Notification/controller/notification_controller.dart';
 
-class HomeController extends GetxController {
+class HomeController extends GetxController with WidgetsBindingObserver {
   RxBool isLoading = false.obs;
   RxList<PostItem> posts = <PostItem>[].obs;
   RxBool isStoryLoading = false.obs;
@@ -51,13 +55,68 @@ class HomeController extends GetxController {
   RxDouble trimStartTime = 0.0.obs; // In milliseconds
   RxDouble trimDuration = 0.0.obs;  // In milliseconds
 
+  RxInt unreadNotificationCount = 0.obs;
+  Rxn<ProfileConfigModel> profileConfig = Rxn<ProfileConfigModel>();
+
+  void loadCachedProfileConfig() {
+    final cached = SharedPrefManager().profileConfig;
+    if (cached != null) {
+      try {
+        profileConfig.value = ProfileConfigModel.fromJson(cached);
+      } catch (e) {
+        print("Error loading cached profile config: $e");
+      }
+    }
+  }
+
+  Future<void> fetchProfileConfig() async {
+    try {
+      final response = await api.callGet(AppUrls.profileConfig);
+      print("Profile Config API Response: $response");
+      if (response != null && response['status'] == true) {
+        final configModel = ProfileConfigModel.fromJson(response);
+        profileConfig.value = configModel;
+        await SharedPrefManager().saveProfileConfig(response);
+      }
+    } catch (e) {
+      print("Error fetching profile config in HomeController: $e");
+    }
+  }
+
+  Future<void> fetchUnreadNotificationCount() async {
+    try {
+      final response = await api.callGet(AppUrls.unreadCount);
+      if (response != null && response['success'] == true) {
+        unreadNotificationCount.value = response['unread'] as int? ?? 0;
+      }
+    } catch (e) {
+      print("Error fetching unread count in HomeController: $e");
+    }
+  }
+
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     loadCurrentUser();
+    loadCachedProfileConfig();
     fetchPosts();
     fetchStories();
+    fetchUnreadNotificationCount();
+    fetchProfileConfig();
+  }
 
+  @override
+  void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      fetchProfileConfig();
+    }
   }
 
 
@@ -202,11 +261,38 @@ class HomeController extends GetxController {
       // Check for video and compress if needed
       File? videoToCompress;
       String? videoKey;
+      int? videoIndexInList;
 
       body.forEach((key, value) {
-        if (value is File && (value.path.endsWith(".mp4") || value.path.endsWith(".mov") || value.path.endsWith(".m4v"))) {
-          videoToCompress = value;
-          videoKey = key;
+        if (value is File) {
+          final pathLower = value.path.toLowerCase();
+          if (pathLower.endsWith(".mp4") ||
+              pathLower.endsWith(".mov") ||
+              pathLower.endsWith(".m4v") ||
+              pathLower.endsWith(".3gp") ||
+              pathLower.endsWith(".mkv") ||
+              pathLower.endsWith(".avi")) {
+            videoToCompress = value;
+            videoKey = key;
+          }
+        } else if (value is List) {
+          for (int i = 0; i < value.length; i++) {
+            final item = value[i];
+            if (item is File) {
+              final pathLower = item.path.toLowerCase();
+              if (pathLower.endsWith(".mp4") ||
+                  pathLower.endsWith(".mov") ||
+                  pathLower.endsWith(".m4v") ||
+                  pathLower.endsWith(".3gp") ||
+                  pathLower.endsWith(".mkv") ||
+                  pathLower.endsWith(".avi")) {
+                videoToCompress = item;
+                videoKey = key;
+                videoIndexInList = i;
+                break;
+              }
+            }
+          }
         }
       });
 
@@ -225,7 +311,12 @@ class HomeController extends GetxController {
         );
 
         if (info != null && info.path != null) {
-          body[videoKey!] = File(info.path!);
+          final compressedFile = File(info.path!);
+          if (videoIndexInList != null) {
+            (body[videoKey!] as List)[videoIndexInList!] = compressedFile;
+          } else {
+            body[videoKey!] = compressedFile;
+          }
           print("BACKGROUND COMPRESSION COMPLETE: ${info.path}");
         }
         isCompressing.value = false;
@@ -244,6 +335,37 @@ class HomeController extends GetxController {
       if (response != null && response.statusCode! >= 200 && response.statusCode! < 300) {
         CustomSnackBar.showSuccess(message: response.data["message"] ?? "Upload successful!");
         fetchPosts(); // Refresh home feed
+        
+        // Refresh Discover videos list if VideoController is registered
+        if (Get.isRegistered<VideoController>()) {
+          Get.find<VideoController>().fetchVideo();
+        }
+        
+        // Refresh reels/clips list if ShortPlayController is registered
+        if (Get.isRegistered<ShortPlayController>()) {
+          Get.find<ShortPlayController>().fetchReels();
+        }
+        
+        // Refresh user's own profile post/video tabs if registered
+        final currentUsername = SharedPrefManager().user?.username;
+        if (currentUsername != null && currentUsername.isNotEmpty) {
+          final List<String> filters = ["posts", "videos"];
+          for (var filter in filters) {
+            final tag = "${currentUsername}_$filter";
+            if (Get.isRegistered<OwnPostController>(tag: tag)) {
+              Get.find<OwnPostController>(tag: tag).fetchOwnPosts(
+                username: currentUsername,
+                filterType: filter,
+              );
+            }
+          }
+          if (Get.isRegistered<OwnPostController>(tag: currentUsername)) {
+            Get.find<OwnPostController>(tag: currentUsername).fetchOwnPosts(
+              username: currentUsername,
+              filterType: "posts",
+            );
+          }
+        }
       } else {
         CustomSnackBar.showError(message: "Upload failed. Please try again.");
       }
@@ -393,6 +515,11 @@ class HomeController extends GetxController {
   }
 
   Future<void> logout() async {
+    try {
+      await Get.find<NotificationController>().deleteTokenOnLogout();
+    } catch (e) {
+      print("Error deleting token on logout: $e");
+    }
     final response = await api.callDelete("api/v1/auth/logout");
     print("logout response : $response");
 

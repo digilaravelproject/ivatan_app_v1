@@ -77,6 +77,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw Exception("Server did not respond");
     }
 
+    if (response["errors"] != null && response["errors"] is Map) {
+      final errorsMap = response["errors"] as Map;
+      if (errorsMap.isNotEmpty) {
+        final firstErrorList = errorsMap.values.first;
+        if (firstErrorList is List && firstErrorList.isNotEmpty) {
+          throw Exception(firstErrorList.first.toString());
+        }
+      }
+    }
+
     if (response["data"] == null || response["data"] is! Map) {
       if (response["message"] != null) {
         throw Exception(response["message"]);

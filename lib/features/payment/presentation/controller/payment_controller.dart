@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart' as rzp;
 import '../../../../db/shared_pref_manager.dart';
 import '../../data/repository/payment_repository.dart';
@@ -73,6 +74,9 @@ class PaymentController extends GetxController {
       'prefill': {
         'contact': user?.phone ?? '',
         'email': user?.email ?? '',
+      },
+      'theme': {
+        'color': '#${AppColors.primary.value.toRadixString(16).padLeft(8, '0').substring(2)}',
       },
       'external': {
         'wallets': ['paytm']

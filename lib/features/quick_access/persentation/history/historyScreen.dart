@@ -7,6 +7,10 @@ import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../controller/history_controller.dart';
 import '../../model/history_model.dart';
+import '../../../dashboard/persentation/widgets/feed_video_player.dart';
+import '../../../videos/persentation/play_video_screen.dart';
+import 'package:i_vatan_app/features/reels_screen/persentation/reels_view.dart';
+import 'package:i_vatan_app/features/reels_screen/model/reel_model.dart';
 
 /*
 class HistoryScreen extends StatelessWidget {
@@ -601,10 +605,25 @@ class VideoGridSection extends StatelessWidget {
 /// Enum for Video type
 enum VideoType { like, comment, product, service }
 
-class HistoryScreen extends StatelessWidget {
-  HistoryScreen({super.key});
-  
+class HistoryScreen extends StatefulWidget {
+  const HistoryScreen({super.key});
+
+  @override
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
   final HistoryController controller = Get.put(HistoryController());
+
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchVideoViews();
+    controller.fetchLikes();
+    controller.fetchComments();
+    controller.fetchPurchases();
+    controller.fetchServices();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -627,6 +646,7 @@ class HistoryScreen extends StatelessWidget {
       body: DefaultTabController(
         length: 4,
         child: NestedScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
 
@@ -693,116 +713,13 @@ class HistoryScreen extends StatelessWidget {
                         }
                         return false;
                       },
-                      child: PageView.builder(
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
                         itemCount: controller.videoViews.length,
-                        controller: PageController(viewportFraction: 0.9),
-                        padEnds: false,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemBuilder: (context, index) {
                           final item = controller.videoViews[index];
-                          final preview = item.preview;
-                          final imageUrl = preview?.thumbnail ?? "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp";
-                          
-                          return Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 8),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.shade300,
-                                  blurRadius: 8,
-                                  spreadRadius: 2,
-                                )
-                              ],
-                            ),
-                            child: Stack(
-                              children: [
-                                /// 🌄 IMAGE
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: Image.network(
-                                    imageUrl,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (ctx, err, stack) => Container(color: Colors.grey),
-                                  ),
-                                ),
-
-                                /// 🌑 GRADIENT OVERLAY
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.black.withOpacity(0.3),
-                                        Colors.black.withOpacity(0.0),
-                                      ],
-                                      begin: Alignment.bottomCenter,
-                                      end: Alignment.topCenter,
-                                    ),
-                                  ),
-                                ),
-
-                                /// 🕒 TIME LABEL (Placeholder, can be updated later if API provides duration)
-                                Positioned(
-                                  bottom: 10,
-                                  right: 12,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withOpacity(0.7),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: const Text(
-                                      "Video",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                /// 📝 TITLE & VIEWS
-                                Positioned(
-                                  bottom: 12,
-                                  left: 16,
-                                  right: 80, // thoda space for time
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        preview?.caption ?? "Nature Video",
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          shadows: [
-                                            Shadow(
-                                              color: Colors.black54,
-                                              offset: Offset(0, 1),
-                                              blurRadius: 2,
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        item.createdHuman,
-                                        style: TextStyle(
-                                          color: Colors.white.withOpacity(0.9),
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
+                          return HistoryVideoSliderItem(item: item);
                         },
                       ),
                     );
@@ -1176,49 +1093,62 @@ class VideoGridSection extends StatelessWidget {
             : _buildShimmerGrid();
       }
       
-      if (items.isEmpty) {
-        return _buildEmptyState("No history found.");
-      }
+      final Widget content = items.isEmpty
+          ? _buildEmptyState("No history found.")
+          : NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                if (!isLoading && hasMore && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+                  loadMore();
+                }
+                return false;
+              },
+              child: (type == VideoType.product || type == VideoType.service)
+                  ? ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(16),
+                      itemCount: items.length + (hasMore ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == items.length) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final item = items[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: _buildOrderCard(item as PurchaseHistoryItem),
+                        );
+                      },
+                    )
+                  : GridView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(16),
+                      itemCount: items.length + (hasMore ? 1 : 0),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 1.0,
+                      ),
+                      itemBuilder: (context, index) {
+                        if (index == items.length) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final item = items[index];
+                        return _buildVideoCard(item, type);
+                      },
+                    ),
+            );
 
-      return NotificationListener<ScrollNotification>(
-        onNotification: (ScrollNotification scrollInfo) {
-          if (!isLoading && hasMore && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-            loadMore();
-          }
-          return false;
+      return RefreshIndicator(
+        onRefresh: () async {
+          await Future.wait([
+            controller.fetchVideoViews(),
+            controller.fetchLikes(),
+            controller.fetchComments(),
+            controller.fetchPurchases(),
+            controller.fetchServices(),
+          ]);
         },
-        child: (type == VideoType.product || type == VideoType.service)
-            ? ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: items.length + (hasMore ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index == items.length) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final item = items[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: _buildOrderCard(item as PurchaseHistoryItem),
-                  );
-                },
-              )
-            : GridView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: items.length + (hasMore ? 1 : 0),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 1.0,
-                ),
-                itemBuilder: (context, index) {
-                  if (index == items.length) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final item = items[index];
-                  return _buildVideoCard(item, type);
-                },
-              ),
+        child: content,
       );
     });
   }
@@ -1272,22 +1202,30 @@ class VideoGridSection extends StatelessWidget {
   }
 
   Widget _buildEmptyState(String title) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.history_toggle_off, size: 64, color: Colors.grey.shade400),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w500,
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        SizedBox(
+          height: 350,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.history_toggle_off, size: 64, color: Colors.grey.shade400),
+                const SizedBox(height: 16),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -1343,31 +1281,128 @@ class VideoGridSection extends StatelessWidget {
     );
   }
 
+  Widget _buildPlaceholderWidget(VideoType type) {
+    IconData iconData;
+    switch (type) {
+      case VideoType.like:
+        iconData = Icons.favorite_border_rounded;
+        break;
+      case VideoType.comment:
+        iconData = Icons.chat_bubble_outline_rounded;
+        break;
+      case VideoType.product:
+        iconData = Icons.shopping_bag_outlined;
+        break;
+      case VideoType.service:
+        iconData = Icons.design_services_outlined;
+        break;
+    }
+
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF2E2E2E), Color(0xFF1A1A1A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Center(
+        child: Icon(
+          iconData,
+          size: 40,
+          color: Colors.white24,
+        ),
+      ),
+    );
+  }
+
   Widget _buildVideoCard(dynamic item, VideoType type) {
-    String imageUrl = "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp";
+    String? imageUrl;
     String title = "Video";
     String sub = "";
+    int entityId = 0;
+    String entityType = "";
 
     if (item is LikeHistoryItem) {
-      imageUrl = item.preview?.thumbnail ?? imageUrl;
+      imageUrl = item.preview?.thumbnail;
       title = item.preview?.caption ?? "Liked Video";
       sub = item.createdHuman;
+      entityId = item.entityId;
+      entityType = item.entityType;
     } else if (item is CommentHistoryItem) {
       title = item.body;
       sub = item.createdHuman;
+      entityId = item.entityId;
+      entityType = item.entityType;
     }
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (ctx, err, stack) => Container(color: Colors.grey),
+    final bool hasImage = imageUrl != null && imageUrl.isNotEmpty;
+
+    return GestureDetector(
+      onTap: () {
+        if (hasImage && imageUrl!.toLowerCase().contains('.mp4')) {
+          if (entityType.toLowerCase() == 'reel') {
+            final singleReel = ReelModel(
+              id: entityId,
+              uuid: entityId.toString(),
+              caption: title,
+              isMine: false,
+              isFollowing: false,
+              user: UserModel(
+                id: 0,
+                name: "",
+                username: "",
+                avatar: "",
+                isVerified: false,
+                interests: "",
+              ),
+              media: [
+                MediaModel(
+                  id: 0,
+                  type: "video",
+                  url: imageUrl,
+                  thumbnail: imageUrl,
+                  mimeType: "video/mp4",
+                )
+              ],
+              stats: ReelStats(
+                likeCount: 0,
+                commentCount: 0,
+                shareCount: 0,
+                viewCount: 0,
+                isLiked: false,
+                isSaved: false,
+              ),
+              createdAt: "",
+              createdHuman: sub,
+            );
+            Get.to(() => ReelsView(
+              reels: [singleReel],
+              initialIndex: 0,
+            ));
+          } else {
+            Get.to(() => VideoPlayerScreen(videoUrl: imageUrl!, videoId: entityId));
+          }
+        }
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: hasImage
+                  ? (imageUrl.toLowerCase().contains('.mp4')
+                      ? FeedVideoPlayer(
+                          videoUrl: imageUrl,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (ctx, err, stack) => _buildPlaceholderWidget(type),
+                        ))
+                  : _buildPlaceholderWidget(type),
             ),
-          ),
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -1382,22 +1417,23 @@ class VideoGridSection extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            top: 8,
-            right: 8,
-            child: Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.play_arrow,
-                size: 18,
-                color: Colors.white,
+          if (hasImage && imageUrl.toLowerCase().contains('.mp4'))
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.play_arrow,
+                  size: 18,
+                  color: Colors.white,
+                ),
               ),
             ),
-          ),
           Positioned(
             bottom: 8,
             left: 8,
@@ -1425,8 +1461,9 @@ class VideoGridSection extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildBottomIcon(VideoType type) {
     switch (type) {
@@ -1455,6 +1492,308 @@ class VideoGridSection extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class HistoryVideoSliderItem extends StatefulWidget {
+  final VideoViewHistoryItem item;
+
+  const HistoryVideoSliderItem({Key? key, required this.item}) : super(key: key);
+
+  @override
+  State<HistoryVideoSliderItem> createState() => _HistoryVideoSliderItemState();
+}
+
+class _HistoryVideoSliderItemState extends State<HistoryVideoSliderItem> {
+  late double _aspectRatio;
+
+  @override
+  void initState() {
+    super.initState();
+    final imageUrl = widget.item.preview?.thumbnail ?? "";
+    _aspectRatio = 16 / 9;
+    if (widget.item.postType.toLowerCase().contains('reel') || 
+        widget.item.postType.toLowerCase().contains('clip') || 
+        widget.item.postType.toLowerCase().contains('short') ||
+        imageUrl.toLowerCase().contains('reel')) {
+      _aspectRatio = 9 / 16;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final preview = widget.item.preview;
+    final imageUrl = preview?.thumbnail ?? "";
+
+    return GestureDetector(
+      onTap: () {
+        if (imageUrl.isNotEmpty && imageUrl.toLowerCase().contains('.mp4')) {
+          if (widget.item.postType.toLowerCase() == 'reel') {
+            try {
+              final historyController = Get.find<HistoryController>();
+              final reelsList = historyController.videoViews
+                  .where((v) => v.postType.toLowerCase() == 'reel')
+                  .toList();
+              final reelIndex = reelsList.indexWhere((r) => r.id == widget.item.id);
+              
+              if (reelIndex != -1) {
+                final mappedReels = reelsList.map((v) => ReelModel(
+                  id: v.entityId,
+                  uuid: v.entityId.toString(),
+                  caption: v.preview?.caption ?? "",
+                  isMine: false,
+                  isFollowing: false,
+                  user: UserModel(
+                    id: 0,
+                    name: "",
+                    username: "",
+                    avatar: "",
+                    isVerified: false,
+                    interests: "",
+                  ),
+                  media: [
+                    MediaModel(
+                      id: 0,
+                      type: "video",
+                      url: v.preview?.thumbnail ?? "",
+                      thumbnail: v.preview?.thumbnail ?? "",
+                      mimeType: "video/mp4",
+                    )
+                  ],
+                  stats: ReelStats(
+                    likeCount: 0,
+                    commentCount: 0,
+                    shareCount: 0,
+                    viewCount: 0,
+                    isLiked: false,
+                    isSaved: false,
+                  ),
+                  createdAt: v.createdAt,
+                  createdHuman: v.createdHuman,
+                )).toList();
+
+                Get.to(() => ReelsView(
+                  reels: mappedReels,
+                  initialIndex: reelIndex,
+                ));
+              } else {
+                final singleReel = ReelModel(
+                  id: widget.item.entityId,
+                  uuid: widget.item.entityId.toString(),
+                  caption: widget.item.preview?.caption ?? "",
+                  isMine: false,
+                  isFollowing: false,
+                  user: UserModel(
+                    id: 0,
+                    name: "",
+                    username: "",
+                    avatar: "",
+                    isVerified: false,
+                    interests: "",
+                  ),
+                  media: [
+                    MediaModel(
+                      id: 0,
+                      type: "video",
+                      url: imageUrl,
+                      thumbnail: imageUrl,
+                      mimeType: "video/mp4",
+                    )
+                  ],
+                  stats: ReelStats(
+                    likeCount: 0,
+                    commentCount: 0,
+                    shareCount: 0,
+                    viewCount: 0,
+                    isLiked: false,
+                    isSaved: false,
+                  ),
+                  createdAt: widget.item.createdAt,
+                  createdHuman: widget.item.createdHuman,
+                );
+                Get.to(() => ReelsView(
+                  reels: [singleReel],
+                  initialIndex: 0,
+                ));
+              }
+            } catch (e) {
+              final singleReel = ReelModel(
+                id: widget.item.entityId,
+                uuid: widget.item.entityId.toString(),
+                caption: widget.item.preview?.caption ?? "",
+                isMine: false,
+                isFollowing: false,
+                user: UserModel(
+                  id: 0,
+                  name: "",
+                  username: "",
+                  avatar: "",
+                  isVerified: false,
+                  interests: "",
+                ),
+                media: [
+                  MediaModel(
+                    id: 0,
+                    type: "video",
+                    url: imageUrl,
+                    thumbnail: imageUrl,
+                    mimeType: "video/mp4",
+                  )
+                ],
+                stats: ReelStats(
+                  likeCount: 0,
+                  commentCount: 0,
+                  shareCount: 0,
+                  viewCount: 0,
+                  isLiked: false,
+                  isSaved: false,
+                ),
+                createdAt: widget.item.createdAt,
+                createdHuman: widget.item.createdHuman,
+              );
+              Get.to(() => ReelsView(
+                reels: [singleReel],
+                initialIndex: 0,
+              ));
+            }
+          } else {
+            Get.to(() => VideoPlayerScreen(videoUrl: imageUrl, videoId: widget.item.entityId));
+          }
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(right: 12),
+        child: AspectRatio(
+          aspectRatio: _aspectRatio,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.shade300,
+                  blurRadius: 8,
+                  spreadRadius: 2,
+                )
+              ],
+            ),
+            child: Stack(
+              children: [
+                /// 🌄 IMAGE/VIDEO
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: imageUrl.toLowerCase().contains('.mp4')
+                        ? FeedVideoPlayer(
+                            videoUrl: imageUrl,
+                            fit: BoxFit.cover,
+                            onRatioLoaded: (ratio) {
+                              if (mounted && ratio != _aspectRatio) {
+                                setState(() {
+                                  _aspectRatio = ratio;
+                                });
+                              }
+                            },
+                          )
+                      : (imageUrl.isNotEmpty
+                          ? Image.network(
+                              imageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (ctx, err, stack) => Container(color: Colors.grey),
+                            )
+                          : Container(
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Color(0xFF2E2E2E), Color(0xFF1A1A1A)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                              child: const Center(
+                                child: Icon(Icons.play_circle_outline, size: 40, color: Colors.white24),
+                              ),
+                            )),
+                ),
+              ),
+
+              /// 🌑 GRADIENT OVERLAY
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.black.withOpacity(0.3),
+                      Colors.black.withOpacity(0.0),
+                    ],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                  ),
+                ),
+              ),
+
+              /// 🕒 TIME LABEL
+              Positioned(
+                top: 12,
+                right: 12,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Text(
+                    "Video",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+
+              /// 📝 TITLE & VIEWS
+              Positioned(
+                bottom: 12,
+                left: 12,
+                right: 12,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      preview?.caption ?? "Nature Video",
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black54,
+                            offset: Offset(0, 1),
+                            blurRadius: 2,
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.item.createdHuman,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          ),
+        ),
+      ),
     );
   }
 }

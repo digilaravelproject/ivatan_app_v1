@@ -1,270 +1,386 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:i_vatan_app/core/helper/custom_image_view.dart';
 
-import '../../../../../core/helper/custom_serchbar.dart';
-import '../../../../../core/theme/app_colors.dart';
-import 'live_straem_screen.dart';
+import 'package:i_vatan_app/core/theme/app_colors.dart';
+import 'package:i_vatan_app/db/shared_pref_manager.dart';
+import '../controller/live_chat_list_controller.dart';
+import '../model/chat_inbox_model.dart';
+import 'live_group_chat_screen.dart';
 
+// =========================================================================
+// 🎨 LIVE CHAT GROUPS LIST SCREEN (TYPE-SAFE MODULE LAYER)
+// =========================================================================
 class LiveChatList extends StatelessWidget {
   const LiveChatList({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(LiveChatListController());
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: const Icon(
+            Icons.menu_rounded,
+            color: Colors.black54,
+            size: 24,
+          ),
+        ),
+        title: Text(
+          "Live Chat Groups",
+          style: GoogleFonts.poppins(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.refresh_rounded,
+              color: Colors.black87,
+              size: 24,
+            ),
+            onPressed: () => controller.fetchGroups(),
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.add_rounded,
+              color: AppColors.primary,
+              size: 28,
+            ),
+            onPressed: () {
+              // Action for adding
+            },
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // 🔍 Premium Search Bar Below Header
+          _buildSearchBar(controller),
+
+          // 🏆 WhatsApp-Style Full-Width Underlined Tabs
+          _buildWhatsAppTabs(controller),
+
+          const Divider(height: 1, color: Color(0xFFE5E7EB)),
+
+          // Groups Feed List
+          Expanded(
+            child: Obx(() {
+              if (controller.isLoading.value && controller.filteredGroups.isEmpty) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                  ),
+                );
+              }
+
+              if (controller.filteredGroups.isEmpty) {
+                return _buildEmptyState(controller);
+              }
+
+              return RefreshIndicator(
+                color: AppColors.primary,
+                onRefresh: () => controller.fetchGroups(),
+                child: ListView.builder(
+                  itemCount: controller.filteredGroups.length,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    final group = controller.filteredGroups[index];
+                    return _buildGroupRow(context, group, controller);
+                  },
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar(LiveChatListController controller) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+      child: Container(
+        height: 42,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF3F4F6),
+          borderRadius: BorderRadius.circular(21),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            const Icon(Icons.search_rounded, color: Colors.grey, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TextField(
+                controller: controller.searchController,
+                style: GoogleFonts.poppins(fontSize: 14, color: Colors.black),
+                decoration: InputDecoration(
+                  hintText: "Search groups...",
+                  hintStyle: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[400]),
+                  border: InputBorder.none,
+                  isDense: true,
+                ),
+              ),
+            ),
+            Obx(() => controller.searchQuery.value.isNotEmpty
+                ? GestureDetector(
+                    onTap: () {
+                      controller.searchController.clear();
+                      controller.searchQuery.value = "";
+                    },
+                    child: const Icon(Icons.close_rounded, color: Colors.grey, size: 18),
+                  )
+                : const SizedBox.shrink()),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWhatsAppTabs(LiveChatListController controller) {
+    final tabs = ["Groups", "Unread", "Read", "Business"];
+
     return Container(
       color: Colors.white,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: AppColors.transparent,
-          leading: GestureDetector(
-            onTap: (){
-              Navigator.of(context).pop();
-            },
-            child: Icon(
-              Icons.arrow_back_ios_new_rounded,
-              color: AppColors.black,
-              size: 20,
-            ),
-          ),
-          title: Text(
-            "Live Chat",
-            style: TextStyle(
-              color: AppColors.black,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: CircleAvatar(
-                radius: 25,
-                child: ClipOval(
-                  child: CustomImageView(
-                    url:
-                        "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp",
+      child: Row(
+        children: tabs.map((tab) {
+          return Expanded(
+            child: Obx(() {
+              final isSelected = controller.selectedTab.value == tab;
+              return GestureDetector(
+                onTap: () => controller.changeTab(tab),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: isSelected ? AppColors.primary : Colors.transparent,
+                        width: 3.0,
+                      ),
+                    ),
+                  ),
+                  child: Text(
+                    tab,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                      color: isSelected ? AppColors.primary : Colors.grey[500],
+                    ),
                   ),
                 ),
+              );
+            }),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildGroupRow(BuildContext context, ChatInboxModel group, LiveChatListController controller) {
+    final lastMsg = group.lastMessage;
+    final isMuted = false;
+    final unreadCount = group.unreadCount;
+    final chatId = group.id;
+    final groupName = group.name;
+    final groupType = group.type;
+
+    String senderName = "";
+    String content = "No messages yet";
+    String timeString = "";
+
+    if (lastMsg != null) {
+      if (lastMsg.messageType == 'image') {
+        content = lastMsg.content.isNotEmpty && !lastMsg.content.startsWith("Sending Image...")
+            ? "📷 ${lastMsg.content}"
+            : "📷 Image";
+      } else if (lastMsg.messageType == 'file') {
+        content = lastMsg.content.isNotEmpty && !lastMsg.content.startsWith("Sending File...")
+            ? "📄 ${lastMsg.content}"
+            : "📄 Document";
+      } else {
+        content = lastMsg.content;
+      }
+      
+      if (lastMsg.sender != null) {
+        senderName = lastMsg.sender!.name;
+      }
+
+      final currentUserId = SharedPrefManager().user?.id;
+      final senderId = lastMsg.sender?.id;
+      if (currentUserId != null && senderId != null && currentUserId.toString() == senderId.toString()) {
+        senderName = "You";
+      }
+
+      timeString = controller.formatTime(lastMsg.createdAt);
+    } else {
+      timeString = controller.formatTime(group.lastMessageAt);
+    }
+
+    final avatarColor = controller.getAvatarColor(chatId, groupName);
+
+    return InkWell(
+      onTap: () {
+        Get.to(
+          () => const LiveGroupChatScreen(),
+          arguments: {
+            'chat_id': chatId,
+            'name': groupName,
+            'avatar': "",
+            'avatar_color': avatarColor,
+            'chat_mode': group.chatMode,
+            'participants_count': group.participantsCount,
+            'is_admin': group.name == "Announcements" ? false : true,
+            'is_muted': isMuted,
+            'is_banned': false,
+            'description': group.description
+          },
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 26,
+              backgroundColor: avatarColor,
+              child: Icon(
+                groupType == "group" ? Icons.groups_rounded : Icons.campaign_rounded,
+                color: Colors.white,
+                size: 28,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          groupName,
+                          style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "${group.participantsCount}",
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              color: Colors.grey[500],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          Icon(Icons.people_alt_outlined, color: Colors.grey[400], size: 13),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: RichText(
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          text: TextSpan(
+                            style: GoogleFonts.poppins(fontSize: 13),
+                            children: [
+                              if (senderName.isNotEmpty)
+                                TextSpan(
+                                  text: "$senderName: ",
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              TextSpan(
+                                text: content,
+                                style: GoogleFonts.poppins(color: Colors.grey[600]),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        timeString,
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          color: Colors.grey[400],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (unreadCount > 0) ...[
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: const BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            "$unreadCount",
+                            style: GoogleFonts.poppins(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
         ),
-        body:
-        // SingleChildScrollView(
-        //   child:
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-            child: Column(
-              children: [
-            Container(
-              height: 45,
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(25),
-                border: Border.all(color: Colors.grey[300]!),
-              ),
-              child: Row(
-                children: [
-                  const SizedBox(width: 16),
-                  SvgPicture.string(
-                    '''<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M21 21L16.65 16.65" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>''',
-                    width: 20,
-                    height: 20,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      //controller: controller.searchController,
-                      decoration: InputDecoration(
-                        hintText: 'Search name ...',
-                        hintStyle: GoogleFonts.poppins(
-                          color: Colors.grey[500],
-                          fontSize: 14,
-                        ),
-                        border: InputBorder.none,
-                      ),
-                      style: GoogleFonts.poppins(color: Colors.black, fontSize: 14),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                ],
-              ),
-            ),
-                // SizedBox(height: 10),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //   children: [
-                //     Column(
-                //       crossAxisAlignment: CrossAxisAlignment.start,
-                //       children: [
-                //         Text(
-                //           "Live Chat",
-                //           style: TextStyle(
-                //             color: AppColors.black,
-                //             fontSize: 24,
-                //             fontWeight: FontWeight.bold,
-                //           ),
-                //         ),
-                //         Text(
-                //           "120 Friends Online",
-                //           style: TextStyle(
-                //             color: Colors.grey.shade600,
-                //             fontSize: 14,
-                //           ),
-                //         ),
-                //       ],
-                //     ),
-                //     Text(
-                //       "See All",
-                //       style: TextStyle(
-                //         color: AppColors.primary,
-                //         fontSize: 14,
-                //         fontWeight: FontWeight.w600,
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                const SizedBox(height: 16),
+      ),
+    );
+  }
 
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: 10,
-                    shrinkWrap: true,
-                   // physics: NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              Get.to(LiveStreamScreen());
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              child: Row(
-                                children: [
-                                  Stack(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(16),
-                                        child: CustomImageView(
-                                          url: "https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp",
-                                          height: 60,
-                                          width: 60,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      Positioned(
-                                        bottom: 0,
-                                        right: 0,
-                                        child: Container(
-                                          padding: const EdgeInsets.all(2),
-                                          decoration: const BoxDecoration(
-                                            color: Colors.white,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Container(
-                                            width: 12,
-                                            height: 12,
-                                            decoration: const BoxDecoration(
-                                              color: Colors.green,
-                                              shape: BoxShape.circle,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "National News Channel",
-                                          style: TextStyle(
-                                            color: AppColors.black,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 0.2,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Row(
-                                          children: [
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                              decoration: BoxDecoration(
-                                                color: Colors.red.shade50,
-                                                borderRadius: BorderRadius.circular(4),
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  Container(
-                                                    width: 6,
-                                                    height: 6,
-                                                    decoration: const BoxDecoration(
-                                                      color: Colors.red,
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 4),
-                                                  const Text(
-                                                    "LIVE",
-                                                    style: TextStyle(
-                                                      color: Colors.red,
-                                                      fontSize: 10,
-                                                      fontWeight: FontWeight.w800,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Icon(
-                                              Icons.remove_red_eye_outlined,
-                                              color: Colors.grey.shade600,
-                                              size: 14,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              "126K watching",
-                                              style: TextStyle(
-                                                color: Colors.grey.shade600,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Icon(
-                                    Icons.arrow_forward_ios_rounded,
-                                    size: 14,
-                                    color: Colors.grey.shade500,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Divider(height: 1, color: Colors.grey.shade300, ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ],
+  Widget _buildEmptyState(LiveChatListController controller) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.chat_bubble_outline_rounded, size: 48, color: Colors.grey[350]),
+          const SizedBox(height: 12),
+          Text(
+            "No live chat groups found",
+            style: GoogleFonts.poppins(
+              fontSize: 15,
+              color: Colors.grey[500],
+              fontWeight: FontWeight.w500,
             ),
           ),
-      //  ),
+        ],
       ),
     );
   }

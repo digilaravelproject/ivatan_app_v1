@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../core/constants/app_assets.dart';
 import '../../../core/helper/custom_image_view.dart';
@@ -38,6 +39,7 @@ import '../../service/persentation/my_enquiries.dart';
 import '../../service/persentation/my_services_screen.dart';
 import '../../service/persentation/create_service_screen.dart';
 import '../../dashboard/persentation/service_screen.dart';
+import '../../dashboard/persentation/edit_profile_screen.dart';
 import '../../dashboard/persentation/settings_page.dart';
 import '../../messages/controller/chatt_controller.dart';
 import '../../messages/persentation/chatting_screen.dart';
@@ -116,7 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         body: Obx(() {
           final user = profileController.userProfile.value;
           if (user == null) {
-            return Center(child: CircularProgressIndicator());
+            return _buildProfileShimmer();
           }
           
           final bool isCurrentlyOther = finalUserName != (SharedPrefManager().user?.username ?? "");
@@ -264,168 +266,192 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         Positioned(
                                           top: 40,
                                           right: 10,
-                                          child: PopupMenuButton<String>(
-                                            onSelected: (value) async {
-                                              if (value == 'profile') {
-                                                Get.to(() => SettingsScreen());
-                                              } else if (value == 'bookmarks') {
-                                                profileController.openBookmarks();
-                                              } else if (value == 'block') {
-                                                // Show confirmation dialog for block
-                                                Get.dialog(
-                                                  CupertinoAlertDialog(
-                                                    title: Text(user.isBlocked == true ? "Unblock User?" : "Block User?"),
-                                                    content: Text(user.isBlocked == true 
-                                                      ? "Are you sure you want to unblock @${user.username}?" 
-                                                      : "Are you sure you want to block @${user.username}? They will no longer be able to see your content or interact with you."),
-                                                    actions: [
-                                                      CupertinoDialogAction(
-                                                        child: const Text("Cancel"),
-                                                        onPressed: () => Get.back(),
-                                                      ),
-                                                      CupertinoDialogAction(
-                                                        isDestructiveAction: true,
-                                                        child: Text(user.isBlocked == true ? "Unblock" : "Block"),
-                                                        onPressed: () {
-                                                          Get.back();
-                                                          profileController.toggleBlockUser(user.id!);
-                                                        },
-                                                      ),
+                                          child: Builder(
+                                            builder: (context) {
+                                              return GestureDetector(
+                                                onTap: () {
+                                                  final RenderBox? button = context.findRenderObject() as RenderBox?;
+                                                  final RenderBox? overlay = Navigator.of(context).overlay?.context.findRenderObject() as RenderBox?;
+                                                  
+                                                  if (button == null || !button.hasSize || overlay == null || !overlay.hasSize) {
+                                                    return;
+                                                  }
+                                                  
+                                                  final RelativeRect position = RelativeRect.fromRect(
+                                                    Rect.fromPoints(
+                                                      button.localToGlobal(Offset.zero, ancestor: overlay),
+                                                      button.localToGlobal(button.size.bottomRight(Offset.zero), ancestor: overlay),
+                                                    ),
+                                                    Offset.zero & overlay.size,
+                                                  );
+
+                                                  showMenu<String>(
+                                                    context: context,
+                                                    position: position,
+                                                    items: [
+                                                      if (!isOtherProfile) ...[
+                                                        const PopupMenuItem(
+                                                          value: 'profile',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(CupertinoIcons.person_add, size: 20),
+                                                              const SizedBox(width: 10),
+                                                              Text("Profile Settings"),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const PopupMenuItem(
+                                                          value: 'bookmarks',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(CupertinoIcons.bookmark, size: 20),
+                                                              const SizedBox(width: 10),
+                                                              Text("Bookmarks"),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const PopupMenuItem(
+                                                          value: 'orders',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(CupertinoIcons.bag, size: 20),
+                                                              const SizedBox(width: 10),
+                                                              Text("My Orders"),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const PopupMenuItem(
+                                                          value: 'enquiries',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(CupertinoIcons.bag, size: 20),
+                                                              const SizedBox(width: 10),
+                                                              Text("My Enquiries"),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        if (user.isSeller == true)
+                                                          const PopupMenuItem(
+                                                            value: 'products',
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(CupertinoIcons.cube_box, size: 20),
+                                                                const SizedBox(width: 10),
+                                                                Text("Your Products"),
+                                                               ],
+                                                            ),
+                                                          ),
+                                                        if (user.isSeller == true)
+                                                          const PopupMenuItem(
+                                                            value: 'services',
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(Icons.room_service_outlined, size: 20),
+                                                                const SizedBox(width: 10),
+                                                                Text("Your Services"),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        if (user.isSeller == true)
+                                                          const PopupMenuItem(
+                                                            value: 'enquiry',
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(CupertinoIcons.chat_bubble_text, size: 20),
+                                                                const SizedBox(width: 10),
+                                                                Text("Enquiry"),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        if (user.isSeller == true)
+                                                          const PopupMenuItem(
+                                                            value: 'dashboard',
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(CupertinoIcons.doc_append, size: 20),
+                                                                const SizedBox(width: 10),
+                                                                Text("Dashboard"),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                      ] else ...[
+                                                        PopupMenuItem(
+                                                          value: 'block',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(user.isBlocked == true ? Icons.person_off_outlined : Icons.block, size: 20, color: Colors.red),
+                                                              const SizedBox(width: 10),
+                                                              Text(user.isBlocked == true ? "Unblock User" : "Block User", style: const TextStyle(color: Colors.red)),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ],
-                                                  )
-                                                );
-                                              } else if (value == 'enquiry') {
-                                                Get.to(() => EnquiriesListScreen());
-                                              } else if (value == 'orders') {
-                                                Get.to(() => MyOrdersScreen());
-                                              } else if (value == 'enquiries') {
-                                                Get.to(() => MyEnquiryListScreen());
-                                              }
-                                              else if (value == 'products') {
-                                                await Get.to(() => MyProductsScreen());
-                                                if (Get.isRegistered<MarketplaceProductController>()) {
-                                                  Get.find<MarketplaceProductController>().fetchMarketplaceProducts(isRefresh: true);
-                                                }
-                                              } else if (value == 'services') {
-                                                await Get.to(() => MyServicesScreen());
-                                                if (Get.isRegistered<ServiceController>()) {
-                                                  Get.find<ServiceController>().fetchMarketplaceServices(isRefresh: true);
-                                                }
-                                              } else if (value == 'dashboard') {
-                                                Get.to(() => SellerDashboard());
-                                              }
+                                                  ).then((value) async {
+                                                    if (value == null) return;
+                                                    if (value == 'profile') {
+                                                      Get.to(() => SettingsScreen());
+                                                    } else if (value == 'bookmarks') {
+                                                      profileController.openBookmarks();
+                                                    } else if (value == 'block') {
+                                                      // Show confirmation dialog for block
+                                                      Get.dialog(
+                                                        CupertinoAlertDialog(
+                                                          title: Text(user.isBlocked == true ? "Unblock User?" : "Block User?"),
+                                                          content: Text(user.isBlocked == true 
+                                                            ? "Are you sure you want to unblock @${user.username}?" 
+                                                            : "Are you sure you want to block @${user.username}? They will no longer be able to see your content or interact with you."),
+                                                          actions: [
+                                                            CupertinoDialogAction(
+                                                              child: const Text("Cancel"),
+                                                              onPressed: () => Get.back(),
+                                                            ),
+                                                            CupertinoDialogAction(
+                                                              isDestructiveAction: true,
+                                                              child: Text(user.isBlocked == true ? "Unblock" : "Block"),
+                                                              onPressed: () {
+                                                                Get.back();
+                                                                profileController.toggleBlockUser(user.id!);
+                                                              },
+                                                            ),
+                                                          ],
+                                                        )
+                                                      );
+                                                    } else if (value == 'enquiry') {
+                                                      Get.to(() => EnquiriesListScreen());
+                                                    } else if (value == 'orders') {
+                                                      Get.to(() => MyOrdersScreen());
+                                                    } else if (value == 'enquiries') {
+                                                      Get.to(() => MyEnquiryListScreen());
+                                                    } else if (value == 'products') {
+                                                      await Get.to(() => MyProductsScreen());
+                                                      if (Get.isRegistered<MarketplaceProductController>()) {
+                                                        Get.find<MarketplaceProductController>().fetchMarketplaceProducts(isRefresh: true);
+                                                      }
+                                                    } else if (value == 'services') {
+                                                      await Get.to(() => MyServicesScreen());
+                                                      if (Get.isRegistered<ServiceController>()) {
+                                                        Get.find<ServiceController>().fetchMarketplaceServices(isRefresh: true);
+                                                      }
+                                                    } else if (value == 'dashboard') {
+                                                      Get.to(() => SellerDashboard());
+                                                    }
+                                                  });
+                                                },
+                                                child: Container(
+                                                  padding: const EdgeInsets.all(6),
+                                                  decoration: const BoxDecoration(
+                                                    color: Colors.black26,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.more_vert,
+                                                    color: Colors.white,
+                                                    size: 22,
+                                                  ),
+                                                ),
+                                              );
                                             },
-                                            itemBuilder: (context) => [
-                                              if (!isOtherProfile) ...[
-                                                const PopupMenuItem(
-                                                  value: 'profile',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(CupertinoIcons.person_add, size: 20),
-                                                      SizedBox(width: 10),
-                                                      Text("Profile Settings"),
-                                                    ],
-                                                  ),
-                                                ),
-                                                const PopupMenuItem(
-                                                  value: 'bookmarks',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(CupertinoIcons.bookmark, size: 20),
-                                                      SizedBox(width: 10),
-                                                      Text("Bookmarks"),
-                                                    ],
-                                                  ),
-                                                ),
-                                                const PopupMenuItem(
-                                                  value: 'orders',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(CupertinoIcons.bag, size: 20),
-                                                      SizedBox(width: 10),
-                                                      Text("My Orders"),
-                                                    ],
-                                                  ),
-                                                ),
-                                                const PopupMenuItem(
-                                                  value: 'enquiries',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(CupertinoIcons.bag, size: 20),
-                                                      SizedBox(width: 10),
-                                                      Text("My Enquiries"),
-                                                    ],
-                                                  ),
-                                                ),
-                                                if (user.isSeller == true)
-                                                  const PopupMenuItem(
-                                                    value: 'products',
-                                                    child: Row(
-                                                      children: [
-                                                        Icon(CupertinoIcons.cube_box, size: 20),
-                                                        SizedBox(width: 10),
-                                                        Text("Your Products"),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                if (user.isSeller == true)
-                                                  const PopupMenuItem(
-                                                    value: 'services',
-                                                    child: Row(
-                                                      children: [
-                                                        Icon(Icons.room_service_outlined, size: 20),
-                                                        SizedBox(width: 10),
-                                                        Text("Your Services"),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                if (user.isSeller == true)
-                                                  const PopupMenuItem(
-                                                    value: 'enquiry',
-                                                    child: Row(
-                                                      children: [
-                                                        Icon(CupertinoIcons.chat_bubble_text, size: 20),
-                                                        SizedBox(width: 10),
-                                                        Text("Enquiry"),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                if (user.isSeller == true)
-                                                  const PopupMenuItem(
-                                                    value: 'dashboard',
-                                                    child: Row(
-                                                      children: [
-                                                        Icon(CupertinoIcons.doc_append, size: 20),
-                                                        SizedBox(width: 10),
-                                                        Text("Dashboard"),
-                                                      ],
-                                                    ),
-                                                  ),
-                                              ] else ...[
-                                                 PopupMenuItem(
-                                                  value: 'block',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(user.isBlocked == true ? Icons.person_off_outlined : Icons.block, size: 20, color: Colors.red),
-                                                      const SizedBox(width: 10),
-                                                      Text(user.isBlocked == true ? "Unblock User" : "Block User", style: const TextStyle(color: Colors.red)),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ],
-                                            child: Container(
-                                              padding: const EdgeInsets.all(6),
-                                              decoration: const BoxDecoration(
-                                                color: Colors.black26,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(
-                                                Icons.more_vert,
-                                                color: Colors.white,
-                                                size: 22,
-                                              ),
-                                            ),
                                           ),
                                         ),
 
@@ -701,7 +727,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                            children: [
                                              Expanded(
                                                child: _buildActionButton("Edit Profile", () {
-                                                  Get.to(() => SettingsScreen());
+                                                  Get.to(() => EditProfileScreen());
                                                }, isExpanded: true),
                                              ),
                                              const SizedBox(width: 10),
@@ -2063,6 +2089,244 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildProfileShimmer() {
+    return SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. Banner area
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  height: 240,
+                  width: double.infinity,
+                  color: Colors.white,
+                ),
+              ),
+              // Profile pic overlay
+              Positioned(
+                top: 190,
+                left: 20,
+                child: Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 90,
+                    height: 90,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 3),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 50),
+          
+          // 2. Info text placeholders
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 150,
+                    height: 18,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 100,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: double.infinity,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 200,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          
+          // 3. Stats row
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(3, (index) => Column(
+                children: [
+                  Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      width: 50,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      width: 60,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ],
+              )),
+            ),
+          ),
+          const SizedBox(height: 20),
+          
+          // 4. Action buttons
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 25),
+          
+          // 5. Highlights row
+          SizedBox(
+            height: 90,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              itemCount: 4,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: Column(
+                    children: [
+                      Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          width: 55,
+                          height: 55,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          width: 40,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 20),
+          
+          // 6. Tabs layout placeholder
+          Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              height: 45,
+              width: double.infinity,
+              color: Colors.white,
+            ),
+          ),
+        ],
       ),
     );
   }

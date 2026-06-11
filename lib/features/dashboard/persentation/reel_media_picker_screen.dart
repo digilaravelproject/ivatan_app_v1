@@ -132,7 +132,7 @@ class _ReelMediaPickerScreenState extends State<ReelMediaPickerScreen> {
 
     // Navigate to preview screen for reel creation
     if (Get.isOverlaysOpen) Get.back(); // Close picker bottom sheet if open
-    Get.to(() => PreviewScreen(userName: currentUserName ?? ""));
+    Get.off(() => PreviewScreen(userName: currentUserName ?? ""));
   }
 
   @override
@@ -151,27 +151,53 @@ class _ReelMediaPickerScreenState extends State<ReelMediaPickerScreen> {
           style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
         ),
         actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.filter_list, color: Colors.white),
-            onSelected: (value) {
-              setState(() {
-                selectedFilter = value;
-              });
-              _loadMedia();
-            },
-            itemBuilder: (context) => filters.map((filter) {
-              return PopupMenuItem<String>(
-                value: filter,
-                child: Row(
-                  children: [
-                    if (selectedFilter == filter)
-                      const Icon(Icons.check, size: 20, color: Colors.blue),
-                    if (selectedFilter == filter) const SizedBox(width: 8),
-                    Text(filter),
-                  ],
-                ),
+          Builder(
+            builder: (context) {
+              return IconButton(
+                icon: const Icon(Icons.filter_list, color: Colors.white),
+                onPressed: () {
+                  final RenderBox? button = context.findRenderObject() as RenderBox?;
+                  final RenderBox? overlay = Navigator.of(context).overlay?.context.findRenderObject() as RenderBox?;
+                  
+                  if (button == null || !button.hasSize || overlay == null || !overlay.hasSize) {
+                    return;
+                  }
+                  
+                  final RelativeRect position = RelativeRect.fromRect(
+                    Rect.fromPoints(
+                      button.localToGlobal(Offset.zero, ancestor: overlay),
+                      button.localToGlobal(button.size.bottomRight(Offset.zero), ancestor: overlay),
+                    ),
+                    Offset.zero & overlay.size,
+                  );
+
+                  showMenu<String>(
+                    context: context,
+                    position: position,
+                    items: filters.map((filter) {
+                      return PopupMenuItem<String>(
+                        value: filter,
+                        child: Row(
+                          children: [
+                            if (selectedFilter == filter)
+                              const Icon(Icons.check, size: 20, color: Colors.blue),
+                            if (selectedFilter == filter) const SizedBox(width: 8),
+                            Text(filter),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ).then((value) {
+                    if (value != null) {
+                      setState(() {
+                        selectedFilter = value;
+                      });
+                      _loadMedia();
+                    }
+                  });
+                },
               );
-            }).toList(),
+            },
           ),
         ],
       ),

@@ -6,7 +6,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/core/constants/app_assets.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
-import 'package:iconly/iconly.dart';
 import 'package:video_player/video_player.dart';
 import '../../../core/helper/custom_image_view.dart';
 import '../../../core/utils/app_icons.dart';
@@ -162,7 +161,7 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: []);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: SystemUiOverlay.values);
 
     // ✅ Status bar color transparent
     SystemChrome.setSystemUIOverlayStyle(
@@ -446,87 +445,96 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
             GestureDetector(
               onVerticalDragUpdate: _onVerticalDragUpdate,
               onVerticalDragEnd: _onVerticalDragEnd,
-              child: PageView.builder(
-                controller: _pageController,
-                physics: const PageScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                itemCount: widget.reels.length,
-                onPageChanged: _onPageChanged,
-                itemBuilder: (context, index) {
-                  final controller = _videoControllers[index];
-                  if (controller == null) {
-                    return Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        CachedNetworkImage(
-                          imageUrl: widget.reels[index].user.avatar,
-                          fit: BoxFit.cover,
-                          placeholder:
-                              (context, url) =>
+              child: RefreshIndicator(
+                color: Colors.white,
+                backgroundColor: Colors.black,
+                onRefresh: () async {
+                  if (Get.isRegistered<ShortPlayController>()) {
+                    await Get.find<ShortPlayController>().fetchReels();
+                  }
+                },
+                child: PageView.builder(
+                  controller: _pageController,
+                  physics: const AlwaysScrollableScrollPhysics(parent: PageScrollPhysics()),
+                  scrollDirection: Axis.vertical,
+                  itemCount: widget.reels.length,
+                  onPageChanged: _onPageChanged,
+                  itemBuilder: (context, index) {
+                    final controller = _videoControllers[index];
+                    if (controller == null) {
+                      return Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          CachedNetworkImage(
+                            imageUrl: widget.reels[index].user.avatar,
+                            fit: BoxFit.cover,
+                            placeholder:
+                                (context, url) =>
+                            widget.loadingWidget ??
+                                const Center(child: CircularProgressIndicator()),
+                            errorWidget:
+                                (context, url, error) =>
+                            widget.errorWidget ?? const Icon(Icons.error),
+                          ),
                           widget.loadingWidget ??
                               const Center(child: CircularProgressIndicator()),
-                          errorWidget:
-                              (context, url, error) =>
-                          widget.errorWidget ?? const Icon(Icons.error),
-                        ),
-                        widget.loadingWidget ??
-                            const Center(child: CircularProgressIndicator()),
-                      ],
-                    );
-                  }
-                  return VideoReel(
-                    index: index,
-                    pageController: _pageController,
-                    reel: widget.reels[index],
-                    controller: controller,
-                    likeAnimation: _likeAnimation,
-                    isLiked: _isLiked,
-                    onLike: _toggleLike,
-                    onFollow: _followAuthor,
-                    // Volume Props
-                    isMuted: _isMuted,
-                    onToggleSound: _toggleSound,
-                    volumeAnimation: _volumeAnimation,
+                        ],
+                      );
+                    }
+                    return VideoReel(
+                      index: index,
+                      pageController: _pageController,
+                      reel: widget.reels[index],
+                      controller: controller,
+                      likeAnimation: _likeAnimation,
+                      isLiked: _isLiked,
+                      onLike: _toggleLike,
+                      onFollow: _followAuthor,
+                      // Volume Props
+                      isMuted: _isMuted,
+                      onToggleSound: _toggleSound,
+                      volumeAnimation: _volumeAnimation,
 
-                    allowDoubleTapToLike: widget.allowDoubleTapToLike,
-                    allowTapToPause: widget.allowTapToPause,
-                    commentIcon: widget.commentIcon,
-                    errorWidget: widget.errorWidget,
-                    followText: widget.followText,
-                    leftActionButtons: widget.leftActionButtons,
-                    likeIcon: widget.likeIcon,
-                    loadingWidget: widget.loadingWidget,
-                    progressBarColor: widget.progressBarColor,
-                    rightActionButtons: widget.rightActionButtons,
-                    shareIcon: widget.shareIcon,
-                    showAuthor: widget.showAuthor,
-                    showBuffering: widget.showBuffering,
-                    showComments: widget.showComments,
-                    showDescription: widget.showDescription,
-                    showFollowButton: widget.showFollowButton,
-                    showGradient: widget.showGradient,
-                    showLikeAnimation: widget.showLikeAnimation,
-                    showLikes: widget.showLikes,
-                    showMoreOptions: widget.showMoreOptions,
-                    showPlayPause: widget.showPlayPause,
-                    showProgress: widget.showProgress,
-                    showReplay: widget.showReplay,
-                    showSettings: widget.showSettings,
-                    showShares: widget.showShares,
-                    showTags: widget.showTags,
-                    showTitle: widget.showTitle,
-                    showUploadDate: widget.showUploadDate,
-                    showVerifiedTick: widget.showVerifiedTick,
-                    showVolumeControl: widget.showVolumeControl,
-                    unlikeIcon: widget.unlikeIcon,
-                    verifiedBadge: widget.verifiedBadge,
-                    settingsDialogBuilder: widget.settingsDialogBuilder,
-                    shareDialogBuilder: widget.shareDialogBuilder,
-                    moreOptionsDialogBuilder: widget.moreOptionsDialogBuilder,
-                    onComment: () {},
-                    onShare: () {},
-                  );
-                },
+                      allowDoubleTapToLike: widget.allowDoubleTapToLike,
+                      allowTapToPause: widget.allowTapToPause,
+                      commentIcon: widget.commentIcon,
+                      errorWidget: widget.errorWidget,
+                      followText: widget.followText,
+                      leftActionButtons: widget.leftActionButtons,
+                      likeIcon: widget.likeIcon,
+                      loadingWidget: widget.loadingWidget,
+                      progressBarColor: widget.progressBarColor,
+                      rightActionButtons: widget.rightActionButtons,
+                      shareIcon: widget.shareIcon,
+                      showAuthor: widget.showAuthor,
+                      showBuffering: widget.showBuffering,
+                      showComments: widget.showComments,
+                      showDescription: widget.showDescription,
+                      showFollowButton: widget.showFollowButton,
+                      showGradient: widget.showGradient,
+                      showLikeAnimation: widget.showLikeAnimation,
+                      showLikes: widget.showLikes,
+                      showMoreOptions: widget.showMoreOptions,
+                      showPlayPause: widget.showPlayPause,
+                      showProgress: widget.showProgress,
+                      showReplay: widget.showReplay,
+                      showSettings: widget.showSettings,
+                      showShares: widget.showShares,
+                      showTags: widget.showTags,
+                      showTitle: widget.showTitle,
+                      showUploadDate: widget.showUploadDate,
+                      showVerifiedTick: widget.showVerifiedTick,
+                      showVolumeControl: widget.showVolumeControl,
+                      unlikeIcon: widget.unlikeIcon,
+                      verifiedBadge: widget.verifiedBadge,
+                      settingsDialogBuilder: widget.settingsDialogBuilder,
+                      shareDialogBuilder: widget.shareDialogBuilder,
+                      moreOptionsDialogBuilder: widget.moreOptionsDialogBuilder,
+                      onComment: () {},
+                      onShare: () {},
+                    );
+                  },
+                ),
               ),
             ),
             // "Reels" title overlay at the top center
@@ -906,7 +914,7 @@ class VideoGradient extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.black.withValues(alpha: .3),
+            Colors.black.withValues(alpha: 0.55),
             Colors.transparent,
             Colors.black.withValues(alpha: 0.3),
           ],

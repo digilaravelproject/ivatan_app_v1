@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../core/constants/app_assets.dart';
 import '../../../core/helper/expandable_text.dart';
@@ -14,6 +15,9 @@ import '../../messages/persentation/dashboard.dart';
 import '../../profile/screen/profile_screen.dart';
 import '../../quick_access/persentation/drawerScreen.dart';
 import '../../story/persentation/storyfullview.dart';
+import '../../subscription/persentation/profile_plans_screen.dart';
+import '../../subscription/controller/subscription_controller.dart';
+import '../../subscription/data/model/profile_config_model.dart';
 import '../controller/comment_controller.dart';
 import '../controller/homeController.dart';
 import '../controller/create_story_controller.dart';
@@ -21,6 +25,7 @@ import '../model/post_model.dart';
 import '../model/story_model.dart';
 import 'widgets/feed_media_widget.dart';
 import '../../../core/network/app_urls.dart';
+import '../../../route/app_pages.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({Key? key}) : super(key: key);
@@ -59,6 +64,7 @@ class HomePage extends StatelessWidget {
           onRefresh: () async {
             await controller.fetchPosts();
             await controller.fetchStories();
+            await controller.fetchUnreadNotificationCount();
           },
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -112,9 +118,62 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
                 actions: [
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 1.0),
+                      child: const AnimatedProBadge(),
+                    ),
+                  ),
+                  Obx(() {
+                    final count = controller.unreadNotificationCount.value;
+                    return Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.notifications,
+                            color: Colors.black87,
+                            size: 26,
+                          ),
+                          onPressed: () async {
+                            await Get.toNamed(AppRoutes.notifications);
+                            controller.fetchUnreadNotificationCount();
+                          },
+                        ),
+                        if (count > 0)
+                          Positioned(
+                            top: 10,
+                            right: 10,
+                            child: Container(
+                              padding: const EdgeInsets.all(3),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 1.5),
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  count > 99 ? '99+' : '$count',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  }),
                   Stack(
                     alignment: Alignment.center,
                     children: [
+
                       IconButton(
                         icon: Icon(
                           Icons.chat_bubble_outline,
@@ -156,10 +215,7 @@ class HomePage extends StatelessWidget {
               SliverToBoxAdapter(
                 child: Obx(() {
                   if (controller.isStoryLoading.value) {
-                    return SizedBox(
-                      height: 100,
-                      child: Center(child: CircularProgressIndicator()),
-                    );
+                    return _buildStoriesShimmer();
                   }
 
                   // Identify My Story vs Others
@@ -184,15 +240,15 @@ class HomePage extends StatelessWidget {
 
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 500),
-                    height: controller.showStories.value ? 150 : 0,
+                    height: controller.showStories.value ? 130 : 0,
                     curve: Curves.easeInOut,
                     child: AnimatedOpacity(
                       duration: const Duration(milliseconds: 500),
                       opacity: controller.showStories.value ? 1.0 : 0.0,
                       child: Container(
-                        height: 150,
+                        height: 130,
                         color: Colors.white,
-                        padding: EdgeInsets.only(top: 12, bottom: 8),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           padding: EdgeInsets.symmetric(horizontal: 16),
@@ -236,9 +292,7 @@ class HomePage extends StatelessWidget {
               // ============= POSTS SECTION =============
               Obx(() {
                 if (controller.isLoading.value && controller.posts.isEmpty) {
-                  return SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator()),
-                  );
+                  return _buildPostsShimmer();
                 }
 
                 if (controller.posts.isEmpty) {
@@ -292,6 +346,163 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  Widget _buildStoriesShimmer() {
+    return SizedBox(
+      height: 100,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: 6,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+            child: Column(
+              children: [
+                Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 40,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildPostsShimmer() {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header (Avatar + Name)
+                Row(
+                  children: [
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            width: 120,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            width: 80,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // Media Area (Large rectangle)
+                Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    height: 250,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Actions (Like, Comment, Share icons placeholder)
+                Row(
+                  children: [
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          );
+        },
+        childCount: 3,
+      ),
+    );
+  }
+
   // ============= ADD STORY BUTTON =============
   // ============= MY STORY ITEM (Index 0) =============
   // ============= MY STORY ITEM (Index 0) =============
@@ -316,14 +527,14 @@ class HomePage extends StatelessWidget {
         }
       },
       child: Container(
-        width: 100,
-        margin: EdgeInsets.only(right: 12),
+        width: 80,
+        margin: const EdgeInsets.only(right: 10),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           color: Colors.grey.shade900,
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -342,13 +553,13 @@ class HomePage extends StatelessWidget {
               // Dark Gradient for Text
               Positioned(
                 bottom: 0, left: 0, right: 0,
-                height: 60,
+                height: 45,
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
-                      colors: [Colors.black.withOpacity(0.8), Colors.transparent],
+                      colors: [Colors.black.withOpacity(0.75), Colors.transparent],
                     ),
                   ),
                 ),
@@ -356,14 +567,15 @@ class HomePage extends StatelessWidget {
               
               // Text
               Positioned(
-                bottom: 12, left: 12, right: 12,
+                bottom: 8, left: 6, right: 6,
                 child: Text(
                   hasStory ? "Your Story" : "Add Story",
-                  style: TextStyle(
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 13,
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    letterSpacing: 0.3,
+                    letterSpacing: 0.2,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -372,26 +584,62 @@ class HomePage extends StatelessWidget {
 
               // Badge
               Positioned(
-                top: 10, left: 10,
+                top: 6, left: 6,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                   decoration: BoxDecoration(
-                    color: Color(0xFFF05136), // Vibrant orange-red from screenshot
-                    borderRadius: BorderRadius.circular(12),
+                    color: const Color(0xFFF05136),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (!hasStory) Icon(Icons.add, color: Colors.white, size: 12),
-                      if (!hasStory) SizedBox(width: 4),
+                      if (!hasStory) const Icon(Icons.add, color: Colors.white, size: 10),
+                      if (!hasStory) const SizedBox(width: 2),
                       Text(
                         hasStory ? "Story" : "Add",
-                        style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                 ),
               ),
+
+              // Floating Plus Button to add more stories when they already have active stories
+              if (hasStory)
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: GestureDetector(
+                    onTap: () {
+                      final storyController = Get.put(StoryController());
+                      storyController.showPickerOptions();
+                    },
+                    child: Container(
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1.5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.25),
+                            blurRadius: 3,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -416,15 +664,15 @@ class HomePage extends StatelessWidget {
                 FullScreenStoryViewer(stories: story.stories, initialIndex: 0),
           ),
       child: Container(
-        width: 100,
-        margin: EdgeInsets.only(right: 12),
+        width: 80,
+        margin: const EdgeInsets.only(right: 10),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           color: Colors.grey.shade900,
-          border: hasUnseen ? Border.all(color: Color(0xFFF05136), width: 1.5) : null,
+          border: hasUnseen ? Border.all(color: const Color(0xFFF05136), width: 1.5) : null,
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(hasUnseen ? 14 : 16),
+          borderRadius: BorderRadius.circular(hasUnseen ? 10 : 12),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -436,13 +684,13 @@ class HomePage extends StatelessWidget {
               // Dark Gradient for Text
               Positioned(
                 bottom: 0, left: 0, right: 0,
-                height: 60,
+                height: 45,
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
-                      colors: [Colors.black.withOpacity(0.8), Colors.transparent],
+                      colors: [Colors.black.withOpacity(0.75), Colors.transparent],
                     ),
                   ),
                 ),
@@ -450,14 +698,15 @@ class HomePage extends StatelessWidget {
               
               // Text
               Positioned(
-                bottom: 12, left: 12, right: 12,
+                bottom: 8, left: 6, right: 6,
                 child: Text(
                   name,
-                  style: TextStyle(
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 13,
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    letterSpacing: 0.3,
+                    letterSpacing: 0.2,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -467,16 +716,16 @@ class HomePage extends StatelessWidget {
               // Badge
               if (hasUnseen)
                 Positioned(
-                  top: 10, left: 10,
+                  top: 6, left: 6,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                     decoration: BoxDecoration(
-                      color: Color(0xFFF05136), // Vibrant orange-red from screenshot
-                      borderRadius: BorderRadius.circular(12),
+                      color: const Color(0xFFF05136),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text(
+                    child: const Text(
                       "New",
-                      style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -4195,3 +4444,381 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //
 //
 //
+
+class AnimatedProBadge extends StatefulWidget {
+  const AnimatedProBadge({Key? key}) : super(key: key);
+
+  @override
+  State<AnimatedProBadge> createState() => _AnimatedProBadgeState();
+}
+
+class _AnimatedProBadgeState extends State<AnimatedProBadge>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _glowAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.08).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+
+    _glowAnimation = Tween<double>(begin: 4.0, end: 12.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: GestureDetector(
+            onTap: () async {
+              final homeController = Get.find<HomeController>();
+              var config = homeController.profileConfig.value;
+              
+              if (config == null) {
+                // Try reading from SharedPreferences
+                final cached = SharedPrefManager().profileConfig;
+                if (cached != null) {
+                  try {
+                    config = ProfileConfigModel.fromJson(cached);
+                  } catch (e) {
+                    debugPrint("Error reading cached config: $e");
+                  }
+                }
+              }
+
+              if (config == null) {
+                // Show loading spinner
+                Get.dialog(
+                  const Center(child: CircularProgressIndicator(color: Colors.black)),
+                  barrierDismissible: false,
+                );
+                
+                try {
+                  await homeController.fetchProfileConfig();
+                  config = homeController.profileConfig.value;
+                } catch (e) {
+                  debugPrint("Error fetching profile config: $e");
+                }
+                
+                Get.back(); // close loading dialog
+              }
+
+              if (config == null) {
+                Get.snackbar(
+                  "Error",
+                  "Failed to retrieve profile configuration. Please check your internet connection.",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+                return;
+              }
+
+              // Resolve current active profile from config
+              final currentProfileName = config.data?.userProfile?.currentProfileName;
+              if (currentProfileName == null || currentProfileName.isEmpty) {
+                Get.snackbar(
+                  "Error",
+                  "Current active profile name is not set.",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+                return;
+              }
+
+              String mappedProfileType = 'personal';
+              int? profileId;
+              String? activePlanSlug;
+              bool isSubscribedActive = false;
+              dynamic profileObj;
+
+              if (currentProfileName == 'personal' || currentProfileName == 'personal_profile') {
+                mappedProfileType = 'personal';
+                profileObj = config.data?.personalProfile;
+                profileId = profileObj?.profileId;
+                activePlanSlug = profileObj?.subscription?.planSlug;
+                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'employer') {
+                mappedProfileType = 'employer';
+                profileObj = config.data?.employer;
+                profileId = profileObj?.profileId;
+                activePlanSlug = profileObj?.subscription?.planSlug;
+                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'ecommerce' || currentProfileName == 'seller') {
+                mappedProfileType = 'seller';
+                profileObj = config.data?.ecommerce;
+                profileId = profileObj?.profileId;
+                activePlanSlug = profileObj?.subscription?.planSlug;
+                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'music_play' || currentProfileName == 'music') {
+                mappedProfileType = 'music';
+                profileObj = config.data?.musicPlay;
+                profileId = profileObj?.profileId;
+                activePlanSlug = profileObj?.subscription?.planSlug;
+                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'content_creation' || currentProfileName == 'creator') {
+                mappedProfileType = 'creator';
+                profileObj = config.data?.contentCreation;
+                profileId = profileObj?.profileId;
+                activePlanSlug = profileObj?.subscriptionDetails?.planSlug;
+                isSubscribedActive = profileObj?.subscriptionDetails?.isActive ?? false;
+              }
+
+              if (profileObj == null) {
+                Get.snackbar(
+                  "Error",
+                  "Profile configuration details are missing for: $currentProfileName",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+                return;
+              }
+
+              try {
+                final subscriptionController = Get.isRegistered<SubscriptionController>()
+                    ? Get.find<SubscriptionController>()
+                    : Get.put(SubscriptionController());
+
+                Get.dialog(
+                  const Center(child: CircularProgressIndicator(color: Colors.black)),
+                  barrierDismissible: false,
+                );
+
+                final resolvedSub = await subscriptionController.fetchPlansForProfileType(
+                  mappedProfileType,
+                  activePlanSlug: activePlanSlug,
+                  isSubscribedActive: isSubscribedActive,
+                  profileId: profileId,
+                );
+
+                Get.back(); // Close loading dialog
+
+                if (resolvedSub != null) {
+                  Get.to(() => ProfilePlansScreen(profileTypeSub: resolvedSub));
+                } else {
+                  Get.snackbar(
+                    "Error",
+                    "Failed to load plans for profile type: $mappedProfileType",
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                  );
+                }
+              } catch (e) {
+                Get.back(); // Close loading dialog in case of error
+                Get.snackbar(
+                  "Error",
+                  "Something went wrong while loading plans: $e",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+              }
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFFFFF099),
+                    Color(0xFFD4AF37),
+                    Color(0xFF9F7A1A),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFD4AF37).withOpacity(0.5),
+                    blurRadius: _glowAnimation.value,
+                    spreadRadius: 1,
+                  ),
+                ],
+                border: Border.all(
+                  color: const Color(0xFFFFF7C2),
+                  width: 1.5,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.workspace_premium_rounded,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 4),
+                  const Text(
+                    "PRO",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.8,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black26,
+                          blurRadius: 2,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSubscriptionModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFF151515),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade800,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD4AF37).withOpacity(0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.workspace_premium_rounded,
+                  color: Color(0xFFD4AF37),
+                  size: 48,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                "Upgrade to IVatan PRO",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Unlock all premium features, badges, and services.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey.shade400,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildFeatureRow(Icons.check_circle_rounded, "Golden Verified Profile Badge"),
+              _buildFeatureRow(Icons.check_circle_rounded, "Priority Support & Approval"),
+              _buildFeatureRow(Icons.check_circle_rounded, "Unlimited Product & Service Listings"),
+              _buildFeatureRow(Icons.check_circle_rounded, "Access to Exclusive Music Playlists"),
+              const SizedBox(height: 32),
+              Container(
+                width: double.infinity,
+                height: 52,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFFF099),
+                      Color(0xFFD4AF37),
+                      Color(0xFF9F7A1A),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(26),
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Get.snackbar(
+                      "Premium",
+                      "Subscription processing is coming soon!",
+                      snackPosition: SnackPosition.TOP,
+                      backgroundColor: Colors.black87,
+                      colorText: Colors.white,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(26),
+                    ),
+                  ),
+                  child: const Text(
+                    "Subscribe Now - 9.99/mo",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildFeatureRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Icon(icon, color: const Color(0xFFD4AF37), size: 20),
+          const SizedBox(width: 12),
+          Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

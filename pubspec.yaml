@@ -71,8 +71,6 @@ dependencies:
 
 
 
-  # ffmpeg_kit_flutter_min_gpl: ^6.0.2
-  iconly:
   google_fonts: ^6.2.1
   file_picker: ^8.1.7
   carousel_slider: ^5.0.0

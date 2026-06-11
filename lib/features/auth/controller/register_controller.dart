@@ -4,10 +4,13 @@ import 'package:i_vatan_app/features/auth/persentation/login_screen.dart';
 
 import '../../../../core/helper/custom_date_picker.dart';
 import '../../../../core/helper/custom_snack_bar.dart';
+import '../../../../core/network/api_services.dart';
 import '../../../route/app_pages.dart';
 import '../../dashboard/persentation/dashboard_page.dart';
 import '../data/data_source/auth_remote_data_source.dart';
 import '../data/model/req/register_req_model.dart';
+import '../data/model/res/profile_type_model.dart';
+import 'package:i_vatan_app/features/Notification/controller/notification_controller.dart';
 
 /*class RegisterController extends GetxController {
   final AuthRemoteDataSource dataSource;
@@ -154,6 +157,12 @@ class RegisterController extends GetxController {
   RxString selectedOccupation = "".obs;
   var countryCode = "+91".obs;
 
+  /// Profile Types and selection
+  final ApiServices api = ApiServices();
+  RxList<ProfileType> profileTypes = <ProfileType>[].obs;
+  Rx<ProfileType?> selectedProfileType = Rx<ProfileType?>(null);
+  RxString selectedSellerType = "".obs;
+
 
   /// Text controllers
   final nameController = TextEditingController();
@@ -165,10 +174,82 @@ class RegisterController extends GetxController {
   final dobController = TextEditingController();
   final occupationController = TextEditingController();
   final interestsController = TextEditingController(); // comma separated: "Reading,Coding"
+  final profileTypeController = TextEditingController();
+  final sellerTypeController = TextEditingController();
 
 
   /// Form Key
   final formKey = GlobalKey<FormState>();
+
+  @override
+  void onInit() {
+    super.onInit();
+    // ⚡️ OPTIMISTIC UI: Load fallback profile types immediately
+    profileTypes.value = _fallbackProfileTypes
+        .map((json) => ProfileType.fromJson(json))
+        .toList();
+    fetchProfileTypes();
+  }
+
+  Future<void> fetchProfileTypes() async {
+    try {
+      final response = await api.callGet("api/profile-types");
+      if (response != null && response["status"] == true) {
+        final List<dynamic> typesJson = response["data"]["types"];
+        profileTypes.value = typesJson.map((x) => ProfileType.fromJson(x)).toList();
+      }
+    } catch (e) {
+      print("⚠️ Silent background fetch of profile types failed: $e");
+    }
+  }
+
+  final List<Map<String, dynamic>> _fallbackProfileTypes = [
+    {
+      "type": "personal",
+      "label": "Personal Profile",
+      "description": "Default personal profile with basic features.",
+      "is_default": true,
+      "requires_approval": false,
+      "has_subscription": true
+    },
+    {
+      "type": "employer",
+      "label": "Employer Profile",
+      "description": "Post job openings and manage recruitment.",
+      "is_default": false,
+      "requires_approval": true,
+      "has_subscription": false
+    },
+    {
+      "type": "ecommerce",
+      "label": "Ecommerce Profile",
+      "description": "Sell products, services, or both.",
+      "is_default": false,
+      "requires_approval": true,
+      "has_subscription": true,
+      "sub_types": [
+        "product",
+        "service",
+        "both"
+      ]
+    },
+    {
+      "type": "music",
+      "label": "Music Playlist Profile",
+      "description": "Create and manage music playlists.",
+      "is_default": false,
+      "requires_approval": true,
+      "has_subscription": false
+    },
+    {
+      "type": "creator",
+      "label": "Content Creator Profile",
+      "description": "Upload content, manage monetization.",
+      "is_default": false,
+      "requires_approval": true,
+      "has_subscription": true
+    }
+  ];
 
   /// ----------- VALIDATIONS -----------
 
@@ -311,6 +392,12 @@ class RegisterController extends GetxController {
           .where((e) => e.isNotEmpty)
           .toList();
 
+      // Send exactly what the API returned — no custom mapping
+      final String? apiProfileType = selectedProfileType.value?.type;
+      final String? apiProfileSubType = selectedSellerType.value.isNotEmpty
+          ? selectedSellerType.value
+          : null;
+
       final req = RegisterReqModel(
         name: nameController.text.trim(),
         email: emailController.text.trim(),
@@ -320,18 +407,29 @@ class RegisterController extends GetxController {
         dateOfBirth: dobController.text.trim(),
         occupation: occupationController.text.trim(),
         interests: interestList,
-         // ["Coding", "Reading", "Traveling"]
+        profileType: apiProfileType,
+        profileSubType: apiProfileSubType,
       );
 
-      print("registrationrequset : "+req.name+ req.email+ req.phone+req.username+req.password+req.dateOfBirth+req.occupation+req.interests.toString());
+      print("registrationrequset : "+req.name+ req.email+ req.phone+req.username+req.password+req.dateOfBirth+req.occupation+req.interests.toString() + " type: " + (req.profileType ?? "null") + " subType: " + (req.profileSubType ?? "null"));
 
       final modal = await dataSource.makeUserRegister(req);
       final msg = "Registration successful! Welcome ${modal.name}";
 
+      try {
+        Get.find<NotificationController>().initNotification();
+      } catch (e) {
+        print("Notification init error on register: $e");
+      }
+
       Get.offAll(() =>  DashboardPage());
       CustomSnackBar.showSuccess(message: msg);
     } catch (e) {
-      CustomSnackBar.showError(message: e.toString());
+      String errMsg = e.toString();
+      if (errMsg.startsWith("Exception: ")) {
+        errMsg = errMsg.replaceFirst("Exception: ", "");
+      }
+      CustomSnackBar.showError(message: errMsg);
     } finally {
       isLoading.value = false;
     }

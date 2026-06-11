@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/features/auth/persentation/splash_page.dart';
@@ -12,13 +13,42 @@ import 'features/auth/persentation/google_login_page.dart';
 import 'features/dashboard/persentation/dashboard_page.dart';
 import 'features/onbording/persentation/view/onboarding_page.dart';
 import 'firebase_options.dart';
+import 'features/Notification/binding/notification_binding.dart';
+
+
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(
+    RemoteMessage message,
+    ) async {
+  if (Firebase.apps.isEmpty) {
+    try {
+      await Firebase.initializeApp();
+    } catch (e) {
+      print("Firebase background init exception: $e");
+    }
+  }
+
+  print("Background Notification");
+  print("Title: ${message.notification?.title}");
+  print("Body: ${message.notification?.body}");
+  print("Data: ${message.data}");
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // 1. Initialize Firebase with options first
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+  if (Firebase.apps.isEmpty) {
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } catch (e) {
+      print("Firebase main init exception: $e");
+    }
+  }
+
+  FirebaseMessaging.onBackgroundMessage(
+    firebaseMessagingBackgroundHandler,
   );
 
   // 2. Run other app initializations
@@ -44,6 +74,7 @@ class MyApp extends StatelessWidget {
           ),
           initialRoute: AppRoutes.splash,
           getPages: AppRoutes.appPages,
+          initialBinding: NotificationBinding(),
          // home: const SplashPage(),
          // getPages: AppRoutes.appPages,
         );

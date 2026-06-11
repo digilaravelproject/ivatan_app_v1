@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_assets.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../reels_screen/model/reel_model.dart';
 import '../../reels_screen/persentation/reels_view.dart';
@@ -135,12 +137,17 @@ class BookmarksScreen extends StatelessWidget {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        FadeInImage(
-                          image: NetworkImage(thumb),
-                          placeholder: const AssetImage(AppAssets.imgOnbording1),
-                          imageErrorBuilder: (context, error, stackTrace) {
-                            return Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover);
-                          },
+                        CachedNetworkImage(
+                          imageUrl: thumb,
+                          placeholder: (context, url) => Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(color: Colors.white),
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
+                            AppAssets.imgAppLogo,
+                            fit: BoxFit.cover,
+                          ),
                           fit: BoxFit.cover,
                         ),
                         if (item.type == 'video' || item.type == 'reel')

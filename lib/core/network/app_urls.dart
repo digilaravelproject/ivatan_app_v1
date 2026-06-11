@@ -33,6 +33,7 @@ class AppUrls {
   static const loginOtp = "api/auth/mobile_login";
   static const register = "api/auth/register";
   static const posts  ="api/v1/posts";
+  static const profileConfig = "api/v1/profiles/config";
 
   static const verifyForgetPassword  ="api/forgot-password/verify";
   static const changePassword  ="api/forgot-password/reset";
@@ -72,12 +73,28 @@ class AppUrls {
   static const feedForYou = "api/v1/posts/feed/for-you";
   static const banners = "api/v1/banners";
   static const logout = "api/v1/auth/logout";
+  static const deleteAccount = "api/v1/auth/delete-account";
   static String blockUser(int id) => "api/v1/users/$id/block";
   static String markInterested(int id) => "api/v1/posts/$id/interested";
   static String markNotInterested(int id) => "api/v1/posts/$id/not-interested";
   static String bookmarkPost(int id) => "api/v1/posts/$id/bookmark";
   static const myBookmarks = "api/v1/user/bookmarks";
   static const blockedUsers = "api/v1/user/blocked-users";
+  static const String chats = "api/v1/chats";
+  static const String liveChatGroups = "api/v1/live-chat-groups";
+  static String liveChatGroupDetail(dynamic id) => "api/v1/live-chat-groups/$id";
+  static String chatMessages(dynamic chatId) => "api/v1/chats/$chatId/messages";
+
+
+  //    NOTIFICATIONS
+
+  static const String registerDeviceToken = "api/v1/notifications/device-tokens";
+
+  static const String deleteDeviceToken = "api/v1/notifications/device-tokens";
+  static const String getNotifications = "api/v1/notifications";
+  static const String unreadCount = "api/v1/notifications/unread-count";
+  static const String markNotificationRead = "api/v1/notifications/mark-read";
+  static const String markAllNotificationsRead = "api/v1/notifications/mark-all-read";
 
   static const defaultApiKey =
       "1|1yCFcc7ahglUgOL3cftZZ7T83gcyFJreXGlQx0zud042e463";

@@ -83,7 +83,19 @@ class JobRemoteDataSourceImpl implements JobRemoteDataSource {
       if (response['status'] == true) {
         return response['message']?.toString() ?? 'Job created successfully.';
       } else {
-        throw response['message']?.toString() ?? 'Failed to create job.';
+        String errorMessage = response['message']?.toString() ?? 'Failed to create job.';
+        if (response['errors'] != null && response['errors'] is Map) {
+          final errors = response['errors'] as Map;
+          if (errors.isNotEmpty) {
+            final firstError = errors.values.first;
+            if (firstError is List && firstError.isNotEmpty) {
+              errorMessage = firstError.first.toString();
+            } else {
+              errorMessage = firstError.toString();
+            }
+          }
+        }
+        throw errorMessage;
       }
     }
     return null;
@@ -120,7 +132,19 @@ class JobRemoteDataSourceImpl implements JobRemoteDataSource {
       if (response['status'] == true) {
         return response['message']?.toString() ?? 'Job updated successfully.';
       } else {
-        throw response['message']?.toString() ?? 'Failed to update job.';
+        String errorMessage = response['message']?.toString() ?? 'Failed to update job.';
+        if (response['errors'] != null && response['errors'] is Map) {
+          final errors = response['errors'] as Map;
+          if (errors.isNotEmpty) {
+            final firstError = errors.values.first;
+            if (firstError is List && firstError.isNotEmpty) {
+              errorMessage = firstError.first.toString();
+            } else {
+              errorMessage = firstError.toString();
+            }
+          }
+        }
+        throw errorMessage;
       }
     }
     return null;
