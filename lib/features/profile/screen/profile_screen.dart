@@ -345,7 +345,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             ],
                                                           ),
                                                         ),
-                                                        if (user.isSeller == true)
+                                                        if (ProfilePermissionManager.canSellProducts) ...[
                                                           const PopupMenuItem(
                                                             value: 'products',
                                                             child: Row(
@@ -353,32 +353,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                                 Icon(CupertinoIcons.cube_box, size: 20),
                                                                 const SizedBox(width: 10),
                                                                 Text("Your Products"),
-                                                               ],
-                                                            ),
-                                                          ),
-                                                        if (user.isSeller == true)
-                                                          const PopupMenuItem(
-                                                            value: 'services',
-                                                            child: Row(
-                                                              children: [
-                                                                Icon(Icons.room_service_outlined, size: 20),
-                                                                const SizedBox(width: 10),
-                                                                Text("Your Services"),
                                                               ],
                                                             ),
                                                           ),
-                                                        if (user.isSeller == true)
-                                                          const PopupMenuItem(
-                                                            value: 'enquiry',
-                                                            child: Row(
-                                                              children: [
-                                                                Icon(CupertinoIcons.chat_bubble_text, size: 20),
-                                                                const SizedBox(width: 10),
-                                                                Text("Enquiry"),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        if (user.isSeller == true)
                                                           const PopupMenuItem(
                                                             value: 'dashboard',
                                                             child: Row(
@@ -389,6 +366,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                               ],
                                                             ),
                                                           ),
+                                                        ],
+                                                        if (ProfilePermissionManager.canProvideServices) ...[
+                                                          const PopupMenuItem(
+                                                            value: 'services',
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(Icons.room_service_outlined, size: 20),
+                                                                const SizedBox(width: 10),
+                                                                Text("Your Services"),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          const PopupMenuItem(
+                                                            value: 'enquiry',
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(CupertinoIcons.chat_bubble_text, size: 20),
+                                                                const SizedBox(width: 10),
+                                                                Text("Enquiry"),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ] else ...[
                                                         PopupMenuItem(
                                                           value: 'block',
