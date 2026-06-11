@@ -142,22 +142,20 @@ class DrawerScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                      Obx(() => Row(
+                      Row(
                         children: [
-                          if (ProfilePermissionManager.isProfileActive(ProfileType.employer)) ...[
-                            Expanded(
-                              child: _buildBottomCard(
-                                context,
-                                "i-QuickHire",
-                                CupertinoIcons.briefcase_fill,
-                                "Job Board",
-                                onTap: () {
-                                  Get.toNamed(AppRoutes.jobSearchScreen);
-                                },
-                              ),
+                          Expanded(
+                            child: _buildBottomCard(
+                              context,
+                              "i-QuickHire",
+                              CupertinoIcons.briefcase_fill,
+                              "Job Board",
+                              onTap: () {
+                                Get.toNamed(AppRoutes.jobSearchScreen);
+                              },
                             ),
-                            const SizedBox(width: 12),
-                          ],
+                          ),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: _buildBottomCard(
                               context,
@@ -167,7 +165,7 @@ class DrawerScreen extends StatelessWidget {
                             ),
                           ),
                         ],
-                      )),
+                      ),
                      const SizedBox(height: 16),
                      GestureDetector(
                       onTap: () => Get.to(HelpCenter()),
