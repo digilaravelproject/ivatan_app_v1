@@ -696,10 +696,9 @@ class VideoReel extends StatelessWidget {
       onTap: onToggleSound,
       // Use the callback
       child: Container(
-        // margin: EdgeInsets.only(
-        //   //top: appBarHeight,
-        //   bottom: bottomNavHeight,
-        // ),
+        margin: EdgeInsets.only(
+          bottom: 60 + MediaQuery.of(context).padding.bottom,
+        ),
         child: Stack(
           fit: StackFit.expand,
           children: [
