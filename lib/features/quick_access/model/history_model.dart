@@ -67,6 +67,7 @@ class CommentHistoryItem {
   final String entityType;
   final int entityId;
   final int? parentId;
+  final HistoryPreview? preview;
   final String createdAt;
   final String createdHuman;
 
@@ -76,6 +77,7 @@ class CommentHistoryItem {
     required this.entityType,
     required this.entityId,
     this.parentId,
+    this.preview,
     required this.createdAt,
     required this.createdHuman,
   });
@@ -87,6 +89,7 @@ class CommentHistoryItem {
       entityType: json['entity_type'] ?? '',
       entityId: json['entity_id'] ?? 0,
       parentId: json['parent_id'],
+      preview: json['preview'] is Map<String, dynamic> ? HistoryPreview.fromJson(json['preview']) : null,
       createdAt: json['created_at'] ?? '',
       createdHuman: json['created_human'] ?? '',
     );

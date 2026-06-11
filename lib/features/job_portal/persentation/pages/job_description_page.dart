@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/helper/profile_permission_manager.dart';
 import '../../../../route/app_pages.dart';
 import '../../data/model/job_model.dart';
 import '../controller/job_discription_controller.dart';
@@ -689,6 +690,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
   }
 
   bool _isRecruiter() {
-    return SharedPrefManager().user?.isEmployer ?? false;
+    return ProfilePermissionManager.isProfileActive(ProfileType.employer);
+  //    SharedPrefManager().user?.isEmployer ?? false;
   }
 }

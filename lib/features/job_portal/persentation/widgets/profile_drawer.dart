@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:i_vatan_app/route/app_pages.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/helper/profile_permission_manager.dart';
 import '../../../../core/network/app_urls.dart';
 import '../../../../db/shared_pref_manager.dart';
 import '../../../dashboard/persentation/edit_profile_screen.dart';
@@ -348,7 +349,8 @@ class ProfileDrawer extends StatelessWidget {
   }
 
   bool _isRecruiter() {
-    return SharedPrefManager().user?.isEmployer ?? false;
+    return ProfilePermissionManager.isProfileActive(ProfileType.employer);
+     // SharedPrefManager().user?.isEmployer ?? false;
   }
 
 }
