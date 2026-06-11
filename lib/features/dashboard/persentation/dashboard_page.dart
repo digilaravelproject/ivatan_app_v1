@@ -71,32 +71,32 @@ class DashboardPage extends StatelessWidget {
             ),
           ),
           child: Container(
-            margin: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
+            margin: EdgeInsets.zero,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(
-                color: Colors.black.withOpacity(0.06),
-                width: 1.5,
+              border: Border(
+                top: BorderSide(
+                  color: Colors.black.withOpacity(0.06),
+                  width: 1.0,
+                ),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 25,
-                  spreadRadius: 1,
-                  offset: const Offset(0, 8),
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
                 ),
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.zero,
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                 child: SafeArea(
                   top: false,
                   left: false,
                   right: false,
-                  bottom: false,
+                  bottom: true,
                   child: Container(
                     height: 60,
                     padding: const EdgeInsets.symmetric(horizontal: 10),
