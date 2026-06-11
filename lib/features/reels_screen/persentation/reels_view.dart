@@ -354,9 +354,7 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
     _isLiked.value = !_isLiked.value;
 
     // Update controller maps for UI button sync
-    if (shortPlayController.isLikedMap[_currentPage] != null) {
-      shortPlayController.isLikedMap[_currentPage]!.value = _isLiked.value;
-    }
+    shortPlayController.getIsLiked(currentReel.id, currentReel.stats.isLiked).value = _isLiked.value;
 
     // Trigger animation only when liking
     if (_isLiked.value && widget.showLikeAnimation) {
@@ -378,18 +376,14 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
       currentReel.stats.isLiked = _isLiked.value;
 
       // Update controller like count for UI button
-      if (shortPlayController.likeCounts[_currentPage] != null) {
-        shortPlayController.likeCounts[_currentPage]!.value =
-            currentReel.stats.likeCount;
-      }
+      shortPlayController.getLikeCount(currentReel.id, currentReel.stats.likeCount).value =
+          currentReel.stats.likeCount;
 
       setState(() {}); // Refresh UI with new count
     } catch (e) {
       // Revert on error
       _isLiked.value = wasLiked;
-      if (shortPlayController.isLikedMap[_currentPage] != null) {
-        shortPlayController.isLikedMap[_currentPage]!.value = wasLiked;
-      }
+      shortPlayController.getIsLiked(currentReel.id, currentReel.stats.isLiked).value = wasLiked;
       setState(() {});
     }
   }
@@ -997,8 +991,8 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
 
   Widget _buildCommentsPreview(BuildContext context) {
     return Obx(() {
-      final comments = controller.reelComments[index];
-      if (comments == null || comments.isEmpty) {
+      final comments = controller.getReelComments(item.id);
+      if (comments.isEmpty) {
         return const SizedBox.shrink();
       }
       final commentsToShow = comments.take(3).toList();
@@ -1213,7 +1207,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                       width: 50,
                       height: 50,
                       child: Center(
-                        child: controller.isLikedMap[index]?.value == true
+                        child: controller.getIsLiked(item.id, item.stats.isLiked).value == true
                             ? Image.asset(
                           "assets/icon/ic_liked.png",
                           width: 50,
@@ -1229,7 +1223,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      controller.likeCounts[index]?.value.toString() ?? "0",
+                      controller.getLikeCount(item.id, item.stats.likeCount).value.toString(),
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
@@ -1250,7 +1244,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
               size: 20,
               removeColor: false,
             ),
-            label: controller.commentCounts[index]?.value.toString() ?? "0",
+            label: controller.getCommentCount(item.id, item.stats.commentCount).value.toString(),
             onPressed: () {
               showModalBottomSheet(
                 context: context,
@@ -1270,7 +1264,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
             size: 18,
             removeColor: false,
           ),
-          label: controller.shareCounts[index]?.value.toString() ?? "0",
+          label: controller.getShareCount(item.id, item.stats.shareCount).value.toString(),
           onPressed: () {
             // Create shareable link
             final String reelUrl = "https://ivatan.in/post/${item.id}";

@@ -474,6 +474,42 @@ class ShortPlayController extends GetxController {
   // Per-reel comments cache for instant preview
   final RxMap<int, RxList<CommentModel>> reelComments = <int, RxList<CommentModel>>{}.obs;
 
+  RxBool getIsLiked(int reelId, bool initialValue) {
+    if (!isLikedMap.containsKey(reelId)) {
+      isLikedMap[reelId] = initialValue.obs;
+    }
+    return isLikedMap[reelId]!;
+  }
+
+  RxInt getLikeCount(int reelId, int initialValue) {
+    if (!likeCounts.containsKey(reelId)) {
+      likeCounts[reelId] = initialValue.obs;
+    }
+    return likeCounts[reelId]!;
+  }
+
+  RxInt getCommentCount(int reelId, int initialValue) {
+    if (!commentCounts.containsKey(reelId)) {
+      commentCounts[reelId] = initialValue.obs;
+    }
+    return commentCounts[reelId]!;
+  }
+
+  RxInt getShareCount(int reelId, int initialValue) {
+    if (!shareCounts.containsKey(reelId)) {
+      shareCounts[reelId] = initialValue.obs;
+    }
+    return shareCounts[reelId]!;
+  }
+
+  RxList<CommentModel> getReelComments(int reelId) {
+    if (!reelComments.containsKey(reelId)) {
+      reelComments[reelId] = <CommentModel>[].obs;
+      _fetchCommentsForReel(reelId);
+    }
+    return reelComments[reelId]!;
+  }
+
   @override
   void onInit() {
     callAllFunction();
@@ -501,10 +537,11 @@ class ShortPlayController extends GetxController {
 
         // Initialize reactive stats
         for (var i = 0; i < fetchedReels.length; i++) {
-          likeCounts[i] = (fetchedReels[i].stats.likeCount).obs;
-          commentCounts[i] = (fetchedReels[i].stats.commentCount).obs;
-          shareCounts[i] = (fetchedReels[i].stats.shareCount).obs;
-          isLikedMap[i] = (fetchedReels[i].stats.isLiked).obs;
+          final reel = fetchedReels[i];
+          likeCounts[reel.id] = (reel.stats.likeCount).obs;
+          commentCounts[reel.id] = (reel.stats.commentCount).obs;
+          shareCounts[reel.id] = (reel.stats.shareCount).obs;
+          isLikedMap[reel.id] = (reel.stats.isLiked).obs;
         }
 
         reelsList.value = fetchedReels;
@@ -516,7 +553,7 @@ class ShortPlayController extends GetxController {
           // Pre-initialize follow status to avoid build-time creation
           followController.setInitialFollowStatus(reel.user.id, reel.isFollowing);
           // Pre-fetch/initialize comments map
-          _fetchCommentsForReel(reel.id, i);
+          _fetchCommentsForReel(reel.id);
         }
       }
     } catch (e) {
@@ -526,17 +563,17 @@ class ShortPlayController extends GetxController {
     }
   }
 
-  Future<void> _fetchCommentsForReel(int postId, int index) async {
+  Future<void> _fetchCommentsForReel(int postId) async {
     try {
       final response = await ApiServices().callGet("api/v1/comments/post/$postId");
       if (response != null && response["data"] != null) {
         final commentResponse = CommentResponse.fromJson(response);
-        reelComments[index] = commentResponse.data.obs;
+        reelComments[postId] = commentResponse.data.obs;
       } else {
-        reelComments[index] = <CommentModel>[].obs;
+        reelComments[postId] = <CommentModel>[].obs;
       }
     } catch (e) {
-      reelComments[index] = <CommentModel>[].obs;
+      reelComments[postId] = <CommentModel>[].obs;
       print("Error fetching comments for reel $postId: $e");
     }
   }
@@ -593,8 +630,8 @@ class ShortPlayController extends GetxController {
   }
 
   Future<void> updateShortVideoLike(int postId, int index) async {
-    final statsLike = isLikedMap[index]!;
-    final statsCount = likeCounts[index]!;
+    final statsLike = getIsLiked(postId, false);
+    final statsCount = getLikeCount(postId, 0);
 
     statsLike.value = !statsLike.value;
     statsCount.value += statsLike.value ? 1 : -1;
@@ -612,14 +649,11 @@ class ShortPlayController extends GetxController {
   }
 
   void updateCommentCount(int postId, bool increase) {
-    int index = reelsList.indexWhere((p) => p.id == postId);
-    if (index != -1) {
-      final count = commentCounts[index]!;
-      if (increase) {
-        count.value++;
-      } else {
-        if (count.value > 0) count.value--;
-      }
+    final count = getCommentCount(postId, 0);
+    if (increase) {
+      count.value++;
+    } else {
+      if (count.value > 0) count.value--;
     }
   }
 

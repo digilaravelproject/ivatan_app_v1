@@ -49,31 +49,38 @@ class _SearchScreenState extends State<SearchScreen> {
 
                 // 2. Banner Slider
                 SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: 130,
-                    child: Obx(() {
-                      if (controller.isLoading.value && controller.bannersList.isEmpty) {
-                        return const Center(child: CircularProgressIndicator());
+                  child: Obx(() {
+                    if (controller.bannersList.isEmpty) {
+                      if (controller.isLoading.value) {
+                        return const SizedBox(
+                          height: 130,
+                          child: Center(child: CircularProgressIndicator()),
+                        );
                       }
-                      if (controller.bannersList.isEmpty) {
-                        return const SizedBox.shrink();
-                      }
-                      return ImageSlider(
-                        images: controller.bannersList
-                            .map((banner) => banner.mediaUrl)
-                            .toList(),
-                        viewPort: 0.9,
-                        borderRadius: 16,
-                        autoScroll: true,
-                        isIndicatorVisible: true,
-                        itemPadding: const EdgeInsets.symmetric(horizontal: 8),
-                        indicatorAlignment: MainAxisAlignment.center,
-                      );
-                    }),
-                  ),
+                      return const SizedBox.shrink();
+                    }
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          height: 130,
+                          child: ImageSlider(
+                            images: controller.bannersList
+                                .map((banner) => banner.mediaUrl)
+                                .toList(),
+                            viewPort: 0.9,
+                            borderRadius: 16,
+                            autoScroll: true,
+                            isIndicatorVisible: true,
+                            itemPadding: const EdgeInsets.symmetric(horizontal: 8),
+                            indicatorAlignment: MainAxisAlignment.center,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    );
+                  }),
                 ),
-
-                const SliverToBoxAdapter(child: SizedBox(height: 10)),
 
                 // 3. Pinned TabBar
                 SliverPersistentHeader(

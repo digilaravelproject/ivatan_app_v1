@@ -49,9 +49,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(widget.videoUrl)
+    final bool isPassedUrlValid = widget.videoUrl.isNotEmpty && 
+        widget.videoUrl.toLowerCase().contains('.mp4');
+    final String playUrl = isPassedUrlValid 
+        ? widget.videoUrl 
+        : 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+
+    _controller = VideoPlayerController.network(playUrl)
       ..initialize().then((_) {
-        setState(() {});
+        if (mounted) setState(() {});
       });
 
     // Controller yahan initialize karo
@@ -117,8 +123,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         Get.delete<VideoController>(tag: oldWidget.videoId.toString());
       }
 
+      final bool isPassedUrlValid = widget.videoUrl.isNotEmpty && 
+          widget.videoUrl.toLowerCase().contains('.mp4');
+      final String playUrl = isPassedUrlValid 
+          ? widget.videoUrl 
+          : 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+
       // Initialize new video controller
-      _controller = VideoPlayerController.network(widget.videoUrl)
+      _controller = VideoPlayerController.network(playUrl)
         ..initialize().then((_) => setState(() {}));
 
       controller = Get.put(
@@ -385,25 +397,24 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
             children: [
               SizedBox(
                 height: AppSizer.deviceHeight26,
-                child: WorkOutVideoPlayPage(videoUrl: widget.videoUrl),
-                //child: WorkOutVideoPlayPage(videoUrl: controller.),
-              ),
-
-             /* SizedBox(
-                height: AppSizer.deviceHeight26,
                 child: Obx(() {
                   final video = controller.currentVideo.value;
-
-                  if (video == null || video.media.isEmpty || video.media.first.url == null) {
+                  final bool isPassedUrlValid = widget.videoUrl.isNotEmpty && 
+                      widget.videoUrl.toLowerCase().contains('.mp4');
+                  
+                  if (isPassedUrlValid) {
+                    return WorkOutVideoPlayPage(videoUrl: widget.videoUrl);
+                  }
+                  
+                  if (video == null || video.media.isEmpty) {
                     return const Center(
-                      child: CircularProgressIndicator(),
+                      child: CircularProgressIndicator(color: Colors.cyan),
                     );
                   }
-
-                  // ✅ Video available hai, tabhi player call karo
-                  return WorkOutVideoPlayPage(videoUrl: video.media.first.url!);
+                  
+                  return WorkOutVideoPlayPage(videoUrl: video.media.first.url);
                 }),
-              ),*/
+              ),
 
 
               Positioned(

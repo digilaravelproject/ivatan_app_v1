@@ -11,6 +11,10 @@ import '../../../dashboard/persentation/widgets/feed_video_player.dart';
 import '../../../videos/persentation/play_video_screen.dart';
 import 'package:i_vatan_app/features/reels_screen/persentation/reels_view.dart';
 import 'package:i_vatan_app/features/reels_screen/model/reel_model.dart';
+import 'package:i_vatan_app/features/post/presentation/image_post_screen.dart';
+import 'package:i_vatan_app/core/network/api_services.dart';
+import 'package:i_vatan_app/features/reels_screen/controller/short_play_controller.dart';
+
 
 /*
 class HistoryScreen extends StatelessWidget {
@@ -1133,7 +1137,7 @@ class VideoGridSection extends StatelessWidget {
                           return const Center(child: CircularProgressIndicator());
                         }
                         final item = items[index];
-                        return _buildVideoCard(item, type);
+                        return _buildVideoCard(context, item, type);
                       },
                     ),
             );
@@ -1316,7 +1320,7 @@ class VideoGridSection extends StatelessWidget {
     );
   }
 
-  Widget _buildVideoCard(dynamic item, VideoType type) {
+  Widget _buildVideoCard(BuildContext context, dynamic item, VideoType type) {
     String? imageUrl;
     String title = "Video";
     String sub = "";
@@ -1341,49 +1345,13 @@ class VideoGridSection extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        if (hasImage && imageUrl!.toLowerCase().contains('.mp4')) {
-          if (entityType.toLowerCase() == 'reel') {
-            final singleReel = ReelModel(
-              id: entityId,
-              uuid: entityId.toString(),
-              caption: title,
-              isMine: false,
-              isFollowing: false,
-              user: UserModel(
-                id: 0,
-                name: "",
-                username: "",
-                avatar: "",
-                isVerified: false,
-                interests: "",
-              ),
-              media: [
-                MediaModel(
-                  id: 0,
-                  type: "video",
-                  url: imageUrl,
-                  thumbnail: imageUrl,
-                  mimeType: "video/mp4",
-                )
-              ],
-              stats: ReelStats(
-                likeCount: 0,
-                commentCount: 0,
-                shareCount: 0,
-                viewCount: 0,
-                isLiked: false,
-                isSaved: false,
-              ),
-              createdAt: "",
-              createdHuman: sub,
-            );
-            Get.to(() => ReelsView(
-              reels: [singleReel],
-              initialIndex: 0,
-            ));
-          } else {
-            Get.to(() => VideoPlayerScreen(videoUrl: imageUrl!, videoId: entityId));
-          }
+        final String typeLower = entityType.toLowerCase();
+        if (typeLower == 'post' || typeLower == 'image') {
+          Get.to(() => ImagePostScreen(postId: entityId));
+        } else if (typeLower == 'reel' || (imageUrl != null && imageUrl.toLowerCase().contains('reel') && imageUrl.toLowerCase().contains('.mp4'))) {
+          _openReel(context, entityId, title, sub, imageUrl ?? "");
+        } else {
+          Get.to(() => VideoPlayerScreen(videoUrl: imageUrl ?? "", videoId: entityId));
         }
       },
       child: ClipRRect(
@@ -1529,138 +1497,13 @@ class _HistoryVideoSliderItemState extends State<HistoryVideoSliderItem> {
 
     return GestureDetector(
       onTap: () {
-        if (imageUrl.isNotEmpty && imageUrl.toLowerCase().contains('.mp4')) {
-          if (widget.item.postType.toLowerCase() == 'reel') {
-            try {
-              final historyController = Get.find<HistoryController>();
-              final reelsList = historyController.videoViews
-                  .where((v) => v.postType.toLowerCase() == 'reel')
-                  .toList();
-              final reelIndex = reelsList.indexWhere((r) => r.id == widget.item.id);
-              
-              if (reelIndex != -1) {
-                final mappedReels = reelsList.map((v) => ReelModel(
-                  id: v.entityId,
-                  uuid: v.entityId.toString(),
-                  caption: v.preview?.caption ?? "",
-                  isMine: false,
-                  isFollowing: false,
-                  user: UserModel(
-                    id: 0,
-                    name: "",
-                    username: "",
-                    avatar: "",
-                    isVerified: false,
-                    interests: "",
-                  ),
-                  media: [
-                    MediaModel(
-                      id: 0,
-                      type: "video",
-                      url: v.preview?.thumbnail ?? "",
-                      thumbnail: v.preview?.thumbnail ?? "",
-                      mimeType: "video/mp4",
-                    )
-                  ],
-                  stats: ReelStats(
-                    likeCount: 0,
-                    commentCount: 0,
-                    shareCount: 0,
-                    viewCount: 0,
-                    isLiked: false,
-                    isSaved: false,
-                  ),
-                  createdAt: v.createdAt,
-                  createdHuman: v.createdHuman,
-                )).toList();
-
-                Get.to(() => ReelsView(
-                  reels: mappedReels,
-                  initialIndex: reelIndex,
-                ));
-              } else {
-                final singleReel = ReelModel(
-                  id: widget.item.entityId,
-                  uuid: widget.item.entityId.toString(),
-                  caption: widget.item.preview?.caption ?? "",
-                  isMine: false,
-                  isFollowing: false,
-                  user: UserModel(
-                    id: 0,
-                    name: "",
-                    username: "",
-                    avatar: "",
-                    isVerified: false,
-                    interests: "",
-                  ),
-                  media: [
-                    MediaModel(
-                      id: 0,
-                      type: "video",
-                      url: imageUrl,
-                      thumbnail: imageUrl,
-                      mimeType: "video/mp4",
-                    )
-                  ],
-                  stats: ReelStats(
-                    likeCount: 0,
-                    commentCount: 0,
-                    shareCount: 0,
-                    viewCount: 0,
-                    isLiked: false,
-                    isSaved: false,
-                  ),
-                  createdAt: widget.item.createdAt,
-                  createdHuman: widget.item.createdHuman,
-                );
-                Get.to(() => ReelsView(
-                  reels: [singleReel],
-                  initialIndex: 0,
-                ));
-              }
-            } catch (e) {
-              final singleReel = ReelModel(
-                id: widget.item.entityId,
-                uuid: widget.item.entityId.toString(),
-                caption: widget.item.preview?.caption ?? "",
-                isMine: false,
-                isFollowing: false,
-                user: UserModel(
-                  id: 0,
-                  name: "",
-                  username: "",
-                  avatar: "",
-                  isVerified: false,
-                  interests: "",
-                ),
-                media: [
-                  MediaModel(
-                    id: 0,
-                    type: "video",
-                    url: imageUrl,
-                    thumbnail: imageUrl,
-                    mimeType: "video/mp4",
-                  )
-                ],
-                stats: ReelStats(
-                  likeCount: 0,
-                  commentCount: 0,
-                  shareCount: 0,
-                  viewCount: 0,
-                  isLiked: false,
-                  isSaved: false,
-                ),
-                createdAt: widget.item.createdAt,
-                createdHuman: widget.item.createdHuman,
-              );
-              Get.to(() => ReelsView(
-                reels: [singleReel],
-                initialIndex: 0,
-              ));
-            }
-          } else {
-            Get.to(() => VideoPlayerScreen(videoUrl: imageUrl, videoId: widget.item.entityId));
-          }
+        final String typeLower = widget.item.postType.toLowerCase();
+        if (typeLower == 'post' || typeLower == 'image') {
+          Get.to(() => ImagePostScreen(postId: widget.item.entityId));
+        } else if (typeLower == 'reel') {
+          _openReel(context, widget.item.entityId, widget.item.preview?.caption ?? "", widget.item.createdHuman, imageUrl);
+        } else {
+          Get.to(() => VideoPlayerScreen(videoUrl: imageUrl, videoId: widget.item.entityId));
         }
       },
       child: Padding(
@@ -1797,6 +1640,166 @@ class _HistoryVideoSliderItemState extends State<HistoryVideoSliderItem> {
       ),
     );
   }
+}
+
+void _openReel(BuildContext context, int entityId, String fallbackTitle, String fallbackSub, String fallbackUrl) async {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.cyan),
+      );
+    },
+  );
+
+  try {
+    final api = Get.find<ApiServices>();
+    final response = await api.callGet("api/v1/posts/$entityId");
+    
+    // Dismiss loading dialog
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
+
+    if (response != null) {
+      final map = response["data"] is Map<String, dynamic> ? response["data"] : response;
+      
+      // Parse media url
+      String videoUrl = fallbackUrl;
+      String thumbUrl = fallbackUrl;
+      if (map["media"] is List && map["media"].isNotEmpty) {
+        videoUrl = map["media"][0]["url"] ?? fallbackUrl;
+        thumbUrl = map["media"][0]["thumbnail"] ?? fallbackUrl;
+      }
+      
+      final singleReel = ReelModel(
+        id: entityId,
+        uuid: entityId.toString(),
+        caption: map["caption"] ?? fallbackTitle,
+        isMine: map["is_mine"] ?? false,
+        isFollowing: map["is_following"] ?? false,
+        user: UserModel(
+          id: map["user"]?["id"] ?? 0,
+          name: map["user"]?["name"] ?? "",
+          username: map["user"]?["username"] ?? "",
+          avatar: map["user"]?["avatar"] ?? "",
+          isVerified: map["user"]?["is_verified"] ?? false,
+          interests: map["user"]?["interests"] ?? "",
+        ),
+        media: [
+          MediaModel(
+            id: 0,
+            type: "video",
+            url: videoUrl,
+            thumbnail: thumbUrl,
+            mimeType: "video/mp4",
+          )
+        ],
+        stats: ReelStats(
+          likeCount: map["stats"]?["like_count"] ?? 0,
+          commentCount: map["stats"]?["comment_count"] ?? 0,
+          shareCount: map["stats"]?["share_count"] ?? 0,
+          viewCount: map["stats"]?["view_count"] ?? 0,
+          isLiked: map["stats"]?["is_liked"] ?? false,
+          isSaved: map["stats"]?["is_saved"] ?? false,
+        ),
+        createdAt: map["created_at"] ?? "",
+        createdHuman: map["created_human"] ?? fallbackSub,
+      );
+
+      List<ReelModel> finalReels = [];
+      int initialIndex = 0;
+
+      if (Get.isRegistered<ShortPlayController>()) {
+        final shortPlayController = Get.find<ShortPlayController>();
+        final index = shortPlayController.reelsList.indexWhere((r) => r.id == entityId);
+        if (index != -1) {
+          finalReels = List<ReelModel>.from(shortPlayController.reelsList);
+          initialIndex = index;
+        } else {
+          finalReels = [singleReel, ...shortPlayController.reelsList];
+          initialIndex = 0;
+        }
+      } else {
+        finalReels = [singleReel];
+        initialIndex = 0;
+      }
+
+      Get.to(() => ReelsView(
+        reels: finalReels,
+        initialIndex: initialIndex,
+      ));
+    } else {
+      _openReelFallback(entityId, fallbackTitle, fallbackSub, fallbackUrl);
+    }
+  } catch (e) {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
+    print("Error opening reel: $e");
+    _openReelFallback(entityId, fallbackTitle, fallbackSub, fallbackUrl);
+  }
+}
+
+void _openReelFallback(int entityId, String title, String sub, String url) {
+  final singleReel = ReelModel(
+    id: entityId,
+    uuid: entityId.toString(),
+    caption: title,
+    isMine: false,
+    isFollowing: false,
+    user: UserModel(
+      id: 0,
+      name: "",
+      username: "",
+      avatar: "",
+      isVerified: false,
+      interests: "",
+    ),
+    media: [
+      MediaModel(
+        id: 0,
+        type: "video",
+        url: url,
+        thumbnail: url,
+        mimeType: "video/mp4",
+      )
+    ],
+    stats: ReelStats(
+      likeCount: 0,
+      commentCount: 0,
+      shareCount: 0,
+      viewCount: 0,
+      isLiked: false,
+      isSaved: false,
+    ),
+    createdAt: "",
+    createdHuman: sub,
+  );
+
+  List<ReelModel> finalReels = [];
+  int initialIndex = 0;
+
+  if (Get.isRegistered<ShortPlayController>()) {
+    final shortPlayController = Get.find<ShortPlayController>();
+    final index = shortPlayController.reelsList.indexWhere((r) => r.id == entityId);
+    if (index != -1) {
+      finalReels = List<ReelModel>.from(shortPlayController.reelsList);
+      initialIndex = index;
+    } else {
+      finalReels = [singleReel, ...shortPlayController.reelsList];
+      initialIndex = 0;
+    }
+  } else {
+    finalReels = [singleReel];
+    initialIndex = 0;
+  }
+
+  Get.to(() => ReelsView(
+    reels: finalReels,
+    initialIndex: initialIndex,
+  ));
 }
 
 
