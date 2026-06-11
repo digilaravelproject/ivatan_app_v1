@@ -62,8 +62,12 @@ class DashboardPage extends StatelessWidget {
             gradient: LinearGradient(
               colors: [
                 Colors.white.withOpacity(0.0),
+                Colors.white.withOpacity(0.1),
                 Colors.white.withOpacity(0.2),
+                Colors.white.withOpacity(0.3),
+                Colors.white.withOpacity(0.4),
                 Colors.white.withOpacity(0.5),
+                Colors.white.withOpacity(0.7),
                 Colors.white,
               ],
               begin: Alignment.topCenter,
