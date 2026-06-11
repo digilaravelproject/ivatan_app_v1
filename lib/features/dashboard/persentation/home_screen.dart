@@ -810,20 +810,19 @@ class HomePage extends StatelessWidget {
                     height: 40,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.grey.shade100,
+                      color: Colors.grey.shade200,
                     ),
                     child: ClipOval(
-                      child:
-                          post.user.avatar != null &&
-                                  post.user.avatar!.isNotEmpty
-                              ? Image.network(
-                                AppUrls.getFullImageUrl(post.user.avatar!),
-                                fit: BoxFit.cover,
-                              )
-                              : Image.asset(
-                                AppAssets.imgAppLogo,
-                                fit: BoxFit.cover,
-                              ),
+                      child: (post.user.avatar != null &&
+                              post.user.avatar!.isNotEmpty &&
+                              post.user.avatar != "null")
+                          ? Image.network(
+                              AppUrls.getFullImageUrl(post.user.avatar!),
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Icon(Icons.person, color: Colors.grey.shade600, size: 24),
+                            )
+                          : Icon(Icons.person, color: Colors.grey.shade600, size: 24),
                     ),
                   ),
                 ),
@@ -1491,25 +1490,25 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                   // Avatar with online indicator
                   Stack(
                     children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.grey.shade100,
-                        backgroundImage:
-                            (comment.user?.avtar != null &&
-                                    comment.user?.avtar != "")
-                                ? NetworkImage(
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.grey.shade200,
+                        ),
+                        child: ClipOval(
+                          child: (comment.user?.avtar != null &&
+                                  comment.user!.avtar!.isNotEmpty &&
+                                  comment.user!.avtar != "null")
+                              ? Image.network(
                                   AppUrls.getFullImageUrl(comment.user!.avtar!),
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Icon(Icons.person, color: Colors.grey.shade600, size: 24),
                                 )
-                                : null,
-                        child:
-                            (comment.user?.avtar == null ||
-                                    comment.user?.avtar == "")
-                                ? Icon(
-                                  Icons.person,
-                                  color: Colors.grey.shade700,
-                                  size: 24,
-                                )
-                                : null,
+                              : Icon(Icons.person, color: Colors.grey.shade600, size: 24),
+                        ),
                       ),
                     ],
                   ),
@@ -1650,23 +1649,25 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: Colors.grey.shade100,
-              backgroundImage:
-                  (reply.user?.avtar != null && reply.user?.avtar != "")
-                      ? NetworkImage(
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey.shade200,
+              ),
+              child: ClipOval(
+                child: (reply.user?.avtar != null &&
+                        reply.user!.avtar!.isNotEmpty &&
+                        reply.user!.avtar != "null")
+                    ? Image.network(
                         AppUrls.getFullImageUrl(reply.user!.avtar!),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Icon(Icons.person, color: Colors.grey.shade600, size: 20),
                       )
-                      : null,
-              child:
-                  (reply.user?.avtar == null || reply.user?.avtar == "")
-                      ? Icon(
-                        Icons.person,
-                        color: Colors.grey.shade700,
-                        size: 20,
-                      )
-                      : null,
+                    : Icon(Icons.person, color: Colors.grey.shade600, size: 20),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(

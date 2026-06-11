@@ -863,21 +863,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4)),
                                   ],
                                 ),
-                                child: CircleAvatar(
-                                  radius: 45,
-                                  backgroundColor: Colors.grey.shade200,
-                                  backgroundImage: (user.profilePhotoPath != null && user.profilePhotoPath!.isNotEmpty)
-                                      ? NetworkImage(AppUrls.getFullImageUrl(user.profilePhotoPath))
-                                      : null,
-                                  onBackgroundImageError: (user.profilePhotoPath != null && user.profilePhotoPath!.isNotEmpty)
-                                      ? (error, stackTrace) {
-                                          print("Image Load Error: $error");
-                                        }
-                                      : null,
-                                  child: (user.profilePhotoPath == null || user.profilePhotoPath!.isEmpty)
-                                      ? Icon(Icons.person, color: Colors.grey.shade600, size: 60)
-                                      : null,
-                                ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+                                child: Container(
+                                   width: 90,
+                                   height: 90,
+                                   decoration: BoxDecoration(
+                                     color: Colors.grey.shade200,
+                                     shape: BoxShape.circle,
+                                   ),
+                                   child: ClipOval(
+                                     child: (user.profilePhotoPath != null &&
+                                             user.profilePhotoPath!.isNotEmpty &&
+                                             user.profilePhotoPath != "null")
+                                         ? Image.network(
+                                             AppUrls.getFullImageUrl(user.profilePhotoPath),
+                                             fit: BoxFit.cover,
+                                             errorBuilder: (context, error, stackTrace) {
+                                               return Icon(Icons.person, color: Colors.grey.shade600, size: 60);
+                                             },
+                                           )
+                                         : Icon(Icons.person, color: Colors.grey.shade600, size: 60),
+                                   ),
+                                 ).animate(onPlay: (controller) => controller.repeat(reverse: true))
                                  .scale(duration: 600.ms, curve: Curves.easeOutBack)
                                  .fadeIn()
                                     .then(delay: 500.ms)
