@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
+import '../../../core/helper/profile_permission_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -128,29 +129,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
           final bool isPrivateHidden = isCurrentlyOther && 
                                      (user.accountPrivacy?.toLowerCase() == "private") && 
                                      !isFollowing;
-            // Build dynamic tabs and views
-            List<Tab> tabs = [
-              Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 
-              Tab(child: Image.asset(AppAssets.icVideo, width: 24, height: 24)),
-              Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)), // Products - always visible
-              Tab(child: Icon(Icons.miscellaneous_services_outlined, color: Colors.black, size: 26)), // Services - always visible
-            ];
-            
-            List<Widget> tabViews = [
-              MyPostScreen(username: finalUserName),
-              MyVideoScreen(username: finalUserName),
-              (user.isSeller == true && !isOtherProfile)
-                ? ProductGridScreen(isOwnProfile: true)
-              // Seller viewing their own products
-                : ProductGridScreen(isOwnProfile: false), // Non-seller or viewing other profile - browse mode
-              // Services tab: Show seller's services if they're a seller, otherwise show browsable services
-              (user.isSeller == true && !isOtherProfile)
-                ? DigitalProductListScreen(isOwnProfile: true) // Seller viewing their own services
-                : DigitalProductListScreen(isOwnProfile: false), // Non-seller or viewing other profile - browse mode
-            ];
-            return DefaultTabController(
-              key: ValueKey("${user.id}_${user.isSeller}"), // Force recreate when owner or seller status changes
-              length: 4, // Always 4 tabs now
+             // Build dynamic tabs and views
+             final bool showProductTab = isOtherProfile
+                 ? (user.isSeller == true && (user.profileSubType?.toLowerCase() == 'product' || user.profileSubType?.toLowerCase() == 'both' || user.profileSubType == null))
+                 : ProfilePermissionManager.canSellProducts;
+
+             final bool showServiceTab = isOtherProfile
+                 ? (user.isSeller == true && (user.profileSubType?.toLowerCase() == 'service' || user.profileSubType?.toLowerCase() == 'both' || user.profileSubType == null))
+                 : ProfilePermissionManager.canProvideServices;
+
+             List<Tab> tabs = [
+               Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 
+               Tab(child: Image.asset(AppAssets.icVideo, width: 24, height: 24)),
+             ];
+             
+             List<Widget> tabViews = [
+               MyPostScreen(username: finalUserName),
+               MyVideoScreen(username: finalUserName),
+             ];
+
+             if (showProductTab) {
+               tabs.add(Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)));
+               tabViews.add(
+                 (user.isSeller == true && !isOtherProfile)
+                   ? ProductGridScreen(isOwnProfile: true)
+                   : ProductGridScreen(isOwnProfile: false),
+               );
+             }
+
+             if (showServiceTab) {
+               tabs.add(Tab(child: Icon(Icons.miscellaneous_services_outlined, color: Colors.black, size: 26)));
+               tabViews.add(
+                 (user.isSeller == true && !isOtherProfile)
+                   ? DigitalProductListScreen(isOwnProfile: true)
+                   : DigitalProductListScreen(isOwnProfile: false),
+               );
+             }
+
+             return DefaultTabController(
+               key: ValueKey("${user.id}_${showProductTab}_${showServiceTab}"),
+               length: tabs.length,
               child: Stack(
                 children: [
                   NestedScrollView(
