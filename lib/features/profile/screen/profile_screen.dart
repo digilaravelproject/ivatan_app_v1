@@ -228,7 +228,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                        // Cart Icon (Visible on EVERY profile)
                                          Positioned(
                                            top: 40,
-                                           right: isOtherProfile ? 10 : 60,
+                                           right: 60,
                                            child: GestureDetector(
                                              onTap: () => Get.to(() => CartScreen()),
                                              child: Stack(
