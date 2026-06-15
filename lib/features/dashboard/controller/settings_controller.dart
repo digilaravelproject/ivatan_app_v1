@@ -363,10 +363,13 @@ class SettingsController extends GetxController {
   var imageFile = Rx<File?>(null);
 
   RxList<String> occupationList = <String>[
-    "Student / Learner",
+    "Student",
+    "Learner",
     "Working Professional",
-    "Freelancer / Flexible Employee",
-    "Business Owner / Self-Employed",
+    "Freelancer",
+    "Flexible Employee",
+    "Business Owner",
+    "Self-Employed",
     "Looking for Opportunities",
     "Others (Not Found! Any More creative.)",
   ].obs;

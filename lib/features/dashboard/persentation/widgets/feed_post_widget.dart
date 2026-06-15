@@ -88,7 +88,8 @@ class FeedPostWidget extends StatelessWidget {
                           ),
                           if (post.user.isVerified) ...[
                             const SizedBox(width: 4),
-                            const Icon(Icons.verified, color: Colors.blue, size: 14),
+                            Image.asset(AppAssets.imgverified,height: 16,width: 16,),
+                           // const Icon(Icons.verified, color: Colors.blue, size: 14),
                           ],
                           
                           // Date / Time

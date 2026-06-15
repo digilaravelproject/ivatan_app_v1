@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:i_vatan_app/features/auth/persentation/login_screen.dart';
 
 import '../../../../core/helper/custom_date_picker.dart';
 import '../../../../core/helper/custom_snack_bar.dart';
@@ -11,6 +10,8 @@ import '../data/data_source/auth_remote_data_source.dart';
 import '../data/model/req/register_req_model.dart';
 import '../data/model/res/profile_type_model.dart';
 import 'package:i_vatan_app/features/Notification/controller/notification_controller.dart';
+import '../../../../db/shared_pref_manager.dart';
+import '../widgets/terms_conditions_dialog.dart';
 
 /*class RegisterController extends GetxController {
   final AuthRemoteDataSource dataSource;
@@ -425,14 +426,30 @@ class RegisterController extends GetxController {
         print("Notification init error on register: $e");
       }
 
-      Get.offAll(() =>  DashboardPage());
-      CustomSnackBar.showSuccess(message: msg);
+      Get.dialog(
+        TermsConditionsDialog(
+          onAccept: () {
+            Get.back();
+            Get.offAll(() => DashboardPage());
+            CustomSnackBar.showSuccess(message: msg);
+          },
+          onCancel: () async {
+            Get.back();
+            await SharedPrefManager().userLogOut();
+            Get.offAllNamed(AppRoutes.login);
+            CustomSnackBar.showError(
+              message: "You must accept the Terms & Conditions to proceed.",
+            );
+          },
+        ),
+        barrierDismissible: false,
+      );
     } catch (e) {
       String errMsg = e.toString();
       if (errMsg.startsWith("Exception: ")) {
         errMsg = errMsg.replaceFirst("Exception: ", "");
       }
-    //  CustomSnackBar.showError(message: errMsg);
+      CustomSnackBar.showError(message: errMsg);
     } finally {
       isLoading.value = false;
     }

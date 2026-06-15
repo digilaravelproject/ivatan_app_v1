@@ -485,26 +485,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
                                       // Stats Pill
-                                      Positioned(
-                                        top: 0,
-                                        bottom: 0,
-                                        left: 16,
-                                        child: Container(
-                                          padding: const EdgeInsets.all(6),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                  "@${user.username ?? ""}".toTitleCase(),
-                                                  style: const TextStyle(color: Colors.white, fontSize: 20)
-                                              ),
-                                              if (user.isVerified ?? false) ...[
-                                                const SizedBox(width: 4),
-                                                const Icon(Icons.verified, color: Colors.blue, size: 16),
-                                              ]
-                                            ],
-                                          ),
-                                        ),
-                                      ),
+                                      // Positioned(
+                                      //   top: 0,
+                                      //   bottom: 0,
+                                      //   left: 16,
+                                      //   child: Container(
+                                      //     padding: const EdgeInsets.all(6),
+                                      //     child: Row(
+                                      //       children: [
+                                      //         Text(
+                                      //             "@${user.username ?? ""}".toTitleCase(),
+                                      //             style: const TextStyle(color: Colors.white, fontSize: 20)
+                                      //         ),
+                                      //         if (user.isVerified ?? false) ...[
+                                      //           const SizedBox(width: 4),
+                                      //           Image.asset(AppAssets.imgverified,height: 16,width: 16,),
+                                      //          // const Icon(Icons.verified, color: Colors.blue, size: 16),
+                                      //         ]
+                                      //       ],
+                                      //     ),
+                                      //   ),
+                                      // ),
                                       Positioned(
                                         right: 16,
                                         bottom: 20,
@@ -562,7 +563,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                       ),
                                                       if (user.isVerified ?? false) ...[
                                                         const SizedBox(width: 4),
-                                                        const Icon(Icons.verified, color: Colors.blue, size: 16),
+                                                        Image.asset(AppAssets.imgverified,height: 16,width: 16,),
+                                                      //  const Icon(Icons.verified, color: Colors.blue, size: 16),
                                                       ],
                                                       if (user.accountPrivacy?.toLowerCase() == "private") ...[
                                                         const SizedBox(width: 4),
