@@ -128,12 +128,12 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
                 actions: [
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 1.0),
-                      child: const AnimatedProBadge(),
-                    ),
-                  ),
+                  // Center(
+                  //   child: Padding(
+                  //     padding: const EdgeInsets.only(right: 1.0),
+                  //     child: const AnimatedProBadge(),
+                  //   ),
+                  // ),
                   Obx(() {
                     final count = controller.unreadNotificationCount.value;
                     return Stack(

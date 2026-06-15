@@ -56,6 +56,10 @@ import 'my_video_screen.dart';
 import 'profile_shop_screen.dart';
 import 'profile_live_posts.dart';
 
+import '../../subscription/controller/subscription_controller.dart';
+import '../../subscription/persentation/profile_plans_screen.dart';
+import '../../subscription/data/model/profile_config_model.dart';
+
 class ProfileScreen extends StatefulWidget {
   //ProfileScreen({Key? key}) : super(key: key);
   final String? viewUserName; // add this
@@ -225,7 +229,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ),
                                         ),
 
-                                       // Cart Icon (Visible on EVERY profile)
+                                       if (!isOtherProfile)
+                                         Positioned(
+                                           top: 44,
+                                           right: 110,
+                                           child: const AnimatedProBadge(),
+                                         ),
+
+                                       // Cart Icon (Visible ONLY on own profile)
+                                       if (!isOtherProfile)
                                          Positioned(
                                            top: 40,
                                            right: 60,
@@ -2351,6 +2363,255 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class AnimatedProBadge extends StatefulWidget {
+  const AnimatedProBadge({Key? key}) : super(key: key);
+
+  @override
+  State<AnimatedProBadge> createState() => _AnimatedProBadgeState();
+}
+
+class _AnimatedProBadgeState extends State<AnimatedProBadge>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _glowAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.04).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+
+    _glowAnimation = Tween<double>(begin: 4.0, end: 12.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: GestureDetector(
+            onTap: () async {
+              final homeController = Get.isRegistered<HomeController>()
+                  ? Get.find<HomeController>()
+                  : Get.put(HomeController());
+              var config = homeController.profileConfig.value;
+              
+              if (config == null) {
+                // Try reading from SharedPreferences
+                final cached = SharedPrefManager().profileConfig;
+                if (cached != null) {
+                  try {
+                    config = ProfileConfigModel.fromJson(cached);
+                  } catch (e) {
+                    debugPrint("Error reading cached config: $e");
+                  }
+                }
+              }
+
+              if (config == null) {
+                // Show loading spinner
+                Get.dialog(
+                  const Center(child: CircularProgressIndicator(color: Colors.black)),
+                  barrierDismissible: false,
+                );
+                
+                try {
+                  await homeController.fetchProfileConfig();
+                  config = homeController.profileConfig.value;
+                } catch (e) {
+                  debugPrint("Error fetching profile config: $e");
+                }
+                
+                Get.back(); // close loading dialog
+              }
+
+              if (config == null) {
+                Get.snackbar(
+                  "Error",
+                  "Failed to retrieve profile configuration. Please check your internet connection.",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+                return;
+              }
+
+              // Resolve current active profile from config
+              final currentProfileName = config.data?.userProfile?.currentProfileName;
+              if (currentProfileName == null || currentProfileName.isEmpty) {
+                Get.snackbar(
+                  "Error",
+                  "Current active profile name is not set.",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+                return;
+              }
+
+              String mappedProfileType = 'personal';
+              int? profileId;
+              String? activePlanSlug;
+              bool isSubscribedActive = false;
+              dynamic profileObj;
+
+              if (currentProfileName == 'personal' || currentProfileName == 'personal_profile') {
+                mappedProfileType = 'personal';
+                profileObj = config.data?.personalProfile;
+                profileId = profileObj?.profileId;
+                activePlanSlug = profileObj?.subscription?.planSlug;
+                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'employer') {
+                mappedProfileType = 'employer';
+                profileObj = config.data?.employer;
+                profileId = profileObj?.profileId;
+                activePlanSlug = profileObj?.subscription?.planSlug;
+                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'ecommerce' || currentProfileName == 'seller') {
+                mappedProfileType = 'seller';
+                profileObj = config.data?.ecommerce;
+                profileId = profileObj?.profileId;
+                activePlanSlug = profileObj?.subscription?.planSlug;
+                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'music_play' || currentProfileName == 'music') {
+                mappedProfileType = 'music';
+                profileObj = config.data?.musicPlay;
+                profileId = profileObj?.profileId;
+                activePlanSlug = profileObj?.subscription?.planSlug;
+                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'content_creation' || currentProfileName == 'creator') {
+                mappedProfileType = 'creator';
+                profileObj = config.data?.contentCreation;
+                profileId = profileObj?.profileId;
+                activePlanSlug = profileObj?.subscriptionDetails?.planSlug;
+                isSubscribedActive = profileObj?.subscriptionDetails?.isActive ?? false;
+              }
+
+              if (profileObj == null) {
+                Get.snackbar(
+                  "Error",
+                  "Profile configuration details are missing for: $currentProfileName",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+                return;
+              }
+
+              try {
+                final subscriptionController = Get.isRegistered<SubscriptionController>()
+                    ? Get.find<SubscriptionController>()
+                    : Get.put(SubscriptionController());
+
+                Get.dialog(
+                  const Center(child: CircularProgressIndicator(color: Colors.black)),
+                  barrierDismissible: false,
+                );
+
+                final resolvedSub = await subscriptionController.fetchPlansForProfileType(
+                  mappedProfileType,
+                  activePlanSlug: activePlanSlug,
+                  isSubscribedActive: isSubscribedActive,
+                  profileId: profileId,
+                );
+
+                Get.back(); // Close loading dialog
+
+                if (resolvedSub != null) {
+                  Get.to(() => ProfilePlansScreen(profileTypeSub: resolvedSub));
+                } else {
+                  Get.snackbar(
+                    "Error",
+                    "Failed to load plans for profile type: $mappedProfileType",
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                  );
+                }
+              } catch (e) {
+                Get.back(); // Close loading dialog in case of error
+                Get.snackbar(
+                  "Error",
+                  "Something went wrong while loading plans: $e",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+              }
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFFFFF099),
+                    Color(0xFFD4AF37),
+                    Color(0xFF9F7A1A),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFD4AF37).withOpacity(0.5),
+                    blurRadius: _glowAnimation.value,
+                    spreadRadius: 1,
+                  ),
+                ],
+                border: Border.all(
+                  color: const Color(0xFFFFF7C2),
+                  width: 1.2,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.workspace_premium_rounded,
+                    color: Colors.white,
+                    size: 13,
+                  ),
+                  const SizedBox(width: 3),
+                  const Text(
+                    "PRO",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.6,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black26,
+                          blurRadius: 2,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -83,7 +83,7 @@ class ApiServices extends GetxService {
       _handleError("Request timed out: $e");
     } catch (e, stackTrace) {
       printMessage("Unexpected error: $e\n$stackTrace");
-      CustomSnackBar.showError(message: "An unexpected error occurred.");
+     // CustomSnackBar.showError(message: "An unexpected error occurred.");
     }
     return null;
   }
@@ -506,7 +506,7 @@ class ApiServices extends GetxService {
       _handleError("Request timed out: $e");
     } catch (e, stackTrace) {
       printMessage("Unexpected error: $e\n$stackTrace");
-      CustomSnackBar.showError(message: "An unexpected error occurred.");
+     // CustomSnackBar.showError(message: "An unexpected error occurred.");
     }
     return null;
   }
@@ -518,7 +518,7 @@ class ApiServices extends GetxService {
     _isLoggingOut = true;
     printMessage("Auto Logout Triggered due to Unauthenticated session.");
     SharedPrefManager().userLogOut();
-    CustomSnackBar.showError(message: "Session expired. Please log in again.");
+   // CustomSnackBar.showError(message: "Session expired. Please log in again.");
     try {
       Get.delete<LoginController>(force: true);
     } catch (e) {
@@ -572,7 +572,7 @@ class ApiServices extends GetxService {
   /// Error handler
   void _handleError(String message) {
     printMessage("HTTP ERROR: $message");
-    CustomSnackBar.showError(message: message);
+  //  CustomSnackBar.showError(message: message);
   }
 
   /// Logging helpers

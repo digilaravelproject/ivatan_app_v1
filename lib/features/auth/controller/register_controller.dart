@@ -145,10 +145,13 @@ class RegisterController extends GetxController {
 
   /// Occupation list (Dummy for now)
   RxList<String> occupationList = <String>[
-    "Student / Learner",
+    "Student",
+    "Learner",
     "Working Professional",
-    "Freelancer / Flexible Employee",
-    "Business Owner / Self-Employed",
+    "Freelancer",
+    "Flexible Employee",
+    "Business Owner",
+    "Self-Employed",
     "Looking for Opportunities",
     "Others (Not Found! Any More creative.)",
   ].obs;
@@ -429,7 +432,7 @@ class RegisterController extends GetxController {
       if (errMsg.startsWith("Exception: ")) {
         errMsg = errMsg.replaceFirst("Exception: ", "");
       }
-      CustomSnackBar.showError(message: errMsg);
+    //  CustomSnackBar.showError(message: errMsg);
     } finally {
       isLoading.value = false;
     }

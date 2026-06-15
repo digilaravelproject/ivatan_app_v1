@@ -161,7 +161,7 @@ class LoginController extends GetxController {
       CustomSnackBar.showSuccess(message: msg);
     } catch (e, stk) {
       printMessage("Exception : " + e.toString() + "\n$stk");
-      CustomSnackBar.showError(message: e.toString());
+   //   CustomSnackBar.showError(message: e.toString());
     } finally {
       isCallingApi.value = false;
       CustomLoader.hide();
@@ -208,7 +208,7 @@ class LoginController extends GetxController {
         // Navigate to Interest Screen (Step 1)
         Get.to(() => const InterestScreen());
       } else {
-        CustomSnackBar.showError(message: errorMsg);
+      //  CustomSnackBar.showError(message: errorMsg);
       }
     } finally {
       isCallingApi.value = false;
@@ -308,7 +308,7 @@ class LoginController extends GetxController {
       if (e is FirebaseAuthException) {
         errorMessage = e.message ?? errorMessage;
       }
-      CustomSnackBar.showError(message: errorMessage);
+    //  CustomSnackBar.showError(message: errorMessage);
     } finally {
       isLoading.value = false;
     }
@@ -432,7 +432,7 @@ class LoginController extends GetxController {
 
     } catch (e, stk) {
       printMessage("Exception : " + e.toString() + "\n$stk");
-      CustomSnackBar.showError(message: e.toString());
+    //  CustomSnackBar.showError(message: e.toString());
     } finally {
       isCallingApi.value = false;
       CustomLoader.hide();
@@ -466,7 +466,7 @@ class LoginController extends GetxController {
 
     } catch (e, stk) {
       printMessage("Exception : " + e.toString() + "\n$stk");
-      CustomSnackBar.showError(message: e.toString());
+    //  CustomSnackBar.showError(message: e.toString());
     } finally {
       isCallingApi.value = false;
       CustomLoader.hide();
