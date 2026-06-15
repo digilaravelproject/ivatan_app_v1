@@ -13,6 +13,8 @@ import '../controller/settings_controller.dart';
 import '../../subscription/controller/subscription_controller.dart';
 import '../../subscription/persentation/profile_plans_screen.dart';
 import '../../subscription/data/model/profile_switch_request.dart';
+import '../../../core/helper/profile_permission_manager.dart' as ppm;
+import '../controller/homeController.dart';
 
 class SettingsScreen extends StatelessWidget {
   SettingsScreen({super.key});
@@ -177,7 +179,48 @@ class SettingsScreen extends StatelessWidget {
                   controller: profileController.profileTypeController,
                   profileTypes: profileController.profileTypes,
                   enabled: !profileController.hasPendingRequest,
-                  onSelected: (profileType, sellerType) {
+                  onSelected: (profileType, sellerType) async {
+                    if ((profileType.type == 'seller' || profileType.type == 'ecommerce') && sellerType == 'both') {
+                      final homeController = Get.isRegistered<HomeController>()
+                          ? Get.find<HomeController>()
+                          : Get.put(HomeController());
+                      
+                      Get.dialog(
+                        const Center(child: CircularProgressIndicator(color: Colors.white)),
+                        barrierDismissible: false,
+                      );
+                      
+                      try {
+                        await homeController.fetchProfileConfig();
+                      } catch (e) {
+                        print("Error updating profile config: $e");
+                      } finally {
+                        Get.back();
+                      }
+
+                      final ecommerceProfileId = homeController.profileConfig.value?.data?.ecommerce?.profileId;
+                      final hasSubscription = ppm.ProfilePermissionManager.hasActiveSubscription(ppm.ProfileType.ecommerce);
+                      
+                      if (!hasSubscription) {
+                        try {
+                          final subscriptionController = Get.isRegistered<SubscriptionController>()
+                              ? Get.find<SubscriptionController>()
+                              : Get.put(SubscriptionController());
+                          final updatedSub = await subscriptionController.fetchPlansForProfileType(
+                            profileType.type == 'ecommerce' ? 'seller' : profileType.type,
+                            profileId: ecommerceProfileId,
+                          );
+                          if (updatedSub != null) {
+                            Get.to(() => ProfilePlansScreen(profileTypeSub: updatedSub));
+                          } else {
+                            Get.snackbar("Error", "Could not load subscription plans");
+                          }
+                        } catch (e) {
+                          Get.snackbar("Error", "Something went wrong loading plans: $e");
+                        }
+                        return;
+                      }
+                    }
                     profileController.switchProfileType(profileType, sellerType);
                   },
                 ),

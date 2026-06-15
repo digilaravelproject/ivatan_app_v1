@@ -7,7 +7,7 @@ import '../../../../db/shared_pref_manager.dart';
 import '../../dashboard/controller/settings_controller.dart';
 import '../data/model/subscription_models.dart';
 import 'subscription_controller.dart';
-
+import '../../dashboard/controller/homeController.dart';
 class SubscriptionPaymentController extends GetxController {
   final ApiServices api = ApiServices();
   late rzp.Razorpay _razorpay;
@@ -61,9 +61,42 @@ class SubscriptionPaymentController extends GetxController {
     }
 
     if (profileId == null) {
+      isLoading.value = true;
+      try {
+        final String apiProfileType = profileTypeSub.type;
+        final String apiProfileSubType = profileTypeSub.subType ?? (apiProfileType == 'seller' ? 'both' : '');
+        
+        final Map<String, dynamic> body = {
+          "to_profile_type": apiProfileType,
+          "notes": "I want to switch to $apiProfileType.",
+        };
+        if (apiProfileSubType.isNotEmpty) {
+          body["profile_sub_type"] = apiProfileSubType;
+        }
+        
+        final switchResponse = await api.callPost(
+          "api/v1/profiles/switch",
+          data: body,
+        );
+        
+        if (switchResponse != null && switchResponse["status"] == true) {
+          final settingsController = _getSettingsController();
+          if (settingsController != null) {
+            await settingsController.fetchProfileSwitchRequests();
+            profileId = _getProfileId(profileTypeSub.type);
+          }
+        }
+      } catch (e) {
+        debugPrint("⚠️ Error dynamically creating profile switch request: $e");
+      } finally {
+        isLoading.value = false;
+      }
+    }
+
+    if (profileId == null) {
       Get.snackbar(
         "Error",
-        "Could not locate profile details. Please try switching to this profile type again.",
+        "Could not locate or initialize profile details. Please try again.",
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -139,6 +172,40 @@ class SubscriptionPaymentController extends GetxController {
   }
 
   int? _getProfileId(String type) {
+    // 1. Try to get from active profile config in HomeController
+    try {
+      if (Get.isRegistered<HomeController>()) {
+        final config = Get.find<HomeController>().profileConfig.value;
+        if (config != null && config.data != null) {
+          final t = type.toLowerCase();
+          if (t == 'seller' || t == 'ecommerce') {
+            if (config.data!.ecommerce != null && config.data!.ecommerce!.profileId != null) {
+              return config.data!.ecommerce!.profileId;
+            }
+          } else if (t == 'employer') {
+            if (config.data!.employer != null && config.data!.employer!.profileId != null) {
+              return config.data!.employer!.profileId;
+            }
+          } else if (t == 'music' || t == 'music_play') {
+            if (config.data!.musicPlay != null && config.data!.musicPlay!.profileId != null) {
+              return config.data!.musicPlay!.profileId;
+            }
+          } else if (t == 'creator' || t == 'content_creation') {
+            if (config.data!.contentCreation != null && config.data!.contentCreation!.profileId != null) {
+              return config.data!.contentCreation!.profileId;
+            }
+          } else if (t == 'personal' || t == 'personal_profile') {
+            if (config.data!.personalProfile != null && config.data!.personalProfile!.profileId != null) {
+              return config.data!.personalProfile!.profileId;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint("Error reading active profileId from HomeController: $e");
+    }
+
+    // 2. Fallback to settings controller switch requests
     final settingsController = _getSettingsController();
     if (settingsController != null) {
       final matchedReq = settingsController.switchRequests.firstWhereOrNull((req) {
