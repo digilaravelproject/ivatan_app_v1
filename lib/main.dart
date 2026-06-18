@@ -7,6 +7,7 @@ import 'package:i_vatan_app/route/app_pages.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'core/network/api_services.dart';
+import 'core/network/websocket_service.dart';
 import 'db/init_app.dart';
 import 'db/shared_pref_manager.dart';
 import 'features/auth/persentation/google_login_page.dart';
@@ -55,6 +56,8 @@ Future<void> main() async {
   await initApp();
   await SharedPrefManager().init();
   Get.put(ApiServices());
+  final wsService = Get.put(WebSocketService());
+  await wsService.init();
   runApp(const MyApp());
 //  runApp(PhoneAuthScreen());
 }

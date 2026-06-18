@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/db/shared_pref_manager.dart';
+import '../../../core/network/websocket_service.dart';
 import '../../subscription/data/model/profile_config_model.dart';
 
 import '../../../core/helper/custom_snack_bar.dart';
@@ -515,6 +516,14 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> logout() async {
+    try {
+      if (Get.isRegistered<WebSocketService>()) {
+        await Get.find<WebSocketService>().disconnect();
+      }
+    } catch (e) {
+      print("WebSocket disconnect error on logout: $e");
+    }
+
     try {
       await Get.find<NotificationController>().deleteTokenOnLogout();
     } catch (e) {

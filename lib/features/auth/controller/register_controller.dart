@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/network/websocket_service.dart';
 import '../../../../core/helper/custom_date_picker.dart';
 import '../../../../core/helper/custom_snack_bar.dart';
 import '../../../../core/network/api_services.dart';
@@ -430,6 +431,13 @@ class RegisterController extends GetxController {
         TermsConditionsDialog(
           onAccept: () {
             Get.back();
+            try {
+              if (Get.isRegistered<WebSocketService>()) {
+                Get.find<WebSocketService>().connect();
+              }
+            } catch (e) {
+              print("WebSocket connect error on register: $e");
+            }
             Get.offAll(() => DashboardPage());
             CustomSnackBar.showSuccess(message: msg);
           },

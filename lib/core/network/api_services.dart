@@ -11,6 +11,7 @@ import '../../core/network/app_urls.dart';
 import '../../db/shared_pref_manager.dart';
 import '../helper/logger_helper.dart';
 import 'api_keys.dart';
+import 'websocket_service.dart';
 import '../../route/app_pages.dart';
 import '../../features/auth/controller/login_controller.dart';
 
@@ -517,6 +518,13 @@ class ApiServices extends GetxService {
     if (_isLoggingOut) return;
     _isLoggingOut = true;
     printMessage("Auto Logout Triggered due to Unauthenticated session.");
+    try {
+      if (Get.isRegistered<WebSocketService>()) {
+        Get.find<WebSocketService>().disconnect();
+      }
+    } catch (e) {
+      printMessage("Error disconnecting WebSocket on auto logout: $e");
+    }
     SharedPrefManager().userLogOut();
    // CustomSnackBar.showError(message: "Session expired. Please log in again.");
     try {

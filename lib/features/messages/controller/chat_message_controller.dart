@@ -6,8 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart' hide MultipartFile;
 import 'package:i_vatan_app/core/helper/custom_snack_bar.dart';
 import 'package:i_vatan_app/db/shared_pref_manager.dart';
-import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
-
+import '../../../core/network/websocket_service.dart';
 import '../../../core/network/api_services.dart';
 import '../model/chat_data_model.dart';
 import '../model/individualChatModel.dart';
@@ -586,72 +585,142 @@ class ChatMessagesController extends GetxController {
   final FocusNode focusNode = FocusNode();
   RxBool isEmojiVisible = false.obs;
 
-  // Pusher Instance
-  PusherChannelsFlutter pusher = PusherChannelsFlutter.getInstance();
-
-  /// 🔥 1. Initialize Pusher & Subscribe
+  /// 🔥 1. Initialize Reverb WebSocket & Subscribe to channel
   Future<void> initPusher() async {
     final chatId = chatProfile.value?.id;
     if (chatId == null) return;
 
-    // TODO: 🔴 GET USER TOKEN HERE (Required for Private Channel)
-    // You must retrieve the Bearer token from your storage (GetStorage/SharedPreferences)
-    // String userToken = Get.find<StorageService>().getToken();
-    String userToken = SharedPrefManager().token.toString(); // <--- INSERT YOUR TOKEN RETRIEVAL LOGIC HERE
-
-    if (userToken.isEmpty) {
-      print("⚠️ Pusher Warning: User Token is empty. Auth may fail.");
-    }
-
     try {
-      await pusher.init(
-          apiKey: "1c97cfa884ecb61e0959",
-          cluster: "ap2",
-          // ✅ AUTHENTICATION LOGIC
-          onAuthorizer: (String channelName, String socketId, options) async {
-            return {
-              "authEndpoint": "https://ivatan.in/api/broadcasting/auth",
-              "headers": {
-                "Authorization": "Bearer $userToken",
-                "Content-Type": "application/json"
-              }
-            };
-          },
-          // ✅ EVENT LISTENER
-          onEvent: (event) {
-            log("🔥 Pusher Event: ${event.eventName}");
+      final wsService = Get.find<WebSocketService>();
+      
+      // Bind event listeners
+      wsService.listen("message.sent", _onMessageSent);
+      wsService.listen("message.edited", _onMessageEdited);
+      wsService.listen("message.deleted", _onMessageDeleted);
 
-            if (event.eventName == "message.sent") {
-              // 1. Parse Data
-              var data = event.data;
-              if (data is String) {
-                data = jsonDecode(data);
-              }
-
-              // 2. Convert to Model
-              final newMessage = ChatMessage.fromJson(data);
-
-
-              if (!messages.any((m) => m.id == newMessage.id)) {
-                // Insert at BOTTOM (Index 0) for ListView(reverse:true)
-                messages.insert(0, newMessage);
-              }
-            }
-          },
-          onConnectionStateChange: (currentState, previousState) {
-            print("🔌 Pusher Connection: $currentState");
-          },
-          onError: (message, code, error) {
-            print("❌ Pusher Error: $message Code: $code");
-          }
-      );
-
-
-      await pusher.subscribe(channelName: "private-chat.$chatId");
-      await pusher.connect();
-
+      // Subscribe to Reverb presence channel for this chat
+      await wsService.subscribe("presence-chat.$chatId");
+      print("🔌 [ChatMessagesController] Subscribed to presence-chat.$chatId via WebSocketService");
     } catch (e) {
-      print("Pusher Init Error: $e");
+      print("WebSocket/Reverb subscribe error: $e");
+    }
+  }
+
+  void _onMessageSent(dynamic data) {
+    try {
+      print("🔥 [ChatMessagesController] Received message.sent event: $data");
+      var parsedData = data;
+      if (parsedData is String) {
+        parsedData = jsonDecode(parsedData);
+      }
+
+      final newMessage = ChatMessage.fromJson(parsedData);
+
+      // Check if message belongs to the current chat ID
+      if (newMessage.chatId == chatProfile.value?.id) {
+        if (!messages.any((m) => m.id == newMessage.id)) {
+          // Insert at Index 0 since list is reversed
+          messages.insert(0, newMessage);
+          messages.refresh();
+
+          // Update Dashboard List "Last Message"
+          _updateChatListLastMessage(parsedData);
+        }
+      }
+    } catch (e) {
+      print("Error parsing message.sent data: $e");
+    }
+  }
+
+  void _onMessageEdited(dynamic data) {
+    try {
+      print("🔥 [ChatMessagesController] Received message.edited event: $data");
+      var parsedData = data;
+      if (parsedData is String) {
+        parsedData = jsonDecode(parsedData);
+      }
+      final int chatId = parsedData["chat_id"] ?? 0;
+      final int messageId = parsedData["message_id"] ?? 0;
+      final String newContent = parsedData["new_content"] ?? "";
+
+      if (chatId == chatProfile.value?.id) {
+        final index = messages.indexWhere((m) => m.id == messageId);
+        if (index != -1) {
+          final oldMsg = messages[index];
+          final newMsg = ChatMessage(
+            id: oldMsg.id,
+            chatId: oldMsg.chatId,
+            content: newContent,
+            messageType: oldMsg.messageType,
+            attachmentUrl: oldMsg.attachmentUrl,
+            isMine: oldMsg.isMine,
+            status: oldMsg.status,
+            createdAt: oldMsg.createdAt,
+            sender: oldMsg.sender,
+            replyTo: oldMsg.replyTo,
+            meta: oldMsg.meta,
+          );
+          messages[index] = newMsg;
+          messages.refresh();
+        }
+      }
+    } catch (e) {
+      print("Error parsing message.edited data: $e");
+    }
+  }
+
+  void _onMessageDeleted(dynamic data) {
+    try {
+      print("🔥 [ChatMessagesController] Received message.deleted event: $data");
+      var parsedData = data;
+      if (parsedData is String) {
+        parsedData = jsonDecode(parsedData);
+      }
+      final int chatId = parsedData["chat_id"] ?? 0;
+      final int messageId = parsedData["message_id"] ?? 0;
+
+      if (chatId == chatProfile.value?.id) {
+        messages.removeWhere((m) => m.id == messageId);
+        messages.refresh();
+      }
+    } catch (e) {
+      print("Error parsing message.deleted data: $e");
+    }
+  }
+
+  void _updateChatListLastMessage(dynamic parsedData) {
+    try {
+      if (Get.isRegistered<ChattController>()) {
+        final chattController = Get.find<ChattController>();
+        final int chatId = parsedData["chat_id"] ?? 0;
+        final index = chattController.chatList.indexWhere((e) => e.id == chatId);
+        if (index != -1) {
+          var chatItem = chattController.chatList[index];
+          final newLastMessage = LastMessage.fromJson(parsedData);
+          
+          final updatedChatItem = ChatListModel(
+            id: chatItem.id,
+            uuid: chatItem.uuid,
+            type: chatItem.type,
+            name: chatItem.name,
+            avatar: chatItem.avatar,
+            isOnline: chatItem.isOnline,
+            isAdmin: chatItem.isAdmin,
+            unreadCount: chatItem.unreadCount, 
+            lastMessage: newLastMessage, 
+            updatedAt: DateTime.now(), 
+            participantsCount: chatItem.participantsCount,
+            participants: chatItem.participants,
+          );
+
+          chattController.chatList[index] = updatedChatItem;
+          chattController.chatList.removeAt(index);
+          chattController.chatList.insert(0, updatedChatItem);
+          chattController.chatList.refresh();
+        }
+      }
+    } catch (e) {
+      print("Error updating chat list last message: $e");
     }
   }
 
@@ -741,10 +810,18 @@ class ChatMessagesController extends GetxController {
   @override
   void onClose() {
     focusNode.dispose();
-    if (chatProfile.value != null) {
-      pusher.unsubscribe(channelName: "private-chat.${chatProfile.value!.id}");
+    final chatId = chatProfile.value?.id;
+    if (chatId != null) {
+      try {
+        final wsService = Get.find<WebSocketService>();
+        wsService.removeListener("message.sent", _onMessageSent);
+        wsService.removeListener("message.edited", _onMessageEdited);
+        wsService.removeListener("message.deleted", _onMessageDeleted);
+        wsService.unsubscribe("presence-chat.$chatId");
+      } catch (e) {
+        print("WebSocket unsubscribe error on onClose: $e");
+      }
     }
-    pusher.disconnect();
     messageController.dispose();
     super.onClose();
   }
@@ -902,7 +979,7 @@ class ChatMessagesController extends GetxController {
       var p = chatProfile.value;
       if (p == null) return;
 
-      final response = await api.callPost(
+      await api.callPost(
         "api/v1/chats/${p.id}/read",
         data: {"last_read_message_id": messageID},
         isFormData: true,
