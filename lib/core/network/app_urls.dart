@@ -63,6 +63,8 @@ class AppUrls {
   static const checkout = "api/v1/checkout";
   static const razorpayOrder = "api/v1/payment/razorpay/order";
   static const razorpayVerify = "api/v1/payment/razorpay/verify";
+  static const phonepeCreate = "api/v1/payment/create";
+  static const phonepeVerify = "api/v1/payment/verify";
   static const enquiries = "api/v1/enquiries";
   static const myEnquiries = "api/v1/user/my-enquiries";
   //static const sellerEnquiries = "api/v1/seller/enquiries";

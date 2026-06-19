@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart' as rzp;
 import '../../../../core/network/api_services.dart';
 import '../../../../db/shared_pref_manager.dart';
 import '../../dashboard/controller/settings_controller.dart';
 import '../data/model/subscription_models.dart';
 import 'subscription_controller.dart';
 import '../../dashboard/controller/homeController.dart';
+import '../../payment/presentation/widgets/payment_webview_page.dart';
+
 class SubscriptionPaymentController extends GetxController {
   final ApiServices api = ApiServices();
-  late rzp.Razorpay _razorpay;
   
   var isLoading = false.obs;
   
@@ -23,15 +23,10 @@ class SubscriptionPaymentController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _razorpay = rzp.Razorpay();
-    _razorpay.on(rzp.Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(rzp.Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(rzp.Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
   @override
   void onClose() {
-    _razorpay.clear();
     super.onClose();
   }
 
@@ -129,16 +124,20 @@ class SubscriptionPaymentController extends GetxController {
         final requiresPayment = data['requires_payment'] ?? false;
         final gateway = data['gateway'] ?? '';
         final gatewaySubId = data['gateway_subscription_id'] ?? '';
-        final razorpayKey = data['razorpay_key'] ?? '';
+        final redirectUrl = data['redirect_url'] ?? '';
         
         _currentGatewaySubId = gatewaySubId;
 
-        if (requiresPayment && gateway == 'razorpay') {
-          // Open Razorpay Checkout using the subscription_id and key returned by backend
-          _openCheckout(
-            razorpayKey: razorpayKey,
-            subscriptionId: gatewaySubId,
-            planName: plan.name,
+        if (requiresPayment && (gateway == 'phonepe' || redirectUrl.toString().isNotEmpty)) {
+          // Open PhonePe Mandate redirect page
+          final result = await Get.to<bool?>(() => PaymentWebViewPage(url: redirectUrl));
+          
+          // Confirm purchase
+          await _purchaseSubscription(
+            profileId: profileId,
+            planId: planId,
+            paymentMethod: "phonepe",
+            gatewaySubId: gatewaySubId,
           );
         } else {
           // If no payment required (Free plan), complete it immediately
@@ -217,64 +216,6 @@ class SubscriptionPaymentController extends GetxController {
       }
     }
     return null;
-  }
-
-  void _openCheckout({
-    required String razorpayKey,
-    required String subscriptionId,
-    required String planName,
-  }) {
-    final user = SharedPrefManager().user;
-    
-    var options = {
-      'key': razorpayKey,
-      'subscription_id': subscriptionId,
-      'name': 'Ivatan',
-      'description': 'Subscription to $planName',
-      'prefill': {
-        'contact': user?.phone ?? '',
-        'email': user?.email ?? '',
-      },
-      'theme': {
-        'color': '#${AppColors.primary.value.toRadixString(16).padLeft(8, '0').substring(2)}',
-      },
-      'external': {
-        'wallets': ['paytm']
-      }
-    };
-
-    try {
-      _razorpay.open(options);
-    } catch (e) {
-      debugPrint('Error opening Razorpay checkout: $e');
-      Get.snackbar(
-        "Checkout Error",
-        "Could not open Razorpay checkout: $e",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    }
-  }
-
-  Future<void> _handlePaymentSuccess(rzp.PaymentSuccessResponse response) async {
-    if (_currentProfileId == null || _currentPlan == null) {
-      Get.snackbar(
-        "Warning",
-        "Payment successful, but subscription parameters were lost.",
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-      );
-      return;
-    }
-
-    final planId = int.tryParse(_currentPlan!.id) ?? 0;
-    
-    await _purchaseSubscription(
-      profileId: _currentProfileId!,
-      planId: planId,
-      paymentMethod: "razorpay",
-      gatewaySubId: _currentGatewaySubId ?? "",
-    );
   }
 
   Future<void> _purchaseSubscription({
@@ -393,24 +334,6 @@ class SubscriptionPaymentController extends GetxController {
     } finally {
       isLoading.value = false;
     }
-  }
-
-  void _handlePaymentError(rzp.PaymentFailureResponse response) {
-    Get.snackbar(
-      "Payment Failed",
-      "Error: ${response.code} - ${response.message}",
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-    );
-  }
-
-  void _handleExternalWallet(rzp.ExternalWalletResponse response) {
-    Get.snackbar(
-      "Wallet Selected",
-      "Wallet: ${response.walletName}",
-      backgroundColor: AppColors.primary,
-      colorText: Colors.white,
-    );
   }
 
   SettingsController? _getSettingsController() {

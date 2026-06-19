@@ -3,12 +3,10 @@ import '../../../../core/network/app_urls.dart';
 import 'package:get/get.dart';
 
 abstract class PaymentRepository {
-  Future<Map<String, dynamic>?> createRazorpayOrder({required int orderId});
-  Future<Map<String, dynamic>?> verifyPayment({
+  Future<Map<String, dynamic>?> initiatePhonePePayment({required int orderId});
+  Future<Map<String, dynamic>?> verifyPhonePePayment({
     required int orderId,
-    required String razorpayOrderId,
-    required String razorpayPaymentId,
-    required String razorpaySignature,
+    required String merchantTransactionId,
   });
 }
 
@@ -16,10 +14,9 @@ class PaymentRepositoryImpl implements PaymentRepository {
   final ApiServices apiServices = Get.find<ApiServices>();
 
   @override
-  Future<Map<String, dynamic>?> createRazorpayOrder({required int orderId}) async {
-    const String endpoint = AppUrls.razorpayOrder;
+  Future<Map<String, dynamic>?> initiatePhonePePayment({required int orderId}) async {
+    const String endpoint = AppUrls.phonepeCreate;
     
-    // User requested form-data: order_id=12
     final response = await apiServices.callPost(
       endpoint,
       data: {
@@ -32,21 +29,17 @@ class PaymentRepositoryImpl implements PaymentRepository {
   }
 
   @override
-  Future<Map<String, dynamic>?> verifyPayment({
+  Future<Map<String, dynamic>?> verifyPhonePePayment({
     required int orderId,
-    required String razorpayOrderId,
-    required String razorpayPaymentId,
-    required String razorpaySignature,
+    required String merchantTransactionId,
   }) async {
-    const String endpoint = AppUrls.razorpayVerify;
+    const String endpoint = AppUrls.phonepeVerify;
     
     final response = await apiServices.callPost(
       endpoint,
       data: {
         "order_id": orderId,
-        "razorpay_order_id": razorpayOrderId,
-        "razorpay_payment_id": razorpayPaymentId,
-        "razorpay_signature": razorpaySignature,
+        "merchantTransactionId": merchantTransactionId,
       },
       isFormData: true,
       showErrorToast: true,
