@@ -242,9 +242,10 @@ class LoginController extends GetxController {
           try {
             UserCredential userCredential = await _auth.signInWithCredential(credential);
             String? firebaseToken = await userCredential.user?.getIdToken();
+            String? firebasePhone = userCredential.user?.phoneNumber;
             
             if (firebaseToken != null) {
-              await _handleOtpSuccess(firebaseToken);
+              await _handleOtpSuccess(firebaseToken, firebasePhone: firebasePhone);
             }
           } catch (e) {
             CustomSnackBar.showError(message: "Auto-verification failed: $e");
@@ -293,11 +294,12 @@ class LoginController extends GetxController {
         credential,
       );
       String? firebaseToken = await userCredential.user?.getIdToken();
+      String? firebasePhone = userCredential.user?.phoneNumber;
       print("🔥 Firebase Token: $firebaseToken");
-      print("📱 Mobile: ${mobileController.text.trim()}");
+      print("📱 Firebase phone: $firebasePhone");
       
       if (firebaseToken != null) {
-        await _handleOtpSuccess(firebaseToken);
+        await _handleOtpSuccess(firebaseToken, firebasePhone: firebasePhone);
       } else {
         throw Exception("Failed to retrieve token");
       }
@@ -314,14 +316,17 @@ class LoginController extends GetxController {
   }
 
 
-  Future<void> _handleOtpSuccess(String firebaseToken) async {
-    final phone = mobileController.text.trim();
+  Future<void> _handleOtpSuccess(String firebaseToken, {String? firebasePhone}) async {
+    String phone = mobileController.text.trim();
+    if (phone.isEmpty && firebasePhone != null) {
+      phone = firebasePhone.replaceAll(RegExp(r'[^\d]'), '');
+      if (phone.length > 10) phone = phone.substring(phone.length - 10);
+    }
+    print("📱 _handleOtpSuccess phone: '$phone'");
 
     if (otpFlowType.value == OtpFlowType.login) {
-      // ✅ LOGIN FLOW
       await callLoginAPI(phone, firebaseToken);
     } else if (otpFlowType.value == OtpFlowType.forgetPassword) {
-      // ✅ FORGET PASSWORD FLOW
       await verifyForgetPassword(phone, firebaseToken);
     }
   }

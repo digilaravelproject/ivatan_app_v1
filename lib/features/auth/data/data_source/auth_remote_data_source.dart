@@ -35,6 +35,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw Exception(response['message'] ?? "Invalid Credentials");
     }
 
+    if (response['data'] == null) {
+      throw Exception(response['message'] ?? "Login failed");
+    }
+
     final userModel = UserModel.fromJson(response['data']);
     final pref = SharedPrefManager();
     await pref.saveUserData(userModel.toJson());
