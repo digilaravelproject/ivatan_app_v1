@@ -155,7 +155,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
                           Get.snackbar("Invalid Code", "Please enter a 6-digit code");
                           return;
                         }
-                        await _controller.verifyOTP(widget.verificationId, otp);
+                        await _controller.verifyOTP(widget.verificationId, otp, phoneNumber: widget.phoneNumber);
                       },
                 gradient: const LinearGradient(
                   colors: [AppColors.primary, AppColors.primaryDark],

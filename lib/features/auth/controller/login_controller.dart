@@ -46,7 +46,7 @@ class LoginController extends GetxController {
   final passwordController = TextEditingController();
   final confirmPassworController = TextEditingController();
   
-  var mobilePhone ;
+  var mobilePhone;
 
 
   final AuthService _authService = AuthService();
@@ -230,6 +230,7 @@ class LoginController extends GetxController {
       return;
     }
 
+    mobilePhone = phone;
     otpFlowType.value = flowType;
     isLoading.value = true;
     String phoneNumber = '${countryCode.value}$phone';
@@ -243,9 +244,10 @@ class LoginController extends GetxController {
           try {
             UserCredential userCredential = await _auth.signInWithCredential(credential);
             String? firebaseToken = await userCredential.user?.getIdToken();
+            String? firebasePhone = userCredential.user?.phoneNumber;
             
             if (firebaseToken != null) {
-              await _handleOtpSuccess(firebaseToken);
+              await _handleOtpSuccess(firebaseToken, firebasePhone: firebasePhone);
             }
           } catch (e) {
             CustomSnackBar.showError(message: "Auto-verification failed: $e");
@@ -282,7 +284,7 @@ class LoginController extends GetxController {
   }
 
   /// Verify OTP entered by user
-  Future<void> verifyOTP(String verificationId, String otp) async {
+  Future<void> verifyOTP(String verificationId, String otp, {String? phoneNumber}) async {
     try {
       isLoading.value = true;
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
@@ -294,11 +296,13 @@ class LoginController extends GetxController {
         credential,
       );
       String? firebaseToken = await userCredential.user?.getIdToken();
+      String? firebasePhone = userCredential.user?.phoneNumber;
       print("🔥 Firebase Token: $firebaseToken");
+      print("📱 Firebase phone: $firebasePhone");
       print("📱 Mobile: ${mobileController.text.trim()}");
       
       if (firebaseToken != null) {
-        await _handleOtpSuccess(firebaseToken);
+        await _handleOtpSuccess(firebaseToken, firebasePhone: firebasePhone);
       } else {
         throw Exception("Failed to retrieve token");
       }
@@ -315,8 +319,14 @@ class LoginController extends GetxController {
   }
 
 
-  Future<void> _handleOtpSuccess(String firebaseToken) async {
-    final phone = mobileController.text.trim();
+  Future<void> _handleOtpSuccess(String firebaseToken, {String? firebasePhone}) async {
+    String phone = mobilePhone?.toString() ?? '';
+    if (phone.isEmpty) phone = mobileController.text.trim();
+    if (phone.isEmpty && firebasePhone != null) {
+      phone = firebasePhone.replaceAll(RegExp(r'[^\d]'), '');
+      if (phone.length > 10) phone = phone.substring(phone.length - 10);
+    }
+    print("📱 _handleOtpSuccess final phone: '$phone'");
 
     if (otpFlowType.value == OtpFlowType.login) {
       // ✅ LOGIN FLOW
