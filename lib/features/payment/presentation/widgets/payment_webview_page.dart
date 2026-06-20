@@ -33,7 +33,21 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
             });
             
             if (url.contains("/payment/callback/phonepe")) {
-              // Try extracting the body text to see if payment succeeded/failed
+              final uri = Uri.tryParse(url);
+              if (uri != null) {
+                final code = uri.queryParameters['code'];
+                if (code == 'PAYMENT_SUCCESS') {
+                  debugPrint("WebView URL indicates successful payment callback: $url");
+                  Navigator.of(context).pop(true);
+                  return;
+                } else if (code == 'PAYMENT_ERROR') {
+                  debugPrint("WebView URL indicates failed payment callback: $url");
+                  Navigator.of(context).pop(false);
+                  return;
+                }
+              }
+
+              // Fallback: Try extracting the body text to see if payment succeeded/failed
               try {
                 final dynamic result = await _controller.runJavaScriptReturningResult("document.body.innerText");
                 final String content = result.toString().replaceAll('"', '').trim();
@@ -43,7 +57,12 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
                 if (content.contains("Payment Successful")) {
                   Navigator.of(context).pop(true);
                 } else if (content.contains("Payment Failed")) {
-                  Navigator.of(context).pop(false);
+                  // Double check if the URL code was SUCCESS (in case of DB delay)
+                  if (url.contains("code=PAYMENT_SUCCESS")) {
+                    Navigator.of(context).pop(true);
+                  } else {
+                    Navigator.of(context).pop(false);
+                  }
                 }
               } catch (e) {
                 debugPrint("Error extracting body text: $e");

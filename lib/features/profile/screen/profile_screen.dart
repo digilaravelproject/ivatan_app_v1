@@ -135,8 +135,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                      !isFollowing;
               debugPrint("Profile Debug: user=${user.username}, isOtherProfile=$isOtherProfile, isCurrentlyOther=$isCurrentlyOther, isSeller=${user.isSeller}, profileType=${user.profileType}, profileSubType=${user.profileSubType}");
              // Build dynamic tabs and views
-             final bool showProductTab = isCurrentlyOther || ProfilePermissionManager.canProfileSellProducts(user, isCurrentlyOther);
-             final bool showServiceTab = isCurrentlyOther || ProfilePermissionManager.canProfileProvideServices(user, isCurrentlyOther);
+             bool showProductTab = false;
+             bool showServiceTab = false;
+
+             if (isCurrentlyOther) {
+               final pType = user.profileType?.toLowerCase();
+               showProductTab = (pType == 'product' || pType == 'both');
+               showServiceTab = (pType == 'service' || pType == 'both');
+             } else {
+               showProductTab = ProfilePermissionManager.canProfileSellProducts(user, isCurrentlyOther);
+               showServiceTab = ProfilePermissionManager.canProfileProvideServices(user, isCurrentlyOther);
+             }
 
              List<Tab> tabs = [
                Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 

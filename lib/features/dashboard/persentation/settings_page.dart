@@ -199,27 +199,24 @@ class SettingsScreen extends StatelessWidget {
                       }
 
                       final ecommerceProfileId = homeController.profileConfig.value?.data?.ecommerce?.profileId;
-                      final hasSubscription = ppm.ProfilePermissionManager.hasActiveSubscription(ppm.ProfileType.ecommerce);
                       
-                      if (!hasSubscription) {
-                        try {
-                          final subscriptionController = Get.isRegistered<SubscriptionController>()
-                              ? Get.find<SubscriptionController>()
-                              : Get.put(SubscriptionController());
-                          final updatedSub = await subscriptionController.fetchPlansForProfileType(
-                            profileType.type == 'ecommerce' ? 'seller' : profileType.type,
-                            profileId: ecommerceProfileId,
-                          );
-                          if (updatedSub != null) {
-                            Get.to(() => ProfilePlansScreen(profileTypeSub: updatedSub));
-                          } else {
-                            Get.snackbar("Error", "Could not load subscription plans");
-                          }
-                        } catch (e) {
-                          Get.snackbar("Error", "Something went wrong loading plans: $e");
+                      try {
+                        final subscriptionController = Get.isRegistered<SubscriptionController>()
+                            ? Get.find<SubscriptionController>()
+                            : Get.put(SubscriptionController());
+                        final updatedSub = await subscriptionController.fetchPlansForProfileType(
+                          profileType.type == 'ecommerce' ? 'seller' : profileType.type,
+                          profileId: ecommerceProfileId,
+                        );
+                        if (updatedSub != null) {
+                          Get.to(() => ProfilePlansScreen(profileTypeSub: updatedSub));
+                        } else {
+                          Get.snackbar("Error", "Could not load subscription plans");
                         }
-                        return;
+                      } catch (e) {
+                        Get.snackbar("Error", "Something went wrong loading plans: $e");
                       }
+                      return;
                     }
                     profileController.switchProfileType(profileType, sellerType);
                   },

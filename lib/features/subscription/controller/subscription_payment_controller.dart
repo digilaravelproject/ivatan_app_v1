@@ -36,6 +36,7 @@ class SubscriptionPaymentController extends GetxController {
     
     // 1. Fetch/Determine profile_id
     int? profileId = profileTypeSub.profileId ?? _getProfileId(profileTypeSub.type);
+    print("fkdfmgnfdige :"+profileId.toString());
     
     if (profileId == null) {
       isLoading.value = true;

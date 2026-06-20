@@ -18,6 +18,7 @@ import 'intrest_controller.dart';
 import '../persentation/interest_screen.dart';
 import '../controller/register_controller.dart';
 import 'package:i_vatan_app/features/Notification/controller/notification_controller.dart';
+import '../../../core/network/websocket_service.dart';
 
 class LoginController extends GetxController {
   final AuthRemoteDataSource authDataSource;
@@ -155,6 +156,14 @@ class LoginController extends GetxController {
         print("Notification init error on password login: $e");
       }
 
+      try {
+        if (Get.isRegistered<WebSocketService>()) {
+          Get.find<WebSocketService>().connect();
+        }
+      } catch (e) {
+        print("WebSocket connect error on password login: $e");
+      }
+
       Get.offAllNamed(AppRoutes.navigationScreen);
 
       CustomSnackBar.showSuccess(message: msg);
@@ -183,6 +192,14 @@ class LoginController extends GetxController {
         Get.find<NotificationController>().initNotification();
       } catch (e) {
         print("Notification init error on OTP login: $e");
+      }
+
+      try {
+        if (Get.isRegistered<WebSocketService>()) {
+          Get.find<WebSocketService>().connect();
+        }
+      } catch (e) {
+        print("WebSocket connect error on OTP login: $e");
       }
 
       Get.offAllNamed(AppRoutes.navigationScreen);
@@ -390,6 +407,15 @@ class LoginController extends GetxController {
         } catch (e) {
           print("Notification init error on Google login: $e");
         }
+
+        try {
+          if (Get.isRegistered<WebSocketService>()) {
+            Get.find<WebSocketService>().connect();
+          }
+        } catch (e) {
+          print("WebSocket connect error on Google login: $e");
+        }
+
         Get.offAllNamed(AppRoutes.navigationScreen);
 
         final msg = "Welcome ${user.displayName ?? 'User'}!";
