@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart' as dio;
 
-import '../../core/helper/custom_snack_bar.dart';
 import '../../core/network/app_urls.dart';
 import '../../db/shared_pref_manager.dart';
 import '../helper/logger_helper.dart';
@@ -33,12 +32,12 @@ class ApiServices extends GetxService {
       _logRequest(
         method: "GET",
         uri: uri,
-        headers: _defaultHeaders(),
+        headers: _defaultHeaders(endpoint: endpoint),
         body: queryParams,
       );
 
       final response = await http
-          .get(uri, headers: _defaultHeaders())
+          .get(uri, headers: _defaultHeaders(endpoint: endpoint))
           .timeout(_timeout);
 
       _logResponse(response);
@@ -61,7 +60,7 @@ class ApiServices extends GetxService {
 
     return _safeCallBytes(() async {
       final response = await http
-          .get(uri, headers: _defaultHeaders())
+          .get(uri, headers: _defaultHeaders(endpoint: endpoint))
           .timeout(_timeout);
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
@@ -97,7 +96,7 @@ class ApiServices extends GetxService {
   }) async {
     final dioClient = dio.Dio();
     dioClient.options.baseUrl = AppUrls.apiBaseUrl;
-    dioClient.options.headers = _multipartHeaders();
+    dioClient.options.headers = _multipartHeaders(endpoint: endpoint);
     dioClient.options.connectTimeout = _timeout;
     dioClient.options.receiveTimeout = const Duration(minutes: 30);
     dioClient.options.sendTimeout = const Duration(minutes: 30);
@@ -210,7 +209,7 @@ class ApiServices extends GetxService {
     return _safeCall(() async {
       if (isFormData) {
         final request = http.MultipartRequest("POST", uri);
-        request.headers.addAll(_multipartHeaders());
+        request.headers.addAll(_multipartHeaders(endpoint: endpoint));
 
         data.forEach((key, value) {
           if (value is File) return; // files handled separately below
@@ -268,11 +267,11 @@ class ApiServices extends GetxService {
         _logRequest(
           method: "POST",
           uri: uri,
-          headers: _defaultHeaders(),
+          headers: _defaultHeaders(endpoint: endpoint),
           body: data,
         );
         final response = await http
-            .post(uri, headers: _defaultHeaders(), body: jsonEncode(data))
+            .post(uri, headers: _defaultHeaders(endpoint: endpoint), body: jsonEncode(data))
             .timeout(_timeout);
         _logResponse(response);
         return _parseResponse(response, showErrorToast: showErrorToast);
@@ -305,7 +304,7 @@ class ApiServices extends GetxService {
     _logRequest(
       method: "DELETE",
       uri: uri,
-      headers: _defaultHeaders(),
+      headers: _defaultHeaders(endpoint: endpoint),
       body: bodyData,
     );
 
@@ -317,10 +316,10 @@ class ApiServices extends GetxService {
         response = await http.Request(
           "DELETE",
           uri,
-        ).sendWithBody(_defaultHeaders(), jsonEncode(bodyData));
+        ).sendWithBody(_defaultHeaders(endpoint: endpoint), jsonEncode(bodyData));
       } else {
         response = await http
-            .delete(uri, headers: _defaultHeaders())
+            .delete(uri, headers: _defaultHeaders(endpoint: endpoint))
             .timeout(_timeout);
 
         _logResponse(response);
@@ -355,7 +354,7 @@ class ApiServices extends GetxService {
       if (isFormData) {
         // Multipart PUT request
         final request = http.MultipartRequest("PUT", uri);
-        request.headers.addAll(_multipartHeaders());
+        request.headers.addAll(_multipartHeaders(endpoint: endpoint));
 
         data.forEach((key, value) {
           if (value is File) return; // files handled separately below
@@ -385,7 +384,7 @@ class ApiServices extends GetxService {
         _logRequest(
           method: "PUT",
           uri: uri,
-          headers: _defaultHeaders(),
+          headers: _defaultHeaders(endpoint: endpoint),
           body: data,
         );
 
@@ -396,7 +395,7 @@ class ApiServices extends GetxService {
       } else {
         // Normal JSON PUT
         final response = await http
-            .put(uri, headers: _defaultHeaders(), body: jsonEncode(data))
+            .put(uri, headers: _defaultHeaders(endpoint: endpoint), body: jsonEncode(data))
             .timeout(_timeout);
         return _parseResponse(response, showErrorToast: showErrorToast);
       }
@@ -425,7 +424,7 @@ class ApiServices extends GetxService {
       if (isFormData) {
         // Multipart PATCH request
         final request = http.MultipartRequest("PATCH", uri);
-        request.headers.addAll(_multipartHeaders());
+        request.headers.addAll(_multipartHeaders(endpoint: endpoint));
 
         data.forEach((key, value) {
           if (value is File) return; // files handled separately below
@@ -454,7 +453,7 @@ class ApiServices extends GetxService {
         _logRequest(
           method: "PATCH",
           uri: uri,
-          headers: _defaultHeaders(),
+          headers: _defaultHeaders(endpoint: endpoint),
           body: data,
         );
 
@@ -467,11 +466,11 @@ class ApiServices extends GetxService {
         _logRequest(
           method: "PATCH",
           uri: uri,
-          headers: _defaultHeaders(),
+          headers: _defaultHeaders(endpoint: endpoint),
           body: data,
         );
         final response = await http
-            .patch(uri, headers: _defaultHeaders(), body: jsonEncode(data))
+            .patch(uri, headers: _defaultHeaders(endpoint: endpoint), body: jsonEncode(data))
             .timeout(_timeout);
         _logResponse(response);
         return _parseResponse(response, showErrorToast: showErrorToast);
@@ -481,19 +480,49 @@ class ApiServices extends GetxService {
 
 
   /// Default headers
-  Map<String, String> _defaultHeaders() => {
-    HttpHeaders.acceptHeader: "application/json",
-    HttpHeaders.contentTypeHeader: "application/json",
-    "Authorization":
-        "Bearer ${SharedPrefManager().token ?? AppUrls.defaultApiKey}",
-  };
+  Map<String, String> _defaultHeaders({String? endpoint}) {
+    final headers = {
+      HttpHeaders.acceptHeader: "application/json",
+      HttpHeaders.contentTypeHeader: "application/json",
+    };
+
+    final bool isPublicAuth = endpoint != null && (
+      endpoint.contains("auth/login") ||
+      endpoint.contains("auth/mobile_login") ||
+      endpoint.contains("auth/register") ||
+      endpoint.contains("forgot-password/")
+    );
+
+    if (isPublicAuth) {
+      headers["Authorization"] = "Bearer ${AppUrls.defaultApiKey}";
+    } else {
+      headers["Authorization"] =
+          "Bearer ${SharedPrefManager().token ?? AppUrls.defaultApiKey}";
+    }
+    return headers;
+  }
 
   /// Headers for multipart requests (without content-type)
-  Map<String, String> _multipartHeaders() => {
-    HttpHeaders.acceptHeader: "application/json",
-    "Authorization":
-        "Bearer ${SharedPrefManager().token ?? AppUrls.defaultApiKey}",
-  };
+  Map<String, String> _multipartHeaders({String? endpoint}) {
+    final headers = {
+      HttpHeaders.acceptHeader: "application/json",
+    };
+
+    final bool isPublicAuth = endpoint != null && (
+      endpoint.contains("auth/login") ||
+      endpoint.contains("auth/mobile_login") ||
+      endpoint.contains("auth/register") ||
+      endpoint.contains("forgot-password/")
+    );
+
+    if (isPublicAuth) {
+      headers["Authorization"] = "Bearer ${AppUrls.defaultApiKey}";
+    } else {
+      headers["Authorization"] =
+          "Bearer ${SharedPrefManager().token ?? AppUrls.defaultApiKey}";
+    }
+    return headers;
+  }
 
   /// Safe API call wrapper
   Future<Map<String, dynamic>?> _safeCall(
@@ -544,9 +573,15 @@ class ApiServices extends GetxService {
       final body = response.body.isNotEmpty ? jsonDecode(response.body) : {};
       logApiMessage(" Response --> $body  ${response.statusCode}");
 
-      // Auto logout if unauthenticated or session expired
-      if (response.statusCode == 401 ||
-          (body is Map && body['message']?.toString().toLowerCase().contains('unauthenticated') == true)) {
+      final requestPath = response.request?.url.path ?? "";
+      final bool isPublicAuthEndpoint = requestPath.contains("auth/login") ||
+          requestPath.contains("auth/mobile_login") ||
+          requestPath.contains("auth/register") ||
+          requestPath.contains("forgot-password/");
+
+      // Auto logout if unauthenticated or session expired (except on public auth routes)
+      if ((response.statusCode == 401 && !isPublicAuthEndpoint) ||
+          (body is Map && body['message']?.toString().toLowerCase().contains('unauthenticated') == true && !isPublicAuthEndpoint)) {
         _performAutoLogout();
         return body is Map<String, dynamic> ? body : {"data": body};
       }

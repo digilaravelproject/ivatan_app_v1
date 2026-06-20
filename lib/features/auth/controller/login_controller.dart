@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/core/network/app_urls.dart';
-import 'package:i_vatan_app/features/auth/persentation/new_password.dart';
 
 import '../../../core/helper/custom_snack_bar.dart';
 import '../../../core/helper/logger_helper.dart';
@@ -161,7 +160,7 @@ class LoginController extends GetxController {
       CustomSnackBar.showSuccess(message: msg);
     } catch (e, stk) {
       printMessage("Exception : " + e.toString() + "\n$stk");
-   //   CustomSnackBar.showError(message: e.toString());
+      CustomSnackBar.showError(message: e.toString());
     } finally {
       isCallingApi.value = false;
       CustomLoader.hide();
@@ -208,7 +207,7 @@ class LoginController extends GetxController {
         // Navigate to Interest Screen (Step 1)
         Get.to(() => const InterestScreen());
       } else {
-      //  CustomSnackBar.showError(message: errorMsg);
+        CustomSnackBar.showError(message: errorMsg);
       }
     } finally {
       isCallingApi.value = false;
@@ -308,7 +307,7 @@ class LoginController extends GetxController {
       if (e is FirebaseAuthException) {
         errorMessage = e.message ?? errorMessage;
       }
-    //  CustomSnackBar.showError(message: errorMessage);
+      CustomSnackBar.showError(message: errorMessage);
     } finally {
       isLoading.value = false;
     }
@@ -432,7 +431,7 @@ class LoginController extends GetxController {
 
     } catch (e, stk) {
       printMessage("Exception : " + e.toString() + "\n$stk");
-    //  CustomSnackBar.showError(message: e.toString());
+      CustomSnackBar.showError(message: e.toString());
     } finally {
       isCallingApi.value = false;
       CustomLoader.hide();
@@ -466,7 +465,7 @@ class LoginController extends GetxController {
 
     } catch (e, stk) {
       printMessage("Exception : " + e.toString() + "\n$stk");
-    //  CustomSnackBar.showError(message: e.toString());
+      CustomSnackBar.showError(message: e.toString());
     } finally {
       isCallingApi.value = false;
       CustomLoader.hide();

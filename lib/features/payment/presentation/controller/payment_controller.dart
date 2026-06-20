@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:i_vatan_app/core/theme/app_colors.dart';
 import '../widgets/payment_webview_page.dart';
-import '../../../../db/shared_pref_manager.dart';
 import '../../data/repository/payment_repository.dart';
+import '../../../../core/network/api_services.dart';
+import '../../../../core/network/app_urls.dart';
 
 class PaymentController extends GetxController {
   final PaymentRepository repository = Get.put(PaymentRepositoryImpl());
-  int? _currentOrderId;
 
   @override
   void onInit() {
@@ -20,7 +19,6 @@ class PaymentController extends GetxController {
   }
 
   Future<void> initiatePayment(int orderId) async {
-    _currentOrderId = orderId;
     try {
       Get.dialog(
         const Center(child: CircularProgressIndicator(color: Colors.black)),
@@ -40,8 +38,17 @@ class PaymentController extends GetxController {
           // 2. Open PhonePe Hosted Checkout in WebView
           final result = await Get.to<bool?>(() => PaymentWebViewPage(url: redirectUrl));
           
-          // 3. Verify Payment
-          await _verifyTransaction(orderId, merchantTxnId);
+          if (result == true) {
+            // 3. Verify Payment
+            await _verifyTransaction(orderId, merchantTxnId);
+          } else if (result == false) {
+            Get.snackbar("Payment Failed", "Your payment failed or was cancelled on PhonePe. Please try again.",
+                backgroundColor: Colors.red, colorText: Colors.white);
+          } else {
+            // result is null (e.g. user closed WebView)
+            // Call verify transaction as a safety check in case the webhook processed it or they did pay.
+            await _verifyTransaction(orderId, merchantTxnId);
+          }
         } else {
           Get.snackbar("Error", "Payment redirect URL is empty.",
               backgroundColor: Colors.red, colorText: Colors.white);
@@ -73,7 +80,30 @@ class PaymentController extends GetxController {
       // Close loading dialog
       Get.back();
 
+      bool isVerified = false;
+      String message = "Your payment has been successfully verified and the order is being processed.";
+
       if (verifyResponse != null && verifyResponse['success'] == true) {
+        isVerified = true;
+        message = verifyResponse['message'] ?? message;
+      } else {
+        // Fallback: Query the order details to fetch the final status
+        try {
+          final apiServices = Get.find<ApiServices>();
+          final orderResponse = await apiServices.callGet(AppUrls.orderDetail(orderId));
+          if (orderResponse != null && orderResponse['success'] == true) {
+            final orderData = orderResponse['order'];
+            if (orderData != null && orderData['payment_status'] == 'paid') {
+              isVerified = true;
+              message = "Payment verified via order status. Order is being processed.";
+            }
+          }
+        } catch (e) {
+          debugPrint("Failed to fetch order status fallback: $e");
+        }
+      }
+
+      if (isVerified) {
         // Close the Cart screen BEFORE showing the success popup
         Get.back(); 
 
@@ -89,7 +119,7 @@ class PaymentController extends GetxController {
               ],
             ),
             content: Text(
-              verifyResponse['message'] ?? "Your payment has been successfully verified and the order is being processed.",
+              message,
               textAlign: TextAlign.center,
             ),
             actionsAlignment: MainAxisAlignment.center,

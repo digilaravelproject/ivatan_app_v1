@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PaymentWebViewPage extends StatefulWidget {
   final String url;
@@ -30,25 +31,47 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
             setState(() {
               _isLoading = false;
             });
-            // Try extracting the body text to see if payment succeeded/failed
-            try {
-              final dynamic result = await _controller.runJavaScriptReturningResult("document.body.innerText");
-              final String content = result.toString().replaceAll('"', '').trim();
-              
-              debugPrint("WebView content check: $content");
-              
-              if (content.contains("Payment Successful")) {
-                Navigator.of(context).pop(true);
-              } else if (content.contains("Payment Failed")) {
-                Navigator.of(context).pop(false);
+            
+            if (url.contains("/payment/callback/phonepe")) {
+              // Try extracting the body text to see if payment succeeded/failed
+              try {
+                final dynamic result = await _controller.runJavaScriptReturningResult("document.body.innerText");
+                final String content = result.toString().replaceAll('"', '').trim();
+                
+                debugPrint("WebView content check: $content");
+                
+                if (content.contains("Payment Successful")) {
+                  Navigator.of(context).pop(true);
+                } else if (content.contains("Payment Failed")) {
+                  Navigator.of(context).pop(false);
+                }
+              } catch (e) {
+                debugPrint("Error extracting body text: $e");
               }
-            } catch (e) {
-              debugPrint("Error extracting body text: $e");
             }
           },
-          onNavigationRequest: (NavigationRequest request) {
+          onNavigationRequest: (NavigationRequest request) async {
             final url = request.url;
             debugPrint("WebView navigating to: $url");
+            
+            if (url.startsWith("upi:") || 
+                url.startsWith("phonepe:") || 
+                url.startsWith("paytm:") || 
+                url.startsWith("gpay:") ||
+                url.startsWith("tez:")) {
+              try {
+                final Uri uri = Uri.parse(url);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                } else {
+                  debugPrint("Could not launch payment URI: $url");
+                }
+              } catch (e) {
+                debugPrint("Error launching payment URI: $e");
+              }
+              return NavigationDecision.prevent;
+            }
+            
             return NavigationDecision.navigate;
           },
         ),

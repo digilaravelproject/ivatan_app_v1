@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:i_vatan_app/core/theme/app_colors.dart';
 import '../../../../core/network/api_services.dart';
 import '../../../../db/shared_pref_manager.dart';
 import '../../dashboard/controller/settings_controller.dart';
@@ -15,10 +14,8 @@ class SubscriptionPaymentController extends GetxController {
   var isLoading = false.obs;
   
   // Keep track of current payment context
-  int? _currentProfileId;
   SubscriptionPlan? _currentPlan;
   ProfileTypeSubscription? _currentProfileTypeSub;
-  String? _currentGatewaySubId;
 
   @override
   void onInit() {
@@ -98,8 +95,6 @@ class SubscriptionPaymentController extends GetxController {
       return;
     }
     
-    _currentProfileId = profileId;
-
     // 2. Call initiate subscriptions API: POST api/v1/profiles/{profileId}/subscriptions/initiate
     try {
       isLoading.value = true;
@@ -119,26 +114,31 @@ class SubscriptionPaymentController extends GetxController {
       // Close loading dialog
       Get.back();
 
-      if (initiateResponse != null && initiateResponse['status'] == true) {
+      if (initiateResponse != null && (initiateResponse['status'] == true || initiateResponse['success'] == true)) {
         final data = initiateResponse['data'];
         final requiresPayment = data['requires_payment'] ?? false;
         final gateway = data['gateway'] ?? '';
         final gatewaySubId = data['gateway_subscription_id'] ?? '';
         final redirectUrl = data['redirect_url'] ?? '';
         
-        _currentGatewaySubId = gatewaySubId;
-
         if (requiresPayment && (gateway == 'phonepe' || redirectUrl.toString().isNotEmpty)) {
           // Open PhonePe Mandate redirect page
           final result = await Get.to<bool?>(() => PaymentWebViewPage(url: redirectUrl));
           
-          // Confirm purchase
-          await _purchaseSubscription(
-            profileId: profileId,
-            planId: planId,
-            paymentMethod: "phonepe",
-            gatewaySubId: gatewaySubId,
-          );
+          if (result == true) {
+            await _verifyAndSyncSubscription(profileId, planId);
+          } else if (result == false) {
+            Get.snackbar(
+              "Payment Failed",
+              "Subscription payment failed on PhonePe. Please try again.",
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+            );
+          } else {
+            // result is null (e.g. user closed WebView)
+            // Call verification anyway as a safety check in case the webhook processed it or they did pay.
+            await _verifyAndSyncSubscription(profileId, planId);
+          }
         } else {
           // If no payment required (Free plan), complete it immediately
           await _purchaseSubscription(
@@ -216,6 +216,135 @@ class SubscriptionPaymentController extends GetxController {
       }
     }
     return null;
+  }
+
+  Future<void> _verifyAndSyncSubscription(int profileId, int planId) async {
+    try {
+      isLoading.value = true;
+      Get.dialog(
+        const Center(child: CircularProgressIndicator(color: Colors.black)),
+        barrierDismissible: false,
+      );
+
+      // Short polling: 3 attempts, 2 seconds apart, to allow PhonePe webhook to process and activate
+      Map<String, dynamic>? response;
+      bool isSynced = false;
+      
+      for (int i = 0; i < 3; i++) {
+        response = await api.callGet("api/v1/profiles/$profileId/subscriptions/active");
+        if (response != null && (response['status'] == true || response['success'] == true)) {
+          final data = response['data'];
+          if (data != null) {
+            isSynced = true;
+            break;
+          }
+        }
+        await Future.delayed(const Duration(seconds: 2));
+      }
+
+      Get.back(); // Close loading dialog
+
+      String message = "Your subscription payment was successful. The subscription is being processed.";
+      if (isSynced && response != null) {
+        message = response['message'] ?? "Your subscription is now active.";
+      }
+      
+      _showSubscriptionSuccessDialog(profileId, planId, message, isSynced);
+    } catch (e) {
+      Get.back(); // Close loading dialog on error
+      debugPrint("⚠️ Subscription verification error: $e");
+      // Show success dialog anyway because callback returned successful
+      _showSubscriptionSuccessDialog(
+        profileId,
+        planId,
+        "Your payment was successful. The subscription will activate shortly.",
+        false,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void _showSubscriptionSuccessDialog(int profileId, int planId, String message, bool isSynced) {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Column(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.green, size: 60),
+            const SizedBox(height: 16),
+            const Text("Subscribed Successfully", style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text(
+          message,
+          textAlign: TextAlign.center,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          ElevatedButton(
+            onPressed: () async {
+              Get.back(); // Close dialog
+              Get.back(); // Go back from plan details screen
+              
+              // Sync subscription view in ProfileTypes list
+              if (_currentPlan != null && _currentProfileTypeSub != null) {
+                final subscriptionController = Get.isRegistered<SubscriptionController>()
+                    ? Get.find<SubscriptionController>()
+                    : Get.put(SubscriptionController());
+                
+                final String targetStatus = isSynced ? 'active' : 'pending';
+                
+                final updatedList = subscriptionController.subscriptions.map((sub) {
+                  if (sub.id == _currentProfileTypeSub!.id) {
+                    final updatedPlans = sub.plans.map((p) {
+                      if (p.id == _currentPlan!.id) {
+                        return p.copyWith(status: targetStatus);
+                      }
+                      return p.copyWith(status: 'none');
+                    }).toList();
+
+                    return sub.copyWith(
+                      status: targetStatus,
+                      plans: updatedPlans,
+                    );
+                  }
+                  return sub;
+                }).toList();
+                subscriptionController.subscriptions.value = updatedList;
+
+                // Also trigger a refresh from the server to ensure we have the absolute latest status
+                try {
+                  await subscriptionController.fetchPlansForProfileType(
+                    _currentProfileTypeSub!.type,
+                    activePlanSlug: _currentPlan!.slug,
+                    isSubscribedActive: isSynced,
+                    profileId: profileId,
+                  );
+                } catch (e) {
+                  debugPrint("Error fetching plans after subscription success: $e");
+                }
+              }
+
+              // Sync Settings view
+              final settingsController = _getSettingsController();
+              if (settingsController != null) {
+                settingsController.fetchUserDetails(settingsController.userName);
+                settingsController.fetchProfileSwitchRequests();
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(120, 45),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text("Done"),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
   }
 
   Future<void> _purchaseSubscription({
