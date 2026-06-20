@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class UserModel {
   final int id;
   final String uuid;
@@ -130,7 +132,7 @@ class UserModel {
       lastLoginAt: data["last_login_at"],
       followersCount: data["followers_count"] ?? 0,
       followingCount: data["following_count"] ?? 0,
-      settings: data["settings"],
+      settings: data["settings"] is Map ? jsonEncode(data["settings"]) : data["settings"],
       postsCount: data["posts_count"] ?? 0,
       createdAt: data["created_at"] ?? "",
       updatedAt: data["updated_at"] ?? "",
