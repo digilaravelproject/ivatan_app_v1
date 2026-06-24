@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:i_vatan_app/core/constants/app_assets.dart';
@@ -22,6 +23,9 @@ class ChattingScreen extends GetView<ChatMessagesController> {
 
   @override
   Widget build(BuildContext context) {
+    // Create scroll controller for auto-scrolling to bottom
+    final ScrollController scrollController = ScrollController();
+    
     return WillPopScope(
       onWillPop: () async {
         if (controller.isEmojiVisible.value) {
@@ -47,15 +51,35 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                   return _buildEmptyState();
                 }
 
-                return ListView.builder(
-                  reverse: true,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  itemCount: controller.messages.length,
-                  itemBuilder: (context, index) {
-                    final message = controller.messages[index];
-                    final isMe = message.isMine;
-                    return _buildMessageBubble(context, message, isMe);
+                // Auto-scroll to bottom only once when messages are loaded
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _scrollToBottom(scrollController);
+                });
+
+                return RefreshIndicator(
+                  color: AppColors.primary,
+                  onRefresh: () async {
+                    final chatId = controller.chatProfile.value?.id;
+                    if (chatId != null) {
+                      await controller.fetchMessages(chatId);
+                      // Auto-scroll to bottom after refresh
+                      _scrollToBottom(scrollController);
+                    }
                   },
+                  child: ListView.builder(
+                    controller: scrollController,
+                    reverse: false, // Changed from true to false - no more bottom alignment
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    itemCount: controller.messages.length,
+                    itemBuilder: (context, index) {
+                      // Reverse the index to show latest messages at bottom
+                      final reversedIndex = controller.messages.length - 1 - index;
+                      final message = controller.messages[reversedIndex];
+                      final isMe = message.isMine;
+                      
+                      return _buildMessageBubble(context, message, isMe);
+                    },
+                  ),
                 );
               }),
             ),
@@ -193,47 +217,50 @@ class ChattingScreen extends GetView<ChatMessagesController> {
     final avatarUrl = message.sender?.avatar;
     final senderName = message.sender?.name;
 
-    Widget bubble = Container(
-      margin: const EdgeInsets.symmetric(vertical: 2), // Tighter spacing
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.75,
-      ),
-      decoration: BoxDecoration(
-        color: isMe ? AppColors.black : Colors.grey.shade100, // Black vs Grey
-        borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(18),
-          topRight: const Radius.circular(18),
-          bottomLeft: Radius.circular(isMe ? 18 : 4),
-          bottomRight: Radius.circular(isMe ? 4 : 18),
+    Widget bubble = GestureDetector(
+      onLongPress: () => _showMessageOptions(context, message),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 2), // Tighter spacing
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          _buildMessageContent(context, message, isMe),
-          const SizedBox(height: 4),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                formatChatTime(message.createdAt.toString()),
-                style: TextStyle(
-                  fontSize: 10,
-                  color: isMe ? Colors.grey.shade400 : Colors.grey.shade500,
-                ),
-              ),
-              if (isMe) ...[
-                const SizedBox(width: 4),
-                Icon(
-                  Icons.done_all, 
-                  size: 14, 
-                  color: message.status == "read" ? Colors.blueAccent : Colors.grey.shade500,
-                ),
-              ],
-            ],
+        decoration: BoxDecoration(
+          color: isMe ? AppColors.black : Colors.grey.shade100, // Black vs Grey
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(18),
+            topRight: const Radius.circular(18),
+            bottomLeft: Radius.circular(isMe ? 18 : 4),
+            bottomRight: Radius.circular(isMe ? 4 : 18),
           ),
-        ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            _buildMessageContent(context, message, isMe),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  formatChatTime(message.createdAt.toString()),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: isMe ? Colors.grey.shade400 : Colors.grey.shade500,
+                  ),
+                ),
+                if (isMe) ...[
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.done_all, 
+                    size: 14, 
+                    color: message.status == "read" ? Colors.blueAccent : Colors.grey.shade500,
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
 
@@ -837,6 +864,149 @@ class ChattingScreen extends GetView<ChatMessagesController> {
     if (bytes < 1024) return "$bytes B";
     if (bytes < 1024 * 1024) return "${(bytes / 1024).toStringAsFixed(1)} KB";
     return "${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB";
+  }
+
+  // Helper function to scroll to bottom
+  void _scrollToBottom(ScrollController scrollController) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (scrollController.hasClients) {
+          scrollController.animateTo(
+            scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    });
+  }
+
+  void _showMessageOptions(BuildContext context, ChatMessage message) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        margin: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 38,
+              height: 4.5,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            _buildOptionRow(
+              icon: Icons.reply_rounded,
+              label: "Reply",
+              color: Colors.black87,
+              onTap: () {
+                Navigator.pop(ctx);
+                // TODO: Implement reply functionality
+                CustomSnackBar.showInfo(message: "Reply feature coming soon!");
+              },
+            ),
+
+            _buildOptionRow(
+              icon: Icons.copy_rounded,
+              label: "Copy",
+              color: Colors.black87,
+              onTap: () {
+                Navigator.pop(ctx);
+                Clipboard.setData(ClipboardData(text: message.content));
+                CustomSnackBar.showSuccess(message: "Message copied to clipboard!");
+              },
+            ),
+
+            _buildOptionRow(
+              icon: Icons.delete_outline_rounded,
+              label: "Delete for me",
+              color: Colors.red.shade300,
+              onTap: () async {
+                Navigator.pop(ctx);
+                await controller.deleteMessage(message.id.toString(), deleteForEveryOne: false);
+                CustomSnackBar.showInfo(message: "Message deleted.");
+              },
+            ),
+
+            // Only owner can delete for everyone
+            if (message.isMine)
+              _buildOptionRow(
+                icon: Icons.delete_forever_rounded,
+                label: "Delete for everyone",
+                color: Colors.red,
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  await controller.deleteMessage(message.id.toString(), deleteForEveryOne: true);
+                  CustomSnackBar.showSuccess(message: "Message deleted for everyone.");
+                },
+              ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: GestureDetector(
+                onTap: () => Navigator.pop(ctx),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  child: const Text(
+                    "Cancel",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOptionRow({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 22),
+            const SizedBox(width: 14),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14.5,
+                fontWeight: FontWeight.w500,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

@@ -7,7 +7,6 @@ import '../repository/live_chat_repository.dart';
 // 🚀 GETX CONTROLLER FOR LIVE CHAT GROUPS LIST (CLEAN ARCHITECTURE)
 // =========================================================================
 class LiveChatListController extends GetxController {
-  RxString selectedTab = "Groups".obs;
   RxString searchQuery = "".obs;
   RxBool isLoading = false.obs;
   RxList<ChatInboxModel> groupsList = <ChatInboxModel>[].obs;
@@ -166,14 +165,14 @@ class LiveChatListController extends GetxController {
   }
 
   void changeTab(String tabName) {
-    selectedTab.value = tabName;
-    fetchGroups();
+    // Removed tab functionality - always use live_groups filter
   }
 
   Future<void> fetchGroups() async {
     try {
       isLoading.value = true;
-      final list = await _repository.fetchChats(filter: selectedTab.value.toLowerCase());
+      // Always use 'live_groups' filter as per requirement
+      final list = await _repository.fetchChats(filter: 'live_groups');
 
       if (list != null) {
         groupsList.assignAll(list);
@@ -192,19 +191,8 @@ class LiveChatListController extends GetxController {
 
   void _loadMockGroups() {
     final parsedMock = mockGroupsJson.map((e) => ChatInboxModel.fromJson(e)).toList();
-    var list = parsedMock;
-
-    if (selectedTab.value == "Groups") {
-      list = list.where((g) => g.type == "group").toList();
-    } else if (selectedTab.value == "Unread") {
-      list = list.where((g) => g.unreadCount > 0).toList();
-    } else if (selectedTab.value == "Read") {
-      list = list.where((g) => g.unreadCount == 0).toList();
-    } else if (selectedTab.value == "Business") {
-      list = list.where((g) => g.type == "business").toList();
-    }
-
-    groupsList.assignAll(list);
+    // Load all groups - no filtering needed since API filter handles it
+    groupsList.assignAll(parsedMock);
     _filterList();
   }
 

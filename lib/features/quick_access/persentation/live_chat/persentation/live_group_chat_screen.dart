@@ -43,6 +43,9 @@ class LiveGroupChatScreen extends StatelessWidget {
       tag: chatId.toString(),
     );
 
+    // Create scroll controller for auto-scrolling to bottom
+    final ScrollController listScrollController = ScrollController();
+
     return WillPopScope(
       onWillPop: () async {
         if (controller.isEmojiVisible.value) {
@@ -78,25 +81,39 @@ class LiveGroupChatScreen extends StatelessWidget {
                     if (controller.messages.isEmpty) {
                       return _buildEmptyState();
                     }
+
+                    // Auto-scroll to bottom only once when messages are loaded
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _scrollToBottom(listScrollController);
+                    });
   
-                    return ListView.builder(
-                      controller: controller.scrollController,
-                      reverse: true,
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      itemCount: controller.messages.length,
-                      itemBuilder: (context, index) {
-                        final message = controller.messages[index];
-                        final isMe = message.isMine;
-                        
-                        bool showDate = false;
-                        if (index == controller.messages.length - 1) {
-                          showDate = true;
-                        } else {
-                          final nextMessage = controller.messages[index + 1];
-                          if (controller.formatMessageDate(nextMessage.createdAt) != controller.formatMessageDate(message.createdAt)) {
+                    return RefreshIndicator(
+                      color: AppColors.primary,
+                      onRefresh: () async {
+                        await controller.fetchMessages();
+                        // Auto-scroll to bottom after refresh
+                        _scrollToBottom(listScrollController);
+                      },
+                      child: ListView.builder(
+                        controller: listScrollController, // Use our custom scroll controller
+                        reverse: false, // Changed from true to false - no more bottom alignment
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        itemCount: controller.messages.length,
+                        itemBuilder: (context, index) {
+                          // Reverse the index to show latest messages at bottom
+                          final reversedIndex = controller.messages.length - 1 - index;
+                          final message = controller.messages[reversedIndex];
+                          final isMe = message.isMine;
+                          
+                          bool showDate = false;
+                          if (reversedIndex == controller.messages.length - 1) {
                             showDate = true;
+                          } else {
+                            final nextMessage = controller.messages[reversedIndex + 1];
+                            if (controller.formatMessageDate(nextMessage.createdAt) != controller.formatMessageDate(message.createdAt)) {
+                              showDate = true;
+                            }
                           }
-                        }
   
                         // System messages styling
                         if (message.messageType == 'system' || message.sender?.name == 'System') {
@@ -122,6 +139,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                           ],
                         );
                       },
+                    ),
                     );
                   }),
                 ),
@@ -755,7 +773,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                                 message.status == "sending"
                                     ? Icons.access_time_rounded
                                     : Icons.done_all_rounded,
-                                color: message.status == "sending" ? Colors.white70 : AppColors.secondary,
+                                color: message.status == "sending" ? Colors.white70 : Colors.white70,
                                 size: 14,
                               ),
                             ],
@@ -1468,3 +1486,18 @@ class _SwipeToReplyWrapperState extends State<_SwipeToReplyWrapper>
     );
   }
 }
+
+  // Helper function to scroll to bottom
+  void _scrollToBottom(ScrollController scrollController) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (scrollController.hasClients) {
+          scrollController.animateTo(
+            scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    });
+  }

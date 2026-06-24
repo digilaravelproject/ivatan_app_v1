@@ -273,11 +273,14 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
               }
               
               return Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.only(top: 8, bottom: 20),
-                  itemCount: controller.filteredChatList.length,
-                  separatorBuilder: (ctx, i) => Divider(height: 1, indent: 80, color: Colors.grey.shade100),
-                  itemBuilder: (context, index) {
+                child: RefreshIndicator(
+                  color: AppColors.primary,
+                  onRefresh: () => controller.fetchInbox(),
+                  child: ListView.separated(
+                    padding: const EdgeInsets.only(top: 8, bottom: 20),
+                    itemCount: controller.filteredChatList.length,
+                    separatorBuilder: (ctx, i) => Divider(height: 1, indent: 80, color: Colors.grey.shade100),
+                    itemBuilder: (context, index) {
                     final message = controller.filteredChatList[index];
                     final hasUnread = message.unreadCount! > 0;
                     
@@ -405,6 +408,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                       ),
                     );
                   },
+                ),
                 ),
               );
             }),
