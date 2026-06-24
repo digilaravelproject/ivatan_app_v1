@@ -175,7 +175,7 @@ class LiveChatList extends StatelessWidget {
     final avatarColor = controller.getAvatarColor(chatId, groupName);
 
     return InkWell(
-      onTap: () {
+      onTap: group.isBanned == true ? null : () {
         Get.to(
           () => const LiveGroupChatScreen(),
           arguments: {
@@ -192,7 +192,9 @@ class LiveChatList extends StatelessWidget {
           },
         );
       },
-      child: Padding(
+      child: Opacity(
+        opacity: group.isBanned == true ? 0.5 : 1.0,
+        child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
@@ -214,15 +216,48 @@ class LiveChatList extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Text(
-                          groupName,
-                          style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                groupName,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            // Show banned/muted indicators
+                            if (group.isBanned == true) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade100,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  "BANNED",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red.shade700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                            if (group.isMuted == true && group.isBanned != true) ...[
+                              const SizedBox(width: 6),
+                              Icon(
+                                Icons.volume_off_rounded,
+                                size: 14,
+                                color: Colors.grey[500],
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -288,6 +323,7 @@ class LiveChatList extends StatelessWidget {
               ),
             ),
           ],
+        ),
         ),
       ),
     );

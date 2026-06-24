@@ -171,18 +171,25 @@ class LiveChatListController extends GetxController {
   Future<void> fetchGroups() async {
     try {
       isLoading.value = true;
+      print("🔄 [LiveChatListController] Starting fetchGroups with filter: live_groups");
+      
       // Always use 'live_groups' filter as per requirement
       final list = await _repository.fetchChats(filter: 'live_groups');
 
-      if (list != null) {
+      print("📦 [LiveChatListController] Received list: ${list?.length ?? 0} items");
+
+      if (list != null && list.isNotEmpty) {
         groupsList.assignAll(list);
         _filterList();
+        print("✅ [LiveChatListController] Groups loaded successfully: ${groupsList.length}");
         return;
       }
 
+      print("⚠️ [LiveChatListController] API returned null or empty, loading mock data");
       _loadMockGroups();
-    } catch (e) {
-      print("Fetch Groups Error: $e");
+    } catch (e, stackTrace) {
+      print("❌ [LiveChatListController] Fetch Groups Error: $e");
+      print("Stack trace: $stackTrace");
       _loadMockGroups();
     } finally {
       isLoading.value = false;
@@ -190,10 +197,20 @@ class LiveChatListController extends GetxController {
   }
 
   void _loadMockGroups() {
-    final parsedMock = mockGroupsJson.map((e) => ChatInboxModel.fromJson(e)).toList();
+    print("📝 [LiveChatListController] Loading mock groups for testing");
+    final parsedMock = mockGroupsJson.map((e) {
+      try {
+        return ChatInboxModel.fromJson(e);
+      } catch (error) {
+        print("❌ [LiveChatListController] Error parsing mock item: $error");
+        print("Mock item: $e");
+        rethrow;
+      }
+    }).toList();
     // Load all groups - no filtering needed since API filter handles it
     groupsList.assignAll(parsedMock);
     _filterList();
+    print("✅ [LiveChatListController] Mock groups loaded: ${groupsList.length}");
   }
 
   void _filterList() {
