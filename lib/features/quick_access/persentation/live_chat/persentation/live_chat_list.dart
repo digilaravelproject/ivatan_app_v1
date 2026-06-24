@@ -48,16 +48,16 @@ class LiveChatList extends StatelessWidget {
             ),
             onPressed: () => controller.fetchGroups(),
           ),
-          IconButton(
-            icon: const Icon(
-              Icons.add_rounded,
-              color: AppColors.primary,
-              size: 28,
-            ),
-            onPressed: () {
-              // Action for adding
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(
+          //     Icons.add_rounded,
+          //     color: AppColors.primary,
+          //     size: 28,
+          //   ),
+          //   onPressed: () {
+          //     // Action for adding
+          //   },
+          // ),
         ],
       ),
       body: Column(

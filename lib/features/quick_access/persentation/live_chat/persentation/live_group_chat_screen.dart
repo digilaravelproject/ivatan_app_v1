@@ -396,21 +396,25 @@ class LiveGroupChatScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Stack(
                   children: [
-                    if (!isMe)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 3),
-                        child: Text(
-                          senderName,
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: avatarColor,
-                          ),
-                        ),
-                      ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 4, right: isMe ? 68 : 45), // Reserve space for the timestamp (more space for 'isMe' due to checkmark)
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (!isMe)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 3),
+                              child: Text(
+                                senderName,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: avatarColor,
+                                ),
+                              ),
+                            ),
 
                            // 💬 WhatsApp-style Quoted Reply Block
                     if (message.repliedMessage != null) ...[ 
@@ -726,32 +730,38 @@ class LiveGroupChatScreen extends StatelessWidget {
                         ),
                       ),
                     ],
-
-                    const SizedBox(height: 3),
-
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        const SizedBox(width: 40),
-                        Text(
-                          controller.formatMessageTime(message.createdAt),
-                          style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            color: isMe ? Colors.grey[400] : Colors.grey[500],
-                          ),
-                        ),
-                        if (isMe) ...[
-                          const SizedBox(width: 4),
-                          Icon(
-                            message.status == "sending"
-                                ? Icons.access_time_rounded
-                                : Icons.done_all_rounded,
-                            color: message.status == "sending" ? Colors.grey[400] : AppColors.secondary,
-                            size: 14,
-                          ),
                         ],
-                      ],
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 2, right: 2),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              controller.formatMessageTime(message.createdAt),
+                              style: GoogleFonts.poppins(
+                                fontSize: 10,
+                                color: isMe ? Colors.white70 : Colors.grey[500],
+                              ),
+                            ),
+                            if (isMe) ...[
+                              const SizedBox(width: 4),
+                              Icon(
+                                message.status == "sending"
+                                    ? Icons.access_time_rounded
+                                    : Icons.done_all_rounded,
+                                color: message.status == "sending" ? Colors.white70 : AppColors.secondary,
+                                size: 14,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
