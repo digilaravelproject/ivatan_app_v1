@@ -12,7 +12,6 @@ import '../model/chat_data_model.dart';
 import '../model/individualChatModel.dart';
 import 'chatt_controller.dart';
 
-
 /*
 class ChatMessagesController extends GetxController {
   final ApiServices api = Get.find<ApiServices>();
@@ -38,7 +37,7 @@ class ChatMessagesController extends GetxController {
     if (chatId == null) return;
 
     await pusher.init(
-      apiKey: "1c97cfa884ecb61e0959",
+      apiKey: "cvtm70sqh0nz9ogq1cza",
       cluster: "ap2",
       authEndpoint: "[https://ivatan.in/api/broadcasting/auth](https://www.ivatan.in/api/v1/chats/$chatId/messages)",
       onEvent: (event) {
@@ -245,8 +244,6 @@ class ChatMessagesController extends GetxController {
 */
 
 
-
-
 /*class ChatMessagesController extends GetxController {
   // Dependency Injection for API Services
   final ApiServices api = Get.find<ApiServices>();
@@ -319,7 +316,7 @@ class ChatMessagesController extends GetxController {
 
       // 4. Initialize Pusher with Auth Logic
       await pusher.init(
-          apiKey: "1c97cfa884ecb61e0959",
+          apiKey: "cvtm70sqh0nz9ogq1cza",
           cluster: "ap2",
 
           // --- AUTHENTICATION HANDLER ---
@@ -599,8 +596,8 @@ class ChatMessagesController extends GetxController {
       wsService.listen("message.deleted", _onMessageDeleted);
 
       // Subscribe to Reverb presence channel for this chat
-      await wsService.subscribe("presence-chat.$chatId");
-      print("🔌 [ChatMessagesController] Subscribed to presence-chat.$chatId via WebSocketService");
+      await wsService.subscribe("presence-presence-chat.$chatId");
+      print("🔌 [ChatMessagesController] Subscribed to presence-presence-chat.$chatId via WebSocketService");
     } catch (e) {
       print("WebSocket/Reverb subscribe error: $e");
     }
@@ -618,14 +615,18 @@ class ChatMessagesController extends GetxController {
 
       // Check if message belongs to the current chat ID
       if (newMessage.chatId == chatProfile.value?.id) {
-        if (!messages.any((m) => m.id == newMessage.id)) {
+        final index = messages.indexWhere((m) => m.id == newMessage.id);
+        if (index == -1) {
           // Insert at Index 0 since list is reversed
           messages.insert(0, newMessage);
-          messages.refresh();
-
-          // Update Dashboard List "Last Message"
-          _updateChatListLastMessage(parsedData);
+        } else {
+          // Replace it to ensure status and other fields from Reverb are up-to-date
+          messages[index] = newMessage;
         }
+        messages.refresh();
+
+        // Update Dashboard List "Last Message"
+        _updateChatListLastMessage(parsedData);
       }
     } catch (e) {
       print("Error parsing message.sent data: $e");
@@ -817,7 +818,7 @@ class ChatMessagesController extends GetxController {
         wsService.removeListener("message.sent", _onMessageSent);
         wsService.removeListener("message.edited", _onMessageEdited);
         wsService.removeListener("message.deleted", _onMessageDeleted);
-        wsService.unsubscribe("presence-chat.$chatId");
+        wsService.unsubscribe("presence-presence-chat.$chatId");
       } catch (e) {
         print("WebSocket unsubscribe error on onClose: $e");
       }
@@ -846,7 +847,13 @@ class ChatMessagesController extends GetxController {
       if (response != null && response["status"] == true) {
         // Add sent message locally immediately at the BOTTOM (Index 0)
         final newMessage = ChatMessage.fromJson(response['data']);
-        messages.insert(0, newMessage);
+        final index = messages.indexWhere((m) => m.id == newMessage.id);
+        if (index == -1) {
+          messages.insert(0, newMessage);
+        } else {
+          messages[index] = newMessage;
+        }
+        messages.refresh();
         messageController.clear();
 
         // 🔥 CRITICAL: Update Dashboard List "Last Message"
@@ -923,7 +930,13 @@ class ChatMessagesController extends GetxController {
 
       if (response != null && response["status"] == true) {
         final newMessage = ChatMessage.fromJson(response['data']);
-        messages.insert(0, newMessage);
+        final index = messages.indexWhere((m) => m.id == newMessage.id);
+        if (index == -1) {
+          messages.insert(0, newMessage);
+        } else {
+          messages[index] = newMessage;
+        }
+        messages.refresh();
 
         // 🔥 CRITICAL: Update Dashboard List "Last Message" for Files too
         try {

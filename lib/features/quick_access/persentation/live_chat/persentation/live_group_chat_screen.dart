@@ -634,15 +634,28 @@ class LiveGroupChatScreen extends StatelessWidget {
                                   ? Uri.parse(message.attachmentUrl!)
                                   : Uri.file(message.attachmentUrl!);
 
+                              bool launched = false;
                               if (await canLaunchUrl(uri)) {
-                                await launchUrl(uri, mode: LaunchMode.externalApplication);
-                              } else {
+                                launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+                              }
+                              if (!launched) {
+                                launched = await launchUrl(uri, mode: LaunchMode.platformDefault);
+                              }
+                              if (!launched) {
                                 Clipboard.setData(ClipboardData(text: message.attachmentUrl!));
                                 CustomSnackBar.showSuccess(message: "Opening file... Link copied to clipboard!");
                               }
                             } catch (e) {
-                              Clipboard.setData(ClipboardData(text: message.attachmentUrl!));
-                              CustomSnackBar.showSuccess(message: "File link copied to clipboard!");
+                              try {
+                                bool launched = await launchUrl(Uri.parse(message.attachmentUrl!), mode: LaunchMode.platformDefault);
+                                if (!launched) {
+                                  Clipboard.setData(ClipboardData(text: message.attachmentUrl!));
+                                  CustomSnackBar.showSuccess(message: "File link copied to clipboard!");
+                                }
+                              } catch (e2) {
+                                Clipboard.setData(ClipboardData(text: message.attachmentUrl!));
+                                CustomSnackBar.showSuccess(message: "File link copied to clipboard!");
+                              }
                             }
                           }
                         },

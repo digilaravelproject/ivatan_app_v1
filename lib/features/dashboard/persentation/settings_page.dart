@@ -15,6 +15,7 @@ import '../../subscription/persentation/profile_plans_screen.dart';
 import '../../subscription/data/model/profile_switch_request.dart';
 import '../../../core/helper/profile_permission_manager.dart' as ppm;
 import '../controller/homeController.dart';
+import '../../subscription/persentation/subscription_history_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   SettingsScreen({super.key});
@@ -273,6 +274,31 @@ class SettingsScreen extends StatelessWidget {
                       const Text("Delete Account", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                       //const Spacer(),
                      // const Icon(Icons.arrow_forward_ios_rounded,size: 18,)
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              GestureDetector(
+                onTap: () {
+                  Get.to(() => SubscriptionHistoryScreen());
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade400)
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.history_rounded, color: Colors.black54),
+                      const SizedBox(width: 12),
+                      const Text("Subscription History", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                      const Spacer(),
+                      const Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.black54)
                     ],
                   ),
                 ),

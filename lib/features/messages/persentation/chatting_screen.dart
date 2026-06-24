@@ -397,12 +397,12 @@ class ChattingScreen extends GetView<ChatMessagesController> {
 
 
 
-  void _showAttachmentBottomSheet(BuildContext context) {
+  /*void _showAttachmentBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        height: 280,
+        height: 180,
         margin: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -468,7 +468,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                       }
                     }
                   ),
-                  _attachmentItem(
+                  *//*_attachmentItem(
                     icon: Icons.headphones, 
                     color: Colors.deepOrange, 
                     label: "Audio",
@@ -502,6 +502,147 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                       Navigator.pop(context);
                       // TODO: Implement Contact Sharing
                     }
+                  ),*//*
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }*/
+
+
+  void _showAttachmentBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: EdgeInsets.only(
+          top: 12, 
+          bottom: MediaQuery.of(context).padding.bottom + 20,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(24),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Drag Handle
+            Container(
+              width: 50,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Header with Title and Close Icon on Right
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  const Text(
+                    "Share Attachment",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.close, size: 18, color: Colors.black54),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _attachmentItem(
+                    icon: Icons.insert_drive_file_rounded,
+                    color: Colors.deepPurple,
+                    label: "Document",
+                    onTap: () async {
+                      Navigator.pop(context);
+
+                      try {
+                        FilePickerResult? result =
+                        await FilePicker.platform.pickFiles();
+
+                        if (result != null &&
+                            result.files.single.path != null) {
+                          controller.sendFile(
+                            File(result.files.single.path!),
+                            "file",
+                          );
+                        }
+                      } catch (e) {
+                        debugPrint("Error picking file: $e");
+                      }
+                    },
+                  ),
+
+                  _attachmentItem(
+                    icon: Icons.camera_alt_rounded,
+                    color: Colors.pink,
+                    label: "Camera",
+                    onTap: () async {
+                      Navigator.pop(context);
+
+                      final picker = ImagePicker();
+                      final image = await picker.pickImage(
+                        source: ImageSource.camera,
+                      );
+
+                      if (image != null) {
+                        controller.sendFile(
+                          File(image.path),
+                          "image",
+                        );
+                      }
+                    },
+                  ),
+
+                  _attachmentItem(
+                    icon: Icons.photo_library_rounded,
+                    color: Colors.blue,
+                    label: "Gallery",
+                    onTap: () async {
+                      Navigator.pop(context);
+
+                      final picker = ImagePicker();
+                      final image = await picker.pickImage(
+                        source: ImageSource.gallery,
+                      );
+
+                      if (image != null) {
+                        controller.sendFile(
+                          File(image.path),
+                          "image",
+                        );
+                      }
+                    },
                   ),
                 ],
               ),
@@ -603,10 +744,26 @@ class ChattingScreen extends GetView<ChatMessagesController> {
         onTap: () async {
           if (url.isNotEmpty) {
             final Uri uri = Uri.parse(url);
-            if (await canLaunchUrl(uri)) {
-              await launchUrl(uri, mode: LaunchMode.externalApplication);
-            } else {
-              CustomSnackBar.showError(message: "Could not open attachment URL");
+            try {
+              bool launched = false;
+              if (await canLaunchUrl(uri)) {
+                launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+              if (!launched) {
+                launched = await launchUrl(uri, mode: LaunchMode.platformDefault);
+              }
+              if (!launched) {
+                CustomSnackBar.showError(message: "Could not open attachment URL");
+              }
+            } catch (e) {
+              try {
+                bool launched = await launchUrl(uri, mode: LaunchMode.platformDefault);
+                if (!launched) {
+                  CustomSnackBar.showError(message: "Could not open attachment URL");
+                }
+              } catch (e2) {
+                CustomSnackBar.showError(message: "Could not open attachment URL");
+              }
             }
           }
         },

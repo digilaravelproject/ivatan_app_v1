@@ -114,6 +114,7 @@ class AppUrls {
   static const String unreadCount = "api/v1/notifications/unread-count";
   static const String markNotificationRead = "api/v1/notifications/mark-read";
   static const String markAllNotificationsRead = "api/v1/notifications/mark-all-read";
+  static const String subscriptionHistory = "api/v1/user/subscriptions/history";
 
   static const defaultApiKey =
       "1|1yCFcc7ahglUgOL3cftZZ7T83gcyFJreXGlQx0zud042e463";
