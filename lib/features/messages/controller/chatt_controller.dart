@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:i_vatan_app/features/messages/model/chat_data_model.dart';
 
 import '../../../core/network/api_services.dart';
+import '../../../core/network/websocket_service.dart';
+import '../../../db/shared_pref_manager.dart';
 import '../model/chat_model.dart';
 
 class ChattController extends GetxController {
@@ -20,12 +22,67 @@ class ChattController extends GetxController {
   Pagination? pagination;
 
   final ApiServices api = ApiServices();
+  WebSocketService? _ws;
 
   @override
   void onInit() {
     fetchInbox();
     fetchInboxGroup();
+    _initPresenceListener();
     super.onInit();
+  }
+
+  void _initPresenceListener() {
+    try {
+      _ws = Get.find<WebSocketService>();
+      final userId = SharedPrefManager().user?.id;
+      if (userId == null) return;
+
+      _ws!.listen("presence.changed", _onPresenceChanged);
+      _ws!.subscribe("private-user.$userId");
+      log("📡 [ChattController] Subscribed to private-user.$userId for presence");
+    } catch (e) {
+      log("⚠️ [ChattController] Failed to init presence listener: $e");
+    }
+  }
+
+  void _onPresenceChanged(dynamic data) {
+    try {
+      final int userId = data["user_id"] ?? 0;
+      final bool isOnline = data["is_online"] ?? false;
+      if (userId == 0) return;
+
+      bool updated = false;
+      for (int i = 0; i < chatList.length; i++) {
+        final chat = chatList[i];
+        if (chat.type == "private") {
+          final bool isMatch = chat.participants.any((p) => p.userId == userId);
+          if (isMatch) {
+            chatList[i] = ChatListModel(
+              id: chat.id,
+              uuid: chat.uuid,
+              type: chat.type,
+              name: chat.name,
+              avatar: chat.avatar,
+              isOnline: isOnline,
+              isAdmin: chat.isAdmin,
+              unreadCount: chat.unreadCount,
+              lastMessage: chat.lastMessage,
+              updatedAt: chat.updatedAt,
+              participantsCount: chat.participantsCount,
+              participants: chat.participants,
+            );
+            updated = true;
+          }
+        }
+      }
+      if (updated) {
+        chatList.refresh();
+        filteredChatList.assignAll(chatList);
+      }
+    } catch (e) {
+      log("⚠️ [ChattController] _onPresenceChanged error: $e");
+    }
   }
 
   Future<void> fetchInboxGroup() async {
@@ -51,7 +108,6 @@ class ChattController extends GetxController {
     isLoading.value = true;
 
     try {
-      /// query params build karo
       String url = "api/v1/chats";
       if (filter != null) {
         url = "$url?filter=$filter";
@@ -106,45 +162,6 @@ class ChattController extends GetxController {
     }
   }
 
-/*
-  Future<void> createPrivateChat( int chatId) async {
-    isLoading.value = true;
-
-    try {
-      final response = await api.callPost("api/v1/chats/private", data: {"other_user_id" : chatId});
-
-      if (response != null && response["status"] == true) {
-
-        final data = response['data'];
-
-        // CASE 1: List response
-        if (data is List) {
-          chatList.assignAll(
-            data
-                .map((e) => ChatListModel.fromJson(Map<String, dynamic>.from(e)))
-                .toList(),
-          );
-        }
-        // CASE 2: Single object response (current case)
-        else if (data is Map) {
-          chatList.assignAll([
-            ChatListModel.fromJson(Map<String, dynamic>.from(data)),
-          ]);
-        }
-
-        print("responsechatt : $response");
-      } else {
-        chatList.clear();
-      }
-    } catch (e, stk) {
-      log("FetchInbox Error: $e,\n$stk");
-      chatList.clear();
-    }
-
-    isLoading.value = false;
-  }
-*/
-
   Future<int?> createSinglePrivateChat(int userId) async {
     try {
       final response = await api.callPost(
@@ -159,14 +176,28 @@ class ChattController extends GetxController {
 
         if (data is Map) {
           final map = Map<String, dynamic>.from(data);
-          return map["id"]; // 👈 yaha se chat id milegi
+          return map["id"];
         }
       }
     } catch (e, stk) {
       print("createSinglePrivateChat error: $e\n$stk");
     }
 
-    return null; // fail case
+    return null;
   }
 
+  @override
+  void onClose() {
+    try {
+      final userId = SharedPrefManager().user?.id;
+      if (_ws != null && userId != null) {
+        _ws!.removeListener("presence.changed", _onPresenceChanged);
+        _ws!.unsubscribe("private-user.$userId");
+      }
+    } catch (e) {
+      log("⚠️ [ChattController] onClose error: $e");
+    }
+    searchController.dispose();
+    super.onClose();
+  }
 }

@@ -111,27 +111,18 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
               ),
             ),
             centerTitle: true,
-            // actions: [
-            //    IconButton(
-            //       icon: const Icon(
-            //         Icons.search,
-            //         color: Colors.white,
-            //         size: 26,
-            //       ),
-            //       onPressed: () {},
-            //     ),
-            //   Container(
-            //     margin: const EdgeInsets.only(right: 12),
-            //     child: IconButton(
-            //       icon: const Icon(
-            //         Icons.more_vert,
-            //         color: Colors.white,
-            //         size: 26,
-            //       ),
-            //       onPressed: () {},
-            //     ),
-            //   ),
-            // ],
+            actions: [
+              IconButton(
+                icon: const Icon(
+                  Icons.group_add_rounded,
+                  color: Colors.white,
+                  size: 26,
+                ),
+                onPressed: () {
+                  Get.toNamed(AppRoutes.createGroupScreen);
+                },
+              ),
+            ],
           ),
         ),
         body: Column(
@@ -292,39 +283,57 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         child: Row(
                           children: [
-                            // Avatar
-                            Container(
-                              width: 50, 
-                              height: 50,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.grey.shade200,
-                              ),
-                              child: ClipOval(
-                                child: (message.avatar != null && message.avatar.toString().isNotEmpty)
-                                    ? Image.network(
-                                        message.avatar.toString(),
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return message.type == "group"
-                                              ? const Center(child: Icon(Icons.group, color: Colors.grey, size: 26))
-                                              : Center(
-                                                  child: Text(
-                                                    message.name.isNotEmpty ? message.name[0].toUpperCase() : "?",
-                                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
-                                                  ),
-                                                );
-                                        },
-                                      )
-                                    : (message.type == "group"
-                                        ? const Center(child: Icon(Icons.group, color: Colors.grey, size: 26))
-                                        : Center(
-                                            child: Text(
-                                              message.name.isNotEmpty ? message.name[0].toUpperCase() : "?",
-                                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
-                                            ),
-                                          )),
-                              ),
+                            // Avatar with online indicator
+                            Stack(
+                              children: [
+                                Container(
+                                  width: 50, 
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.grey.shade200,
+                                  ),
+                                  child: ClipOval(
+                                    child: (message.avatar != null && message.avatar.toString().isNotEmpty)
+                                        ? Image.network(
+                                            message.avatar.toString(),
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) {
+                                              return message.type == "group"
+                                                  ? const Center(child: Icon(Icons.group, color: Colors.grey, size: 26))
+                                                  : Center(
+                                                      child: Text(
+                                                        message.name.isNotEmpty ? message.name[0].toUpperCase() : "?",
+                                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
+                                                      ),
+                                                    );
+                                            },
+                                          )
+                                        : (message.type == "group"
+                                            ? const Center(child: Icon(Icons.group, color: Colors.grey, size: 26))
+                                            : Center(
+                                                child: Text(
+                                                  message.name.isNotEmpty ? message.name[0].toUpperCase() : "?",
+                                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
+                                                ),
+                                              )),
+                                  ),
+                                ),
+                                if (message.type != "group" && message.isOnline)
+                                  Positioned(
+                                    right: 2,
+                                    bottom: 2,
+                                    child: Container(
+                                      width: 13,
+                                      height: 13,
+                                      decoration: BoxDecoration(
+                                        color: Colors.green,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: Colors.white, width: 2.5),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                             
                             const SizedBox(width: 14),

@@ -215,7 +215,14 @@ class ApiServices extends GetxService {
           if (value is File) return; // files handled separately below
           if (value == null) return; // skip null values
           
-          if (value is Map || value is List) {
+          if (value is List && value.every((e) => !(e is File))) {
+            for (var item in value) {
+              request.files.add(http.MultipartFile.fromBytes(
+                '$key[]',
+                utf8.encode(item.toString()),
+              ));
+            }
+          } else if (value is Map || value is List) {
             _flattenMultipartData(key, value, request.fields);
           } else if (value is bool) {
             request.fields[key] = value ? '1' : '0';

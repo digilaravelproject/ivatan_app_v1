@@ -1,16 +1,14 @@
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:i_vatan_app/core/constants/app_assets.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:i_vatan_app/core/helper/custom_snack_bar.dart';
-import '../../../../core/widgets/coming_soon_dialog.dart';
+import 'package:i_vatan_app/route/app_pages.dart';
 import '../controller/chat_message_controller.dart';
 import '../model/individualChatModel.dart';
 import 'package:flutter/foundation.dart' as foundation;
@@ -21,18 +19,28 @@ import 'package:url_launcher/url_launcher.dart';
 class ChattingScreen extends GetView<ChatMessagesController> {
   const ChattingScreen({super.key});
 
+  // Helper method to scroll to bottom
+  void _scrollToBottom(ScrollController scrollController) {
+    if (scrollController.hasClients) {
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Create scroll controller for auto-scrolling to bottom
     final ScrollController scrollController = ScrollController();
     
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
         if (controller.isEmojiVisible.value) {
           controller.isEmojiVisible.value = false;
-          return false;
         }
-        return true;
       },
       child: Scaffold(
         backgroundColor: Colors.white, // Clean White Background
@@ -145,25 +153,36 @@ class ChattingScreen extends GetView<ChatMessagesController> {
       ),
       title: Obx(() {
         final profile = controller.chatProfile.value;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              profile?.name ?? "User",
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black, // Dark Text
+        final isGroup = profile?.type == "group";
+        return InkWell(
+          onTap: () {
+            if (isGroup && profile != null) {
+              Get.toNamed(AppRoutes.groupDetailsScreen, arguments: profile);
+            }
+          },
+          borderRadius: BorderRadius.circular(8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                profile?.name ?? "User",
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
-            ),
-            const Text(
-              "Online", // Dynamic status if available
+            Text(
+              isGroup
+                  ? "${profile?.participantsCount ?? 0} participants"
+                  : (profile?.isOnline == true ? "Online" : "Offline"),
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.green, // Accent for status
+                color: isGroup ? Colors.grey : (profile?.isOnline == true ? Colors.green : Colors.grey),
               ),
             ),
-          ],
+            ],
+          ),
         );
       }),
       /*actions: [
@@ -866,21 +885,6 @@ class ChattingScreen extends GetView<ChatMessagesController> {
     return "${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB";
   }
 
-  // Helper function to scroll to bottom
-  void _scrollToBottom(ScrollController scrollController) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 100), () {
-        if (scrollController.hasClients) {
-          scrollController.animateTo(
-            scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
-      });
-    });
-  }
-
   void _showMessageOptions(BuildContext context, ChatMessage message) {
     showModalBottomSheet(
       context: context,
@@ -926,6 +930,18 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                 CustomSnackBar.showSuccess(message: "Message copied to clipboard!");
               },
             ),
+
+            // Read by option - only for own messages in group chats
+            if (message.isMine && controller.chatProfile.value?.type == "group")
+              _buildOptionRow(
+                icon: Icons.visibility_rounded,
+                label: "Read by",
+                color: Colors.blue,
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _showReadReceipts(context, message);
+                },
+              ),
 
             _buildOptionRow(
               icon: Icons.delete_outline_rounded,
@@ -974,6 +990,97 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                 ),
               ),
             ),
+            const SizedBox(height: 6),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showReadReceipts(BuildContext context, ChatMessage message) async {
+    final readers = await controller.getReadReceipts(message.id);
+    if (!context.mounted) return;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        margin: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 38,
+              height: 4.5,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Row(
+                children: [
+                  const Icon(Icons.visibility_rounded, color: Colors.blue, size: 20),
+                  const SizedBox(width: 10),
+                  Text(
+                    "Read by ${readers.length}",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(),
+            if (readers.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 30),
+                child: Text(
+                  "No one has read this yet",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              )
+            else
+              ...readers.map((reader) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.grey[200],
+                      backgroundImage: reader.avatar.isNotEmpty
+                          ? NetworkImage(reader.avatar)
+                          : null,
+                      child: reader.avatar.isEmpty
+                          ? Text(
+                              reader.name.isNotEmpty
+                                  ? reader.name[0].toUpperCase()
+                                  : "?",
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        reader.name,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
             const SizedBox(height: 6),
           ],
         ),

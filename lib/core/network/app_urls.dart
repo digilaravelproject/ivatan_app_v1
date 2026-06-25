@@ -103,6 +103,9 @@ class AppUrls {
   static const String liveChatGroups = "api/v1/live-chat-groups";
   static String liveChatGroupDetail(dynamic id) => "api/v1/live-chat-groups/$id";
   static String chatMessages(dynamic chatId) => "api/v1/chats/$chatId/messages";
+  static String addParticipants(dynamic chatId) => "api/v1/chats/$chatId/participants";
+  static String leaveGroup(dynamic chatId) => "api/v1/chats/$chatId/leave";
+  static String readReceipts(dynamic messageId) => "api/v1/chats/messages/$messageId/read-receipts";
 
 
   //    NOTIFICATIONS

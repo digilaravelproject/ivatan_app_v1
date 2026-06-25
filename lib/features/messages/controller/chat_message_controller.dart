@@ -5,11 +5,12 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart' hide MultipartFile;
 import 'package:i_vatan_app/core/helper/custom_snack_bar.dart';
-import 'package:i_vatan_app/db/shared_pref_manager.dart';
 import '../../../core/network/websocket_service.dart';
 import '../../../core/network/api_services.dart';
+import '../../../core/network/app_urls.dart';
 import '../model/chat_data_model.dart';
 import '../model/individualChatModel.dart';
+import '../model/read_receipt_model.dart';
 import 'chatt_controller.dart';
 
 /*
@@ -594,6 +595,7 @@ class ChatMessagesController extends GetxController {
       wsService.listen("message.sent", _onMessageSent);
       wsService.listen("message.edited", _onMessageEdited);
       wsService.listen("message.deleted", _onMessageDeleted);
+      wsService.listen("presence.changed", _onPresenceChanged);
 
       // Subscribe to Reverb presence channel for this chat
       await wsService.subscribe("presence-presence-chat.$chatId");
@@ -689,6 +691,38 @@ class ChatMessagesController extends GetxController {
     }
   }
 
+  void _onPresenceChanged(dynamic data) {
+    try {
+      final int userId = data["user_id"] ?? 0;
+      final bool isOnline = data["is_online"] ?? false;
+      final profile = chatProfile.value;
+      if (profile == null || userId == 0) return;
+
+      // Only update if this is a private chat and the userId matches a participant
+      if (profile.type == "private") {
+        final bool isMatch = profile.participants.any((p) => p.userId == userId);
+        if (!isMatch) return;
+
+        chatProfile.value = ChatListModel(
+          id: profile.id,
+          uuid: profile.uuid,
+          type: profile.type,
+          name: profile.name,
+          avatar: profile.avatar,
+          isOnline: isOnline,
+          isAdmin: profile.isAdmin,
+          unreadCount: profile.unreadCount,
+          lastMessage: profile.lastMessage,
+          updatedAt: profile.updatedAt,
+          participantsCount: profile.participantsCount,
+          participants: profile.participants,
+        );
+      }
+    } catch (e) {
+      print("Error in _onPresenceChanged: $e");
+    }
+  }
+
   void _updateChatListLastMessage(dynamic parsedData) {
     try {
       if (Get.isRegistered<ChattController>()) {
@@ -753,19 +787,37 @@ class ChatMessagesController extends GetxController {
         queryParams: nextCursor != null ? {"cursor": nextCursor} : null,
       );
 
-      print("fetchMessages response: $response");
+      print("📦 [ChatMessagesController] fetchMessages response: $response");
 
-      if (response != null && response["status"] == true && response['data'] is List) {
-        var apiList = response['data'] as List;
-        List<ChatMessage> fetchedMessages = apiList.map((e) => ChatMessage.fromJson(e)).toList();
+      if (response != null && response["status"] == true && response['data'] != null) {
+        final data = response['data'];
+        
+        List<ChatMessage>? fetchedMessages;
+        
+        // Handle nested structure: data -> messages -> data
+        if (data is Map && data['messages'] != null && data['messages']['data'] != null) {
+          final List<dynamic> rawList = data['messages']['data'];
+          print("✅ [ChatMessagesController] Found ${rawList.length} messages in nested structure");
+          fetchedMessages = rawList.map((e) => ChatMessage.fromJson(e)).toList();
+        }
+        // Handle direct array structure: data -> [array]
+        else if (data is List) {
+          print("✅ [ChatMessagesController] Found ${data.length} messages in direct array");
+          fetchedMessages = data.map((e) => ChatMessage.fromJson(e)).toList();
+        } else {
+          print("❌ [ChatMessagesController] Unexpected data structure: ${data.runtimeType}");
+        }
 
-        // API returns Newest First (Index 0).
-        // ListView(reverse: true) puts Index 0 at Bottom.
-        // So we keep the order as is (Newest First).
-        messages.assignAll(fetchedMessages);
+        if (fetchedMessages != null) {
+          // API returns Newest First (Index 0).
+          // ListView(reverse: true) puts Index 0 at Bottom.
+          // So we keep the order as is (Newest First).
+          messages.assignAll(fetchedMessages);
+          print("✅ [ChatMessagesController] Successfully loaded ${fetchedMessages.length} messages");
+        }
       }
     } catch (e, stk) {
-      print("fetchMessages error: $e,\n$stk");
+      print("❌ [ChatMessagesController] fetchMessages error: $e,\n$stk");
     } finally {
       isLoading.value = false;
       isMoreLoading.value = false;
@@ -818,6 +870,7 @@ class ChatMessagesController extends GetxController {
         wsService.removeListener("message.sent", _onMessageSent);
         wsService.removeListener("message.edited", _onMessageEdited);
         wsService.removeListener("message.deleted", _onMessageDeleted);
+        wsService.removeListener("presence.changed", _onPresenceChanged);
         wsService.unsubscribe("presence-presence-chat.$chatId");
       } catch (e) {
         print("WebSocket unsubscribe error on onClose: $e");
@@ -1016,5 +1069,100 @@ class ChatMessagesController extends GetxController {
     } catch (e) {
       print("deleteMessage error: $e");
     }
+  }
+
+  Future<ChatListModel?> fetchGroupDetails(int chatId) async {
+    try {
+      final response = await api.callGet("api/v1/chats/$chatId");
+      if (response != null && response["status"] == true) {
+        final fresh = ChatListModel.fromJson(response["data"]);
+        if (fresh.participantsCount == 0 && chatProfile.value != null) {
+          final merged = ChatListModel(
+            id: fresh.id,
+            uuid: fresh.uuid,
+            type: fresh.type,
+            name: fresh.name,
+            avatar: fresh.avatar,
+            isOnline: fresh.isOnline,
+            isAdmin: fresh.isAdmin,
+            unreadCount: fresh.unreadCount,
+            lastMessage: fresh.lastMessage,
+            updatedAt: fresh.updatedAt,
+            participantsCount: chatProfile.value!.participantsCount,
+            participants: fresh.participants.isNotEmpty ? fresh.participants : chatProfile.value!.participants,
+          );
+          chatProfile.value = merged;
+          return merged;
+        }
+        chatProfile.value = fresh;
+        return fresh;
+      }
+    } catch (e) {
+      print("fetchGroupDetails error: $e");
+    }
+    return null;
+  }
+
+  Future<bool> addParticipants(int chatId, List<int> memberIds) async {
+    try {
+      final response = await api.callPost(
+        AppUrls.addParticipants(chatId),
+        data: {"member_ids": memberIds},
+      );
+      if (response != null && response["status"] == true) {
+        CustomSnackBar.showSuccess(message: response["message"] ?? "Members added.");
+        return true;
+      }
+    } catch (e) {
+      print("addParticipants error: $e");
+    }
+    return false;
+  }
+
+  Future<bool> removeParticipant(int chatId, int userId) async {
+    try {
+      final response = await api.callPost(
+        AppUrls.leaveGroup(chatId),
+        data: {"user_id": userId},
+      );
+      if (response != null && response["status"] == true) {
+        CustomSnackBar.showSuccess(message: response["message"] ?? "Member removed.");
+        return true;
+      }
+    } catch (e) {
+      print("removeParticipant error: $e");
+    }
+    return false;
+  }
+
+  Future<bool> leaveGroup(int chatId) async {
+    try {
+      final response = await api.callPost(
+        AppUrls.leaveGroup(chatId),
+        data: {},
+      );
+      if (response != null && response["status"] == true) {
+        CustomSnackBar.showSuccess(message: response["message"] ?? "Left the group.");
+        return true;
+      }
+    } catch (e) {
+      print("leaveGroup error: $e");
+    }
+    return false;
+  }
+
+  Future<List<ReadReceiptReader>> getReadReceipts(int messageId) async {
+    try {
+      final response = await api.callGet(AppUrls.readReceipts(messageId));
+      if (response != null && response["status"] == true && response["data"] != null) {
+        final readers = (response["data"]["readers"] as List? ?? [])
+            .map((e) => ReadReceiptReader.fromJson(e))
+            .toList();
+        return readers;
+      }
+    } catch (e) {
+      print("getReadReceipts error: $e");
+    }
+    return [];
   }
 }
