@@ -362,7 +362,9 @@ class FeedPostWidget extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        child: Column(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Handle
@@ -434,8 +436,10 @@ class FeedPostWidget extends StatelessWidget {
             ),
             const SizedBox(height: 20),
           ],
+          ),
         ),
       ),
     );
   }
 }
+

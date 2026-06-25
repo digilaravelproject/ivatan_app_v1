@@ -895,7 +895,9 @@ class ChattingScreen extends GetView<ChatMessagesController> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Column(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).padding.bottom),
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 8),
@@ -992,6 +994,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
             ),
             const SizedBox(height: 6),
           ],
+          ),
         ),
       ),
     );
@@ -1010,7 +1013,9 @@ class ChattingScreen extends GetView<ChatMessagesController> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Column(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).padding.bottom),
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 8),
@@ -1083,6 +1088,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
               )),
             const SizedBox(height: 6),
           ],
+          ),
         ),
       ),
     );

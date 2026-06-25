@@ -619,13 +619,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           if (!isOtherProfile)
                                             InkWell(
                                               onTap: () {
+                                                final bottomPad = MediaQuery.of(context).padding.bottom;
                                                 Get.bottomSheet(
                                                   Container(
                                                     decoration: const BoxDecoration(
                                                       color: Colors.white,
                                                       borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
                                                     ),
-                                                    padding: const EdgeInsets.only(top: 12, bottom: 30, left: 20, right: 20),
+                                                    padding: EdgeInsets.fromLTRB(20, 12, 20, 30 + bottomPad),
                                                     child: Column(
                                                       mainAxisSize: MainAxisSize.min,
                                                       children: [
@@ -1074,9 +1075,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showUnfollowBottomSheet(dynamic user) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: EdgeInsets.only(top: 20, bottom: 20 + bottomPadding),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -1123,9 +1125,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showContactBottomSheet(dynamic user) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: EdgeInsets.only(top: 20, bottom: 20 + bottomPadding),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

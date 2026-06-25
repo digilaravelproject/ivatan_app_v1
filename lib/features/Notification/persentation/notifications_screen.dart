@@ -186,9 +186,10 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     final details = _getCategoryDetails(item.innerData?.category ?? '');
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final bottomPad = MediaQuery.of(context).padding.bottom;
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + bottomPad),
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkSurface : Colors.white,
           borderRadius: const BorderRadius.only(

@@ -148,10 +148,13 @@ class ProfileController extends GetxController {
 
 
   void showPickerOptions() {
+    final bottomPad = MediaQuery.of(Get.context!).padding.bottom;
     Get.bottomSheet(
       Container(
         color: const Color(0xFFf9f9f9),
-        child: Wrap(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: bottomPad),
+          child: Wrap(
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library),
@@ -170,6 +173,7 @@ class ProfileController extends GetxController {
               },
             ),
           ],
+          ),
         ),
       ),
     );
@@ -1049,9 +1053,10 @@ class SettingsController extends GetxController {
 
 
   void showPickerOptions() {
+    final bottomPad = MediaQuery.of(Get.context!).padding.bottom;
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + bottomPad),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

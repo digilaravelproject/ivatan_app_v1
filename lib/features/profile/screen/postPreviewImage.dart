@@ -535,7 +535,9 @@ class _PreviewScreenState extends State<PreviewScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-        child: Column(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Center(child: Container(margin: const EdgeInsets.only(top: 10, bottom: 6), width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)))),
@@ -545,6 +547,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
             _buildVisibilityOption(icon: Icons.lock, title: "Private", subtitle: "Only you can see this post", value: "private", color: Colors.orange),
             const SizedBox(height: 20),
           ],
+          ),
         ),
       ),
     );
