@@ -88,13 +88,14 @@ class HomePage extends StatelessWidget {
                 elevation: 0,
                 automaticallyImplyLeading: false,
                 toolbarHeight: 60,
+                titleSpacing: 0, // 👈 Left spacing remove
                 title: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // App Logo - Clean Circular
-                    Container(
-                      width: 32,
-                      height: 32,
+                    // Container(
+                    //   width: 32,
+                    //   height: 32,
                       // decoration: BoxDecoration(
                       //   shape: BoxShape.circle,
                       //   color: Colors.white,
@@ -106,25 +107,28 @@ class HomePage extends StatelessWidget {
                       //     ),
                       //   ],
                       // ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          AppAssets.AppLogo,
+                      //child: ClipOval(
+                      //  child:
+                        Image.asset(
+                          AppAssets.HomeAppLogo,
+                          width: 120,
+                          height: 120,
                           //fit: BoxFit.cover,
                         ),
-                      ),
-                    ),
-                    SizedBox(width: 2),
-                    // Vatan Text
-                    Text(
-                      "-Vatan",
-                      style: TextStyle(
-                        fontFamily: 'Billabong',
-                        fontSize: 24,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
+                     // ),
+                   // ),
+                    // SizedBox(width: 2),
+                    // // Vatan Text
+                    // Text(
+                    //   "-Vatan",
+                    //   style: TextStyle(
+                    //     fontFamily: 'Billabong',
+                    //     fontSize: 24,
+                    //     color: Colors.black,
+                    //     fontWeight: FontWeight.w600,
+                    //     letterSpacing: 0.3,
+                    //   ),
+                    // ),
                   ],
                 ),
                 actions: [
