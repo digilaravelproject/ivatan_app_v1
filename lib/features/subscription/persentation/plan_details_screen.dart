@@ -45,9 +45,12 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
       final fresh = await _controller.fetchPlanDetails(_plan.id);
       if (fresh != null && mounted) {
         setState(() {
-          // Preserve the local subscription status (active/pending/none) from the
-          // already-loaded plans list — only update content fields from API
-          _plan = fresh.copyWith(status: _plan.status);
+          // Preserve local subscription status and features from the
+          // already-loaded plans list if API returns empty
+          _plan = fresh.copyWith(
+            status: _plan.status,
+            features: fresh.features.isNotEmpty ? fresh.features : _plan.features,
+          );
         });
       }
     } catch (e) {

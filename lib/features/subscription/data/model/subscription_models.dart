@@ -83,6 +83,7 @@ class SubscriptionPlan {
 
   SubscriptionPlan copyWith({
     String? status,
+    List<PlanFeature>? features,
   }) {
     return SubscriptionPlan(
       id: id,
@@ -92,7 +93,7 @@ class SubscriptionPlan {
       description: description,
       isPopular: isPopular,
       status: status ?? this.status,
-      features: features,
+      features: features ?? this.features,
       slug: slug,
     );
   }
