@@ -649,9 +649,10 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   }
 
   void openReportBottomSheet({required int postId}) {
+    final bottomPad = MediaQuery.of(Get.context!).padding.bottom;
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+        padding: EdgeInsets.fromLTRB(20, 12, 20, 30 + bottomPad),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),

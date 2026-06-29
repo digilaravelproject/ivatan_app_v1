@@ -82,7 +82,7 @@ class CustomSearchableDropdown extends StatelessWidget {
           expand: false,
           builder: (context, scrollController) {
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              padding: EdgeInsets.fromLTRB(20, 16, 20, 16 + MediaQuery.of(context).padding.bottom),
               child: Column(
                 children: [
                    // Handle Bar

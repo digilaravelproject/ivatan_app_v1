@@ -59,10 +59,7 @@ class LiveChatInboxScreen extends StatelessWidget {
           // 🔍 Premium Search Bar Below Header
           _buildSearchBar(controller),
 
-          // 🏆 WhatsApp-Style Full-Width Underlined Tabs
-          _buildWhatsAppTabs(controller),
-
-          const Divider(height: 1, color: Color(0xFFE5E7EB)),
+          // Inbox chats list
 
           // Inbox chats list
           Expanded(
@@ -139,45 +136,7 @@ class LiveChatInboxScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWhatsAppTabs(LiveChatInboxController controller) {
-    final tabs = ["Groups", "Unread", "Read", "Business"];
 
-    return Container(
-      color: Colors.white,
-      child: Row(
-        children: tabs.map((tab) {
-          return Expanded(
-            child: Obx(() {
-              final isSelected = controller.selectedTab.value == tab;
-              return GestureDetector(
-                onTap: () => controller.changeTab(tab),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: isSelected ? AppColors.primary : Colors.transparent,
-                        width: 3.0,
-                      ),
-                    ),
-                  ),
-                  child: Text(
-                    tab,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                      color: isSelected ? AppColors.primary : Colors.grey[500],
-                    ),
-                  ),
-                ),
-              );
-            }),
-          );
-        }).toList(),
-      ),
-    );
-  }
 
   Widget _buildInboxRow(BuildContext context, ChatInboxModel chat, LiveChatInboxController controller) {
     final lastMsg = chat.lastMessage;
@@ -223,6 +182,7 @@ class LiveChatInboxScreen extends StatelessWidget {
 
     return InkWell(
       onTap: () {
+        controller.markChatAsReadLocally(chatId);
         Get.to(
           () => const LiveGroupChatScreen(),
           arguments: {

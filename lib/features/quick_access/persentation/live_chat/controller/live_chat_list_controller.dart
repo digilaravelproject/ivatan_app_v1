@@ -7,7 +7,6 @@ import '../repository/live_chat_repository.dart';
 // 🚀 GETX CONTROLLER FOR LIVE CHAT GROUPS LIST (CLEAN ARCHITECTURE)
 // =========================================================================
 class LiveChatListController extends GetxController {
-  RxString selectedTab = "Groups".obs;
   RxString searchQuery = "".obs;
   RxBool isLoading = false.obs;
   RxList<ChatInboxModel> groupsList = <ChatInboxModel>[].obs;
@@ -166,24 +165,31 @@ class LiveChatListController extends GetxController {
   }
 
   void changeTab(String tabName) {
-    selectedTab.value = tabName;
-    fetchGroups();
+    // Removed tab functionality - always use live_groups filter
   }
 
   Future<void> fetchGroups() async {
     try {
       isLoading.value = true;
-      final list = await _repository.fetchChats(filter: selectedTab.value.toLowerCase());
+      print("🔄 [LiveChatListController] Starting fetchGroups with filter: live_groups");
+      
+      // Always use 'live_groups' filter as per requirement
+      final list = await _repository.fetchChats(filter: 'live_groups');
 
-      if (list != null) {
+      print("📦 [LiveChatListController] Received list: ${list?.length ?? 0} items");
+
+      if (list != null && list.isNotEmpty) {
         groupsList.assignAll(list);
         _filterList();
+        print("✅ [LiveChatListController] Groups loaded successfully: ${groupsList.length}");
         return;
       }
 
+      print("⚠️ [LiveChatListController] API returned null or empty, loading mock data");
       _loadMockGroups();
-    } catch (e) {
-      print("Fetch Groups Error: $e");
+    } catch (e, stackTrace) {
+      print("❌ [LiveChatListController] Fetch Groups Error: $e");
+      print("Stack trace: $stackTrace");
       _loadMockGroups();
     } finally {
       isLoading.value = false;
@@ -191,21 +197,20 @@ class LiveChatListController extends GetxController {
   }
 
   void _loadMockGroups() {
-    final parsedMock = mockGroupsJson.map((e) => ChatInboxModel.fromJson(e)).toList();
-    var list = parsedMock;
-
-    if (selectedTab.value == "Groups") {
-      list = list.where((g) => g.type == "group").toList();
-    } else if (selectedTab.value == "Unread") {
-      list = list.where((g) => g.unreadCount > 0).toList();
-    } else if (selectedTab.value == "Read") {
-      list = list.where((g) => g.unreadCount == 0).toList();
-    } else if (selectedTab.value == "Business") {
-      list = list.where((g) => g.type == "business").toList();
-    }
-
-    groupsList.assignAll(list);
+    print("📝 [LiveChatListController] Loading mock groups for testing");
+    final parsedMock = mockGroupsJson.map((e) {
+      try {
+        return ChatInboxModel.fromJson(e);
+      } catch (error) {
+        print("❌ [LiveChatListController] Error parsing mock item: $error");
+        print("Mock item: $e");
+        rethrow;
+      }
+    }).toList();
+    // Load all groups - no filtering needed since API filter handles it
+    groupsList.assignAll(parsedMock);
     _filterList();
+    print("✅ [LiveChatListController] Mock groups loaded: ${groupsList.length}");
   }
 
   void _filterList() {

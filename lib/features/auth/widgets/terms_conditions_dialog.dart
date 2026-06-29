@@ -40,9 +40,14 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
   Future<void> _openUrl(String urlString) async {
     final Uri url = Uri.parse(urlString);
     try {
+      bool launched = false;
       if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      } else {
+        launched = await launchUrl(url, mode: LaunchMode.externalApplication);
+      }
+      if (!launched) {
+        launched = await launchUrl(url, mode: LaunchMode.platformDefault);
+      }
+      if (!launched) {
         Get.snackbar(
           "Notice",
           "Could not open link directly. Opening defaults.",
@@ -50,11 +55,22 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
         );
       }
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Unable to load link.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      try {
+        bool launched = await launchUrl(url, mode: LaunchMode.platformDefault);
+        if (!launched) {
+          Get.snackbar(
+            "Error",
+            "Unable to load link.",
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      } catch (e2) {
+        Get.snackbar(
+          "Error",
+          "Unable to load link.",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
     }
   }
 

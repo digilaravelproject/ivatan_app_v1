@@ -88,13 +88,14 @@ class HomePage extends StatelessWidget {
                 elevation: 0,
                 automaticallyImplyLeading: false,
                 toolbarHeight: 60,
+                titleSpacing: 0, // 👈 Left spacing remove
                 title: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // App Logo - Clean Circular
-                    Container(
-                      width: 32,
-                      height: 32,
+                    // Container(
+                    //   width: 32,
+                    //   height: 32,
                       // decoration: BoxDecoration(
                       //   shape: BoxShape.circle,
                       //   color: Colors.white,
@@ -106,25 +107,28 @@ class HomePage extends StatelessWidget {
                       //     ),
                       //   ],
                       // ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          AppAssets.AppLogo,
+                      //child: ClipOval(
+                      //  child:
+                        Image.asset(
+                          AppAssets.HomeAppLogo,
+                          width: 120,
+                          height: 120,
                           //fit: BoxFit.cover,
                         ),
-                      ),
-                    ),
-                    SizedBox(width: 2),
-                    // Vatan Text
-                    Text(
-                      "-Vatan",
-                      style: TextStyle(
-                        fontFamily: 'Billabong',
-                        fontSize: 24,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
+                     // ),
+                   // ),
+                    // SizedBox(width: 2),
+                    // // Vatan Text
+                    // Text(
+                    //   "-Vatan",
+                    //   style: TextStyle(
+                    //     fontFamily: 'Billabong',
+                    //     fontSize: 24,
+                    //     color: Colors.black,
+                    //     fontWeight: FontWeight.w600,
+                    //     letterSpacing: 0.3,
+                    //   ),
+                    // ),
                   ],
                 ),
                 actions: [
@@ -1145,7 +1149,9 @@ class HomePage extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
-            child: Column(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+              child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Handle
@@ -1263,10 +1269,13 @@ class HomePage extends StatelessWidget {
                 SizedBox(height: 20),
               ],
             ),
+            ),
           ),
     );
   }
 }
+
+
 
 class CommentsBottomSheet extends StatefulWidget {
   final int postId;
@@ -1301,7 +1310,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
+        bottom: MediaQuery.of(context).viewInsets.bottom + MediaQuery.of(context).padding.bottom,
       ),
       child: DraggableScrollableSheet(
         initialChildSize: 0.75,
@@ -4699,7 +4708,9 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
             color: Color(0xFF151515),
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          padding: EdgeInsets.fromLTRB(
+            24, 20, 24, 20 + MediaQuery.of(context).padding.bottom,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

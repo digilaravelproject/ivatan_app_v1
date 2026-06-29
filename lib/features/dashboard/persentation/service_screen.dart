@@ -118,6 +118,7 @@ void _showEnquiryBottomSheet(BuildContext context) {
     builder: (context) {
       return Container(
         height: 200,
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
         child: Center(
           child: Text("Bottom Sheet Content"),
         ),

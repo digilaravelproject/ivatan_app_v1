@@ -13,7 +13,7 @@ class WebSocketService extends GetxService {
   bool _isConnecting = false;
   bool _isConnected = false;
   String? _socketId;
-  final String _appKey = "1c97cfa884ecb61e0959"; // Default app key for Reverb
+  final String _appKey = "cvtm70sqh0nz9ogq1cza"; // Default app key for Reverb
 
   // Track active subscriptions to resubscribe on reconnection
   final Set<String> _activeChannels = {};
@@ -46,9 +46,9 @@ class WebSocketService extends GetxService {
     }
 
     return [
+      "wss://$baseHost/app/$_appKey?protocol=7&client=js&version=7.0.3&flash=false",
       "wss://socket.ivatan.com/app/$_appKey?protocol=7&client=js&version=7.0.3&flash=false",
       "wss://$alternateHost/app/$_appKey?protocol=7&client=js&version=7.0.3&flash=false",
-      "wss://$baseHost/app/$_appKey?protocol=7&client=js&version=7.0.3&flash=false",
     ];
   }
 
@@ -58,7 +58,7 @@ class WebSocketService extends GetxService {
     if (!base.endsWith("/")) {
       base += "/";
     }
-    return "${base}api/v1/broadcasting/auth";
+    return "${base}api/broadcasting/auth";
   }
 
   /// Initializes and connects to the WebSocket if user is logged in

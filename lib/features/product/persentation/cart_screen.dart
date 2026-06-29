@@ -520,6 +520,7 @@ class CartScreen extends StatelessWidget {
   }
 
   void _showAddressBottomSheet(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     Get.bottomSheet(
       Container(
         height: Get.height * 0.7,
@@ -527,7 +528,9 @@ class CartScreen extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        child: Column(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: bottomPadding),
+          child: Column(
           children: [
             Container(
               margin: EdgeInsets.only(top: 8),
@@ -601,6 +604,7 @@ class CartScreen extends StatelessWidget {
               }),
             ),
           ],
+          ),
         ),
       ),
     );

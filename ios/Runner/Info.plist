@@ -57,6 +57,19 @@
     <true/>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+      <string>https</string>
+      <string>http</string>
+      <string>tel</string>
+      <string>mailto</string>
+      <string>sms</string>
+      <string>upi</string>
+      <string>phonepe</string>
+      <string>paytm</string>
+      <string>gpay</string>
+      <string>tez</string>
+    </array>
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>

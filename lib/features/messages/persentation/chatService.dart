@@ -29,7 +29,7 @@ class ChatService {
 
       // Initialize Pusher client
       _pusher = PusherClient(
-        '1c97cfa884ecb61e0959', // your apiKey
+        'cvtm70sqh0nz9ogq1cza', // your apiKey
         options,
         autoConnect: false,
         enableLogging: true, // optional, for debug

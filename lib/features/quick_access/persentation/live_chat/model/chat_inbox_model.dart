@@ -14,6 +14,14 @@ class ChatInboxModel {
   final String description;
   final ChatMessageModel? lastMessage;
   final String lastMessageAt;
+  
+  // New fields from /api/v1/live-chat-groups endpoint
+  final String? slug;
+  final bool? isActive;
+  final int? chatId;
+  final bool? isBanned;
+  final bool? isMuted;
+  final String? createdAt;
 
   ChatInboxModel({
     required this.id,
@@ -29,6 +37,12 @@ class ChatInboxModel {
     required this.description,
     this.lastMessage,
     required this.lastMessageAt,
+    this.slug,
+    this.isActive,
+    this.chatId,
+    this.isBanned,
+    this.isMuted,
+    this.createdAt,
   });
 
   factory ChatInboxModel.fromJson(Map<String, dynamic> json) {
@@ -48,6 +62,12 @@ class ChatInboxModel {
           ? ChatMessageModel.fromJson(json['last_message'])
           : null,
       lastMessageAt: json['last_message_at'] ?? json['updated_at'] ?? "",
+      slug: json['slug'],
+      isActive: json['is_active'],
+      chatId: json['chat_id'],
+      isBanned: json['is_banned'],
+      isMuted: json['is_muted'],
+      createdAt: json['created_at'],
     );
   }
 
@@ -66,6 +86,12 @@ class ChatInboxModel {
       'description': description,
       'last_message': lastMessage?.toJson(),
       'last_message_at': lastMessageAt,
+      'slug': slug,
+      'is_active': isActive,
+      'chat_id': chatId,
+      'is_banned': isBanned,
+      'is_muted': isMuted,
+      'created_at': createdAt,
     };
   }
 }

@@ -1,15 +1,14 @@
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:i_vatan_app/core/constants/app_assets.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:i_vatan_app/core/helper/custom_snack_bar.dart';
-import '../../../../core/widgets/coming_soon_dialog.dart';
+import 'package:i_vatan_app/route/app_pages.dart';
 import '../controller/chat_message_controller.dart';
 import '../model/individualChatModel.dart';
 import 'package:flutter/foundation.dart' as foundation;
@@ -20,15 +19,28 @@ import 'package:url_launcher/url_launcher.dart';
 class ChattingScreen extends GetView<ChatMessagesController> {
   const ChattingScreen({super.key});
 
+  // Helper method to scroll to bottom
+  void _scrollToBottom(ScrollController scrollController) {
+    if (scrollController.hasClients) {
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    // Create scroll controller for auto-scrolling to bottom
+    final ScrollController scrollController = ScrollController();
+    
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
         if (controller.isEmojiVisible.value) {
           controller.isEmojiVisible.value = false;
-          return false;
         }
-        return true;
       },
       child: Scaffold(
         backgroundColor: Colors.white, // Clean White Background
@@ -47,15 +59,35 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                   return _buildEmptyState();
                 }
 
-                return ListView.builder(
-                  reverse: true,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  itemCount: controller.messages.length,
-                  itemBuilder: (context, index) {
-                    final message = controller.messages[index];
-                    final isMe = message.isMine;
-                    return _buildMessageBubble(context, message, isMe);
+                // Auto-scroll to bottom only once when messages are loaded
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _scrollToBottom(scrollController);
+                });
+
+                return RefreshIndicator(
+                  color: AppColors.primary,
+                  onRefresh: () async {
+                    final chatId = controller.chatProfile.value?.id;
+                    if (chatId != null) {
+                      await controller.fetchMessages(chatId);
+                      // Auto-scroll to bottom after refresh
+                      _scrollToBottom(scrollController);
+                    }
                   },
+                  child: ListView.builder(
+                    controller: scrollController,
+                    reverse: false, // Changed from true to false - no more bottom alignment
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    itemCount: controller.messages.length,
+                    itemBuilder: (context, index) {
+                      // Reverse the index to show latest messages at bottom
+                      final reversedIndex = controller.messages.length - 1 - index;
+                      final message = controller.messages[reversedIndex];
+                      final isMe = message.isMine;
+                      
+                      return _buildMessageBubble(context, message, isMe);
+                    },
+                  ),
                 );
               }),
             ),
@@ -121,25 +153,36 @@ class ChattingScreen extends GetView<ChatMessagesController> {
       ),
       title: Obx(() {
         final profile = controller.chatProfile.value;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              profile?.name ?? "User",
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black, // Dark Text
+        final isGroup = profile?.type == "group";
+        return InkWell(
+          onTap: () {
+            if (isGroup && profile != null) {
+              Get.toNamed(AppRoutes.groupDetailsScreen, arguments: profile);
+            }
+          },
+          borderRadius: BorderRadius.circular(8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                profile?.name ?? "User",
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
-            ),
-            const Text(
-              "Online", // Dynamic status if available
+            Text(
+              isGroup
+                  ? "${profile?.participantsCount ?? 0} participants"
+                  : (profile?.isOnline == true ? "Online" : "Offline"),
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.green, // Accent for status
+                color: isGroup ? Colors.grey : (profile?.isOnline == true ? Colors.green : Colors.grey),
               ),
             ),
-          ],
+            ],
+          ),
         );
       }),
       /*actions: [
@@ -193,47 +236,50 @@ class ChattingScreen extends GetView<ChatMessagesController> {
     final avatarUrl = message.sender?.avatar;
     final senderName = message.sender?.name;
 
-    Widget bubble = Container(
-      margin: const EdgeInsets.symmetric(vertical: 2), // Tighter spacing
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.75,
-      ),
-      decoration: BoxDecoration(
-        color: isMe ? AppColors.black : Colors.grey.shade100, // Black vs Grey
-        borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(18),
-          topRight: const Radius.circular(18),
-          bottomLeft: Radius.circular(isMe ? 18 : 4),
-          bottomRight: Radius.circular(isMe ? 4 : 18),
+    Widget bubble = GestureDetector(
+      onLongPress: () => _showMessageOptions(context, message),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 2), // Tighter spacing
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          _buildMessageContent(context, message, isMe),
-          const SizedBox(height: 4),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                formatChatTime(message.createdAt.toString()),
-                style: TextStyle(
-                  fontSize: 10,
-                  color: isMe ? Colors.grey.shade400 : Colors.grey.shade500,
-                ),
-              ),
-              if (isMe) ...[
-                const SizedBox(width: 4),
-                Icon(
-                  Icons.done_all, 
-                  size: 14, 
-                  color: message.status == "read" ? Colors.blueAccent : Colors.grey.shade500,
-                ),
-              ],
-            ],
+        decoration: BoxDecoration(
+          color: isMe ? AppColors.black : Colors.grey.shade100, // Black vs Grey
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(18),
+            topRight: const Radius.circular(18),
+            bottomLeft: Radius.circular(isMe ? 18 : 4),
+            bottomRight: Radius.circular(isMe ? 4 : 18),
           ),
-        ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            _buildMessageContent(context, message, isMe),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  formatChatTime(message.createdAt.toString()),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: isMe ? Colors.grey.shade400 : Colors.grey.shade500,
+                  ),
+                ),
+                if (isMe) ...[
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.done_all, 
+                    size: 14, 
+                    color: message.status == "read" ? Colors.blueAccent : Colors.grey.shade500,
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
 
@@ -397,12 +443,12 @@ class ChattingScreen extends GetView<ChatMessagesController> {
 
 
 
-  void _showAttachmentBottomSheet(BuildContext context) {
+  /*void _showAttachmentBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        height: 280,
+        height: 180,
         margin: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -468,7 +514,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                       }
                     }
                   ),
-                  _attachmentItem(
+                  *//*_attachmentItem(
                     icon: Icons.headphones, 
                     color: Colors.deepOrange, 
                     label: "Audio",
@@ -502,6 +548,147 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                       Navigator.pop(context);
                       // TODO: Implement Contact Sharing
                     }
+                  ),*//*
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }*/
+
+
+  void _showAttachmentBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: EdgeInsets.only(
+          top: 12, 
+          bottom: MediaQuery.of(context).padding.bottom + 20,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(24),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Drag Handle
+            Container(
+              width: 50,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Header with Title and Close Icon on Right
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  const Text(
+                    "Share Attachment",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.close, size: 18, color: Colors.black54),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _attachmentItem(
+                    icon: Icons.insert_drive_file_rounded,
+                    color: Colors.deepPurple,
+                    label: "Document",
+                    onTap: () async {
+                      Navigator.pop(context);
+
+                      try {
+                        FilePickerResult? result =
+                        await FilePicker.platform.pickFiles();
+
+                        if (result != null &&
+                            result.files.single.path != null) {
+                          controller.sendFile(
+                            File(result.files.single.path!),
+                            "file",
+                          );
+                        }
+                      } catch (e) {
+                        debugPrint("Error picking file: $e");
+                      }
+                    },
+                  ),
+
+                  _attachmentItem(
+                    icon: Icons.camera_alt_rounded,
+                    color: Colors.pink,
+                    label: "Camera",
+                    onTap: () async {
+                      Navigator.pop(context);
+
+                      final picker = ImagePicker();
+                      final image = await picker.pickImage(
+                        source: ImageSource.camera,
+                      );
+
+                      if (image != null) {
+                        controller.sendFile(
+                          File(image.path),
+                          "image",
+                        );
+                      }
+                    },
+                  ),
+
+                  _attachmentItem(
+                    icon: Icons.photo_library_rounded,
+                    color: Colors.blue,
+                    label: "Gallery",
+                    onTap: () async {
+                      Navigator.pop(context);
+
+                      final picker = ImagePicker();
+                      final image = await picker.pickImage(
+                        source: ImageSource.gallery,
+                      );
+
+                      if (image != null) {
+                        controller.sendFile(
+                          File(image.path),
+                          "image",
+                        );
+                      }
+                    },
                   ),
                 ],
               ),
@@ -603,10 +790,26 @@ class ChattingScreen extends GetView<ChatMessagesController> {
         onTap: () async {
           if (url.isNotEmpty) {
             final Uri uri = Uri.parse(url);
-            if (await canLaunchUrl(uri)) {
-              await launchUrl(uri, mode: LaunchMode.externalApplication);
-            } else {
-              CustomSnackBar.showError(message: "Could not open attachment URL");
+            try {
+              bool launched = false;
+              if (await canLaunchUrl(uri)) {
+                launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+              if (!launched) {
+                launched = await launchUrl(uri, mode: LaunchMode.platformDefault);
+              }
+              if (!launched) {
+                CustomSnackBar.showError(message: "Could not open attachment URL");
+              }
+            } catch (e) {
+              try {
+                bool launched = await launchUrl(uri, mode: LaunchMode.platformDefault);
+                if (!launched) {
+                  CustomSnackBar.showError(message: "Could not open attachment URL");
+                }
+              } catch (e2) {
+                CustomSnackBar.showError(message: "Could not open attachment URL");
+              }
             }
           }
         },
@@ -680,6 +883,243 @@ class ChattingScreen extends GetView<ChatMessagesController> {
     if (bytes < 1024) return "$bytes B";
     if (bytes < 1024 * 1024) return "${(bytes / 1024).toStringAsFixed(1)} KB";
     return "${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB";
+  }
+
+  void _showMessageOptions(BuildContext context, ChatMessage message) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        margin: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).padding.bottom),
+          child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 38,
+              height: 4.5,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            _buildOptionRow(
+              icon: Icons.reply_rounded,
+              label: "Reply",
+              color: Colors.black87,
+              onTap: () {
+                Navigator.pop(ctx);
+                // TODO: Implement reply functionality
+                CustomSnackBar.showInfo(message: "Reply feature coming soon!");
+              },
+            ),
+
+            _buildOptionRow(
+              icon: Icons.copy_rounded,
+              label: "Copy",
+              color: Colors.black87,
+              onTap: () {
+                Navigator.pop(ctx);
+                Clipboard.setData(ClipboardData(text: message.content));
+                CustomSnackBar.showSuccess(message: "Message copied to clipboard!");
+              },
+            ),
+
+            // Read by option - only for own messages in group chats
+            if (message.isMine && controller.chatProfile.value?.type == "group")
+              _buildOptionRow(
+                icon: Icons.visibility_rounded,
+                label: "Read by",
+                color: Colors.blue,
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _showReadReceipts(context, message);
+                },
+              ),
+
+            _buildOptionRow(
+              icon: Icons.delete_outline_rounded,
+              label: "Delete for me",
+              color: Colors.red.shade300,
+              onTap: () async {
+                Navigator.pop(ctx);
+                await controller.deleteMessage(message.id.toString(), deleteForEveryOne: false);
+                CustomSnackBar.showInfo(message: "Message deleted.");
+              },
+            ),
+
+            // Only owner can delete for everyone
+            if (message.isMine)
+              _buildOptionRow(
+                icon: Icons.delete_forever_rounded,
+                label: "Delete for everyone",
+                color: Colors.red,
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  await controller.deleteMessage(message.id.toString(), deleteForEveryOne: true);
+                  CustomSnackBar.showSuccess(message: "Message deleted for everyone.");
+                },
+              ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: GestureDetector(
+                onTap: () => Navigator.pop(ctx),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  child: const Text(
+                    "Cancel",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+          ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showReadReceipts(BuildContext context, ChatMessage message) async {
+    final readers = await controller.getReadReceipts(message.id);
+    if (!context.mounted) return;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        margin: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).padding.bottom),
+          child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 38,
+              height: 4.5,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Row(
+                children: [
+                  const Icon(Icons.visibility_rounded, color: Colors.blue, size: 20),
+                  const SizedBox(width: 10),
+                  Text(
+                    "Read by ${readers.length}",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(),
+            if (readers.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 30),
+                child: Text(
+                  "No one has read this yet",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              )
+            else
+              ...readers.map((reader) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.grey[200],
+                      backgroundImage: reader.avatar.isNotEmpty
+                          ? NetworkImage(reader.avatar)
+                          : null,
+                      child: reader.avatar.isEmpty
+                          ? Text(
+                              reader.name.isNotEmpty
+                                  ? reader.name[0].toUpperCase()
+                                  : "?",
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        reader.name,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+            const SizedBox(height: 6),
+          ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOptionRow({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 22),
+            const SizedBox(width: 14),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14.5,
+                fontWeight: FontWeight.w500,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

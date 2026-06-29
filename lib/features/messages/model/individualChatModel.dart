@@ -1,3 +1,5 @@
+import 'package:i_vatan_app/db/shared_pref_manager.dart';
+
 class ChatMessagesData {
   final List<ChatMessage> data;
   final String path;
@@ -77,13 +79,22 @@ class ChatMessage {
   });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
+    final int currentUserId = SharedPrefManager().user?.id ?? 0;
+    final senderMap = json['sender'];
+    final int senderId = senderMap != null ? (senderMap['id'] ?? 0) : 0;
+    
+    // Determine isMine dynamically by comparing sender's ID with logged-in user's ID
+    final bool calculatedIsMine = (currentUserId != 0 && senderId != 0)
+        ? (senderId == currentUserId)
+        : (json['is_mine'] ?? false);
+
     return ChatMessage(
       id: json['id'] ?? 0,
       chatId: json['chat_id'] ?? 0,
       content: json['content'] ?? "",
       messageType: json['message_type'] ?? "",
       attachmentUrl: json['attachment_url'],
-      isMine: json['is_mine'] ?? false,
+      isMine: calculatedIsMine,
       status: json['status'] ?? "",
       createdAt: json['created_at'] ?? "",
       sender: json['sender'] != null ? Sender.fromJson(json['sender']) : null,

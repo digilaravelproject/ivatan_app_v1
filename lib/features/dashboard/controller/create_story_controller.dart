@@ -431,9 +431,10 @@ class StoryController extends GetxController {
   }
 
   Future<void> showMoreOption() async {
+    final bottomPad = MediaQuery.of(Get.context!).padding.bottom;
     await Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: EdgeInsets.only(top: 20, bottom: 20 + bottomPad),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(
@@ -490,9 +491,10 @@ class StoryController extends GetxController {
   }
 
   void addToHighlight() {
+    final bottomPad = MediaQuery.of(Get.context!).padding.bottom;
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: EdgeInsets.only(top: 20, bottom: 20 + bottomPad),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(
@@ -729,9 +731,10 @@ class StoryController extends GetxController {
 
   void createNewHighlight() {
     captionCtrl.clear();
+    final bottomPad = MediaQuery.of(Get.context!).padding.bottom;
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.only(top: 20),
+        padding: EdgeInsets.only(top: 20, bottom: bottomPad),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(

@@ -58,16 +58,19 @@ void showServiceDetailBottomSheet(BuildContext context, int serviceId, {bool isO
                 topRight: Radius.circular(25),
               ),
             ),
-            child: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    controller: scrollController,
-                    child: _buildServiceDetailContent(context, service),
+            child: Padding(
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: scrollController,
+                      child: _buildServiceDetailContent(context, service),
+                    ),
                   ),
-                ),
-                _buildActionButtons(context, service, ownService),
-              ],
+                  _buildActionButtons(context, service, ownService),
+                ],
+              ),
             ),
           );
         },

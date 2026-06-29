@@ -135,8 +135,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                      !isFollowing;
               debugPrint("Profile Debug: user=${user.username}, isOtherProfile=$isOtherProfile, isCurrentlyOther=$isCurrentlyOther, isSeller=${user.isSeller}, profileType=${user.profileType}, profileSubType=${user.profileSubType}");
              // Build dynamic tabs and views
-             final bool showProductTab = isCurrentlyOther || ProfilePermissionManager.canProfileSellProducts(user, isCurrentlyOther);
-             final bool showServiceTab = isCurrentlyOther || ProfilePermissionManager.canProfileProvideServices(user, isCurrentlyOther);
+             bool showProductTab = false;
+             bool showServiceTab = false;
+
+             if (isCurrentlyOther) {
+               final pType = user.profileType?.toLowerCase();
+               showProductTab = (pType == 'product' || pType == 'both');
+               showServiceTab = (pType == 'service' || pType == 'both');
+             } else {
+               showProductTab = ProfilePermissionManager.canProfileSellProducts(user, isCurrentlyOther);
+               showServiceTab = ProfilePermissionManager.canProfileProvideServices(user, isCurrentlyOther);
+             }
 
              List<Tab> tabs = [
                Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 
@@ -610,13 +619,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           if (!isOtherProfile)
                                             InkWell(
                                               onTap: () {
+                                                final bottomPad = MediaQuery.of(context).padding.bottom;
                                                 Get.bottomSheet(
                                                   Container(
                                                     decoration: const BoxDecoration(
                                                       color: Colors.white,
                                                       borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
                                                     ),
-                                                    padding: const EdgeInsets.only(top: 12, bottom: 30, left: 20, right: 20),
+                                                    padding: EdgeInsets.fromLTRB(20, 12, 20, 30 + bottomPad),
                                                     child: Column(
                                                       mainAxisSize: MainAxisSize.min,
                                                       children: [
@@ -1065,9 +1075,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showUnfollowBottomSheet(dynamic user) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: EdgeInsets.only(top: 20, bottom: 20 + bottomPadding),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -1114,9 +1125,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showContactBottomSheet(dynamic user) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     Get.bottomSheet(
       Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: EdgeInsets.only(top: 20, bottom: 20 + bottomPadding),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

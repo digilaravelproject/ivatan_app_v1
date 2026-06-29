@@ -104,8 +104,8 @@ class NotificationPayload {
 
   factory NotificationPayload.fromJson(Map<String, dynamic> json) {
     return NotificationPayload(
-      title: json['title'] ?? '',
-      message: json['message'] ?? '',
+      title: json['title'] ?? json['sender_name'] ?? '',
+      message: json['message'] ?? json['content'] ?? '',
       actorId: json['actor_id'],
       actorName: json['actor_name'],
       actorAvatar: json['actor_avatar'],

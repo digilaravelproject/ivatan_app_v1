@@ -507,8 +507,9 @@ class _VideosScreenState extends State<VideosScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        padding: const EdgeInsets.all(20),
-        child: Column(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + MediaQuery.of(context).padding.bottom),
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -571,6 +572,7 @@ class _VideosScreenState extends State<VideosScreen> {
             ),
             const SizedBox(height: 10),
           ],
+          ),
         ),
       ),
     );

@@ -14,6 +14,8 @@ import '../features/job_portal/persentation/pages/job_portal_page.dart';
 import '../features/job_portal/persentation/pages/my_jobs.dart';
 import '../features/messages/binding/chat_binding.dart';
 import '../features/messages/persentation/chatting_screen.dart';
+import '../features/messages/persentation/create_group_screen.dart';
+import '../features/messages/persentation/group_details_screen.dart';
 
 import '../features/job_portal/binding/applicant_binding.dart';
 import '../features/job_portal/persentation/pages/applicant_list.dart';
@@ -38,6 +40,8 @@ class AppRoutes {
   static const String dashboard = '/dashboard';
   static const String navigationScreen = '/navigationScreen';
   static const String chattingScreen = '/chattingScreen';
+  static const String createGroupScreen = '/createGroupScreen';
+  static const String groupDetailsScreen = '/groupDetailsScreen';
   static const String notifications = '/notifications';
 
 
@@ -76,6 +80,18 @@ class AppRoutes {
     GetPage(
       name: AppRoutes.chattingScreen,
       page: () => ChattingScreen(),
+      binding: ChatBinding(),
+      transition: Transition.cupertino,
+    ),
+    GetPage(
+      name: AppRoutes.createGroupScreen,
+      page: () => const CreateGroupScreen(),
+      binding: ChatBinding(),
+      transition: Transition.cupertino,
+    ),
+    GetPage(
+      name: AppRoutes.groupDetailsScreen,
+      page: () => const GroupDetailsScreen(),
       binding: ChatBinding(),
       transition: Transition.cupertino,
     ),

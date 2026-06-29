@@ -10,6 +10,7 @@ class AppAssets {
   static const String imgLive = "assets/images/live.png";
   static const String imgAppLogo = "assets/images/imageApplogo.jpg";
   static const String AppLogo = "assets/images/i_app.jpeg";
+  static const String HomeAppLogo = "assets/images/home_app_icon.png";
   static const String imgverified = "assets/images/verified.jpeg";
   static const String imgLike = "assets/images/like.png";
   static const String imgShare = "assets/images/share.png";

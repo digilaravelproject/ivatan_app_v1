@@ -52,7 +52,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       data: req.toPasswordMap(),
      // data: req.toMap(),
-      isFormData: true,
+      isFormData: false,
     );
     if (response == null) {
       throw Exception("Invalid Credentials");

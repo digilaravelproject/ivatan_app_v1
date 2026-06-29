@@ -421,7 +421,8 @@ class SellerOrderDetailScreen extends StatelessWidget {
       ),
       builder: (context) {
         return Container(
-          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Padding(
+            padding: EdgeInsets.only(top: 20, bottom: 20 + MediaQuery.of(context).padding.bottom),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -455,6 +456,7 @@ class SellerOrderDetailScreen extends StatelessWidget {
               )),
             //  const SizedBox(height: 20),
             ],
+            ),
           ),
         );
       },

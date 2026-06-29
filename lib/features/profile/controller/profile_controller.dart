@@ -46,10 +46,13 @@ import 'package:i_vatan_app/core/theme/app_colors.dart';
 
 
   void showPickerOptions() {
+    final bottom = MediaQuery.of(Get.context!).padding.bottom;
     Get.bottomSheet(
       Container(
         color: const Color(0xFFf9f9f9),
-        child: Wrap(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: bottom),
+          child: Wrap(
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library),
@@ -68,6 +71,7 @@ import 'package:i_vatan_app/core/theme/app_colors.dart';
               },
             ),
           ],
+          ),
         ),
       ),
     );
@@ -382,13 +386,16 @@ class ProfileController extends GetxController {
     final bool isVideoType = selectedType.value == "reel" || selectedType.value == "video";
     final bool isStoryType = selectedType.value == "story";
 
+    final bottomPad = MediaQuery.of(Get.context!).padding.bottom;
     Get.bottomSheet(
       Container(
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        child: Column(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: bottomPad),
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Handle
@@ -483,6 +490,7 @@ class ProfileController extends GetxController {
             
             const SizedBox(height: 20),
           ],
+          ),
         ),
       ),
     );

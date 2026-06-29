@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/core/network/app_urls.dart';
-import 'package:i_vatan_app/features/auth/persentation/new_password.dart';
 
 import '../../../core/helper/custom_snack_bar.dart';
 import '../../../core/helper/logger_helper.dart';
@@ -19,6 +18,7 @@ import 'intrest_controller.dart';
 import '../persentation/interest_screen.dart';
 import '../controller/register_controller.dart';
 import 'package:i_vatan_app/features/Notification/controller/notification_controller.dart';
+import '../../../core/network/websocket_service.dart';
 
 class LoginController extends GetxController {
   final AuthRemoteDataSource authDataSource;
@@ -156,12 +156,20 @@ class LoginController extends GetxController {
         print("Notification init error on password login: $e");
       }
 
+      try {
+        if (Get.isRegistered<WebSocketService>()) {
+          Get.find<WebSocketService>().connect();
+        }
+      } catch (e) {
+        print("WebSocket connect error on password login: $e");
+      }
+
       Get.offAllNamed(AppRoutes.navigationScreen);
 
       CustomSnackBar.showSuccess(message: msg);
     } catch (e, stk) {
       printMessage("Exception : " + e.toString() + "\n$stk");
-   //   CustomSnackBar.showError(message: e.toString());
+      CustomSnackBar.showError(message: e.toString());
     } finally {
       isCallingApi.value = false;
       CustomLoader.hide();
@@ -186,6 +194,14 @@ class LoginController extends GetxController {
         print("Notification init error on OTP login: $e");
       }
 
+      try {
+        if (Get.isRegistered<WebSocketService>()) {
+          Get.find<WebSocketService>().connect();
+        }
+      } catch (e) {
+        print("WebSocket connect error on OTP login: $e");
+      }
+
       Get.offAllNamed(AppRoutes.navigationScreen);
 
       CustomSnackBar.showSuccess(message: msg);
@@ -208,7 +224,7 @@ class LoginController extends GetxController {
         // Navigate to Interest Screen (Step 1)
         Get.to(() => const InterestScreen());
       } else {
-      //  CustomSnackBar.showError(message: errorMsg);
+        CustomSnackBar.showError(message: errorMsg);
       }
     } finally {
       isCallingApi.value = false;
@@ -312,7 +328,7 @@ class LoginController extends GetxController {
       if (e is FirebaseAuthException) {
         errorMessage = e.message ?? errorMessage;
       }
-    //  CustomSnackBar.showError(message: errorMessage);
+      CustomSnackBar.showError(message: errorMessage);
     } finally {
       isLoading.value = false;
     }
@@ -394,6 +410,15 @@ class LoginController extends GetxController {
         } catch (e) {
           print("Notification init error on Google login: $e");
         }
+
+        try {
+          if (Get.isRegistered<WebSocketService>()) {
+            Get.find<WebSocketService>().connect();
+          }
+        } catch (e) {
+          print("WebSocket connect error on Google login: $e");
+        }
+
         Get.offAllNamed(AppRoutes.navigationScreen);
 
         final msg = "Welcome ${user.displayName ?? 'User'}!";
@@ -440,7 +465,7 @@ class LoginController extends GetxController {
 
     } catch (e, stk) {
       printMessage("Exception : " + e.toString() + "\n$stk");
-    //  CustomSnackBar.showError(message: e.toString());
+      CustomSnackBar.showError(message: e.toString());
     } finally {
       isCallingApi.value = false;
       CustomLoader.hide();
@@ -474,7 +499,7 @@ class LoginController extends GetxController {
 
     } catch (e, stk) {
       printMessage("Exception : " + e.toString() + "\n$stk");
-    //  CustomSnackBar.showError(message: e.toString());
+      CustomSnackBar.showError(message: e.toString());
     } finally {
       isCallingApi.value = false;
       CustomLoader.hide();

@@ -1321,10 +1321,11 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
     );
   }
 
-  _showFeedBackBottomSheet(ReelModel item) {
-    // controller.feedBackController.text = item.feedBack.value;
+/*  _showFeedBackBottomSheet(ReelModel item) {
     Get.bottomSheet(
-      Column(
+      Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+        child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         spacing: 12,
         children: [
@@ -1340,11 +1341,12 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
           //   item: item,
           // ),
         ],
+        ),
       ),
       isScrollControlled: true,
       persistent: true,
     );
-  }
+  }*/
 
 /*
   _showLectureBottomSheet(ReelModel item, BuildContext context) {

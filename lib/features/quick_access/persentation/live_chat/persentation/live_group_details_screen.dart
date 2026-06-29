@@ -142,7 +142,8 @@ class LiveGroupDetailsController extends GetxController {
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16, 20, 16, 20 + MediaQuery.of(ctx).padding.bottom),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -238,6 +239,7 @@ class LiveGroupDetailsController extends GetxController {
                 onTap: () => Navigator.pop(ctx),
               ),
             ],
+            ),
           ),
         );
       },

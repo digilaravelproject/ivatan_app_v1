@@ -43,6 +43,9 @@ class LiveGroupChatScreen extends StatelessWidget {
       tag: chatId.toString(),
     );
 
+    // Create scroll controller for auto-scrolling to bottom
+    final ScrollController listScrollController = ScrollController();
+
     return WillPopScope(
       onWillPop: () async {
         if (controller.isEmojiVisible.value) {
@@ -78,25 +81,39 @@ class LiveGroupChatScreen extends StatelessWidget {
                     if (controller.messages.isEmpty) {
                       return _buildEmptyState();
                     }
+
+                    // Auto-scroll to bottom only once when messages are loaded
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _scrollToBottom(listScrollController);
+                    });
   
-                    return ListView.builder(
-                      controller: controller.scrollController,
-                      reverse: true,
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      itemCount: controller.messages.length,
-                      itemBuilder: (context, index) {
-                        final message = controller.messages[index];
-                        final isMe = message.isMine;
-                        
-                        bool showDate = false;
-                        if (index == controller.messages.length - 1) {
-                          showDate = true;
-                        } else {
-                          final nextMessage = controller.messages[index + 1];
-                          if (controller.formatMessageDate(nextMessage.createdAt) != controller.formatMessageDate(message.createdAt)) {
+                    return RefreshIndicator(
+                      color: AppColors.primary,
+                      onRefresh: () async {
+                        await controller.fetchMessages();
+                        // Auto-scroll to bottom after refresh
+                        _scrollToBottom(listScrollController);
+                      },
+                      child: ListView.builder(
+                        controller: listScrollController, // Use our custom scroll controller
+                        reverse: false, // Changed from true to false - no more bottom alignment
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        itemCount: controller.messages.length,
+                        itemBuilder: (context, index) {
+                          // Reverse the index to show latest messages at bottom
+                          final reversedIndex = controller.messages.length - 1 - index;
+                          final message = controller.messages[reversedIndex];
+                          final isMe = message.isMine;
+                          
+                          bool showDate = false;
+                          if (reversedIndex == controller.messages.length - 1) {
                             showDate = true;
+                          } else {
+                            final nextMessage = controller.messages[reversedIndex + 1];
+                            if (controller.formatMessageDate(nextMessage.createdAt) != controller.formatMessageDate(message.createdAt)) {
+                              showDate = true;
+                            }
                           }
-                        }
   
                         // System messages styling
                         if (message.messageType == 'system' || message.sender?.name == 'System') {
@@ -122,6 +139,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                           ],
                         );
                       },
+                    ),
                     );
                   }),
                 ),
@@ -396,21 +414,25 @@ class LiveGroupChatScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Stack(
                   children: [
-                    if (!isMe)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 3),
-                        child: Text(
-                          senderName,
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: avatarColor,
-                          ),
-                        ),
-                      ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 4, right: isMe ? 68 : 45), // Reserve space for the timestamp (more space for 'isMe' due to checkmark)
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (!isMe)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 3),
+                              child: Text(
+                                senderName,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: avatarColor,
+                                ),
+                              ),
+                            ),
 
                            // 💬 WhatsApp-style Quoted Reply Block
                     if (message.repliedMessage != null) ...[ 
@@ -634,15 +656,28 @@ class LiveGroupChatScreen extends StatelessWidget {
                                   ? Uri.parse(message.attachmentUrl!)
                                   : Uri.file(message.attachmentUrl!);
 
+                              bool launched = false;
                               if (await canLaunchUrl(uri)) {
-                                await launchUrl(uri, mode: LaunchMode.externalApplication);
-                              } else {
+                                launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+                              }
+                              if (!launched) {
+                                launched = await launchUrl(uri, mode: LaunchMode.platformDefault);
+                              }
+                              if (!launched) {
                                 Clipboard.setData(ClipboardData(text: message.attachmentUrl!));
                                 CustomSnackBar.showSuccess(message: "Opening file... Link copied to clipboard!");
                               }
                             } catch (e) {
-                              Clipboard.setData(ClipboardData(text: message.attachmentUrl!));
-                              CustomSnackBar.showSuccess(message: "File link copied to clipboard!");
+                              try {
+                                bool launched = await launchUrl(Uri.parse(message.attachmentUrl!), mode: LaunchMode.platformDefault);
+                                if (!launched) {
+                                  Clipboard.setData(ClipboardData(text: message.attachmentUrl!));
+                                  CustomSnackBar.showSuccess(message: "File link copied to clipboard!");
+                                }
+                              } catch (e2) {
+                                Clipboard.setData(ClipboardData(text: message.attachmentUrl!));
+                                CustomSnackBar.showSuccess(message: "File link copied to clipboard!");
+                              }
                             }
                           }
                         },
@@ -713,32 +748,38 @@ class LiveGroupChatScreen extends StatelessWidget {
                         ),
                       ),
                     ],
-
-                    const SizedBox(height: 3),
-
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        const SizedBox(width: 40),
-                        Text(
-                          controller.formatMessageTime(message.createdAt),
-                          style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            color: isMe ? Colors.grey[400] : Colors.grey[500],
-                          ),
-                        ),
-                        if (isMe) ...[
-                          const SizedBox(width: 4),
-                          Icon(
-                            message.status == "sending"
-                                ? Icons.access_time_rounded
-                                : Icons.done_all_rounded,
-                            color: message.status == "sending" ? Colors.grey[400] : AppColors.secondary,
-                            size: 14,
-                          ),
                         ],
-                      ],
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 2, right: 2),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              controller.formatMessageTime(message.createdAt),
+                              style: GoogleFonts.poppins(
+                                fontSize: 10,
+                                color: isMe ? Colors.white70 : Colors.grey[500],
+                              ),
+                            ),
+                            if (isMe) ...[
+                              const SizedBox(width: 4),
+                              Icon(
+                                message.status == "sending"
+                                    ? Icons.access_time_rounded
+                                    : Icons.done_all_rounded,
+                                color: message.status == "sending" ? Colors.white70 : Colors.white70,
+                                size: 14,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -856,7 +897,7 @@ class LiveGroupChatScreen extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+          padding: EdgeInsets.fromLTRB(24, 16, 24, 32 + MediaQuery.of(ctx).padding.bottom),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1445,3 +1486,18 @@ class _SwipeToReplyWrapperState extends State<_SwipeToReplyWrapper>
     );
   }
 }
+
+  // Helper function to scroll to bottom
+  void _scrollToBottom(ScrollController scrollController) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (scrollController.hasClients) {
+          scrollController.animateTo(
+            scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    });
+  }

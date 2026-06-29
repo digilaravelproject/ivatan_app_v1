@@ -42,7 +42,7 @@ class GroupScreen extends StatelessWidget {
                     border: Border.all(color: Colors.white, width: 2),
                   ),
                   child: CircleAvatar(
-                    backgroundImage: NetworkImage(AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString()),
+                    backgroundImage: NetworkImage(SharedPrefManager().user!.profilePhotoPath.toString()),
                   ),
                 ),
               ),
@@ -90,7 +90,7 @@ class GroupScreen extends StatelessWidget {
                 height: 48,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: Colors.grey.shade200,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -172,6 +172,29 @@ class GroupScreen extends StatelessWidget {
                                 color: Colors.grey.shade200,
                               ),
                               child: ClipOval(
+                                child: message.type == "group" &&
+                                    message.avatar != null &&
+                                    message.avatar.toString().isNotEmpty
+                                    ? Image.network(
+                                  message.avatar.toString(),
+                                  fit: BoxFit.cover,
+                                )
+                                    : message.type == "group"
+                                    ? const Icon(Icons.group, color: Colors.grey)
+                                    : Center(
+                                  child: Text(
+                                    message.name.isNotEmpty
+                                        ? message.name[0].toUpperCase()
+                                        : "?",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              /*child: ClipOval(
                                 child: message.type == "group"
                                     ? const Icon(Icons.group, color: Colors.grey)
                                     : Center(
@@ -180,7 +203,7 @@ class GroupScreen extends StatelessWidget {
                                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
                                         ),
                                       ),
-                              ),
+                              ),*/
                             ),
                             const SizedBox(width: 14),
                             

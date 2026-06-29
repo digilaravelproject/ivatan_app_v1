@@ -459,9 +459,10 @@ class FollowerList extends StatelessWidget {
 
 // Unfollow Confirmation Bottom Sheet
 void _showUnfollowBottomSheet(BuildContext context, dynamic user, dynamic controller) {
+  final bottomPadding = MediaQuery.of(context).padding.bottom;
   Get.bottomSheet(
     Container(
-      padding: const EdgeInsets.symmetric(vertical: 20),
+      padding: EdgeInsets.only(top: 20, bottom: 20 + bottomPadding),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
