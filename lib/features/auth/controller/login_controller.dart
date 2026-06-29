@@ -46,7 +46,7 @@ class LoginController extends GetxController {
   final passwordController = TextEditingController();
   final confirmPassworController = TextEditingController();
   
-  var mobilePhone ;
+  var mobilePhone;
 
 
   final AuthService _authService = AuthService();
@@ -161,7 +161,7 @@ class LoginController extends GetxController {
       CustomSnackBar.showSuccess(message: msg);
     } catch (e, stk) {
       printMessage("Exception : " + e.toString() + "\n$stk");
-      CustomSnackBar.showError(message: e.toString());
+   //   CustomSnackBar.showError(message: e.toString());
     } finally {
       isCallingApi.value = false;
       CustomLoader.hide();
@@ -208,7 +208,7 @@ class LoginController extends GetxController {
         // Navigate to Interest Screen (Step 1)
         Get.to(() => const InterestScreen());
       } else {
-        CustomSnackBar.showError(message: errorMsg);
+      //  CustomSnackBar.showError(message: errorMsg);
       }
     } finally {
       isCallingApi.value = false;
@@ -230,6 +230,7 @@ class LoginController extends GetxController {
       return;
     }
 
+    mobilePhone = phone;
     otpFlowType.value = flowType;
     isLoading.value = true;
     String phoneNumber = '${countryCode.value}$phone';
@@ -283,7 +284,7 @@ class LoginController extends GetxController {
   }
 
   /// Verify OTP entered by user
-  Future<void> verifyOTP(String verificationId, String otp) async {
+  Future<void> verifyOTP(String verificationId, String otp, {String? phoneNumber}) async {
     try {
       isLoading.value = true;
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
@@ -298,6 +299,7 @@ class LoginController extends GetxController {
       String? firebasePhone = userCredential.user?.phoneNumber;
       print("🔥 Firebase Token: $firebaseToken");
       print("📱 Firebase phone: $firebasePhone");
+      print("📱 Mobile: ${mobileController.text.trim()}");
       
       if (firebaseToken != null) {
         await _handleOtpSuccess(firebaseToken, firebasePhone: firebasePhone);
@@ -310,7 +312,7 @@ class LoginController extends GetxController {
       if (e is FirebaseAuthException) {
         errorMessage = e.message ?? errorMessage;
       }
-      CustomSnackBar.showError(message: errorMessage);
+    //  CustomSnackBar.showError(message: errorMessage);
     } finally {
       isLoading.value = false;
     }
@@ -318,12 +320,13 @@ class LoginController extends GetxController {
 
 
   Future<void> _handleOtpSuccess(String firebaseToken, {String? firebasePhone}) async {
-    String phone = mobileController.text.trim();
+    String phone = mobilePhone?.toString() ?? '';
+    if (phone.isEmpty) phone = mobileController.text.trim();
     if (phone.isEmpty && firebasePhone != null) {
       phone = firebasePhone.replaceAll(RegExp(r'[^\d]'), '');
       if (phone.length > 10) phone = phone.substring(phone.length - 10);
     }
-    print("📱 _handleOtpSuccess phone: '$phone'");
+    print("📱 _handleOtpSuccess final phone: '$phone'");
 
     if (otpFlowType.value == OtpFlowType.login) {
       await callLoginAPI(phone, firebaseToken);
@@ -437,7 +440,7 @@ class LoginController extends GetxController {
 
     } catch (e, stk) {
       printMessage("Exception : " + e.toString() + "\n$stk");
-      CustomSnackBar.showError(message: e.toString());
+    //  CustomSnackBar.showError(message: e.toString());
     } finally {
       isCallingApi.value = false;
       CustomLoader.hide();
@@ -471,7 +474,7 @@ class LoginController extends GetxController {
 
     } catch (e, stk) {
       printMessage("Exception : " + e.toString() + "\n$stk");
-      CustomSnackBar.showError(message: e.toString());
+    //  CustomSnackBar.showError(message: e.toString());
     } finally {
       isCallingApi.value = false;
       CustomLoader.hide();

@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/custom_loading_indicator.dart';
 
 class CustomImageView extends StatelessWidget {
   ///[url] is required parameter for fetching network image
@@ -204,13 +205,10 @@ class CustomImageView extends StatelessWidget {
             ),
         placeholder:
             placeHolder ??
-            (context, url) => SizedBox(
+            (context, url) => const SizedBox(
               height: 30,
               width: 30,
-              child: LinearProgressIndicator(
-                color: Colors.grey.shade200,
-                backgroundColor: Colors.grey.shade100,
-              ),
+              child: CustomLoadingIndicator(),
             ),
         alignment: alignment ?? Alignment.center,
         errorWidget:

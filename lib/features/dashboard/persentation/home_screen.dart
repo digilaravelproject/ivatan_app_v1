@@ -93,23 +93,23 @@ class HomePage extends StatelessWidget {
                   children: [
                     // App Logo - Clean Circular
                     Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 4,
-                            offset: Offset(0, 1),
-                          ),
-                        ],
-                      ),
+                      width: 32,
+                      height: 32,
+                      // decoration: BoxDecoration(
+                      //   shape: BoxShape.circle,
+                      //   color: Colors.white,
+                      //   boxShadow: [
+                      //     BoxShadow(
+                      //       color: Colors.black.withOpacity(0.08),
+                      //       blurRadius: 4,
+                      //       offset: Offset(0, 1),
+                      //     ),
+                      //   ],
+                      // ),
                       child: ClipOval(
                         child: Image.asset(
-                          AppAssets.imgAppLogo,
-                          fit: BoxFit.cover,
+                          AppAssets.AppLogo,
+                          //fit: BoxFit.cover,
                         ),
                       ),
                     ),
@@ -128,12 +128,12 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
                 actions: [
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 1.0),
-                      child: const AnimatedProBadge(),
-                    ),
-                  ),
+                  // Center(
+                  //   child: Padding(
+                  //     padding: const EdgeInsets.only(right: 1.0),
+                  //     child: const AnimatedProBadge(),
+                  //   ),
+                  // ),
                   Obx(() {
                     final count = controller.unreadNotificationCount.value;
                     return Stack(
@@ -860,7 +860,8 @@ class HomePage extends StatelessWidget {
                           ),
                           if (post.user.isVerified) ...[
                             SizedBox(width: 4),
-                            Icon(Icons.verified, color: Colors.blue, size: 14),
+                            Image.asset(AppAssets.imgverified,height: 16,width: 16,),
+                            //Icon(Icons.verified, color: Colors.blue, size: 14),
                           ],
 
                           // Date / Time

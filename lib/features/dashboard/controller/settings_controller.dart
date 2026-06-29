@@ -341,7 +341,24 @@ class SettingsController extends GetxController {
   var switchRequests = <ProfileSwitchRequest>[].obs;
   var isLoadingSwitchRequests = false.obs;
 
-  bool get hasPendingRequest => switchRequests.any((req) => req.status.toLowerCase() == 'pending');
+  bool get hasPendingRequest {
+    return switchRequests.any((req) {
+      final isPending = req.status.toLowerCase() == 'pending';
+      if (!isPending) return false;
+
+      // If the pending request is for ecommerce (seller) both, but we don't have subscription,
+      // it means it's unpaid. Let's NOT block the dropdown in this case.
+      final isEcommerceBoth = (req.toProfileType == 'seller' || req.toProfileType == 'ecommerce') &&
+          req.profileSubType == 'both';
+      if (isEcommerceBoth) {
+        final hasSubscription = ppm.ProfilePermissionManager.hasActiveSubscription(ppm.ProfileType.ecommerce);
+        if (!hasSubscription) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
 
   final nameController = TextEditingController();
   final emailController = TextEditingController();
@@ -363,10 +380,13 @@ class SettingsController extends GetxController {
   var imageFile = Rx<File?>(null);
 
   RxList<String> occupationList = <String>[
-    "Student / Learner",
+    "Student",
+    "Learner",
     "Working Professional",
-    "Freelancer / Flexible Employee",
-    "Business Owner / Self-Employed",
+    "Freelancer",
+    "Flexible Employee",
+    "Business Owner",
+    "Self-Employed",
     "Looking for Opportunities",
     "Others (Not Found! Any More creative.)",
   ].obs;

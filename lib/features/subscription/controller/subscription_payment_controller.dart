@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart' as rzp;
 import '../../../../core/network/api_services.dart';
 import '../../../../db/shared_pref_manager.dart';
 import '../../dashboard/controller/settings_controller.dart';
 import '../data/model/subscription_models.dart';
 import 'subscription_controller.dart';
+import '../../dashboard/controller/homeController.dart';
+import '../../payment/presentation/widgets/payment_webview_page.dart';
 
 class SubscriptionPaymentController extends GetxController {
   final ApiServices api = ApiServices();
-  late rzp.Razorpay _razorpay;
   
   var isLoading = false.obs;
   
@@ -23,15 +23,10 @@ class SubscriptionPaymentController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _razorpay = rzp.Razorpay();
-    _razorpay.on(rzp.Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(rzp.Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(rzp.Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
   @override
   void onClose() {
-    _razorpay.clear();
     super.onClose();
   }
 
@@ -61,9 +56,42 @@ class SubscriptionPaymentController extends GetxController {
     }
 
     if (profileId == null) {
+      isLoading.value = true;
+      try {
+        final String apiProfileType = profileTypeSub.type;
+        final String apiProfileSubType = profileTypeSub.subType ?? (apiProfileType == 'seller' ? 'both' : '');
+        
+        final Map<String, dynamic> body = {
+          "to_profile_type": apiProfileType,
+          "notes": "I want to switch to $apiProfileType.",
+        };
+        if (apiProfileSubType.isNotEmpty) {
+          body["profile_sub_type"] = apiProfileSubType;
+        }
+        
+        final switchResponse = await api.callPost(
+          "api/v1/profiles/switch",
+          data: body,
+        );
+        
+        if (switchResponse != null && switchResponse["status"] == true) {
+          final settingsController = _getSettingsController();
+          if (settingsController != null) {
+            await settingsController.fetchProfileSwitchRequests();
+            profileId = _getProfileId(profileTypeSub.type);
+          }
+        }
+      } catch (e) {
+        debugPrint("⚠️ Error dynamically creating profile switch request: $e");
+      } finally {
+        isLoading.value = false;
+      }
+    }
+
+    if (profileId == null) {
       Get.snackbar(
         "Error",
-        "Could not locate profile details. Please try switching to this profile type again.",
+        "Could not locate or initialize profile details. Please try again.",
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -96,16 +124,20 @@ class SubscriptionPaymentController extends GetxController {
         final requiresPayment = data['requires_payment'] ?? false;
         final gateway = data['gateway'] ?? '';
         final gatewaySubId = data['gateway_subscription_id'] ?? '';
-        final razorpayKey = data['razorpay_key'] ?? '';
+        final redirectUrl = data['redirect_url'] ?? '';
         
         _currentGatewaySubId = gatewaySubId;
 
-        if (requiresPayment && gateway == 'razorpay') {
-          // Open Razorpay Checkout using the subscription_id and key returned by backend
-          _openCheckout(
-            razorpayKey: razorpayKey,
-            subscriptionId: gatewaySubId,
-            planName: plan.name,
+        if (requiresPayment && (gateway == 'phonepe' || redirectUrl.toString().isNotEmpty)) {
+          // Open PhonePe Mandate redirect page
+          final result = await Get.to<bool?>(() => PaymentWebViewPage(url: redirectUrl));
+          
+          // Confirm purchase
+          await _purchaseSubscription(
+            profileId: profileId,
+            planId: planId,
+            paymentMethod: "phonepe",
+            gatewaySubId: gatewaySubId,
           );
         } else {
           // If no payment required (Free plan), complete it immediately
@@ -139,6 +171,40 @@ class SubscriptionPaymentController extends GetxController {
   }
 
   int? _getProfileId(String type) {
+    // 1. Try to get from active profile config in HomeController
+    try {
+      if (Get.isRegistered<HomeController>()) {
+        final config = Get.find<HomeController>().profileConfig.value;
+        if (config != null && config.data != null) {
+          final t = type.toLowerCase();
+          if (t == 'seller' || t == 'ecommerce') {
+            if (config.data!.ecommerce != null && config.data!.ecommerce!.profileId != null) {
+              return config.data!.ecommerce!.profileId;
+            }
+          } else if (t == 'employer') {
+            if (config.data!.employer != null && config.data!.employer!.profileId != null) {
+              return config.data!.employer!.profileId;
+            }
+          } else if (t == 'music' || t == 'music_play') {
+            if (config.data!.musicPlay != null && config.data!.musicPlay!.profileId != null) {
+              return config.data!.musicPlay!.profileId;
+            }
+          } else if (t == 'creator' || t == 'content_creation') {
+            if (config.data!.contentCreation != null && config.data!.contentCreation!.profileId != null) {
+              return config.data!.contentCreation!.profileId;
+            }
+          } else if (t == 'personal' || t == 'personal_profile') {
+            if (config.data!.personalProfile != null && config.data!.personalProfile!.profileId != null) {
+              return config.data!.personalProfile!.profileId;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint("Error reading active profileId from HomeController: $e");
+    }
+
+    // 2. Fallback to settings controller switch requests
     final settingsController = _getSettingsController();
     if (settingsController != null) {
       final matchedReq = settingsController.switchRequests.firstWhereOrNull((req) {
@@ -150,64 +216,6 @@ class SubscriptionPaymentController extends GetxController {
       }
     }
     return null;
-  }
-
-  void _openCheckout({
-    required String razorpayKey,
-    required String subscriptionId,
-    required String planName,
-  }) {
-    final user = SharedPrefManager().user;
-    
-    var options = {
-      'key': razorpayKey,
-      'subscription_id': subscriptionId,
-      'name': 'Ivatan',
-      'description': 'Subscription to $planName',
-      'prefill': {
-        'contact': user?.phone ?? '',
-        'email': user?.email ?? '',
-      },
-      'theme': {
-        'color': '#${AppColors.primary.value.toRadixString(16).padLeft(8, '0').substring(2)}',
-      },
-      'external': {
-        'wallets': ['paytm']
-      }
-    };
-
-    try {
-      _razorpay.open(options);
-    } catch (e) {
-      debugPrint('Error opening Razorpay checkout: $e');
-      Get.snackbar(
-        "Checkout Error",
-        "Could not open Razorpay checkout: $e",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    }
-  }
-
-  Future<void> _handlePaymentSuccess(rzp.PaymentSuccessResponse response) async {
-    if (_currentProfileId == null || _currentPlan == null) {
-      Get.snackbar(
-        "Warning",
-        "Payment successful, but subscription parameters were lost.",
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-      );
-      return;
-    }
-
-    final planId = int.tryParse(_currentPlan!.id) ?? 0;
-    
-    await _purchaseSubscription(
-      profileId: _currentProfileId!,
-      planId: planId,
-      paymentMethod: "razorpay",
-      gatewaySubId: _currentGatewaySubId ?? "",
-    );
   }
 
   Future<void> _purchaseSubscription({
@@ -326,24 +334,6 @@ class SubscriptionPaymentController extends GetxController {
     } finally {
       isLoading.value = false;
     }
-  }
-
-  void _handlePaymentError(rzp.PaymentFailureResponse response) {
-    Get.snackbar(
-      "Payment Failed",
-      "Error: ${response.code} - ${response.message}",
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-    );
-  }
-
-  void _handleExternalWallet(rzp.ExternalWalletResponse response) {
-    Get.snackbar(
-      "Wallet Selected",
-      "Wallet: ${response.walletName}",
-      backgroundColor: AppColors.primary,
-      colorText: Colors.white,
-    );
   }
 
   SettingsController? _getSettingsController() {

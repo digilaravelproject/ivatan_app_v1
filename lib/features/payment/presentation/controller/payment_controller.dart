@@ -1,50 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart' as rzp;
+import '../widgets/payment_webview_page.dart';
 import '../../../../db/shared_pref_manager.dart';
 import '../../data/repository/payment_repository.dart';
 
 class PaymentController extends GetxController {
   final PaymentRepository repository = Get.put(PaymentRepositoryImpl());
-  late rzp.Razorpay _razorpay;
   int? _currentOrderId;
 
   @override
   void onInit() {
     super.onInit();
-    _razorpay = rzp.Razorpay();
-    _razorpay.on(rzp.Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(rzp.Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(rzp.Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
   @override
   void onClose() {
-    _razorpay.clear();
     super.onClose();
   }
 
   Future<void> initiatePayment(int orderId) async {
     _currentOrderId = orderId;
     try {
-      // 1. Create Razorpay order on our backend
-      final response = await repository.createRazorpayOrder(orderId: orderId);
+      Get.dialog(
+        const Center(child: CircularProgressIndicator(color: Colors.black)),
+        barrierDismissible: false,
+      );
+
+      // 1. Initiate payment on PhonePe backend
+      final response = await repository.initiatePhonePePayment(orderId: orderId);
+      
+      Get.back(); // Close loading dialog
       
       if (response != null && response['success'] == true) {
-        final razorpayOrderId = response['razorpay_order_id'];
-        final razorpayKey = response['razorpay_key'];
-        final amount = response['amount']; // Expected to be in paise or String with decimal
-        final currency = response['currency'] ?? "INR";
+        final redirectUrl = response['redirect_url'];
+        final merchantTxnId = response['merchant_transaction_id'] ?? response['merchantTransactionId'] ?? "";
         
-        // 2. Open Razorpay Checkout
-        _openCheckout(
-          key: razorpayKey,
-          orderId: razorpayOrderId,
-          amount: amount,
-          currency: currency,
-          description: "Payment for Order #$orderId",
-        );
+        if (redirectUrl != null && redirectUrl.toString().isNotEmpty) {
+          // 2. Open PhonePe Hosted Checkout in WebView
+          final result = await Get.to<bool?>(() => PaymentWebViewPage(url: redirectUrl));
+          
+          // 3. Verify Payment
+          await _verifyTransaction(orderId, merchantTxnId);
+        } else {
+          Get.snackbar("Error", "Payment redirect URL is empty.",
+              backgroundColor: Colors.red, colorText: Colors.white);
+        }
       } else {
         Get.snackbar("Error", response?['message'] ?? "Failed to initiate payment",
             backgroundColor: Colors.red, colorText: Colors.white);
@@ -56,47 +57,7 @@ class PaymentController extends GetxController {
     }
   }
 
-  void _openCheckout({
-    required String key,
-    required String orderId,
-    required dynamic amount,
-    required String currency,
-    required String description,
-  }) {
-    final user = SharedPrefManager().user;
-    
-    var options = {
-      'key': key,
-      'amount': amount, // amount should be in paise
-      'name': 'Ivatan',
-      'order_id': orderId,
-      'description': description,
-      'prefill': {
-        'contact': user?.phone ?? '',
-        'email': user?.email ?? '',
-      },
-      'theme': {
-        'color': '#${AppColors.primary.value.toRadixString(16).padLeft(8, '0').substring(2)}',
-      },
-      'external': {
-        'wallets': ['paytm']
-      }
-    };
-
-    try {
-      _razorpay.open(options);
-    } catch (e) {
-      debugPrint('Error opening Razorpay checkout: $e');
-    }
-  }
-
-  Future<void> _handlePaymentSuccess(rzp.PaymentSuccessResponse response) async {
-    if (_currentOrderId == null) {
-      Get.snackbar("Warning", "Payment successful, but Order ID was lost.",
-          backgroundColor: Colors.orange, colorText: Colors.white);
-      return;
-    }
-
+  Future<void> _verifyTransaction(int orderId, String merchantTransactionId) async {
     try {
       // Show loading indicator during verification
       Get.dialog(
@@ -104,19 +65,16 @@ class PaymentController extends GetxController {
         barrierDismissible: false,
       );
 
-      final verifyResponse = await repository.verifyPayment(
-        orderId: _currentOrderId!,
-        razorpayOrderId: response.orderId ?? "",
-        razorpayPaymentId: response.paymentId ?? "",
-        razorpaySignature: response.signature ?? "",
+      final verifyResponse = await repository.verifyPhonePePayment(
+        orderId: orderId,
+        merchantTransactionId: merchantTransactionId,
       );
 
       // Close loading dialog
       Get.back();
 
       if (verifyResponse != null && verifyResponse['success'] == true) {
-        // ✅ Close the Cart screen BEFORE showing the success popup
-        // This ensures the popup appears on top of the dashboard/previous screen.
+        // Close the Cart screen BEFORE showing the success popup
         Get.back(); 
 
         // Show success dialog
@@ -139,8 +97,6 @@ class PaymentController extends GetxController {
               ElevatedButton(
                 onPressed: () {
                   Get.back(); // Close dialog
-                  // Could optionally navigate back to dashboard/home here:
-                  // Get.offAllNamed(Routes.DASHBOARD);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
@@ -163,15 +119,5 @@ class PaymentController extends GetxController {
       Get.snackbar("Error", "Payment verification error: $e",
           backgroundColor: Colors.red, colorText: Colors.white);
     }
-  }
-
-  void _handlePaymentError(rzp.PaymentFailureResponse response) {
-    Get.snackbar("Payment Failed", "Error: ${response.code} - ${response.message}",
-        backgroundColor: Colors.red, colorText: Colors.white);
-  }
-
-  void _handleExternalWallet(rzp.ExternalWalletResponse response) {
-    Get.snackbar("External Wallet Selected", "Wallet: ${response.walletName}",
-        backgroundColor: Colors.blue, colorText: Colors.white);
   }
 }

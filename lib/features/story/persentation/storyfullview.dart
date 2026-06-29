@@ -7,6 +7,7 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:i_vatan_app/core/constants/app_sizer.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
+import 'package:i_vatan_app/core/widgets/custom_loading_indicator.dart';
 import 'package:i_vatan_app/features/dashboard/controller/homeController.dart';
 import 'package:video_player/video_player.dart';
 
@@ -287,7 +288,7 @@ class _FullScreenStoryViewerState extends State<FullScreenStoryViewer> {
                     return Image(image: imageProvider, fit: BoxFit.cover);
                   },
                   placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(
+                    child: CustomLoadingIndicator(
                       color: Colors.white,
                     ),
                   ),

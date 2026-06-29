@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/core/constants/app_assets.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
+import 'package:i_vatan_app/core/widgets/custom_loading_indicator.dart';
 import 'package:video_player/video_player.dart';
 import '../../../core/helper/custom_image_view.dart';
 import '../../../core/utils/app_icons.dart';
@@ -466,13 +467,13 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
                             placeholder:
                                 (context, url) =>
                             widget.loadingWidget ??
-                                const Center(child: CircularProgressIndicator()),
+                                const Center(child: CustomLoadingIndicator()),
                             errorWidget:
                                 (context, url, error) =>
                             widget.errorWidget ?? const Icon(Icons.error),
                           ),
                           widget.loadingWidget ??
-                              const Center(child: CircularProgressIndicator()),
+                              const Center(child: CustomLoadingIndicator()),
                         ],
                       );
                     }
@@ -799,8 +800,7 @@ class CustomReelPlayer extends StatelessWidget {
                     (context, url) =>
                 loadingWidget ??
                     const Center(
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
+                      child: CustomLoadingIndicator(
                         color: Colors.white,
                       ),
                     ),

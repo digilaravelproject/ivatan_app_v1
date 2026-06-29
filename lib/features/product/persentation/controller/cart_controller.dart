@@ -237,7 +237,7 @@ class CartController extends GetxController {
     try {
       final address = selectedAddress.value!;
       final Map<String, dynamic> checkoutData = {
-        "payment_method": "razorpay",
+        "payment_method": "phonepe",
         "shipping_address": {
           "name": address.fullName,
           "phone": address.phone,
