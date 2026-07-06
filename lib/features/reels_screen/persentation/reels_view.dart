@@ -441,8 +441,7 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
             GestureDetector(
               onVerticalDragUpdate: _onVerticalDragUpdate,
               onVerticalDragEnd: _onVerticalDragEnd,
-              child: RefreshIndicator(
-                color: Colors.white,
+              child: RefreshIndicator(color: Colors.white,
                 backgroundColor: Colors.black,
                 onRefresh: () async {
                   if (Get.isRegistered<ShortPlayController>()) {

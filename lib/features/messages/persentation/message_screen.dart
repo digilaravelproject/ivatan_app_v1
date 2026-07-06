@@ -264,8 +264,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
               }
               
               return Expanded(
-                child: RefreshIndicator(
-                  color: AppColors.primary,
+                child: RefreshIndicator(color: AppColors.primary,
                   onRefresh: () => controller.fetchInbox(),
                   child: ListView.separated(
                     padding: const EdgeInsets.only(top: 8, bottom: 20),

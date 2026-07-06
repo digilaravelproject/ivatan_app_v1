@@ -87,8 +87,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                       _scrollToBottom(listScrollController);
                     });
   
-                    return RefreshIndicator(
-                      color: AppColors.primary,
+                    return RefreshIndicator(color: AppColors.primary,
                       onRefresh: () async {
                         await controller.fetchMessages();
                         // Auto-scroll to bottom after refresh

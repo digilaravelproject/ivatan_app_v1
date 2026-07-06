@@ -68,7 +68,7 @@ class HomePage extends StatelessWidget {
           },
           child: Obx(() {
             final isStoriesShown = controller.showStories.value;
-            return RefreshIndicator(
+            return RefreshIndicator(color: Colors.black, 
               notificationPredicate: (notification) {
                 return isStoriesShown;
               },
@@ -2240,7 +2240,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //
 //             return true;
 //           },
-//           child: RefreshIndicator(
+//           child: RefreshIndicator(color: Colors.black, 
 //             onRefresh: () async {
 //               await controller.fetchPosts();
 //               await controller.fetchStories();

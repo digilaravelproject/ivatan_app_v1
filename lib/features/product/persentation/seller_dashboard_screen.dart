@@ -42,7 +42,7 @@ class SellerDashboard extends StatelessWidget {
         elevation: 0,
         title: const Text('Seller Dashboard', style: TextStyle(color: Colors.black)),
       ),
-      body: RefreshIndicator(
+      body: RefreshIndicator(color: Colors.black, 
         onRefresh: () => controller.fetchDashboardStats(),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),

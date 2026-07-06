@@ -1142,7 +1142,7 @@ class VideoGridSection extends StatelessWidget {
                     ),
             );
 
-      return RefreshIndicator(
+      return RefreshIndicator(color: Colors.black, 
         onRefresh: () async {
           await Future.wait([
             controller.fetchVideoViews(),

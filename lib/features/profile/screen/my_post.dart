@@ -40,7 +40,7 @@ class MyPostScreen extends StatelessWidget {
           }
           return true;
         },
-        child: RefreshIndicator(
+        child: RefreshIndicator(color: Colors.black, 
           onRefresh: () async {
             await controller.fetchOwnPosts(filterType: "posts", username: username);
           },

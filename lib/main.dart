@@ -75,6 +75,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
             fontFamily: 'DMSans',
+            progressIndicatorTheme: const ProgressIndicatorThemeData(color: Colors.black),
           ),
           initialRoute: AppRoutes.splash,
           getPages: AppRoutes.appPages,

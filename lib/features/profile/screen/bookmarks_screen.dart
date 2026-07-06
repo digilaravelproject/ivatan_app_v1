@@ -29,7 +29,7 @@ class BookmarksScreen extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
       ),
-      body: RefreshIndicator(
+      body: RefreshIndicator(color: Colors.black, 
         onRefresh: () async {
           await controller.fetchBookmarks();
         },

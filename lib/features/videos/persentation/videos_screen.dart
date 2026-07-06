@@ -433,7 +433,7 @@ class _VideosScreenState extends State<VideosScreen> {
               ),
               
               Expanded(
-                child: RefreshIndicator(
+                child: RefreshIndicator(color: Colors.black, 
                   onRefresh: () async {
                     await controller.fetchVideo();
                   },
