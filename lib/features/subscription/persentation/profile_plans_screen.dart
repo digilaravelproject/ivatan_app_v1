@@ -271,30 +271,7 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
                 height: 1.3,
               ),
             ),
-            const SizedBox(height: 6),
-            const Divider(height: 1),
-            const SizedBox(height: 6),
-            
-            // Render top 2 features as preview
-            ...plan.features.take(2).map((feat) => Padding(
-              padding: const EdgeInsets.only(bottom: 4.0),
-              child: Row(
-                children: [
-                  const Icon(Icons.check_box_outlined, color: Colors.black87, size: 12),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      feat.title,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            )),
+
           ],
         ),
       ),

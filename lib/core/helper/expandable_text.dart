@@ -38,21 +38,21 @@ class _ExpandableCaptionState extends State<ExpandableCaption> {
       color: Color(0xFF00376B), // Instagram Blue
     );
     const styleMore = TextStyle(
-       fontSize: 14,
-       color: Colors.grey,
+      fontSize: 14,
+      color: Colors.grey,
     );
 
     // Build the full text span with Username + Caption (Parsing hashtags)
     final List<TextSpan> fullSpans = [];
-    
+
     // 1. Username
     if (widget.username.isNotEmpty) {
       fullSpans.add(
-        TextSpan(
-          text: "${widget.username} ", 
-          style: styleUsername,
-          recognizer: TapGestureRecognizer()..onTap = widget.onUsernameTap,
-        )
+          TextSpan(
+            text: "${widget.username} ",
+            style: styleUsername,
+            recognizer: TapGestureRecognizer()..onTap = widget.onUsernameTap,
+          )
       );
     }
 
@@ -74,7 +74,7 @@ class _ExpandableCaptionState extends State<ExpandableCaption> {
       textDirection: TextDirection.ltr,
     );
     textPainter.layout(maxWidth: MediaQuery.of(context).size.width - 32);
-    
+
     final bool isOverflow = textPainter.didExceedMaxLines;
 
     if (!isOverflow) {
@@ -89,10 +89,10 @@ class _ExpandableCaptionState extends State<ExpandableCaption> {
           children: [
             ...fullSpans,
             TextSpan(
-               text: " less", // Added space for safety
-               style: styleMore,
-               recognizer: TapGestureRecognizer()
-                 ..onTap = () => setState(() => _isExpanded = false),
+              text: " less", // Added space for safety
+              style: styleMore,
+              recognizer: TapGestureRecognizer()
+                ..onTap = () => setState(() => _isExpanded = false),
             ),
           ],
         ),
@@ -107,9 +107,9 @@ class _ExpandableCaptionState extends State<ExpandableCaption> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text.rich(
-             fullContent,
-             maxLines: 2,
-             overflow: TextOverflow.ellipsis,
+            fullContent,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
           GestureDetector(
             onTap: () => setState(() => _isExpanded = true),

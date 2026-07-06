@@ -1239,7 +1239,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
             icon:
             //Image.asset(AppAssets.imgShare),
             CustomIcon(
-              svgString: AppIcons.ic_comments,
+              icon: Icons.comment,
               color: Colors.white,
               size: 20,
               removeColor: false,
@@ -1259,7 +1259,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
        // const SizedBox(height: 16),
         _buildIconButton(
           icon: CustomIcon(
-            svgString: AppIcons.ic_share,
+            icon: Icons.share,
             color: Colors.white,
             size: 18,
             removeColor: false,
@@ -1612,24 +1612,36 @@ class VideoControls extends StatelessWidget {
 class CustomIcon extends StatelessWidget {
   final double size;
   final Color color;
-  final String svgString;
+  final String? svgString;
+  final IconData? icon;
   final bool removeColor;
-
   final BoxFit fit;
 
   const CustomIcon({
     super.key,
     this.size = 24,
     this.color = Colors.white,
-    required this.svgString,
+    this.svgString,
+    this.icon,
     this.removeColor = true,
     this.fit = BoxFit.contain,
-  });
+  }) : assert(
+  svgString != null || icon != null,
+  'Either svgString or icon must be provided',
+  );
 
   @override
   Widget build(BuildContext context) {
+    if (icon != null) {
+      return Icon(
+        icon,
+        size: size,
+        color: color,
+      );
+    }
+
     return SvgPicture.string(
-      svgString,
+      svgString!,
       height: size,
       width: size,
       fit: fit,
@@ -1637,7 +1649,6 @@ class CustomIcon extends StatelessWidget {
     );
   }
 }
-
 
 
 

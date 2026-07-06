@@ -43,320 +43,320 @@ class HomePage extends StatelessWidget {
       endDrawerEnableOpenDragGesture: false,
 
       body: NotificationListener<ScrollNotification>(
-        onNotification: (notification) {
-          if (notification is UserScrollNotification) {
-            if (notification.direction == ScrollDirection.reverse) {
-              if (controller.showStories.value) {
-                controller.showStories.value = false;
-              }
-            } else if (notification.direction == ScrollDirection.forward) {
-              if (!controller.showStories.value) {
-                controller.showStories.value = true;
+          onNotification: (notification) {
+            if (notification is UserScrollNotification) {
+              if (notification.direction == ScrollDirection.reverse) {
+                if (controller.showStories.value) {
+                  controller.showStories.value = false;
+                }
+              } else if (notification.direction == ScrollDirection.forward) {
+                if (!controller.showStories.value) {
+                  controller.showStories.value = true;
+                }
               }
             }
-          }
 
-          // Pagination Logic only
-          if (notification is ScrollEndNotification &&
-              !controller.isLoading.value &&
-              controller.isMoreDataAvailable.value &&
-              notification.metrics.pixels >=
-                  notification.metrics.maxScrollExtent * 0.8) {
-            controller.fetchPosts(loadMore: true);
-          }
-          return false;
-        },
-        child: Obx(() {
-          final isStoriesShown = controller.showStories.value;
-          return RefreshIndicator(
-            notificationPredicate: (notification) {
-              return isStoriesShown;
-            },
-            onRefresh: () async {
-            await controller.fetchPosts();
-            await controller.fetchStories();
-            await controller.fetchUnreadNotificationCount();
+            // Pagination Logic only
+            if (notification is ScrollEndNotification &&
+                !controller.isLoading.value &&
+                controller.isMoreDataAvailable.value &&
+                notification.metrics.pixels >=
+                    notification.metrics.maxScrollExtent * 0.8) {
+              controller.fetchPosts(loadMore: true);
+            }
+            return false;
           },
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: [
-              Obx(() => SliverAppBar(
-                floating: true,
-                snap: true,
-                pinned: controller.showStories.value,
-                backgroundColor: Colors.white,
-                elevation: 0,
-                automaticallyImplyLeading: false,
-                toolbarHeight: 60,
-                titleSpacing: 0, // 👈 Left spacing remove
-                title: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // App Logo - Clean Circular
-                    // Container(
-                    //   width: 32,
-                    //   height: 32,
-                      // decoration: BoxDecoration(
-                      //   shape: BoxShape.circle,
-                      //   color: Colors.white,
-                      //   boxShadow: [
-                      //     BoxShadow(
-                      //       color: Colors.black.withOpacity(0.08),
-                      //       blurRadius: 4,
-                      //       offset: Offset(0, 1),
-                      //     ),
-                      //   ],
-                      // ),
-                      //child: ClipOval(
-                      //  child:
+          child: Obx(() {
+            final isStoriesShown = controller.showStories.value;
+            return RefreshIndicator(
+              notificationPredicate: (notification) {
+                return isStoriesShown;
+              },
+              onRefresh: () async {
+                await controller.fetchPosts();
+                await controller.fetchStories();
+                await controller.fetchUnreadNotificationCount();
+              },
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  Obx(() => SliverAppBar(
+                    floating: true,
+                    snap: true,
+                    pinned: controller.showStories.value,
+                    backgroundColor: Colors.white,
+                    elevation: 0,
+                    automaticallyImplyLeading: false,
+                    toolbarHeight: 60,
+                    titleSpacing: 0, // 👈 Left spacing remove
+                    title: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // App Logo - Clean Circular
+                        // Container(
+                        //   width: 32,
+                        //   height: 32,
+                        // decoration: BoxDecoration(
+                        //   shape: BoxShape.circle,
+                        //   color: Colors.white,
+                        //   boxShadow: [
+                        //     BoxShadow(
+                        //       color: Colors.black.withOpacity(0.08),
+                        //       blurRadius: 4,
+                        //       offset: Offset(0, 1),
+                        //     ),
+                        //   ],
+                        // ),
+                        //child: ClipOval(
+                        //  child:
                         Image.asset(
                           AppAssets.HomeAppLogo,
                           width: 120,
                           height: 120,
                           //fit: BoxFit.cover,
                         ),
-                     // ),
-                   // ),
-                    // SizedBox(width: 2),
-                    // // Vatan Text
-                    // Text(
-                    //   "-Vatan",
-                    //   style: TextStyle(
-                    //     fontFamily: 'Billabong',
-                    //     fontSize: 24,
-                    //     color: Colors.black,
-                    //     fontWeight: FontWeight.w600,
-                    //     letterSpacing: 0.3,
-                    //   ),
-                    // ),
-                  ],
-                ),
-                actions: [
-                  // Center(
-                  //   child: Padding(
-                  //     padding: const EdgeInsets.only(right: 1.0),
-                  //     child: const AnimatedProBadge(),
-                  //   ),
-                  // ),
-                  Obx(() {
-                    final count = controller.unreadNotificationCount.value;
-                    return Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            Icons.notifications,
-                            color: Colors.black87,
-                            size: 26,
+                        // ),
+                        // ),
+                        // SizedBox(width: 2),
+                        // // Vatan Text
+                        // Text(
+                        //   "-Vatan",
+                        //   style: TextStyle(
+                        //     fontFamily: 'Billabong',
+                        //     fontSize: 24,
+                        //     color: Colors.black,
+                        //     fontWeight: FontWeight.w600,
+                        //     letterSpacing: 0.3,
+                        //   ),
+                        // ),
+                      ],
+                    ),
+                    actions: [
+                      // Center(
+                      //   child: Padding(
+                      //     padding: const EdgeInsets.only(right: 1.0),
+                      //     child: const AnimatedProBadge(),
+                      //   ),
+                      // ),
+                      Obx(() {
+                        final count = controller.unreadNotificationCount.value;
+                        return Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.notifications,
+                                color: Colors.black87,
+                                size: 26,
+                              ),
+                              onPressed: () async {
+                                await Get.toNamed(AppRoutes.notifications);
+                                controller.fetchUnreadNotificationCount();
+                              },
+                            ),
+                            if (count > 0)
+                              Positioned(
+                                top: 10,
+                                right: 10,
+                                child: Container(
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white, width: 1.5),
+                                  ),
+                                  constraints: const BoxConstraints(
+                                    minWidth: 16,
+                                    minHeight: 16,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      count > 99 ? '99+' : '$count',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      }),
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+
+                          IconButton(
+                            icon: Icon(
+                              Icons.chat_bubble_outline,
+                              color: Colors.black87,
+                              size: 26,
+                            ),
+                            onPressed: () => Get.to(dashboard()),
                           ),
-                          onPressed: () async {
-                            await Get.toNamed(AppRoutes.notifications);
-                            controller.fetchUnreadNotificationCount();
-                          },
-                        ),
-                        if (count > 0)
                           Positioned(
                             top: 10,
                             right: 10,
                             child: Container(
-                              padding: const EdgeInsets.all(3),
+                              width: 8,
+                              height: 8,
                               decoration: BoxDecoration(
                                 color: Colors.red,
                                 shape: BoxShape.circle,
                                 border: Border.all(color: Colors.white, width: 1.5),
                               ),
-                              constraints: const BoxConstraints(
-                                minWidth: 16,
-                                minHeight: 16,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  count > 99 ? '99+' : '$count',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    );
-                  }),
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-
-                      IconButton(
-                        icon: Icon(
-                          Icons.chat_bubble_outline,
-                          color: Colors.black87,
-                          size: 26,
-                        ),
-                        onPressed: () => Get.to(dashboard()),
-                      ),
-                      Positioned(
-                        top: 10,
-                        right: 10,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 1.5),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 12.0),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.menu_rounded,
-                        color: Colors.black87,
-                        size: 28,
-                      ),
-                      onPressed: () => controller.openDrawer(),
-                    ),
-                  ),
-                ],
-              )),
-
-              // ============= STORIES SECTION (Always Visible) =============
-              SliverToBoxAdapter(
-                child: Obx(() {
-                  if (controller.isStoryLoading.value) {
-                    return _buildStoriesShimmer();
-                  }
-
-                  // Identify My Story vs Others
-                  final currentUserId = controller.currentUser.value?.id;
-                  UserStoryGroup? myStoryGroup;
-                  List<UserStoryGroup> otherStories = [];
-
-                  if (currentUserId != null) {
-                    // Split existing stories
-                    for (var group in controller.storyData) {
-                      if (group.user.id == currentUserId ||
-                          (group.stories.isNotEmpty &&
-                              group.stories.first.is_mine)) {
-                        myStoryGroup = group;
-                      } else {
-                        otherStories.add(group);
-                      }
-                    }
-                  } else {
-                    otherStories = List.from(controller.storyData);
-                  }
-
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 500),
-                    height: controller.showStories.value ? 130 : 0,
-                    curve: Curves.easeInOut,
-                    child: AnimatedOpacity(
-                      duration: const Duration(milliseconds: 500),
-                      opacity: controller.showStories.value ? 1.0 : 0.0,
-                      child: Container(
-                        height: 130,
-                        color: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          itemCount:
-                              otherStories.length + 1, // +1 for "Your Story"
-                          itemBuilder: (context, index) {
-                            if (index == 0) {
-                              return _buildMyStoryItem(imageUrl, myStoryGroup);
-                            }
-
-                            final story = otherStories[index - 1];
-
-                            // Double-check: Skip if this is somehow the current user's story
-                            if (story.user.id == currentUserId ||
-                                (story.stories.isNotEmpty &&
-                                    story.stories.first.is_mine)) {
-                              return SizedBox.shrink(); // Don't show duplicate
-                            }
-
-                            return GestureDetector(
-                              onTap: () {
-                                Get.to(
-                                  () => FullScreenStoryViewer(
-                                    stories: story.stories,
-                                    initialIndex: 0,
-                                  ),
-                                );
-                              },
-                              child: _buildStoryCard(
-                                story, // Pass full story object
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              ),
-
-              // ============= POSTS SECTION =============
-              Obx(() {
-                if (controller.isLoading.value && controller.posts.isEmpty) {
-                  return _buildPostsShimmer();
-                }
-
-                if (controller.posts.isEmpty) {
-                  return SliverFillRemaining(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.image_outlined,
-                            size: 80,
-                            color: Colors.grey.shade300,
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            "No Posts Available",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey.shade600,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  );
-                }
+                      Padding(
+                        padding: const EdgeInsets.only(right: 12.0),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.menu_rounded,
+                            color: Colors.black87,
+                            size: 28,
+                          ),
+                          onPressed: () => controller.openDrawer(),
+                        ),
+                      ),
+                    ],
+                  )),
 
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    final post = controller.posts[index];
-                    return _buildModernPostCard(post, index, context);
-                  }, childCount: controller.posts.length),
-                );
-              }),
+                  // ============= STORIES SECTION (Always Visible) =============
+                  SliverToBoxAdapter(
+                    child: Obx(() {
+                      if (controller.isStoryLoading.value) {
+                        return _buildStoriesShimmer();
+                      }
 
-              // ============= LOADING MORE =============
-              Obx(() {
-                return controller.isMoreDataAvailable.value
-                    ? SliverToBoxAdapter(
+                      // Identify My Story vs Others
+                      final currentUserId = controller.currentUser.value?.id;
+                      UserStoryGroup? myStoryGroup;
+                      List<UserStoryGroup> otherStories = [];
+
+                      if (currentUserId != null) {
+                        // Split existing stories
+                        for (var group in controller.storyData) {
+                          if (group.user.id == currentUserId ||
+                              (group.stories.isNotEmpty &&
+                                  group.stories.first.is_mine)) {
+                            myStoryGroup = group;
+                          } else {
+                            otherStories.add(group);
+                          }
+                        }
+                      } else {
+                        otherStories = List.from(controller.storyData);
+                      }
+
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        height: controller.showStories.value ? 130 : 0,
+                        curve: Curves.easeInOut,
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 500),
+                          opacity: controller.showStories.value ? 1.0 : 0.0,
+                          child: Container(
+                            height: 130,
+                            color: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              itemCount:
+                              otherStories.length + 1, // +1 for "Your Story"
+                              itemBuilder: (context, index) {
+                                if (index == 0) {
+                                  return _buildMyStoryItem(imageUrl, myStoryGroup);
+                                }
+
+                                final story = otherStories[index - 1];
+
+                                // Double-check: Skip if this is somehow the current user's story
+                                if (story.user.id == currentUserId ||
+                                    (story.stories.isNotEmpty &&
+                                        story.stories.first.is_mine)) {
+                                  return SizedBox.shrink(); // Don't show duplicate
+                                }
+
+                                return GestureDetector(
+                                  onTap: () {
+                                    Get.to(
+                                          () => FullScreenStoryViewer(
+                                        stories: story.stories,
+                                        initialIndex: 0,
+                                      ),
+                                    );
+                                  },
+                                  child: _buildStoryCard(
+                                    story, // Pass full story object
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+
+                  // ============= POSTS SECTION =============
+                  Obx(() {
+                    if (controller.isLoading.value && controller.posts.isEmpty) {
+                      return _buildPostsShimmer();
+                    }
+
+                    if (controller.posts.isEmpty) {
+                      return SliverFillRemaining(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image_outlined,
+                                size: 80,
+                                color: Colors.grey.shade300,
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                "No Posts Available",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final post = controller.posts[index];
+                        return _buildModernPostCard(post, index, context);
+                      }, childCount: controller.posts.length),
+                    );
+                  }),
+
+                  // ============= LOADING MORE =============
+                  Obx(() {
+                    return controller.isMoreDataAvailable.value
+                        ? SliverToBoxAdapter(
                       child: Padding(
                         padding: EdgeInsets.all(20),
                         child: Center(child: CircularProgressIndicator()),
                       ),
                     )
-                    : SliverToBoxAdapter(child: SizedBox.shrink());
-              }),
-            ],
-          ),
-        );
-      })),
+                        : SliverToBoxAdapter(child: SizedBox.shrink());
+                  }),
+                ],
+              ),
+            );
+          })),
     );
   }
 
@@ -393,7 +393,7 @@ class HomePage extends StatelessWidget {
   Widget _buildPostsShimmer() {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        (context, index) {
+            (context, index) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             child: Column(
@@ -514,7 +514,7 @@ class HomePage extends StatelessWidget {
         if (myStoryGroup != null && myStoryGroup.stories.isNotEmpty) {
           // View own story
           Get.to(
-            () => FullScreenStoryViewer(
+                () => FullScreenStoryViewer(
               stories: myStoryGroup.stories,
               initialIndex: 0,
             ),
@@ -548,7 +548,7 @@ class HomePage extends StatelessWidget {
                 )
               else
                 Container(color: Colors.grey.shade800),
-                
+
               // Dark Gradient for Text
               Positioned(
                 bottom: 0, left: 0, right: 0,
@@ -563,7 +563,7 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               // Text
               Positioned(
                 bottom: 8, left: 6, right: 6,
@@ -660,8 +660,8 @@ class HomePage extends StatelessWidget {
       onTap:
           () => Get.to(
             () =>
-                FullScreenStoryViewer(stories: story.stories, initialIndex: 0),
-          ),
+            FullScreenStoryViewer(stories: story.stories, initialIndex: 0),
+      ),
       child: Container(
         width: 80,
         margin: const EdgeInsets.only(right: 10),
@@ -679,7 +679,7 @@ class HomePage extends StatelessWidget {
               story.stories.isNotEmpty
                   ? _buildStoryMedia(story.stories.last)
                   : _buildUserAvatar(story.user.avatar),
-                  
+
               // Dark Gradient for Text
               Positioned(
                 bottom: 0, left: 0, right: 0,
@@ -694,7 +694,7 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               // Text
               Positioned(
                 bottom: 8, left: 6, right: 6,
@@ -766,9 +766,9 @@ class HomePage extends StatelessWidget {
         fit: BoxFit.cover,
         errorBuilder:
             (ctx, err, stack) => Container(
-              color: Colors.grey.shade200,
-              child: Icon(Icons.person, color: Colors.grey),
-            ),
+          color: Colors.grey.shade200,
+          child: Icon(Icons.person, color: Colors.grey),
+        ),
       );
     }
     return Container(
@@ -807,8 +807,8 @@ class HomePage extends StatelessWidget {
                 GestureDetector(
                   onTap:
                       () => Get.to(
-                        ProfileScreen(viewUserName: post.user.username),
-                      ),
+                    ProfileScreen(viewUserName: post.user.username),
+                  ),
                   child: Container(
                     width: 40,
                     height: 40,
@@ -818,14 +818,14 @@ class HomePage extends StatelessWidget {
                     ),
                     child: ClipOval(
                       child: (post.user.avatar != null &&
-                              post.user.avatar!.isNotEmpty &&
-                              post.user.avatar != "null")
+                          post.user.avatar!.isNotEmpty &&
+                          post.user.avatar != "null")
                           ? Image.network(
-                              AppUrls.getFullImageUrl(post.user.avatar!),
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Icon(Icons.person, color: Colors.grey.shade600, size: 24),
-                            )
+                        AppUrls.getFullImageUrl(post.user.avatar!),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Icon(Icons.person, color: Colors.grey.shade600, size: 24),
+                      )
                           : Icon(Icons.person, color: Colors.grey.shade600, size: 24),
                     ),
                   ),
@@ -844,10 +844,10 @@ class HomePage extends StatelessWidget {
                             child: GestureDetector(
                               onTap:
                                   () => Get.to(
-                                    ProfileScreen(
-                                      viewUserName: post.user.username,
-                                    ),
-                                  ),
+                                ProfileScreen(
+                                  viewUserName: post.user.username,
+                                ),
+                              ),
                               child: Text(
                                 post.user.username.isNotEmpty
                                     ? post.user.username
@@ -920,9 +920,9 @@ class HomePage extends StatelessWidget {
                     final isFollowing =
                         controller.followController
                             .isUserFollowing(
-                              post.user.id,
-                              initialValue: post.is_following,
-                            )
+                          post.user.id,
+                          initialValue: post.is_following,
+                        )
                             .value;
 
                     // If following, you can choose to hide it or show "Following"
@@ -946,14 +946,14 @@ class HomePage extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color:
-                              following
-                                  ? Colors.grey.shade100
-                                  : Colors.transparent,
+                          following
+                              ? Colors.grey.shade100
+                              : Colors.transparent,
                           border: Border.all(
                             color:
-                                following
-                                    ? Colors.grey.shade300
-                                    : Colors.blue.shade600,
+                            following
+                                ? Colors.grey.shade300
+                                : Colors.blue.shade600,
                             width: 1,
                           ),
                           borderRadius: BorderRadius.circular(6),
@@ -962,9 +962,9 @@ class HomePage extends StatelessWidget {
                           following ? "Following" : "Follow",
                           style: TextStyle(
                             color:
-                                following
-                                    ? Colors.black87
-                                    : Colors.blue.shade600,
+                            following
+                                ? Colors.black87
+                                : Colors.blue.shade600,
                             fontWeight: FontWeight.w600,
                             fontSize: 12,
                           ),
@@ -1011,16 +1011,16 @@ class HomePage extends StatelessWidget {
                         duration: const Duration(milliseconds: 300),
                         transitionBuilder:
                             (child, anim) =>
-                                ScaleTransition(scale: anim, child: child),
+                            ScaleTransition(scale: anim, child: child),
                         child: Icon(
                           post.stats.isLiked == true
                               ? Icons.favorite
                               : Icons.favorite_border,
                           key: ValueKey(post.stats.isLiked),
                           color:
-                              post.stats.isLiked == true
-                                  ? Colors.red
-                                  : Colors.black87,
+                          post.stats.isLiked == true
+                              ? Colors.red
+                              : Colors.black87,
                           size: 28,
                         ),
                       ),
@@ -1073,7 +1073,7 @@ class HomePage extends StatelessWidget {
                         Share.share("Check this post 👇\n$link");
                       },
                       child: Icon(
-                        CupertinoIcons.arrowshape_turn_up_right,
+                        Icons.share,
                         color: Colors.black87,
                         size: 24,
                       ),
@@ -1120,13 +1120,13 @@ class HomePage extends StatelessWidget {
                   ExpandableCaption(
                     text: post.caption!,
                     username:
-                        post.user.username.isNotEmpty
-                            ? post.user.username
-                            : post.user.name,
+                    post.user.username.isNotEmpty
+                        ? post.user.username
+                        : post.user.name,
                     onUsernameTap:
                         () => Get.to(
-                          ProfileScreen(viewUserName: post.user.username),
-                        ),
+                      ProfileScreen(viewUserName: post.user.username),
+                    ),
                   ),
                 ],
               ],
@@ -1145,132 +1145,132 @@ class HomePage extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder:
           (context) => Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            child: Padding(
-              padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-              child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Handle
-                Center(
-                  child: Container(
-                    margin: EdgeInsets.only(top: 10, bottom: 6),
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle
+              Center(
+                child: Container(
+                  margin: EdgeInsets.only(top: 10, bottom: 6),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
+              ),
 
-                // 1. Report
-                ListTile(
-                  leading: Icon(
-                    Icons.report_gmailerrorred_outlined,
+              // 1. Report
+              ListTile(
+                leading: Icon(
+                  Icons.report_gmailerrorred_outlined,
+                  color: Colors.redAccent,
+                ),
+                title: Text(
+                  "Report",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
                     color: Colors.redAccent,
                   ),
-                  title: Text(
-                    "Report",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: Colors.redAccent,
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    controller.openReportBottomSheet(postId: postId);
-                  },
                 ),
-                Divider(
-                  height: 1,
-                  thickness: 0.5,
-                  color: Colors.grey.shade100,
-                  indent: 16,
-                  endIndent: 16,
-                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  controller.openReportBottomSheet(postId: postId);
+                },
+              ),
+              Divider(
+                height: 1,
+                thickness: 0.5,
+                color: Colors.grey.shade100,
+                indent: 16,
+                endIndent: 16,
+              ),
 
-                // 2. About this profile
-                ListTile(
-                  leading: Icon(
-                    Icons.info_outline_rounded,
-                    color: Colors.black87,
-                  ),
-                  title: Text(
-                    "About this profile",
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    if (username.isNotEmpty) {
-                      Get.to(ProfileScreen(viewUserName: username));
-                    }
-                  },
+              // 2. About this profile
+              ListTile(
+                leading: Icon(
+                  Icons.info_outline_rounded,
+                  color: Colors.black87,
                 ),
+                title: Text(
+                  "About this profile",
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  if (username.isNotEmpty) {
+                    Get.to(ProfileScreen(viewUserName: username));
+                  }
+                },
+              ),
 
-                // 3. Block
-                ListTile(
-                  leading: Icon(Icons.block, color: Colors.redAccent),
-                  title: Text(
-                    "Block",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: Colors.redAccent,
-                    ),
+              // 3. Block
+              ListTile(
+                leading: Icon(Icons.block, color: Colors.redAccent),
+                title: Text(
+                  "Block",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: Colors.redAccent,
                   ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    controller.blockUser(userId);
-                  },
                 ),
-                Divider(
-                  height: 1,
-                  thickness: 0.5,
-                  color: Colors.grey.shade100,
-                  indent: 16,
-                  endIndent: 16,
-                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  controller.blockUser(userId);
+                },
+              ),
+              Divider(
+                height: 1,
+                thickness: 0.5,
+                color: Colors.grey.shade100,
+                indent: 16,
+                endIndent: 16,
+              ),
 
-                // 4. Interested
-                ListTile(
-                  leading: Icon(
-                    Icons.star_border_rounded,
-                    color: Colors.black87,
-                  ),
-                  title: Text(
-                    "Interested",
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    controller.markInterested(postId);
-                  },
+              // 4. Interested
+              ListTile(
+                leading: Icon(
+                  Icons.star_border_rounded,
+                  color: Colors.black87,
                 ),
-
-                // 5. Not Interested
-                ListTile(
-                  leading: Icon(
-                    Icons.visibility_off_outlined,
-                    color: Colors.black87,
-                  ),
-                  title: Text(
-                    "Not interested",
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    controller.markNotInterested(postId);
-                  },
+                title: Text(
+                  "Interested",
+                  style: TextStyle(fontWeight: FontWeight.w500),
                 ),
+                onTap: () {
+                  Navigator.pop(context);
+                  controller.markInterested(postId);
+                },
+              ),
 
-                SizedBox(height: 20),
-              ],
-            ),
-            ),
+              // 5. Not Interested
+              ListTile(
+                leading: Icon(
+                  Icons.visibility_off_outlined,
+                  color: Colors.black87,
+                ),
+                title: Text(
+                  "Not interested",
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  controller.markNotInterested(postId);
+                },
+              ),
+
+              SizedBox(height: 20),
+            ],
           ),
+        ),
+      ),
     );
   }
 }
@@ -1419,7 +1419,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                       ),
                     ),
                     Obx(
-                      () => Text(
+                          () => Text(
                         "${commentController.commentsList.length} ${commentController.commentsList.length == 1 ? 'comment' : 'comments'}",
                         style: TextStyle(
                           fontSize: 13,
@@ -1509,14 +1509,14 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                         ),
                         child: ClipOval(
                           child: (comment.user?.avtar != null &&
-                                  comment.user!.avtar!.isNotEmpty &&
-                                  comment.user!.avtar != "null")
+                              comment.user!.avtar!.isNotEmpty &&
+                              comment.user!.avtar != "null")
                               ? Image.network(
-                                  AppUrls.getFullImageUrl(comment.user!.avtar!),
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Icon(Icons.person, color: Colors.grey.shade600, size: 24),
-                                )
+                            AppUrls.getFullImageUrl(comment.user!.avtar!),
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Icon(Icons.person, color: Colors.grey.shade600, size: 24),
+                          )
                               : Icon(Icons.person, color: Colors.grey.shade600, size: 24),
                         ),
                       ),
@@ -1560,14 +1560,14 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                           children: [
                             _buildActionButton(
                               icon:
-                                  comment.hasLiked
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
+                              comment.hasLiked
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
                               label: "${comment.likesCount}",
                               color:
-                                  comment.hasLiked
-                                      ? Colors.red
-                                      : Colors.grey.shade700,
+                              comment.hasLiked
+                                  ? Colors.red
+                                  : Colors.grey.shade700,
                               onTap: () {
                                 commentController.likeComment(
                                   comment.id,
@@ -1617,16 +1617,16 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               margin: const EdgeInsets.only(left: 48),
               child: Column(
                 children:
-                    comment.replies.asMap().entries.map<Widget>((entry) {
-                      int replyIndex = entry.key;
-                      var reply = entry.value;
-                      return _buildReply(
-                        reply,
-                        index,
-                        replyIndex,
-                        widget.postId,
-                      );
-                    }).toList(),
+                comment.replies.asMap().entries.map<Widget>((entry) {
+                  int replyIndex = entry.key;
+                  var reply = entry.value;
+                  return _buildReply(
+                    reply,
+                    index,
+                    replyIndex,
+                    widget.postId,
+                  );
+                }).toList(),
               ),
             ),
         ],
@@ -1668,14 +1668,14 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               ),
               child: ClipOval(
                 child: (reply.user?.avtar != null &&
-                        reply.user!.avtar!.isNotEmpty &&
-                        reply.user!.avtar != "null")
+                    reply.user!.avtar!.isNotEmpty &&
+                    reply.user!.avtar != "null")
                     ? Image.network(
-                        AppUrls.getFullImageUrl(reply.user!.avtar!),
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            Icon(Icons.person, color: Colors.grey.shade600, size: 20),
-                      )
+                  AppUrls.getFullImageUrl(reply.user!.avtar!),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      Icon(Icons.person, color: Colors.grey.shade600, size: 20),
+                )
                     : Icon(Icons.person, color: Colors.grey.shade600, size: 20),
               ),
             ),
@@ -1874,9 +1874,9 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                       style: const TextStyle(fontSize: 14),
                       decoration: InputDecoration(
                         hintText:
-                            replyingToCommentId != null
-                                ? "Write a reply..."
-                                : "Share your thoughts...",
+                        replyingToCommentId != null
+                            ? "Write a reply..."
+                            : "Share your thoughts...",
                         hintStyle: TextStyle(
                           color: Colors.grey.shade500,
                           fontSize: 14,
@@ -1948,14 +1948,14 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   }
 
   void _showDeletePopupBlur(
-    BuildContext context,
-    Offset position,
-    int commentId,
-    int commentIndex,
-    int postId, {
-    required bool isReply,
-    int? replyIndex,
-  }) {
+      BuildContext context,
+      Offset position,
+      int commentId,
+      int commentIndex,
+      int postId, {
+        required bool isReply,
+        int? replyIndex,
+      }) {
     OverlayState overlayState = Overlay.of(context);
     late OverlayEntry blurEntry;
     late OverlayEntry popupEntry;
@@ -1963,15 +1963,15 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     blurEntry = OverlayEntry(
       builder:
           (_) => GestureDetector(
-            onTap: () {
-              blurEntry.remove();
-              popupEntry.remove();
-            },
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(color: Colors.black.withOpacity(0.4)),
-            ),
-          ),
+        onTap: () {
+          blurEntry.remove();
+          popupEntry.remove();
+        },
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(color: Colors.black.withOpacity(0.4)),
+        ),
+      ),
     );
 
     popupEntry = OverlayEntry(
@@ -4498,7 +4498,7 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
             onTap: () async {
               final homeController = Get.find<HomeController>();
               var config = homeController.profileConfig.value;
-              
+
               if (config == null) {
                 // Try reading from SharedPreferences
                 final cached = SharedPrefManager().profileConfig;
@@ -4517,14 +4517,14 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
                   const Center(child: CircularProgressIndicator(color: Colors.black)),
                   barrierDismissible: false,
                 );
-                
+
                 try {
                   await homeController.fetchProfileConfig();
                   config = homeController.profileConfig.value;
                 } catch (e) {
                   debugPrint("Error fetching profile config: $e");
                 }
-                
+
                 Get.back(); // close loading dialog
               }
 
