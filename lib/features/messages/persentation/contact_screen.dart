@@ -18,6 +18,7 @@ import '../../profile/screen/profile_screen.dart';
 import '../../quick_access/model/contact_model.dart';
 import '../../quick_access/persentation/controller/contact_controller.dart';
 import '../controller/chatt_controller.dart';
+import '../model/chat_data_model.dart';
 
 class ContactPerson extends StatelessWidget {
   ContactPerson({super.key});
@@ -258,31 +259,66 @@ class ContactPerson extends StatelessWidget {
         textColor = Colors.white;
 
         // Action for Message button
-        // onTapAction = () {
         onTapAction= () async {
-        //  final chatId = await chatController.createSinglePrivateChat(user.id!);
-
-          if (contact.chat_id != null) {
-
-            Get.toNamed(
+          if (contact.chat_id.isNotEmpty) {
+            final chatModel = ChatListModel(
+              id: int.parse(contact.chat_id),
+              uuid: "",
+              type: "private",
+              name: contact.name,
+              avatar: contact.avatar,
+              isOnline: false,
+              isAdmin: 0,
+              unreadCount: 0,
+              updatedAt: DateTime.now(),
+              participantsCount: 2,
+              participants: [
+                Participant(
+                  userId: contact.id,
+                  name: contact.name,
+                  avatar: contact.avatar,
+                  isAdmin: false,
+                )
+              ],
+            );
+            await Get.toNamed(
               AppRoutes.chattingScreen,
-              arguments: contact.chat_id,
+              arguments: chatModel,
             );
           } else {
-            CustomSnackBar.showInfo(message: "Creating chat user id"+contact.id.toString());
+            CustomSnackBar.showInfo(message: "Creating chat user id ${contact.id}");
             final newChatId = await chatController.createSinglePrivateChat(contact.id!.toInt());
             CustomSnackBar.showInfo(message: "Creating chat...$newChatId");
             if (newChatId != null) {
-              Get.toNamed(
+              final chatModel = ChatListModel(
+                id: int.parse(newChatId.toString()),
+                uuid: "",
+                type: "private",
+                name: contact.name,
+                avatar: contact.avatar,
+                isOnline: false,
+                isAdmin: 0,
+                unreadCount: 0,
+                updatedAt: DateTime.now(),
+                participantsCount: 2,
+                participants: [
+                  Participant(
+                    userId: contact.id,
+                    name: contact.name,
+                    avatar: contact.avatar,
+                    isAdmin: false,
+                  )
+                ],
+              );
+              await Get.toNamed(
                 AppRoutes.chattingScreen,
-                arguments: newChatId,
+                arguments: chatModel,
               );
             } else {
               CustomSnackBar.showError(message: "Unable to start chat");
             }
           }
         };
-        // };
       } else if (contact.isFollower.value) {
         buttonText = "Following";
         backgroundColor = Colors.blue;

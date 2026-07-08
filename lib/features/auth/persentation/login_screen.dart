@@ -120,14 +120,38 @@ class LoginPage extends GetWidget<LoginController> {
                               fontWeight: FontWeight.w900,
                               color: AppColors.primary,
                               letterSpacing: 1.5,
+                              shadows: const [
+                                Shadow(
+                                  offset: Offset(0, 1),
+                                  blurRadius: 2,
+                                  color: Colors.white24, // top highlight
+                                ),
+                                Shadow(
+                                  offset: Offset(2, 2),
+                                  blurRadius: 4,
+                                  color: Colors.black45, // bottom shadow
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             "Welcome Back!",
                             style: context.textTheme.titleMedium?.copyWith(
-                              color: Colors.grey.shade600,
+                              color: Colors.grey.shade400,
                               fontWeight: FontWeight.w500,
+                              shadows: const [
+                                Shadow(
+                                  offset: Offset(0, 1),
+                                  blurRadius: 1,
+                                  color: Colors.white24,
+                                ),
+                                Shadow(
+                                  offset: Offset(1.5, 1.5),
+                                  blurRadius: 3,
+                                  color: Colors.black38,
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -382,7 +406,7 @@ class LoginPage extends GetWidget<LoginController> {
                                       TextSpan(
                                         text: "Register",
                                         style: TextStyle(
-                                          color: AppColors.primary,
+                                          color: Colors.blue,
                                           fontWeight: FontWeight.bold,
                                           decoration: TextDecoration.underline,
                                         ),

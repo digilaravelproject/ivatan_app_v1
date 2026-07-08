@@ -145,7 +145,7 @@ class HomePage extends StatelessWidget {
                           children: [
                             IconButton(
                               icon: Icon(
-                                Icons.notifications,
+                                CupertinoIcons.bell,
                                 color: Colors.black87,
                                 size: 26,
                               ),
@@ -190,7 +190,7 @@ class HomePage extends StatelessWidget {
 
                           IconButton(
                             icon: Icon(
-                              Icons.chat_bubble_outline,
+                              Icons.wechat_outlined,
                               color: Colors.black87,
                               size: 26,
                             ),
