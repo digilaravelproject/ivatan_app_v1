@@ -337,6 +337,8 @@ class SettingsController extends GetxController {
   final FollowController followController = Get.put(FollowController());
 
   RxBool isPrivate = false.obs;
+  RxBool showEmail = true.obs;
+  RxBool showPhone = false.obs;
   RxBool isLoading = false.obs;
   Rx<UserData?> userProfile = Rx<UserData?>(null);
   RxString contactVisibility = 'both'.obs; // 'both', 'phone', 'email', 'none'
@@ -798,10 +800,9 @@ class SettingsController extends GetxController {
 
 
       request.fields["account_privacy"] = isPrivate.value ? "private" : "public";
-      request.fields["contact_visibility"] = contactVisibility.value;
-
-
-      request.fields["messaging_privacy"] = staticMessagingPrivacy;
+      request.fields["show_email"] = showEmail.value ? "1" : "0";
+      request.fields["show_phone"] = showPhone.value ? "1" : "0";
+      request.fields["contact_visibility"] = contactVisibility.value;      request.fields["messaging_privacy"] = staticMessagingPrivacy;
 
       // Employer and Seller values
       request.fields["is_employer"] = isEmployer.value ? "1" : "0";

@@ -16,10 +16,13 @@ import '../../subscription/data/model/profile_switch_request.dart';
 import '../../../core/helper/profile_permission_manager.dart' as ppm;
 import '../controller/homeController.dart';
 import '../../subscription/persentation/subscription_history_screen.dart';
+import 'blocked_users_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   SettingsScreen({super.key});
   final String? currentUserName = SharedPrefManager().user?.username;
+
+  // Using reactive variables from controller instead of static ones
 
   @override
   Widget build(BuildContext context) {
@@ -30,149 +33,125 @@ class SettingsScreen extends StatelessWidget {
     );
 
     return Scaffold(
-      backgroundColor: AppColors.white, // Clean White Background
+     // backgroundColor: const Color(0xFFF8F9FA), // Clean, slightly off-white background
       appBar: AppBar(
-        backgroundColor: AppColors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
         leading: GestureDetector(
             onTap: (){
               Navigator.pop(context);
             },
-            child: const Icon(CupertinoIcons.back, color: Colors.black)),
-        title: const Text("Settings", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
+            child: Container(
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5)
+                ]
+              ),
+              child: const Icon(CupertinoIcons.back, color: Colors.black, size: 20)
+            )
+        ),
+        title: const Text("Settings", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 0.5)),
       ),
       body: Obx((){
         return SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 15),
+              const SizedBox(height: 10),
 
-              // TOGGLES
+              _buildSectionHeader("Privacy"),
+              const SizedBox(height: 16),
+
+              // PRIVATE ACCOUNT TOGGLE
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12,),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade400)
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.lock_outline, color: Colors.black54),
-                    const SizedBox(width: 12),
-                    const Text("Private Account", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                    const Spacer(),
-                    Transform.scale(
-                      scale: 0.7,
-                      child: Switch(
-                        value: profileController.isPrivate.value,
-                        onChanged: (val) => profileController.isPrivate.value = val,
-                        activeColor: AppColors.primary,
-                      ),
-                    )
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
                   ],
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
+                    child: const Icon(Icons.lock_outline_rounded, color: AppColors.primary),
+                  ),
+                  title: const Text("Private Account", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                  subtitle: const Text("Only approved followers can see what you share", style: TextStyle(fontSize: 12, color: Colors.black54, height: 1.3)),
+                  trailing: CupertinoSwitch(
+                    value: profileController.isPrivate.value,
+                    activeColor: AppColors.primary,
+                    onChanged: (val) => profileController.isPrivate.value = val,
+                  ),
                 ),
               ),
 
               const SizedBox(height: 16),
 
-              // CONTACT VISIBILITY
-              /*Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              // SHOW EMAIL TOGGLE (STATIC UI)
+              Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade400)
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.contact_phone_outlined, color: Colors.black54),
-                        const SizedBox(width: 12),
-                        const Text("Contact Visibility", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Obx(() => Column(
-                      children: [
-                        _buildVisibilityOption(
-                          label: "Show Both (Phone & Email)",
-                          value: 'both',
-                          groupValue: profileController.contactVisibility.value,
-                          onChanged: (val) => profileController.contactVisibility.value = val!,
-                        ),
-                        _buildVisibilityOption(
-                          label: "Show Phone Only",
-                          value: 'phone',
-                          groupValue: profileController.contactVisibility.value,
-                          onChanged: (val) => profileController.contactVisibility.value = val!,
-                        ),
-                        _buildVisibilityOption(
-                          label: "Show Email Only",
-                          value: 'email',
-                          groupValue: profileController.contactVisibility.value,
-                          onChanged: (val) => profileController.contactVisibility.value = val!,
-                        ),
-                        _buildVisibilityOption(
-                          label: "Hide Contact Button",
-                          value: 'none',
-                          groupValue: profileController.contactVisibility.value,
-                          onChanged: (val) => profileController.contactVisibility.value = val!,
-                        ),
-                      ],
-                    )),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
                   ],
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), shape: BoxShape.circle),
+                    child: const Icon(Icons.email_outlined, color: Colors.blue),
+                  ),
+                  title: const Text("Show Email", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                  subtitle: const Text("Display your email address on your profile", style: TextStyle(fontSize: 12, color: Colors.black54, height: 1.3)),
+                  trailing: Obx(() => CupertinoSwitch(
+                    value: profileController.showEmail.value,
+                    activeColor: AppColors.primary,
+                    onChanged: (val) => profileController.showEmail.value = val,
+                  )),
                 ),
               ),
 
-              const SizedBox(height: 16,),*/
-
-              // EMPLOYER TOGGLE
-              /*Obx(() => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12,),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade400)
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.work_outline, color: Colors.black54),
-                    const SizedBox(width: 12),
-                    const Text("Employer Account", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                    const Spacer(),
-                    Transform.scale(
-                      scale: 0.7,
-                      child: Switch(
-                        value: profileController.isEmployer.value,
-                        onChanged: (val) {
-                          profileController.isEmployer.value = val;
-                          // If switching to employer, optionally update AppUrls globally
-                          if (val) AppUrls.selectedUserType.value = AppUrls.employer;
-                          profileController.updateProfile(shouldGoBack: true);
-                        },
-                        activeColor: AppColors.primary,
-                      ),
-                    )
-                  ],
-                ),
-              )),*/
-
               const SizedBox(height: 16),
 
-              // _buildCleanField(
-              //   child: CustomSearchableDropdown(
-              //     label: "Page Category",
-              //     items: profileController.pageCategoryList,
-              //     controller: profileController.pageCategoryController,
-              //     onChanged: (value) {
-              //       profileController.selectedPageCategory.value = value;
-              //     },
-              //   ),
-              // ),
+              // SHOW PHONE TOGGLE (STATIC UI)
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+                  ],
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), shape: BoxShape.circle),
+                    child: const Icon(Icons.phone_outlined, color: Colors.green),
+                  ),
+                  title: const Text("Show Phone Number", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                  subtitle: const Text("Display your phone number on your profile", style: TextStyle(fontSize: 12, color: Colors.black54, height: 1.3)),
+                  trailing: Obx(() => CupertinoSwitch(
+                    value: profileController.showPhone.value,
+                    activeColor: AppColors.primary,
+                    onChanged: (val) => profileController.showPhone.value = val,
+                  )),
+                ),
+              ),
+
+              const SizedBox(height: 28),
+              _buildSectionHeader("Profile Settings"),
+              const SizedBox(height: 16),
 
               _buildCleanField(
                 child: ProfileTypeSelector(
@@ -224,84 +203,33 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ),
 
-              // SELLER TOGGLE
-              /*Obx(() => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12,),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade400)
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.store_outlined, color: Colors.black54),
-                    const SizedBox(width: 12),
-                    const Text("Seller Account", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                    const Spacer(),
-                    Transform.scale(
-                      scale: 0.7,
-                      child: Switch(
-                        value: profileController.isSeller.value,
-                        onChanged: (val) {
-                          profileController.isSeller.value = val;
-                          // If switching to seller, optionally update AppUrls globally
-                          if (val) AppUrls.selectedUserType.value = AppUrls.seller;
-                          profileController.updateProfile(shouldGoBack: true);
-                        },
-                        activeColor: AppColors.primary,
-                      ),
-                    )
-                  ],
-                ),
-              )),*/
-
-            //  const SizedBox(height: 16,),
-
-              GestureDetector(
-                onTap: (){
-                  Get.to(AccountDeleteReasonScreen());
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade400)
-                  ),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 12),
-                      const Text("Delete Account", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                      //const Spacer(),
-                     // const Icon(Icons.arrow_forward_ios_rounded,size: 18,)
-                    ],
-                  ),
-                ),
-              ),
-
+              const SizedBox(height: 12),
+              _buildSectionHeader("Account Actions"),
               const SizedBox(height: 16),
 
-              GestureDetector(
-                onTap: () {
-                  Get.to(() => SubscriptionHistoryScreen());
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade400)
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.history_rounded, color: Colors.black54),
-                      const SizedBox(width: 12),
-                      const Text("Subscription History", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                      const Spacer(),
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.black54)
-                    ],
-                  ),
-                ),
+              _buildActionTile(
+                title: "Subscription History",
+                icon: Icons.history_rounded,
+                color: Colors.green,
+                onTap: () => Get.to(() => SubscriptionHistoryScreen()),
+              ),
+
+              const SizedBox(height: 12),
+
+              _buildActionTile(
+                title: "Delete Account",
+                icon: Icons.delete_outline_rounded,
+                color: Colors.red,
+                onTap: () => Get.to(() => AccountDeleteReasonScreen()),
+              ),
+
+              const SizedBox(height: 12),
+
+              _buildActionTile(
+                title: "Blocked Account",
+                icon: Icons.block,
+                color: Colors.red,
+                onTap: () => Get.to(() => BlockedUsersScreen()),
               ),
 
               const SizedBox(height: 40),
@@ -320,15 +248,17 @@ class SettingsScreen extends StatelessWidget {
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
-                  height: 50,
-                  borderRadius: 25, // Pill shape
+                  height: 55,
+                  borderRadius: 28, // Pill shape
+                 // fontSize: 16,
+                 // fontWeight: FontWeight.bold,
                 ),
               ),
 
               Obx(() {
                 if (profileController.isLoadingSwitchRequests.value) {
                   return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20.0),
+                    padding: EdgeInsets.symmetric(vertical: 30.0),
                     child: Center(
                       child: CircularProgressIndicator(color: Colors.black),
                     ),
@@ -342,27 +272,20 @@ class SettingsScreen extends StatelessWidget {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Divider(height: 40),
-                    const Text(
-                      "Switch Progress Tracker",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 40),
+                    _buildSectionHeader("Switch Progress Tracker"),
+                    const SizedBox(height: 16),
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: profileController.switchRequests.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 10),
+                      separatorBuilder: (context, index) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final req = profileController.switchRequests[index];
                         return _buildSwitchRequestCard(req, profileController);
                       },
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 40),
                   ],
                 );
               }),
@@ -370,6 +293,43 @@ class SettingsScreen extends StatelessWidget {
           ),
         );
       }),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Text(
+      title.toUpperCase(),
+      style: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
+        color: Colors.black45,
+        letterSpacing: 1.2,
+      ),
+    );
+  }
+
+  Widget _buildActionTile({required String title, required IconData icon, required Color color, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 2)),
+          ],
+        ),
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          leading: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+            child: Icon(icon, color: color, size: 22),
+          ),
+          title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+          trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.black38),
+        ),
+      ),
     );
   }
 
@@ -463,7 +423,7 @@ class SettingsScreen extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.grey.shade200),
           boxShadow: [
             BoxShadow(
@@ -472,14 +432,14 @@ class SettingsScreen extends StatelessWidget {
               offset: const Offset(0, 4),
             ),
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withOpacity(0.02),
               blurRadius: 6,
-              offset: const Offset(0, 1),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
           child: IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -490,21 +450,21 @@ class SettingsScreen extends StatelessWidget {
                 // Main card content
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                     child: Row(
                       children: [
                         // Type icon circle
                         Container(
-                          width: 42,
-                          height: 42,
+                          width: 46,
+                          height: 46,
                           decoration: BoxDecoration(
                             color: accentColor.withOpacity(0.1),
                             shape: BoxShape.circle,
-                            border: Border.all(color: accentColor.withOpacity(0.25), width: 1.5),
+                            border: Border.all(color: accentColor.withOpacity(0.2), width: 1.5),
                           ),
-                          child: Icon(profileIcon, color: accentColor, size: 20),
+                          child: Icon(profileIcon, color: accentColor, size: 22),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 14),
 
                         // Label + notes
                         Expanded(
@@ -515,28 +475,27 @@ class SettingsScreen extends StatelessWidget {
                               Text(
                                 profileLabel,
                                 style: const TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black87,
-                                  letterSpacing: 0.1,
                                 ),
                               ),
-                              const SizedBox(height: 3),
+                              const SizedBox(height: 4),
                               if (req.userNotes != null && req.userNotes!.trim().isNotEmpty)
                                 Text(
                                   req.userNotes!,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.grey.shade500,
+                                    fontSize: 12,
+                                    color: Colors.grey.shade600,
                                   ),
                                 )
                               else if (!isApproved)
                                 Text(
                                   'Tap to view details',
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     color: Colors.grey.shade400,
                                     fontStyle: FontStyle.italic,
                                   ),
@@ -552,22 +511,22 @@ class SettingsScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                               decoration: BoxDecoration(
                                 color: statusBgColor,
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: statusTextColor.withOpacity(0.3), width: 0.8),
+                                border: Border.all(color: statusTextColor.withOpacity(0.2), width: 1),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(statusIcon, color: statusTextColor, size: 10),
-                                  const SizedBox(width: 4),
+                                  Icon(statusIcon, color: statusTextColor, size: 12),
+                                  const SizedBox(width: 6),
                                   Text(
                                     statusText,
                                     style: TextStyle(
                                       color: statusTextColor,
-                                      fontSize: 9,
+                                      fontSize: 10,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.3,
                                     ),
@@ -576,11 +535,11 @@ class SettingsScreen extends StatelessWidget {
                               ),
                             ),
                              if (!isApproved) ...[
-                               const SizedBox(height: 6),
+                               const SizedBox(height: 8),
                                Icon(
                                  Icons.arrow_forward_ios_rounded,
                                  color: Colors.grey.shade400,
-                                 size: 11,
+                                 size: 12,
                                ),
                              ],
                           ],
@@ -598,27 +557,16 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildCleanField({required Widget child}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 2)),
+        ],
+      ),
+      padding: const EdgeInsets.all(12),
       child: child,
-    );
-  }
-
-  Widget _buildVisibilityOption({
-    required String label,
-    required String value,
-    required String groupValue,
-    required ValueChanged<String?> onChanged,
-  }) {
-    return RadioListTile<String>(
-      title: Text(label, style: const TextStyle(fontSize: 14)),
-      value: value,
-      groupValue: groupValue,
-      onChanged: onChanged,
-      activeColor: AppColors.primary,
-      contentPadding: EdgeInsets.zero,
-      dense: true,
-      visualDensity: VisualDensity.compact,
     );
   }
 }
