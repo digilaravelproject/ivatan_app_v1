@@ -18,7 +18,7 @@ import '../../../core/network/app_urls.dart';
 import '../../search/model/mixed_feed_model.dart';
 import '../../reels_screen/model/reel_model.dart' as rm;
 import '../../reels_screen/persentation/reels_view.dart';
-import '../model/post_model.dart';
+import 'user_search_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -44,7 +44,13 @@ class _SearchScreenState extends State<SearchScreen> {
               return [
                 // 1. Search Bar
                 SliverToBoxAdapter(
-                  child: CustomSearchBar(),
+                  child: CustomSearchBar(
+                    readOnly: true,
+                    onTap: () {
+
+                    }
+                    //=> Get.to(() => UserSearchScreen()),
+                  ),
                 ),
 
                 // 2. Banner Slider
