@@ -46,10 +46,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 SliverToBoxAdapter(
                   child: CustomSearchBar(
                     readOnly: true,
-                    onTap: () {
-
-                    }
-                    //=> Get.to(() => UserSearchScreen()),
+                    onTap: () => Get.to(() => UserSearchScreen()),
                   ),
                 ),
 
