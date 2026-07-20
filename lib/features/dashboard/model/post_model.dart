@@ -137,6 +137,8 @@ class PostItem {
   PostStats stats;
   String createdAt;
   String createdHuman;
+  bool? isPurchased;
+  double? price;
 
   PostItem({
     required this.id,
@@ -151,6 +153,8 @@ class PostItem {
     required this.stats,
     required this.createdAt,
     required this.createdHuman,
+    this.isPurchased,
+    this.price,
   });
 
   factory PostItem.fromJson(Map<String, dynamic> json) {
@@ -165,11 +169,13 @@ class PostItem {
       user: PostUser.fromJson(json["user"] ?? {}),
       media: json["media"] != null
           ? List<PostMedia>.from(
-          json["media"].map((e) => PostMedia.fromJson(e)))
+          (json["media"] as List).map((x) => PostMedia.fromJson(x)))
           : [],
       stats: PostStats.fromJson(json["stats"] ?? {}),
       createdAt: (json["created_at"] ?? "").toString(),
       createdHuman: (json["created_human"] ?? "").toString(),
+      isPurchased: json["is_purchased"],
+      price: json["price"] != null ? double.tryParse(json["price"].toString()) : null,
     );
   }
 }

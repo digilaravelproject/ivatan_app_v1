@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
+import '../../../core/constants/app_assets.dart';
 import '../controller/login_controller.dart';
 import '../../../core/helper/custom_buttons.dart';
 
@@ -42,18 +43,20 @@ class _VerifyOtpState extends State<VerifyOtp> {
             children: [
               const SizedBox(height: 20),
               // Icon
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.lock_outline_rounded,
-                  size: 40,
-                  color: AppColors.primary,
-                ),
-              ),
+             // Container(
+              //  padding: const EdgeInsets.all(16),
+                // decoration: BoxDecoration(
+                //   color: AppColors.primary.withOpacity(0.1),
+                //   shape: BoxShape.circle,
+                // ),
+               // child:
+                Image.asset(AppAssets.AppLogo,height: 100,width: 100,),
+                // const Icon(
+                //   Icons.lock_outline_rounded,
+                //   size: 40,
+                //   color: AppColors.primary,
+                // ),
+             // ),
               const SizedBox(height: 24),
 
               // Title

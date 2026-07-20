@@ -108,6 +108,19 @@ class AppUrls {
   static String readReceipts(dynamic messageId) => "api/v1/chats/messages/$messageId/read-receipts";
 
 
+  //    EXCLUSIVE CONTENT
+  static const String exclusiveEnablementStatus = "api/v1/exclusive/enablement-status";
+  static const String exclusiveRequestEnablement = "api/v1/exclusive/request-enablement";
+  static const String exclusiveVerifyEnablement = "api/v1/exclusive/request-enablement/verify";
+  static const String exclusivePosts = "api/v1/exclusive/posts";
+  static String exclusiveUpdatePostPrice(int id) => "api/v1/exclusive/posts/$id/price";
+  static const String exclusiveToggle = "api/v1/exclusive/toggle";
+  static const String exclusiveWalletBalance = "api/v1/exclusive/wallet/balance";
+  static const String exclusiveWalletTransactions = "api/v1/exclusive/wallet/transactions";
+  static String exclusivePurchaseInitiate(int postId) => "api/v1/exclusive/purchase/$postId/initiate";
+  static const String exclusivePurchaseVerify = "api/v1/exclusive/purchase/verify";
+  static String exclusiveMediaAccess(int postId, int mediaId) => "api/v1/exclusive/posts/$postId/media/$mediaId";
+
   //    NOTIFICATIONS
 
   static const String registerDeviceToken = "api/v1/notifications/device-tokens";
