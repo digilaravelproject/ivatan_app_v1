@@ -42,25 +42,15 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
       if (postController.isLoading.value && postController.posts.isEmpty) {
         return const Center(child: CircularProgressIndicator());
       }
+
       
       if (postController.posts.isEmpty) {
         return const Center(child: Text("No exclusive posts found."));
       }
 
-      final accessiblePosts = postController.posts.where((post) {
-        bool isPurchased = post.isPurchased ?? false;
-        bool hasAccess = post.hasAccess ?? false;
-        bool isLocked = !widget.isOwnProfile && !isPurchased && !hasAccess;
-        return !isLocked;
-      }).toList();
-
-      if (accessiblePosts.isEmpty) {
-        return const Center(child: Text("No accessible exclusive posts found."));
-      }
-
       return GridView.builder(
         padding: const EdgeInsets.all(2),
-        itemCount: accessiblePosts.length,
+        itemCount: postController.posts.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           crossAxisSpacing: 2,
@@ -68,7 +58,7 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
           childAspectRatio: 1,
         ),
         itemBuilder: (context, index) {
-          final post = accessiblePosts[index];
+          final post = postController.posts[index];
           
           // Determine if purchased/locked based on API response logic
           bool isPurchased = post.isPurchased ?? false;
@@ -87,8 +77,8 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
                 _showPurchaseDialog(context, exclusiveController, price, post.id ?? 0);
               } else {
                 if (post.type == 'reel') {
-                  // Filter only reels from accessiblePosts
-                  final reelsList = accessiblePosts.where((p) => p.type == 'reel').toList();
+                  // Filter only reels from postController
+                  final reelsList = postController.posts.where((p) => p.type == 'reel').toList();
                   final reelIndex = reelsList.indexWhere((r) => r.id == post.id);
                   
                   if (reelIndex != -1) {
@@ -133,7 +123,7 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
                   }
                 } else {
                   Get.to(() => ProfileFeedScreen(
-                    posts: accessiblePosts,
+                    posts: postController.posts,
                     initialIndex: index,
                     controller: postController, // Pass the OwnPostController
                   ));

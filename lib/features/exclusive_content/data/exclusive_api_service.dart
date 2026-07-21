@@ -33,6 +33,7 @@ class ExclusiveApiService {
     required String visibility,
     required File media,
     required double price,
+    String? title,
   }) async {
     return await _apiServices.callPost(
       AppUrls.exclusivePosts,
@@ -40,6 +41,7 @@ class ExclusiveApiService {
       data: {
         "type": type,
         "caption": caption,
+        "title": title ?? caption, // API requires title for videos
         "visibility": visibility,
         "media[]": [media],
         "price": price,
