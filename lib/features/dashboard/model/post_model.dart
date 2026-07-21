@@ -139,6 +139,10 @@ class PostItem {
   String createdHuman;
   bool? isPurchased;
   double? price;
+  bool? hasAccess;
+  bool? isExclusive;
+  String? exclusiveStatus;
+  String? purchaseStatus;
 
   PostItem({
     required this.id,
@@ -155,6 +159,10 @@ class PostItem {
     required this.createdHuman,
     this.isPurchased,
     this.price,
+    this.hasAccess,
+    this.isExclusive,
+    this.exclusiveStatus,
+    this.purchaseStatus,
   });
 
   factory PostItem.fromJson(Map<String, dynamic> json) {
@@ -176,6 +184,10 @@ class PostItem {
       createdHuman: (json["created_human"] ?? "").toString(),
       isPurchased: json["is_purchased"],
       price: json["price"] != null ? double.tryParse(json["price"].toString()) : null,
+      hasAccess: json["has_access"],
+      isExclusive: json["is_exclusive"],
+      exclusiveStatus: json["exclusive_status"]?.toString(),
+      purchaseStatus: json["purchase_status"]?.toString(),
     );
   }
 }

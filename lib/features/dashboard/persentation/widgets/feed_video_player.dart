@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import '../../../../core/network/app_urls.dart';
+import '../../../../db/shared_pref_manager.dart';
 
 class FeedVideoPlayer extends StatefulWidget {
   final String videoUrl;
@@ -34,8 +35,12 @@ class _FeedVideoPlayerState extends State<FeedVideoPlayer> {
   }
 
   void _initializeController() {
-    _controller = VideoPlayerController.networkUrl(Uri.parse(AppUrls.getFullImageUrl(widget.videoUrl)))
-      ..initialize().then((_) {
+    _controller = VideoPlayerController.networkUrl(
+      Uri.parse(AppUrls.getFullImageUrl(widget.videoUrl)),
+      httpHeaders: {
+        "Authorization": "Bearer ${SharedPrefManager().token ?? AppUrls.defaultApiKey}"
+      },
+    )..initialize().then((_) {
         if (mounted) {
           setState(() {
             _initialized = true;

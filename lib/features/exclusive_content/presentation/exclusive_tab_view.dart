@@ -47,9 +47,20 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
         return const Center(child: Text("No exclusive posts found."));
       }
 
+      final accessiblePosts = postController.posts.where((post) {
+        bool isPurchased = post.isPurchased ?? false;
+        bool hasAccess = post.hasAccess ?? false;
+        bool isLocked = !widget.isOwnProfile && !isPurchased && !hasAccess;
+        return !isLocked;
+      }).toList();
+
+      if (accessiblePosts.isEmpty) {
+        return const Center(child: Text("No accessible exclusive posts found."));
+      }
+
       return GridView.builder(
         padding: const EdgeInsets.all(2),
-        itemCount: postController.posts.length,
+        itemCount: accessiblePosts.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           crossAxisSpacing: 2,
@@ -57,12 +68,12 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
           childAspectRatio: 1,
         ),
         itemBuilder: (context, index) {
-          final post = postController.posts[index];
+          final post = accessiblePosts[index];
           
           // Determine if purchased/locked based on API response logic
-          // (assuming post object has is_purchased or similar, fallback to basic logic)
-          bool isPurchased = post.isPurchased ?? false; 
-          bool isLocked = !widget.isOwnProfile && !isPurchased;
+          bool isPurchased = post.isPurchased ?? false;
+          bool hasAccess = post.hasAccess ?? false;
+          bool isLocked = !widget.isOwnProfile && !isPurchased && !hasAccess;
           String price = "₹${post.price ?? '0'}";
           
           String imageUrl = "";
@@ -76,8 +87,8 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
                 _showPurchaseDialog(context, exclusiveController, price, post.id ?? 0);
               } else {
                 if (post.type == 'reel') {
-                  // Filter only reels
-                  final reelsList = postController.posts.where((p) => p.type == 'reel').toList();
+                  // Filter only reels from accessiblePosts
+                  final reelsList = accessiblePosts.where((p) => p.type == 'reel').toList();
                   final reelIndex = reelsList.indexWhere((r) => r.id == post.id);
                   
                   if (reelIndex != -1) {
@@ -122,7 +133,7 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
                   }
                 } else {
                   Get.to(() => ProfileFeedScreen(
-                    posts: postController.posts,
+                    posts: accessiblePosts,
                     initialIndex: index,
                     controller: postController, // Pass the OwnPostController
                   ));

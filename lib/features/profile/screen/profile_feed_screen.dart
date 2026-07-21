@@ -87,6 +87,14 @@ class _ProfileFeedScreenState extends State<ProfileFeedScreen> {
            displayPosts = widget.posts;
         }
 
+        // Filter out locked exclusive posts so they don't appear in the feed
+        displayPosts = displayPosts.where((post) {
+           bool isPurchased = post.isPurchased ?? false;
+           bool hasAccess = post.hasAccess ?? false;
+           bool isLocked = !post.is_mine && !isPurchased && !hasAccess && (post.price != null || post.isExclusive == true);
+           return !isLocked;
+        }).toList();
+
         return ListView.builder(
           controller: _scrollController,
           itemCount: displayPosts.length,
