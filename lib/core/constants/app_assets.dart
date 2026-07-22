@@ -1,6 +1,7 @@
 class AppAssets {
 
   static const String imgOnbording1 = "assets/images/onbording1.jpg";
+  static const String imgOnboarding6 = "assets/images/onboarding6.png";
   static const String imgOnbording2 = "assets/images/onbording2.jpg";
   static const String imgOnbording3 = "assets/images/onbording3.jpg";
   static const String imgOnbording4 = "assets/images/onbording4.jpg";

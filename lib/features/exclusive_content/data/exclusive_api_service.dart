@@ -97,4 +97,41 @@ class ExclusiveApiService {
       },
     );
   }
+
+  Future<Map<String, dynamic>?> getDashboardStats({String? dateFrom, String? dateTo, String? contentType}) async {
+    Map<String, String> queryParams = {};
+    if (dateFrom != null) queryParams['date_from'] = dateFrom;
+    if (dateTo != null) queryParams['date_to'] = dateTo;
+    if (contentType != null) queryParams['content_type'] = contentType;
+
+    return await _apiServices.callGet(
+      AppUrls.creatorDashboardStats,
+      queryParams: queryParams.isNotEmpty ? queryParams : null,
+    );
+  }
+
+  Future<Map<String, dynamic>?> getExclusiveContent({
+    int page = 1,
+    int perPage = 15,
+    String? sortBy,
+    String? order,
+    String? dateFrom,
+    String? dateTo,
+    String? contentType,
+  }) async {
+    Map<String, String> queryParams = {
+      'page': page.toString(),
+      'per_page': perPage.toString(),
+    };
+    if (sortBy != null) queryParams['sort_by'] = sortBy;
+    if (order != null) queryParams['order'] = order;
+    if (dateFrom != null) queryParams['date_from'] = dateFrom;
+    if (dateTo != null) queryParams['date_to'] = dateTo;
+    if (contentType != null) queryParams['content_type'] = contentType;
+
+    return await _apiServices.callGet(
+      AppUrls.creatorDashboardExclusiveContent,
+      queryParams: queryParams,
+    );
+  }
 }

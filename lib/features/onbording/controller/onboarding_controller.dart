@@ -10,9 +10,9 @@ class OnboardingController extends GetxController {
 
   final List<OnboardingModel> onboardingList = [
     OnboardingModel(
-      image: AppAssets.imgOnbording1,
-      title: 'i-connect\n Your Connection, Your Privacy',
-      description: 'Connect, talk, share — and build real \n relationships with purpose.',
+      image: AppAssets.imgOnboarding6,
+      title: '',
+      description: '',
     ),
     OnboardingModel(
       image: AppAssets.imgOnbording2,

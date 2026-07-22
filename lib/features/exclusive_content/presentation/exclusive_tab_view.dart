@@ -71,63 +71,67 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
             imageUrl = post.media!.first.url ?? "";
           }
 
+          void openPost() {
+            if (post.type == 'reel') {
+              // Filter only reels from postController
+              final reelsList = postController.posts.where((p) => p.type == 'reel').toList();
+              final reelIndex = reelsList.indexWhere((r) => r.id == post.id);
+              
+              if (reelIndex != -1) {
+                // Map to ReelModel
+                final mappedReels = reelsList.map((p) => rm.ReelModel(
+                  id: p.id,
+                  uuid: p.uuid,
+                  caption: p.caption,
+                  isMine: p.is_mine,
+                  isFollowing: p.is_following,
+                  user: rm.UserModel(
+                    id: p.user.id,
+                    name: p.user.name,
+                    username: p.user.username,
+                    avatar: p.user.avatar ?? "",
+                    isVerified: p.user.isVerified,
+                    interests: "",
+                  ),
+                  media: p.media.map((m) => rm.MediaModel(
+                    id: m.id,
+                    type: m.type,
+                    url: m.url,
+                    thumbnail: m.thumbnail,
+                    mimeType: "",
+                  )).toList(),
+                  stats: rm.ReelStats(
+                    likeCount: p.stats.likeCount ?? 0,
+                    isLiked: p.stats.isLiked ?? false,
+                    commentCount: p.stats.commentCount ?? 0,
+                    shareCount: p.stats.shareCount ?? 0,
+                    viewCount: p.stats.viewCount ?? 0,
+                    isSaved: p.stats.isSaved ?? false,
+                  ),
+                  createdAt: p.createdAt,
+                  createdHuman: p.createdHuman,
+                )).toList();
+
+                Get.to(() => ReelsView(
+                  reels: mappedReels,
+                  initialIndex: reelIndex,
+                ));
+              }
+            } else {
+              Get.to(() => ProfileFeedScreen(
+                posts: postController.posts,
+                initialIndex: index,
+                controller: postController, // Pass the OwnPostController
+              ));
+            }
+          }
+
           return GestureDetector(
             onTap: () {
               if (isLocked) {
-                _showPurchaseDialog(context, exclusiveController, price, post.id ?? 0);
+                _showPurchaseDialog(context, exclusiveController, price, post.id ?? 0, openPost);
               } else {
-                if (post.type == 'reel') {
-                  // Filter only reels from postController
-                  final reelsList = postController.posts.where((p) => p.type == 'reel').toList();
-                  final reelIndex = reelsList.indexWhere((r) => r.id == post.id);
-                  
-                  if (reelIndex != -1) {
-                    // Map to ReelModel
-                    final mappedReels = reelsList.map((p) => rm.ReelModel(
-                      id: p.id,
-                      uuid: p.uuid,
-                      caption: p.caption,
-                      isMine: p.is_mine,
-                      isFollowing: p.is_following,
-                      user: rm.UserModel(
-                        id: p.user.id,
-                        name: p.user.name,
-                        username: p.user.username,
-                        avatar: p.user.avatar ?? "",
-                        isVerified: p.user.isVerified,
-                        interests: "",
-                      ),
-                      media: p.media.map((m) => rm.MediaModel(
-                        id: m.id,
-                        type: m.type,
-                        url: m.url,
-                        thumbnail: m.thumbnail,
-                        mimeType: "",
-                      )).toList(),
-                      stats: rm.ReelStats(
-                        likeCount: p.stats.likeCount ?? 0,
-                        isLiked: p.stats.isLiked ?? false,
-                        commentCount: p.stats.commentCount ?? 0,
-                        shareCount: p.stats.shareCount ?? 0,
-                        viewCount: p.stats.viewCount ?? 0,
-                        isSaved: p.stats.isSaved ?? false,
-                      ),
-                      createdAt: p.createdAt,
-                      createdHuman: p.createdHuman,
-                    )).toList();
-
-                    Get.to(() => ReelsView(
-                      reels: mappedReels,
-                      initialIndex: reelIndex,
-                    ));
-                  }
-                } else {
-                  Get.to(() => ProfileFeedScreen(
-                    posts: postController.posts,
-                    initialIndex: index,
-                    controller: postController, // Pass the OwnPostController
-                  ));
-                }
+                openPost();
               }
             },
             child: Stack(
@@ -171,7 +175,7 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
                       const SizedBox(height: 8),
                       ElevatedButton(
                         onPressed: () {
-                          _showPurchaseDialog(context, exclusiveController, price, post.id ?? 0);
+                          _showPurchaseDialog(context, exclusiveController, price, post.id ?? 0, openPost);
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
@@ -198,7 +202,7 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
     });
   }
 
-  void _showPurchaseDialog(BuildContext context, ExclusiveController controller, String price, int postId) {
+  void _showPurchaseDialog(BuildContext context, ExclusiveController controller, String price, int postId, VoidCallback onSuccess) {
     showDialog(
       context: context,
       builder: (context) {
@@ -211,10 +215,13 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
               child: const Text("Cancel"),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(context);
                 // Call initiate purchase
-                controller.initiatePurchase(postId);
+                bool success = await controller.initiatePurchase(postId);
+                if (success) {
+                  onSuccess();
+                }
               },
               child: const Text("Unlock"),
             ),

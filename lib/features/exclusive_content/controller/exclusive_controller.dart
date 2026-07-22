@@ -159,8 +159,9 @@ class ExclusiveController extends GetxController {
       isLoading.value = false;
     }
   }
-  Future<void> initiatePurchase(int postId) async {
+  Future<bool> initiatePurchase(int postId) async {
     isLoading.value = true;
+    bool isSuccess = false;
     try {
       final response = await _apiService.initiatePurchase(postId);
       if (response != null && response['success'] == true) {
@@ -176,9 +177,11 @@ class ExclusiveController extends GetxController {
             final verifyResp = await _apiService.verifyPurchase(purchaseId, "PAYMENT_SUCCESS_REF", "PAYMENT_SUCCESS");
             if (verifyResp != null && verifyResp['success'] == true) {
                Get.snackbar("Success", "Purchase successful! Content unlocked.", backgroundColor: Colors.green, colorText: Colors.white);
+               isSuccess = true;
             } else {
                // Fallback optimistic
                Get.snackbar("Success", "Payment successful! It may take a moment to unlock.", backgroundColor: Colors.green, colorText: Colors.white);
+               isSuccess = true;
             }
           } else if (result == false) {
              Get.snackbar("Payment Failed", "Purchase failed on PhonePe. Please try again.", backgroundColor: Colors.red, colorText: Colors.white);
@@ -188,6 +191,7 @@ class ExclusiveController extends GetxController {
         } else {
           // No redirect URL means it could be a free post or fully paid by wallet?
           Get.snackbar("Success", "Content unlocked.");
+          isSuccess = true;
         }
       } else {
         Get.snackbar("Error", response?['message'] ?? "Failed to initiate purchase.");
@@ -197,5 +201,6 @@ class ExclusiveController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+    return isSuccess;
   }
 }

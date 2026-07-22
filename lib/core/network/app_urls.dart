@@ -109,6 +109,8 @@ class AppUrls {
 
 
   //    EXCLUSIVE CONTENT
+  static const String creatorDashboardStats = "api/v1/creator/dashboard/stats";
+  static const String creatorDashboardExclusiveContent = "api/v1/creator/dashboard/exclusive-content";
   static const String exclusiveEnablementStatus = "api/v1/exclusive/enablement-status";
   static const String exclusiveRequestEnablement = "api/v1/exclusive/request-enablement";
   static const String exclusiveVerifyEnablement = "api/v1/exclusive/request-enablement/verify";
