@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
@@ -55,9 +56,13 @@ class FeedPostWidget extends StatelessWidget {
                         color: Colors.grey.shade100
                     ),
                     child: ClipOval(
-                      child: post.user.avatar != null && post.user.avatar!.isNotEmpty
-                          ? Image.network(post.user.avatar!, fit: BoxFit.cover)
-                          : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                      child: post.user.avatar != null && post.user.avatar!.isNotEmpty && !post.user.avatar!.contains("ui-avatars.com")
+                          ? Image.network(
+                              post.user.avatar!, 
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => const Icon(CupertinoIcons.person, color: Colors.grey),
+                            )
+                          : const Icon(CupertinoIcons.person, color: Colors.grey),
                     ),
                   ),
                 ),
@@ -89,7 +94,6 @@ class FeedPostWidget extends StatelessWidget {
                           if (post.user.isVerified) ...[
                             const SizedBox(width: 4),
                             Image.asset(AppAssets.imgverified,height: 16,width: 16,),
-                           // const Icon(Icons.verified, color: Colors.blue, size: 14),
                           ],
                           
                           // Date / Time

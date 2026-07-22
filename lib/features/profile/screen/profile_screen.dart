@@ -1625,7 +1625,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           .profilePhotoPath!
                                                           .isNotEmpty &&
                                                       user.profilePhotoPath !=
-                                                          "null")
+                                                          "null" &&
+                                                      !user.profilePhotoPath!.contains("ui-avatars.com"))
                                                   ? Image.network(
                                                     AppUrls.getFullImageUrl(
                                                       user.profilePhotoPath,
@@ -1862,14 +1863,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               radius: 40,
               backgroundImage:
                   (user.profilePhotoPath != null &&
-                          user.profilePhotoPath!.isNotEmpty)
+                          user.profilePhotoPath!.isNotEmpty &&
+                          !user.profilePhotoPath!.contains("ui-avatars.com"))
                       ? NetworkImage(
                         AppUrls.getFullImageUrl(user.profilePhotoPath),
                       )
                       : null,
               child:
                   (user.profilePhotoPath == null ||
-                          user.profilePhotoPath!.isEmpty)
+                          user.profilePhotoPath!.isEmpty ||
+                          user.profilePhotoPath!.contains("ui-avatars.com"))
                       ? const Icon(Icons.person, size: 40)
                       : null,
             ),

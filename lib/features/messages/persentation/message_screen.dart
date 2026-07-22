@@ -293,29 +293,19 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                                     color: Colors.grey.shade200,
                                   ),
                                   child: ClipOval(
-                                    child: (message.avatar != null && message.avatar.toString().isNotEmpty)
+                                    child: (message.avatar != null && message.avatar.toString().isNotEmpty && !message.avatar.toString().contains("ui-avatars.com"))
                                         ? Image.network(
                                             message.avatar.toString(),
                                             fit: BoxFit.cover,
                                             errorBuilder: (context, error, stackTrace) {
                                               return message.type == "group"
                                                   ? const Center(child: Icon(Icons.group, color: Colors.grey, size: 26))
-                                                  : Center(
-                                                      child: Text(
-                                                        message.name.isNotEmpty ? message.name[0].toUpperCase() : "?",
-                                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
-                                                      ),
-                                                    );
+                                                  : const Center(child: Icon(CupertinoIcons.person, color: Colors.grey, size: 26));
                                             },
                                           )
                                         : (message.type == "group"
                                             ? const Center(child: Icon(Icons.group, color: Colors.grey, size: 26))
-                                            : Center(
-                                                child: Text(
-                                                  message.name.isNotEmpty ? message.name[0].toUpperCase() : "?",
-                                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
-                                                ),
-                                              )),
+                                            : const Center(child: Icon(CupertinoIcons.person, color: Colors.grey, size: 26))),
                                   ),
                                 ),
                                 if (message.type != "group" && message.isOnline)
