@@ -136,6 +136,7 @@ flutter:
     - assets/icon/
     - assets/images/
     - assets/images/i_app.png
+    - assets/images/onboarding6.png
     - assets/images/reel_like.svg
     - assets/images/verified.jpeg
   #   - images/a_dot_ham.jpeg

@@ -7,8 +7,9 @@ class AssetsRes {
   AssetsRes._();
 
   static const String PROJECT_NAME = 'i_vatan_app';
-  static const String PROJECT_VERSION = '1.0.2+5';
+  static const String PROJECT_VERSION = '1.0.2+6';
   static const String I_APP = 'assets/images/i_app.png';
+  static const String ONBOARDING6 = 'assets/images/onboarding6.png';
   static const String REEL_LIKE = 'assets/images/reel_like.svg';
   static const String VERIFIED = 'assets/images/verified.jpeg';
 }
