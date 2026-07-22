@@ -129,7 +129,12 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
           return GestureDetector(
             onTap: () {
               if (isLocked) {
-                _showPurchaseDialog(context, exclusiveController, price, post.id ?? 0, openPost);
+                _showPurchaseDialog(context, exclusiveController, price, post.id ?? 0, () {
+                  post.isPurchased = true;
+                  post.hasAccess = true;
+                  postController.posts.refresh();
+                  openPost();
+                });
               } else {
                 openPost();
               }
@@ -149,51 +154,44 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
                 if (isLocked) ...[
                   ClipRect(
                     child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                      filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
                       child: Container(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black26, // Light dark overlay so image is still visible
                       ),
                     ),
                   ),
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.lock, color: Colors.white, size: 28),
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          price,
-                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                        ),
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white70, width: 1),
+                        borderRadius: BorderRadius.circular(16),
+                        color: Colors.black12, // Very subtle dark tint
                       ),
-                      const SizedBox(height: 8),
-                      ElevatedButton(
-                        onPressed: () {
-                          _showPurchaseDialog(context, exclusiveController, price, post.id ?? 0, openPost);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                          minimumSize: const Size(60, 30),
-                        ),
-                        child: const Text("Unlock", style: TextStyle(fontSize: 12)),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.lock, color: Colors.white, size: 12),
+                          const SizedBox(width: 4),
+                          Text("Unlock for $price", style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500)),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
+                ],
+              // Top right lock icon indicator
+              if (isLocked)
+                const Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Icon(Icons.lock, color: Colors.grey, size: 18),
+                )
+              else if (!widget.isOwnProfile)
+                const Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Icon(Icons.lock_open, color: Colors.grey, size: 18),
                 ),
-              ],
-              
-              // Star Icon indicating it's exclusive
-              const Positioned(
-                top: 4,
-                right: 4,
-                child: Icon(Icons.star, color: Colors.amber, size: 16),
-              ),
             ],
             ),
           );
