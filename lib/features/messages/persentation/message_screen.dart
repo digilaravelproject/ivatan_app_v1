@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:i_vatan_app/core/constants/app_assets.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:i_vatan_app/db/shared_pref_manager.dart';
-import 'package:i_vatan_app/features/profile/screen/profile_screen.dart';
 import 'package:i_vatan_app/route/app_pages.dart';
 
 import '../../../core/network/app_urls.dart';
@@ -56,7 +55,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
         gradient: LinearGradient(
           colors: [
             AppColors.white,
-            AppColors.primary.withOpacity(0.02),
+            AppColors.primary.withValues(alpha: 0.02),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -272,7 +271,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                     separatorBuilder: (ctx, i) => Divider(height: 1, indent: 80, color: Colors.grey.shade100),
                     itemBuilder: (context, index) {
                     final message = controller.filteredChatList[index];
-                    final hasUnread = message.unreadCount! > 0;
+                    final hasUnread = message.unreadCount > 0;
                     
                     return InkWell(
                       onTap: () async {
@@ -448,8 +447,5 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
     }
   }
 
-  Widget _buildStoryItem(String name, String imageUrl) {
-      // Unused but keeping structure
-      return SizedBox(); 
-  }
+
 }

@@ -19,6 +19,8 @@ import '../../search/model/mixed_feed_model.dart';
 import '../../reels_screen/model/reel_model.dart' as rm;
 import '../../reels_screen/persentation/reels_view.dart';
 import 'user_search_screen.dart';
+import '../../dashboard/model/post_model.dart' as pm;
+import '../../profile/screen/profile_feed_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -266,8 +268,18 @@ class TrendingScreen extends StatelessWidget {
                             initialIndex: initialIndex >= 0 ? initialIndex : 0,
                           ));
                         }
-                      } else if (item.type == "image") {
-                        Get.to(() => ImagePostScreen(postId: item.id));
+                      } else {
+                        final List<pm.PostItem> postItemList = controller.posts
+                            .where((p) => p.type != "video" && p.type != "reel")
+                            .map((p) => _convertToPostItem(p))
+                            .toList();
+                        final int initialIndexImage = postItemList.indexWhere((p) => p.id == item.id);
+                        if (postItemList.isNotEmpty) {
+                          Get.to(() => ProfileFeedScreen(
+                            posts: postItemList,
+                            initialIndex: initialIndexImage >= 0 ? initialIndexImage : 0,
+                          ));
+                        }
                       }
                     },
                     child: ClipRRect(
@@ -374,8 +386,18 @@ class TrendingScreen extends StatelessWidget {
                     }
                   }
                 }
-                else if (postType == "image") {
-                  Get.to(()=>ImagePostScreen(postId: postId,));
+                else {
+                  final List<pm.PostItem> postItemList = controller.intrestedPostList
+                      .where((p) => p.type != "video" && p.type != "reel")
+                      .map((p) => _convertToPostItem(p))
+                      .toList();
+                  final int initialIndex = postItemList.indexWhere((p) => p.id == postId);
+                  if (postItemList.isNotEmpty) {
+                    Get.to(() => ProfileFeedScreen(
+                      posts: postItemList,
+                      initialIndex: initialIndex >= 0 ? initialIndex : 0,
+                    ));
+                  }
                 }
               },
               child: ClipRRect(
@@ -503,6 +525,50 @@ class TrendingScreen extends StatelessWidget {
       createdAt: post.createdAt.toIso8601String(),
       createdHuman: post.createdHuman,
       likeStatus: post.stats.isLiked,
+    );
+  }
+
+  pm.PostItem _convertToPostItem(TrendingPost post) {
+    return pm.PostItem(
+      id: post.id,
+      uuid: post.uuid,
+      type: post.type,
+      caption: post.caption ?? "",
+      visibility: "public",
+      is_mine: post.isMine,
+      is_following: post.isFollowing,
+      user: pm.PostUser(
+        id: post.user.id,
+        name: post.user.name,
+        username: post.user.username,
+        avatar: post.user.avatar ?? "",
+        isVerified: post.user.isVerified,
+        occupation: "",
+        interests: post.user.interests ?? "",
+      ),
+      media: post.media.map((m) => pm.PostMedia(
+        id: m.id,
+        type: m.type,
+        url: m.url,
+        thumbnail: m.thumbnail,
+        mimeType: m.mimeType,
+        aspectRatio: "",
+      )).toList(),
+      stats: pm.PostStats(
+        likeCount: post.stats.likeCount,
+        commentCount: post.stats.commentCount,
+        shareCount: post.stats.shareCount,
+        viewCount: post.stats.viewCount,
+        isLiked: post.stats.isLiked,
+        isSaved: post.stats.isSaved,
+        isBlocked: false,
+      ),
+      createdAt: post.createdAt.toIso8601String(),
+      createdHuman: post.createdHuman,
+      isPurchased: false,
+      price: null,
+      hasAccess: false,
+      isExclusive: false,
     );
   }
 }
@@ -1247,8 +1313,18 @@ class ForYouGridScreen extends StatelessWidget {
                       initialIndex: initialIndex >= 0 ? initialIndex : 0,
                     ));
                   }
-                } else if (item.type == "image") {
-                  Get.to(() => ImagePostScreen(postId: item.id));
+                } else {
+                  final List<pm.PostItem> postItemList = controller.forYouPosts
+                      .where((p) => p.type != "video" && p.type != "reel")
+                      .map((p) => _convertToPostItem(p))
+                      .toList();
+                  final int initialIndex = postItemList.indexWhere((p) => p.id == item.id);
+                  if (postItemList.isNotEmpty) {
+                    Get.to(() => ProfileFeedScreen(
+                      posts: postItemList,
+                      initialIndex: initialIndex >= 0 ? initialIndex : 0,
+                    ));
+                  }
                 }
               },
               child: ClipRRect(
@@ -1347,6 +1423,50 @@ class ForYouGridScreen extends StatelessWidget {
       createdAt: post.createdAt.toIso8601String(),
       createdHuman: post.createdHuman,
       likeStatus: post.stats.isLiked,
+    );
+  }
+
+  pm.PostItem _convertToPostItem(TrendingPost post) {
+    return pm.PostItem(
+      id: post.id,
+      uuid: post.uuid,
+      type: post.type,
+      caption: post.caption ?? "",
+      visibility: "public",
+      is_mine: post.isMine,
+      is_following: post.isFollowing,
+      user: pm.PostUser(
+        id: post.user.id,
+        name: post.user.name,
+        username: post.user.username,
+        avatar: post.user.avatar ?? "",
+        isVerified: post.user.isVerified,
+        occupation: "",
+        interests: post.user.interests ?? "",
+      ),
+      media: post.media.map((m) => pm.PostMedia(
+        id: m.id,
+        type: m.type,
+        url: m.url,
+        thumbnail: m.thumbnail,
+        mimeType: m.mimeType,
+        aspectRatio: "",
+      )).toList(),
+      stats: pm.PostStats(
+        likeCount: post.stats.likeCount,
+        commentCount: post.stats.commentCount,
+        shareCount: post.stats.shareCount,
+        viewCount: post.stats.viewCount,
+        isLiked: post.stats.isLiked,
+        isSaved: post.stats.isSaved,
+        isBlocked: false,
+      ),
+      createdAt: post.createdAt.toIso8601String(),
+      createdHuman: post.createdHuman,
+      isPurchased: false,
+      price: null,
+      hasAccess: false,
+      isExclusive: false,
     );
   }
 }

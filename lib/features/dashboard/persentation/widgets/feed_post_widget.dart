@@ -310,7 +310,7 @@ class FeedPostWidget extends StatelessWidget {
                         final link = "https://ivatan.in/post/${post.id}?type=${post.media.first.type}";
                         Share.share("Check this post 👇\n$link");
                       },
-                      child: const Icon(Icons.send_outlined, color: Colors.black87, size: 24),
+                      child: const Icon(Icons.share, color: Colors.black87, size: 24),
                     ),
 
                     const Spacer(),
