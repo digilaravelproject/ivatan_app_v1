@@ -64,8 +64,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                   _scrollToBottom(scrollController);
                 });
 
-                return RefreshIndicator(
-                  color: AppColors.primary,
+                return RefreshIndicator(color: AppColors.primary,
                   onRefresh: () async {
                     final chatId = controller.chatProfile.value?.id;
                     if (chatId != null) {

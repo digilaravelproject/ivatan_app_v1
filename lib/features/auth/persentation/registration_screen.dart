@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:intl_phone_field/country_picker_dialog.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:intl_phone_field/phone_number.dart';
+import 'package:i_vatan_app/features/auth/widgets/custom_phone_field.dart';
 import 'package:i_vatan_app/features/auth/controller/register_controller.dart';
 import 'package:i_vatan_app/features/auth/persentation/login_screen.dart';
 
@@ -89,64 +87,14 @@ class RegistrationScreen extends GetWidget<RegisterController> {
                   validator: controller.validateEmail,
                 ),
                 const SizedBox(height: 20),
-                IntlPhoneField(
+                CustomPhoneField(
                   controller: controller.phoneController,
-                  decoration: InputDecoration(
-                    labelText: 'Mobile No',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-                    suffixIcon: controller.phoneController.text.isNotEmpty
-                        ? const Icon(Icons.lock, color: Colors.grey)
-                        : null,
-                  ),
-                  initialCountryCode: 'IN',
-                  onCountryChanged: (country) {
-                    controller.countryCode.value = "+${country.dialCode}";
-                  },
-                  disableLengthCheck: true,
-                  dropdownIconPosition: IconPosition.trailing,
-                  flagsButtonPadding: const EdgeInsets.only(left: 12),
-                  showCountryFlag: true,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
-                  keyboardType: TextInputType.phone,
+                  countryCode: controller.countryCode,
+                  labelText: 'Mobile No',
                   enabled: controller.phoneController.text.isEmpty,
-                  pickerDialogStyle: PickerDialogStyle(
-                    backgroundColor: Colors.white,
-                    searchFieldInputDecoration: InputDecoration(
-                      labelText: 'Search Country',
-                      prefixIcon: const Icon(Icons.search, color: AppColors.primary),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                      ),
-                    ),
-                    countryCodeStyle: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                    countryNameStyle: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade700,
-                    ),
-                    listTilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  ),
+                  suffixIcon: controller.phoneController.text.isNotEmpty
+                      ? const Icon(Icons.lock, color: Colors.grey)
+                      : null,
                 ),
                 const SizedBox(height: 20),
                 AuthInputFields(
@@ -205,6 +153,18 @@ class RegistrationScreen extends GetWidget<RegisterController> {
                   },
                   validator: controller.validateOccupation,
                 ),
+
+                Obx(() => controller.selectedOccupation.value == "Others (Not Found! Any More creative.)"
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child: AuthInputFields(
+                          textInputType: TextInputType.text,
+                          controller: controller.customOccupationController,
+                          label: "Enter Occupation",
+                          validator: controller.validateCustomOccupation,
+                        ),
+                      )
+                    : const SizedBox.shrink()),
 
                 const SizedBox(height: 20),
 

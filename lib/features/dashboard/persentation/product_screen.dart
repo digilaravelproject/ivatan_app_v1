@@ -393,7 +393,7 @@ class _BrowseProductsView extends StatelessWidget {
 
       final products = productsData.map((item) => Product.fromJson(item)).toList();
 
-      return RefreshIndicator(
+      return RefreshIndicator(color: Colors.black, 
         onRefresh: () => marketplaceController.fetchMarketplaceProducts(isRefresh: true),
         child: Padding(
           padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),

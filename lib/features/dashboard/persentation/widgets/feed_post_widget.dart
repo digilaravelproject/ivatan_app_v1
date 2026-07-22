@@ -198,12 +198,17 @@ class FeedPostWidget extends StatelessWidget {
                    return;
                 }
 
-                // 2. Filter only videos/reels
+                // 2. Filter only videos/reels and remove locked posts
                 final videoPosts = allPosts.where((p) {
                    bool hasVideo = p.type == 'reel' || 
                                    p.type == 'video' || 
                                    (p.media.isNotEmpty && p.media.first.type == 'video');
-                   return hasVideo;
+                   
+                   bool isPurchased = p.isPurchased ?? false;
+                   bool hasAccess = p.hasAccess ?? false;
+                   bool isLocked = !p.is_mine && !isPurchased && !hasAccess && (p.price != null || p.isExclusive == true);
+
+                   return hasVideo && !isLocked;
                 }).toList();
 
                 // 3. Find index of current post in video list

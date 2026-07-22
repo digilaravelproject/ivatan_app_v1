@@ -6,7 +6,14 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
 class CustomSearchBar extends StatelessWidget {
-  const CustomSearchBar({Key? key}) : super(key: key);
+  final VoidCallback? onTap;
+  final bool readOnly;
+
+  const CustomSearchBar({
+    Key? key,
+    this.onTap,
+    this.readOnly = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +40,8 @@ class CustomSearchBar extends StatelessWidget {
                   SizedBox(width: 8),
                   Expanded(
                     child: TextField(
+                      readOnly: readOnly,
+                      onTap: onTap,
                       decoration: InputDecoration(
                         hintText: 'Search...',
                         hintStyle: TextStyle(

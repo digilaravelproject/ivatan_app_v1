@@ -1,6 +1,7 @@
 class AppAssets {
 
   static const String imgOnbording1 = "assets/images/onbording1.jpg";
+  static const String imgOnboarding6 = "assets/images/onboarding6.png";
   static const String imgOnbording2 = "assets/images/onbording2.jpg";
   static const String imgOnbording3 = "assets/images/onbording3.jpg";
   static const String imgOnbording4 = "assets/images/onbording4.jpg";
@@ -9,7 +10,7 @@ class AppAssets {
   static const String imgGmail = "assets/images/gmail.png";
   static const String imgLive = "assets/images/live.png";
   static const String imgAppLogo = "assets/images/imageApplogo.jpg";
-  static const String AppLogo = "assets/images/i_app.jpeg";
+  static const String AppLogo = "assets/images/i_app.png";
   static const String HomeAppLogo = "assets/images/home_app_icon.png";
   static const String imgverified = "assets/images/verified.jpeg";
   static const String imgLike = "assets/images/like.png";

@@ -463,7 +463,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                     return _buildEmptyState(isDark);
                   }
 
-                  return RefreshIndicator(
+                  return RefreshIndicator(color: Colors.black, 
                     onRefresh: () => _controller.fetchNotificationsList(),
                     child: _buildNotificationList(_controller.notificationsList, isDark),
                   );
@@ -479,7 +479,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                     return _buildEmptyState(isDark);
                   }
 
-                  return RefreshIndicator(
+                  return RefreshIndicator(color: Colors.black, 
                     onRefresh: () => _controller.fetchUnreadNotificationsList(),
                     child: _buildNotificationList(_controller.unreadNotificationsList, isDark),
                   );

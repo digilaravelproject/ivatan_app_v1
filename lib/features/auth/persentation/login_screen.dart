@@ -2,9 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl_phone_field/country_picker_dialog.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:intl_phone_field/phone_number.dart';
+import 'package:i_vatan_app/features/auth/widgets/custom_phone_field.dart';
 import 'package:i_vatan_app/core/helper/custom_image_view.dart';
 import 'package:i_vatan_app/core/utils/app_decoration.dart';
 
@@ -122,14 +120,38 @@ class LoginPage extends GetWidget<LoginController> {
                               fontWeight: FontWeight.w900,
                               color: AppColors.primary,
                               letterSpacing: 1.5,
+                              shadows: const [
+                                Shadow(
+                                  offset: Offset(0, 1),
+                                  blurRadius: 2,
+                                  color: Colors.white24, // top highlight
+                                ),
+                                Shadow(
+                                  offset: Offset(2, 2),
+                                  blurRadius: 4,
+                                  color: Colors.black45, // bottom shadow
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             "Welcome Back!",
                             style: context.textTheme.titleMedium?.copyWith(
-                              color: Colors.grey.shade600,
+                              color: Colors.grey.shade400,
                               fontWeight: FontWeight.w500,
+                              shadows: const [
+                                Shadow(
+                                  offset: Offset(0, 1),
+                                  blurRadius: 1,
+                                  color: Colors.white24,
+                                ),
+                                Shadow(
+                                  offset: Offset(1.5, 1.5),
+                                  blurRadius: 3,
+                                  color: Colors.black38,
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -204,60 +226,10 @@ class LoginPage extends GetWidget<LoginController> {
                                   curve: Curves.easeInOut,
                                   child: Column(
                                     children: [
-                                      IntlPhoneField(
+                                      CustomPhoneField(
                                         controller: controller.mobileController,
-                                        decoration: InputDecoration(
-                                          labelText: 'Mobile Number',
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(15),
-                                            borderSide: BorderSide(color: Colors.grey.shade300),
-                                          ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(15),
-                                            borderSide: BorderSide(color: Colors.grey.shade300),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(15),
-                                            borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                                          ),
-                                          filled: true,
-                                          fillColor: Colors.white,
-                                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-                                        ),
-                                        initialCountryCode: 'IN',
-                                        onCountryChanged: (country) {
-                                          controller.countryCode.value = "+${country.dialCode}";
-                                        },
-                                        disableLengthCheck: true,
-                                        dropdownIconPosition: IconPosition.trailing,
-                                        flagsButtonPadding: const EdgeInsets.only(left: 12),
-                                        showCountryFlag: true,
-                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
-                                        keyboardType: TextInputType.phone,
-                                        pickerDialogStyle: PickerDialogStyle(
-                                          backgroundColor: Colors.white,
-                                          searchFieldInputDecoration: InputDecoration(
-                                            labelText: 'Search Country',
-                                            prefixIcon: const Icon(Icons.search, color: AppColors.primary),
-                                            border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(12),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(12),
-                                              borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                                            ),
-                                          ),
-                                          countryCodeStyle: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.black87,
-                                          ),
-                                          countryNameStyle: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey.shade700,
-                                          ),
-                                          listTilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                        ),
+                                        countryCode: controller.countryCode,
+                                        labelText: 'Mobile Number',
                                       ),
 
                                       // Password Input (conditional)
@@ -434,7 +406,7 @@ class LoginPage extends GetWidget<LoginController> {
                                       TextSpan(
                                         text: "Register",
                                         style: TextStyle(
-                                          color: AppColors.primary,
+                                          color: Colors.blue,
                                           fontWeight: FontWeight.bold,
                                           decoration: TextDecoration.underline,
                                         ),

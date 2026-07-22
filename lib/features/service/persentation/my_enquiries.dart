@@ -78,7 +78,7 @@ class _MyEnquiryListScreenState extends State<MyEnquiryListScreen> {
           );
         }
 
-        return RefreshIndicator(
+        return RefreshIndicator(color: Colors.black, 
           onRefresh: () => controller.fetchMyEnquiries(isRefresh: true),
           child: ListView.builder(
             controller: _scrollController,

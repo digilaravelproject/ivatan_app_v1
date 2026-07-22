@@ -127,18 +127,12 @@ class SubscriptionPaymentController extends GetxController {
           final result = await Get.to<bool?>(() => PaymentWebViewPage(url: redirectUrl));
           
           if (result == true) {
-            await _verifyAndSyncSubscription(profileId, planId);
+            await _verifyAndSyncSubscription(profileId, planId, optimisticSuccess: true);
           } else if (result == false) {
-            Get.snackbar(
-              "Payment Failed",
-              "Subscription payment failed on PhonePe. Please try again.",
-              backgroundColor: Colors.red,
-              colorText: Colors.white,
-            );
+            _showSubscriptionFailureDialog("Subscription payment failed on PhonePe. Please try again.");
           } else {
             // result is null (e.g. user closed WebView)
-            // Call verification anyway as a safety check in case the webhook processed it or they did pay.
-            await _verifyAndSyncSubscription(profileId, planId);
+            _showSubscriptionFailureDialog("Payment was cancelled or interrupted.");
           }
         } else {
           // If no payment required (Free plan), complete it immediately
@@ -219,7 +213,7 @@ class SubscriptionPaymentController extends GetxController {
     return null;
   }
 
-  Future<void> _verifyAndSyncSubscription(int profileId, int planId) async {
+  Future<void> _verifyAndSyncSubscription(int profileId, int planId, {bool optimisticSuccess = true}) async {
     try {
       isLoading.value = true;
       Get.dialog(
@@ -248,19 +242,27 @@ class SubscriptionPaymentController extends GetxController {
       String message = "Your subscription payment was successful. The subscription is being processed.";
       if (isSynced && response != null) {
         message = response['message'] ?? "Your subscription is now active.";
+        _showSubscriptionSuccessDialog(profileId, planId, message, isSynced);
+      } else {
+        if (optimisticSuccess) {
+          _showSubscriptionSuccessDialog(profileId, planId, message, false);
+        } else {
+          _showSubscriptionFailureDialog("Subscription could not be verified at this time.");
+        }
       }
-      
-      _showSubscriptionSuccessDialog(profileId, planId, message, isSynced);
     } catch (e) {
       Get.back(); // Close loading dialog on error
       debugPrint("⚠️ Subscription verification error: $e");
-      // Show success dialog anyway because callback returned successful
-      _showSubscriptionSuccessDialog(
-        profileId,
-        planId,
-        "Your payment was successful. The subscription will activate shortly.",
-        false,
-      );
+      if (optimisticSuccess) {
+        _showSubscriptionSuccessDialog(
+          profileId,
+          planId,
+          "Your payment was successful. The subscription will activate shortly.",
+          false,
+        );
+      } else {
+         _showSubscriptionFailureDialog("Subscription could not be verified.");
+      }
     } finally {
       isLoading.value = false;
     }
@@ -477,5 +479,41 @@ class SubscriptionPaymentController extends GetxController {
       return Get.find<SettingsController>();
     }
     return null;
+  }
+
+  void _showSubscriptionFailureDialog(String message) {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Column(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.red, size: 60),
+            const SizedBox(height: 16),
+            const Text("Payment Failed", style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text(
+          message,
+          textAlign: TextAlign.center,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Get.back(); // Close dialog
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+            ),
+            child: const Text("Okay", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
   }
 }

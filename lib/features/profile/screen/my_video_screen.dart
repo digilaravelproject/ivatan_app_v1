@@ -34,7 +34,7 @@ class MyVideoScreen extends StatelessWidget {
           }
           return false;
         },
-        child: RefreshIndicator(
+        child: RefreshIndicator(color: Colors.black, 
           onRefresh: () async {
             await controller.fetchOwnPosts(filterType: "videos", username: username);
           },

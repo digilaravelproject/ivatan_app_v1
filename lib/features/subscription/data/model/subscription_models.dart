@@ -40,10 +40,18 @@ class SubscriptionPlan {
   factory SubscriptionPlan.fromJson(Map<String, dynamic> json) {
     final rawFeatures = json['features'] as List? ?? [];
     final parsedFeatures = rawFeatures.map((feat) {
-      return PlanFeature(
-        title: feat.toString(),
-        description: "",
-      );
+      if (feat is Map) {
+        return PlanFeature(
+          title: feat['name']?.toString() ?? '',
+          description: feat['description']?.toString() ?? '',
+          isEnabled: feat['is_implemented'] == true || feat['is_implemented'] == 1,
+        );
+      } else {
+        return PlanFeature(
+          title: feat.toString(),
+          description: "",
+        );
+      }
     }).toList();
 
     final rawPrice = json['price'] ?? '0.00';

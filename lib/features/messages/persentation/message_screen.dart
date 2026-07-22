@@ -264,8 +264,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
               }
               
               return Expanded(
-                child: RefreshIndicator(
-                  color: AppColors.primary,
+                child: RefreshIndicator(color: AppColors.primary,
                   onRefresh: () => controller.fetchInbox(),
                   child: ListView.separated(
                     padding: const EdgeInsets.only(top: 8, bottom: 20),
@@ -276,8 +275,9 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                     final hasUnread = message.unreadCount! > 0;
                     
                     return InkWell(
-                      onTap: () {
-                         Get.toNamed(AppRoutes.chattingScreen, arguments: message);
+                      onTap: () async {
+                         await Get.toNamed(AppRoutes.chattingScreen, arguments: message);
+                         controller.fetchInbox(filter: filterMap[_selectedFilter]);
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

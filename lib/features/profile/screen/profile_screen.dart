@@ -3,11 +3,9 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import '../../../core/helper/profile_permission_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:i_vatan_app/features/story/persentation/highlightFullScreen.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -26,7 +24,6 @@ import '../../dashboard/controller/navigationController.dart';
 import '../../dashboard/controller/settings_controller.dart';
 import '../../dashboard/model/user_profile.dart';
 import '../../dashboard/persentation/comming_soon.dart';
-import '../../dashboard/persentation/creater_analysis_screen.dart';
 import '../../dashboard/persentation/post_media_picker_screen.dart';
 import '../../dashboard/persentation/product_screen.dart';
 import '../../dashboard/persentation/reel_media_picker_screen.dart';
@@ -43,23 +40,22 @@ import '../../dashboard/persentation/service_screen.dart';
 import '../../dashboard/persentation/edit_profile_screen.dart';
 import '../../dashboard/persentation/settings_page.dart';
 import '../../messages/controller/chatt_controller.dart';
-import '../../messages/persentation/chatting_screen.dart';
 import '../../product/persentation/controller/cart_controller.dart';
-import '../../service/persentation/create_service_screen.dart';
 import '../../service/persentation/service_enquire_form.dart';
-import '../../story/persentation/storyfullview.dart';
 import '../../product/persentation/controller/product_Controller.dart';
+import '../controller/ownpostController.dart';
 import '../controller/profile_controller.dart';
 import 'follow_tabs.dart' hide CustomEmptyState;
 import 'my_post.dart';
 import 'my_video_screen.dart';
-import 'profile_shop_screen.dart';
-import 'profile_live_posts.dart';
 
 import '../../subscription/controller/subscription_controller.dart';
 import '../../subscription/persentation/profile_plans_screen.dart';
 import '../../subscription/data/model/profile_config_model.dart';
-
+import '../../exclusive_content/controller/exclusive_controller.dart';
+import '../../exclusive_content/presentation/exclusive_dashboard_screen.dart';
+import '../../exclusive_content/presentation/exclusive_tab_view.dart';
+import '../../exclusive_content/presentation/create_exclusive_post_screen.dart';
 class ProfileScreen extends StatefulWidget {
   //ProfileScreen({Key? key}) : super(key: key);
   final String? viewUserName; // add this
@@ -79,6 +75,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final StoryController storyController = Get.put(StoryController());
   final ChattController chatController = Get.put(ChattController());
   final CartController cartController = Get.put(CartController());
+  final ExclusiveController exclusiveController = Get.put(ExclusiveController());
 
   //final HomeController homeController= Get.put(HomeController());
 
@@ -94,10 +91,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     // CASE 1: Coming from some other screen → viewUserName is passed
     if (selected != null &&
-        selected!.isNotEmpty &&
+        selected.isNotEmpty &&
         selected != currentUserName) {
       isOtherProfile = true;
-      finalUserName = selected!;
+      finalUserName = selected;
       // For other profiles, use a tag with their username
       profileController = Get.put(SettingsController(userName: finalUserName), tag: finalUserName);
     } else {
@@ -134,6 +131,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                      (user.accountPrivacy?.toLowerCase() == "private") && 
                                      !isFollowing;
               debugPrint("Profile Debug: user=${user.username}, isOtherProfile=$isOtherProfile, isCurrentlyOther=$isCurrentlyOther, isSeller=${user.isSeller}, profileType=${user.profileType}, profileSubType=${user.profileSubType}");
+              
+             // Fetch exclusive posts to determine if we should show the tab
+             final exclusivePostController = Get.put(
+               OwnPostController(filterType: "exclusive", UserName: finalUserName),
+               tag: "${finalUserName}_exclusive_posts",
+             );
+             bool showExclusiveTab = exclusivePostController.posts.isNotEmpty;
+
              // Build dynamic tabs and views
              bool showProductTab = false;
              bool showServiceTab = false;
@@ -157,6 +162,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                MyVideoScreen(username: finalUserName),
              ];
 
+             if (showExclusiveTab) {
+               tabs.add(Tab(child: Icon(Icons.star_border, color: Colors.amber, size: 26)));
+               tabViews.add(
+                 ExclusiveTabView(username: finalUserName, isOwnProfile: !isOtherProfile),
+               );
+             }
+
              if (showProductTab) {
                tabs.add(Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)));
                tabViews.add(
@@ -176,7 +188,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
              }
 
              return DefaultTabController(
-               key: ValueKey("${user.id}_${showProductTab}_${showServiceTab}"),
+               key: ValueKey("${user.id}_${showProductTab}_${showServiceTab}_${showExclusiveTab}"),
                length: tabs.length,
               child: Stack(
                 children: [
@@ -388,6 +400,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             ),
                                                           ),
                                                         ],
+                                                        const PopupMenuItem(
+                                                          value: 'exclusive',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(Icons.star, color: Colors.amber, size: 20),
+                                                              SizedBox(width: 10),
+                                                              Text("Exclusive Content"),
+                                                            ],
+                                                          ),
+                                                        ),
                                                         if (ProfilePermissionManager.canProvideServices) ...[
                                                           const PopupMenuItem(
                                                             value: 'services',
@@ -471,6 +493,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                       }
                                                     } else if (value == 'dashboard') {
                                                       Get.to(() => SellerDashboard());
+                                                    } else if (value == 'exclusive') {
+                                                      Get.to(() => ExclusiveDashboardScreen());
                                                     }
                                                   });
                                                 },
@@ -720,6 +744,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                               }
                                                             },
                                                           ),
+                                                        Obx(() => (exclusiveController.enablementStatus.value == 'active' || exclusiveController.enablementStatus.value == 'approved')
+                                                            ? Column(
+                                                                children: [
+                                                                  const SizedBox(height: 10),
+                                                                  _buildCreateOption(
+                                                                    icon: Icons.star,
+                                                                    color: Colors.amber,
+                                                                    title: "Exclusive Post",
+                                                                    subtitle: "Share premium content",
+                                                                    onTap: () {
+                                                                      Get.back();
+                                                                      Get.to(() => const CreateExclusivePostScreen());
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              )
+                                                            : const SizedBox.shrink()),
                                                         if (ProfilePermissionManager.canProvideServices)
                                                           const SizedBox(height: 10),
                                                         if (ProfilePermissionManager.canProvideServices)
@@ -1932,76 +1973,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //     ),
   //   );
   // }
-
-  void _showBioDialog(String bio) {
-    Get.dialog(
-      Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /// Title
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "About",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => Get.back(),
-                    child: const Icon(Icons.close, size: 20),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 10),
-
-              /// Bio text
-              Text(
-                bio.isNotEmpty ? bio : "No bio available",
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black87,
-                  height: 1.4,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      barrierDismissible: true,
-    );
-  }
-
-
-  List<Widget> _buildInterestList(List<String> interests) {
-    List<String> visibleList =
-        showAllInterests ? interests : interests.take(3).toList();
-
-    return visibleList.map((item) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 2),
-        child: Text(
-          item,
-          style: TextStyle(
-            fontSize: 15,
-            color: AppColors.neutralGray,
-            fontWeight: FontWeight.w400,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      );
-    }).toList();
-  }
 
   Widget _buildAddStory() {
     return Padding(

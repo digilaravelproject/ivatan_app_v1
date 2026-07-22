@@ -76,8 +76,7 @@ class LiveChatInboxScreen extends StatelessWidget {
                 return _buildEmptyState();
               }
 
-              return RefreshIndicator(
-                color: AppColors.primary,
+              return RefreshIndicator(color: AppColors.primary,
                 onRefresh: () => controller.fetchChats(),
                 child: ListView.builder(
                   itemCount: controller.filteredInbox.length,

@@ -37,7 +37,7 @@ class MyServicesScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: RefreshIndicator(
+      body: RefreshIndicator(color: Colors.black, 
         onRefresh: () => controller.fetchServices(),
         child: Obx(() {
           if (controller.isLoading.value && controller.services.isEmpty) {

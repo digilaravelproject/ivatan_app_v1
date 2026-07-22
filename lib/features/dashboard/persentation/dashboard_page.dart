@@ -42,7 +42,7 @@ class DashboardPage extends StatelessWidget {
         return true;
       },
       child: Scaffold(
-        extendBody: false,
+        extendBody: true,
         backgroundColor: AppColors.white,
         body: Stack(
           children: [
@@ -57,59 +57,36 @@ class DashboardPage extends StatelessWidget {
             _buildGlobalUploadProgress(),
           ],
         ),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.white.withOpacity(0.0),
-                Colors.white.withOpacity(0.25),
-                Colors.white.withOpacity(0.5),
-                Colors.white.withOpacity(0.75),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          child: Container(
-            margin: EdgeInsets.zero,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.65),
-              border: Border(
-                top: BorderSide(
-                  color: Colors.black.withOpacity(0.06),
-                  width: 1.0,
-                ),
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+            child: Container(
+              height: 76,
+              decoration: BoxDecoration(
+                color: const Color(0xFF1B1B1B), // Dark background like image
+                borderRadius: BorderRadius.circular(38),
+                border: Border.all(color: Colors.white12, width: 1.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.zero,
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                child: SafeArea(
-                  top: false,
-                  left: false,
-                  right: false,
-                  bottom: true,
-                  child: Container(
-                    height: 60,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _item(context, Icons.home_rounded, Icons.home_outlined, 0),
-                        _item(context, Icons.search_rounded, Icons.search_rounded, 1),
-                        _item(context, Icons.play_circle_fill_rounded, Icons.play_circle_outline_rounded, 2),
-                        _item(context, Icons.video_library_rounded, Icons.video_library_outlined, 3),
-                        _item(context, Icons.account_circle_rounded, Icons.account_circle_outlined, 4, imageUrl: controller.userProfileImage),
-                      ],
-                    ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(38),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _item(context, Icons.home_rounded, Icons.home_outlined, 0, label: "Home"),
+                      _item(context, Icons.search_rounded, Icons.search_rounded, 1, label: "Search"),
+                      _item(context, Icons.play_circle_fill_rounded, Icons.play_circle_outline_rounded, 2, label: "Video"),
+                      _item(context, Icons.video_library_rounded, Icons.video_library_outlined, 3, label: "Shorts"),
+                      _item(context, Icons.account_circle_rounded, Icons.account_circle_outlined, 4, imageUrl: controller.userProfileImage, label: "Profile"),
+                    ],
                   ),
                 ),
               ),
@@ -124,7 +101,7 @@ class DashboardPage extends StatelessWidget {
     final homeController = Get.find<HomeController>();
     return Obx(() {
       if (!homeController.isUploading.value) return const SizedBox.shrink();
-      
+
       return Positioned(
         bottom: 0,
         left: 0,
@@ -184,7 +161,7 @@ class DashboardPage extends StatelessWidget {
     });
   }
 
-  Widget _item(BuildContext context, dynamic iconDataSelected, dynamic iconDataUnselected, int index, {String? imageUrl}) {
+  Widget _item(BuildContext context, dynamic iconDataSelected, dynamic iconDataUnselected, int index, {String? imageUrl, String label = ""}) {
     return Obx(() {
       final isSelected = controller.selectedIndex.value == index;
 
@@ -196,56 +173,44 @@ class DashboardPage extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AnimatedScale(
+              AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                scale: isSelected ? 1.15 : 1.0,
+                width: 56,
+                height: 38,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isSelected ? const Color(0xFF30333E) : Colors.transparent, // Highlight background matching Samsung Health
+                  borderRadius: BorderRadius.circular(18),
+                ),
                 child: index == 4
-                    ? AnimatedContainer(
-                        duration: const Duration(milliseconds: 250),
-                        curve: Curves.easeInOut,
-                        width: 30,
-                        height: 30,
-                        alignment: Alignment.center,
-                        child: Container(
-                          width: 26,
-                          height: 26,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isSelected ? Colors.black : Colors.black.withOpacity(0.2),
-                              width: isSelected ? 1.8 : 1.2,
-                            ),
+                    ? Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isSelected ? Colors.white : Colors.transparent,
+                            width: 1.2,
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: ClipOval(
-                              child: (imageUrl != null && imageUrl.isNotEmpty)
-                                  ? Image.network(
-                                      AppUrls.getFullImageUrl(imageUrl),
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
-                                    )
-                                  : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
-                            ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(1.0),
+                          child: ClipOval(
+                            child: (imageUrl != null && imageUrl.isNotEmpty)
+                                ? Image.network(
+                                    AppUrls.getFullImageUrl(imageUrl),
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                                  )
+                                : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
                           ),
                         ),
                       )
                     : Icon(
                         isSelected ? iconDataSelected : iconDataUnselected,
-                        size: 24,
-                        color: isSelected ? Colors.black : const Color(0xFF94A3B8),
+                        size: 22,
+                        color: isSelected ? Colors.white : const Color(0xFFA0A0A0),
                       ),
-              ),
-              const SizedBox(height: 5),
-              // Animated dot/indicator below the active item
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: isSelected ? 5 : 0,
-                height: 5,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.black,
-                ),
               ),
             ],
           ),

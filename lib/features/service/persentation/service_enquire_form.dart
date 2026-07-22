@@ -372,7 +372,7 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
                         ],
                       ),
                     )
-                  : RefreshIndicator(
+                  : RefreshIndicator(color: Colors.black, 
                       onRefresh: () async {
                         await controller.fetchSellerEnquiries();
                         await controller.fetchSellerEnquiriesStats();

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/network/app_urls.dart';
+import '../../../../db/shared_pref_manager.dart';
 import '../../model/post_model.dart';
 import 'feed_video_player.dart';
 
@@ -174,6 +175,9 @@ class _FeedMediaWidgetState extends State<FeedMediaWidget> {
         itemBuilder: (context, index) {
           return CachedNetworkImage(
             imageUrl: AppUrls.getFullImageUrl(widget.media[index].url),
+            httpHeaders: {
+              "Authorization": "Bearer ${SharedPrefManager().token ?? AppUrls.defaultApiKey}"
+            },
             fit: BoxFit.cover,
             placeholder: (context, url) => const _ShimmerPlaceholder(),
             errorWidget: (context, url, error) => Container(

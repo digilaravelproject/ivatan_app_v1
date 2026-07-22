@@ -85,7 +85,7 @@ class _DigitalProductListScreenState extends State<DigitalProductListScreen> {
         );
       }
 
-      return RefreshIndicator(
+      return RefreshIndicator(color: Colors.black, 
         onRefresh: () => controller.fetchMarketplaceServices(isRefresh: true),
         child: ListView.builder(
           controller: _scrollController,

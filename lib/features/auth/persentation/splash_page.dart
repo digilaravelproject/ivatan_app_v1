@@ -247,7 +247,7 @@ class _SplashPageState extends State<SplashPage>
                 Text(
                   SharedPrefManager().isUserLogin
                       ? "Welcome, ${SharedPrefManager().user?.username ?? ""}"
-                      : "from octraide",
+                      : "From OCTROID",
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade600,

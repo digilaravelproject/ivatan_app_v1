@@ -70,8 +70,7 @@ class LiveChatList extends StatelessWidget {
                 return _buildEmptyState(controller);
               }
 
-              return RefreshIndicator(
-                color: AppColors.primary,
+              return RefreshIndicator(color: AppColors.primary,
                 onRefresh: () => controller.fetchGroups(),
                 child: ListView.builder(
                   itemCount: controller.filteredGroups.length,

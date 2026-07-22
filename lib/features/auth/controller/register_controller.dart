@@ -178,6 +178,7 @@ class RegisterController extends GetxController {
   final confirmPassworController = TextEditingController();
   final dobController = TextEditingController();
   final occupationController = TextEditingController();
+  final customOccupationController = TextEditingController();
   final interestsController = TextEditingController(); // comma separated: "Reading,Coding"
   final profileTypeController = TextEditingController();
   final sellerTypeController = TextEditingController();
@@ -317,6 +318,13 @@ class RegisterController extends GetxController {
     return null;
   }
 
+  String? validateCustomOccupation(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return "Please enter your occupation";
+    }
+    return null;
+  }
+
 
 
   String? validatePassword(String? value) {
@@ -410,7 +418,9 @@ class RegisterController extends GetxController {
         username: usernameController.text.trim(),
         password: passwordController.text.trim(),
         dateOfBirth: dobController.text.trim(),
-        occupation: occupationController.text.trim(),
+        occupation: selectedOccupation.value == "Others (Not Found! Any More creative.)" 
+            ? customOccupationController.text.trim() 
+            : occupationController.text.trim(),
         interests: interestList,
         profileType: apiProfileType,
         profileSubType: apiProfileSubType,
