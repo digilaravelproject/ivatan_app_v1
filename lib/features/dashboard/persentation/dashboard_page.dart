@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/iconoir.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../controller/navigationController.dart';
 import '../controller/homeController.dart';
@@ -124,45 +125,29 @@ class DashboardPage extends StatelessWidget {
           ],
         ),
         ),
-        bottomNavigationBar: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(38),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                child: Container(
-                  height: 76,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.08), // Frosted glass
-                    borderRadius: BorderRadius.circular(38),
-                    border: Border.all(color: Colors.white.withOpacity(0.15), width: 1.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                      _item(context, CupertinoIcons.house_fill, CupertinoIcons.house, 0, label: "Home"),
-                      _item(context, CupertinoIcons.search, CupertinoIcons.search, 1, label: "Search"),
-                      _item(context, CupertinoIcons.play_circle_fill, CupertinoIcons.play_circle, 2, label: "Video"),
-                      _item(context, CupertinoIcons.film_fill, CupertinoIcons.film, 3, label: "Shorts"),
-                      _item(context, CupertinoIcons.person_solid, CupertinoIcons.person, 4, imageUrl: controller.userProfileImage, label: "Profile"),
-                    ],
-                  ),
-                ),
+        bottomNavigationBar: Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFF0C0C0E),
+            border: Border(top: BorderSide(color: Colors.white12, width: 0.5)),
+          ),
+          child: SafeArea(
+            child: Container(
+              height: 65,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  _item(context, Iconsax.home_2, Iconsax.home_2_copy, 0, label: "Home"),
+                  _item(context, Iconsax.search_normal, Iconsax.search_normal_copy, 1, label: "Search"),
+                  _item(context, Iconsax.video_play, Iconsax.video_play_copy, 2, isCenter: true),
+                  _item(context, Iconsax.video, Iconsax.video_copy, 3, label: "Video"),
+                  _item(context, Iconsax.user, Iconsax.user_copy, 4, imageUrl: controller.userProfileImage, label: "Profile"),
+                ],
               ),
             ),
           ),
         ),
-        )
       ),
     );
   }
@@ -231,9 +216,31 @@ class DashboardPage extends StatelessWidget {
     });
   }
 
-  Widget _item(BuildContext context, dynamic iconDataSelected, dynamic iconDataUnselected, int index, {String? imageUrl, String label = ""}) {
+  Widget _item(BuildContext context, dynamic iconDataSelected, dynamic iconDataUnselected, int index, {String? imageUrl, String label = "", bool isCenter = false}) {
     return Obx(() {
       final isSelected = controller.selectedIndex.value == index;
+      final color = isSelected ? Colors.white : const Color(0xFFA0A0A0);
+
+      if (isCenter) {
+        return GestureDetector(
+          onTap: () => controller.changeIndex(index),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: 46,
+            height: 46,
+            margin: const EdgeInsets.only(bottom: 6),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              iconDataSelected,
+              color: Colors.black,
+              size: 24, // Slightly reduced
+            ),
+          ),
+        );
+      }
 
       return Expanded(
         child: GestureDetector(
@@ -241,47 +248,48 @@ class DashboardPage extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 56,
-                height: 38,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFFB6D8FF).withOpacity(0.2) : Colors.transparent,
-                  borderRadius: BorderRadius.circular(18),
+              if (index == 4)
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected ? Colors.white : Colors.transparent,
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(1.0),
+                    child: ClipOval(
+                      child: (imageUrl != null && imageUrl.isNotEmpty)
+                          ? Image.network(
+                              AppUrls.getFullImageUrl(imageUrl),
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                            )
+                          : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                    ),
+                  ),
+                )
+              else
+                Icon(
+                  isSelected ? iconDataSelected : iconDataUnselected,
+                  size: 22, // Reduced from 24 for a sharper look
+                  color: color,
                 ),
-                child: index == 4
-                    ? Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isSelected ? const Color(0xFFB6D8FF) : Colors.transparent,
-                            width: 1.2,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(1.0),
-                          child: ClipOval(
-                            child: (imageUrl != null && imageUrl.isNotEmpty)
-                                ? Image.network(
-                                    AppUrls.getFullImageUrl(imageUrl),
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
-                                  )
-                                : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
-                          ),
-                        ),
-                      )
-                    : Icon(
-                        isSelected ? iconDataSelected : iconDataUnselected,
-                        size: 24,
-                        color: isSelected ? const Color(0xFFB6D8FF) : const Color(0xFFA0A0A0),
-                      ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                ),
               ),
+              const SizedBox(height: 4),
             ],
           ),
         ),
