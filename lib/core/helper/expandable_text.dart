@@ -5,12 +5,14 @@ class ExpandableCaption extends StatefulWidget {
   final String text;
   final String username;
   final VoidCallback? onUsernameTap;
+  final Color textColor;
 
   const ExpandableCaption({
     Key? key,
     required this.text,
     this.username = "",
     this.onUsernameTap,
+    this.textColor = Colors.black87,
   }) : super(key: key);
 
   @override
@@ -23,14 +25,14 @@ class _ExpandableCaptionState extends State<ExpandableCaption> {
   @override
   Widget build(BuildContext context) {
     // Base styles
-    const styleUsername = TextStyle(
+    final styleUsername = TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.bold,
-      color: Colors.black87,
+      color: widget.textColor,
     );
-    const styleCaption = TextStyle(
-      fontSize: 14,
-      color: Colors.black87,
+    final styleCaption = TextStyle(
+      fontSize: 12,
+      color: widget.textColor,
       height: 1.3,
     );
     const styleLink = TextStyle(
@@ -46,15 +48,15 @@ class _ExpandableCaptionState extends State<ExpandableCaption> {
     final List<TextSpan> fullSpans = [];
 
     // 1. Username
-    if (widget.username.isNotEmpty) {
-      fullSpans.add(
-          TextSpan(
-            text: "${widget.username} ",
-            style: styleUsername,
-            recognizer: TapGestureRecognizer()..onTap = widget.onUsernameTap,
-          )
-      );
-    }
+    // if (widget.username.isNotEmpty) {
+    //   fullSpans.add(
+    //       TextSpan(
+    //         text: "${widget.username} ",
+    //         style: styleUsername,
+    //         recognizer: TapGestureRecognizer()..onTap = widget.onUsernameTap,
+    //       )
+    //   );
+    // }
 
     // 2. Caption Parsing
     widget.text.split(' ').forEach((word) {

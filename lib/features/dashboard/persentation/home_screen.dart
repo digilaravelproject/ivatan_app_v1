@@ -37,7 +37,7 @@ class HomePage extends StatelessWidget {
     final imageUrl = user?.profilePhotoPath ?? "";
 
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: const Color(0xFF121212),
       key: controller.scaffoldKey,
       endDrawer: DrawerScreen(),
       endDrawerEnableOpenDragGesture: false,
@@ -77,76 +77,68 @@ class HomePage extends StatelessWidget {
                 await controller.fetchStories();
                 await controller.fetchUnreadNotificationCount();
               },
-              child: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
+              child: Container(
+                color: const Color(0xFF121212),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: -100,
+                      right: -100,
+                      child: Container(
+                        width: 300,
+                        height: 300,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.05),
+                              blurRadius: 50,
+                              spreadRadius: 10,
+                            ),
+                          ],
+                          gradient: RadialGradient(
+                            colors: [
+                              Colors.white.withOpacity(0.12),
+                              Colors.white.withOpacity(0.12),
+                              Colors.transparent,
+                            ],
+                            stops: const [0.0, 0.6, 1.0],
+                          ),
+                        ),
+                      ),
+                    ),
+                    CustomScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
                   Obx(() => SliverAppBar(
                     floating: true,
                     snap: true,
                     pinned: controller.showStories.value,
-                    backgroundColor: Colors.white,
+                    backgroundColor: Colors.transparent,
                     elevation: 0,
                     automaticallyImplyLeading: false,
                     toolbarHeight: 60,
-                    titleSpacing: 0, // 👈 Left spacing remove
+                    titleSpacing: 0,
                     title: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // App Logo - Clean Circular
-                        // Container(
-                        //   width: 32,
-                        //   height: 32,
-                        // decoration: BoxDecoration(
-                        //   shape: BoxShape.circle,
-                        //   color: Colors.white,
-                        //   boxShadow: [
-                        //     BoxShadow(
-                        //       color: Colors.black.withOpacity(0.08),
-                        //       blurRadius: 4,
-                        //       offset: Offset(0, 1),
-                        //     ),
-                        //   ],
-                        // ),
-                        //child: ClipOval(
-                        //  child:
                         Image.asset(
                           AppAssets.HomeAppLogo,
                           width: 120,
                           height: 120,
-                          //fit: BoxFit.cover,
                         ),
-                        // ),
-                        // ),
-                        // SizedBox(width: 2),
-                        // // Vatan Text
-                        // Text(
-                        //   "-Vatan",
-                        //   style: TextStyle(
-                        //     fontFamily: 'Billabong',
-                        //     fontSize: 24,
-                        //     color: Colors.black,
-                        //     fontWeight: FontWeight.w600,
-                        //     letterSpacing: 0.3,
-                        //   ),
-                        // ),
                       ],
                     ),
                     actions: [
-                      // Center(
-                      //   child: Padding(
-                      //     padding: const EdgeInsets.only(right: 1.0),
-                      //     child: const AnimatedProBadge(),
-                      //   ),
-                      // ),
                       Obx(() {
                         final count = controller.unreadNotificationCount.value;
                         return Stack(
                           alignment: Alignment.center,
                           children: [
                             IconButton(
-                              icon: Icon(
+                              icon: const Icon(
                                 CupertinoIcons.bell,
-                                color: Colors.black87,
+                                color: Colors.white,
                                 size: 26,
                               ),
                               onPressed: () async {
@@ -191,7 +183,7 @@ class HomePage extends StatelessWidget {
                           IconButton(
                             icon: Icon(
                               Icons.wechat_outlined,
-                              color: Colors.black87,
+                              color: Colors.white,
                               size: 26,
                             ),
                             onPressed: () => Get.to(dashboard()),
@@ -216,7 +208,7 @@ class HomePage extends StatelessWidget {
                         child: IconButton(
                           icon: Icon(
                             Icons.menu_rounded,
-                            color: Colors.black87,
+                            color: Colors.white,
                             size: 28,
                           ),
                           onPressed: () => controller.openDrawer(),
@@ -261,7 +253,7 @@ class HomePage extends StatelessWidget {
                           opacity: controller.showStories.value ? 1.0 : 0.0,
                           child: Container(
                             height: 130,
-                            color: Colors.white,
+                            color: Colors.transparent,
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
@@ -355,7 +347,12 @@ class HomePage extends StatelessWidget {
                   }),
                 ],
               ),
+                  ]
+              ),
+            )
+
             );
+
           })),
     );
   }
@@ -363,7 +360,7 @@ class HomePage extends StatelessWidget {
   Widget _buildStoriesShimmer() {
     return Container(
       height: 130,
-      color: Colors.white,
+      color: Colors.transparent,
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -379,7 +376,7 @@ class HomePage extends StatelessWidget {
                 width: 80,
                 height: 114,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.grey.shade900,
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
@@ -529,25 +526,41 @@ class HomePage extends StatelessWidget {
         width: 80,
         margin: const EdgeInsets.only(right: 10),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.grey.shade900,
+          borderRadius: BorderRadius.circular(14),
+          gradient: hasStory
+              ? const LinearGradient(
+                  colors: [Color(0xFFF58529), Color(0xFFDD2A7B), Color(0xFF8134AF)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: !hasStory ? Colors.grey.shade900 : null,
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Stack(
-            fit: StackFit.expand,
+        padding: hasStory ? const EdgeInsets.all(2.0) : EdgeInsets.zero,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.black, // Inner dark color
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Stack(
+              fit: StackFit.expand,
             children: [
               // Background Media
               if (hasStory)
                 _buildStoryMedia(myStoryGroup.stories.last)
-              else if (userAvatar.isNotEmpty)
-                Image.network(
-                  userAvatar,
-                  fit: BoxFit.cover,
-                  errorBuilder: (ctx, err, stack) => Container(color: Colors.grey.shade800),
-                )
               else
-                Container(color: Colors.grey.shade800),
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.05),
+                      border: Border.all(color: Colors.white.withOpacity(0.15)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
 
               // Dark Gradient for Text
               Positioned(
@@ -587,7 +600,11 @@ class HomePage extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF05136),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFF58529), Color(0xFFDD2A7B), Color(0xFF8134AF)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -641,6 +658,7 @@ class HomePage extends StatelessWidget {
                 ),
             ],
           ),
+         ), // Close inner Container
         ),
       ),
     );
@@ -666,14 +684,26 @@ class HomePage extends StatelessWidget {
         width: 80,
         margin: const EdgeInsets.only(right: 10),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.grey.shade900,
-          border: hasUnseen ? Border.all(color: const Color(0xFFF05136), width: 1.5) : null,
+          borderRadius: BorderRadius.circular(14),
+          gradient: hasUnseen
+              ? const LinearGradient(
+                  colors: [Color(0xFFF58529), Color(0xFFDD2A7B), Color(0xFF8134AF)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: !hasUnseen ? Colors.grey.shade900 : null,
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(hasUnseen ? 10 : 12),
-          child: Stack(
-            fit: StackFit.expand,
+        padding: hasUnseen ? const EdgeInsets.all(2.0) : EdgeInsets.zero,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.black, // Inner dark color
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Stack(
+              fit: StackFit.expand,
             children: [
               // Background Media
               story.stories.isNotEmpty
@@ -719,7 +749,11 @@ class HomePage extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF05136),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFF58529), Color(0xFFDD2A7B), Color(0xFF8134AF)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Text(
@@ -730,6 +764,7 @@ class HomePage extends StatelessWidget {
                 ),
             ],
           ),
+         ), // Close inner Container
         ),
       ),
     );
@@ -793,11 +828,16 @@ class HomePage extends StatelessWidget {
   // ============= MODERN POST CARD =============
   Widget _buildModernPostCard(PostItem post, int index, BuildContext context) {
     return Container(
-      color: Colors.white,
-      margin: EdgeInsets.only(bottom: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF242426), // Lighter grey to match the screenshot
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           // ========== POST HEADER ==========
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -855,7 +895,7 @@ class HomePage extends StatelessWidget {
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
-                                  color: Colors.black87,
+                                  color: Colors.white,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -873,7 +913,7 @@ class HomePage extends StatelessWidget {
                             " • ${DateHelper.formatPostDate(post.createdAt)}",
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey.shade500,
+                              color: Colors.grey.shade400,
                             ),
                           ),
                         ],
@@ -888,7 +928,7 @@ class HomePage extends StatelessWidget {
                               Icon(
                                 Icons.music_note,
                                 size: 12,
-                                color: Colors.black87,
+                                color: Colors.grey.shade400,
                               ),
                               SizedBox(width: 4),
                             ],
@@ -900,7 +940,7 @@ class HomePage extends StatelessWidget {
                                     : post.user.occupation,
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: Colors.black87,
+                                  color: Colors.grey.shade400,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -950,10 +990,7 @@ class HomePage extends StatelessWidget {
                               ? Colors.grey.shade100
                               : Colors.transparent,
                           border: Border.all(
-                            color:
-                            following
-                                ? Colors.grey.shade300
-                                : Colors.blue.shade600,
+                            color: following ? Colors.grey.shade300 : Colors.white,
                             width: 1,
                           ),
                           borderRadius: BorderRadius.circular(6),
@@ -961,10 +998,7 @@ class HomePage extends StatelessWidget {
                         child: Text(
                           following ? "Following" : "Follow",
                           style: TextStyle(
-                            color:
-                            following
-                                ? Colors.black87
-                                : Colors.blue.shade600,
+                            color: following ? Colors.black87 : Colors.white,
                             fontWeight: FontWeight.w600,
                             fontSize: 12,
                           ),
@@ -976,7 +1010,7 @@ class HomePage extends StatelessWidget {
 
                 // More Menu
                 IconButton(
-                  icon: Icon(Icons.more_horiz, color: Colors.black87),
+                  icon: Icon(Icons.more_horiz, color: Colors.white),
                   onPressed:
                       () => _showSideMenu(context, post.id, post.user.username, post.user.id),
                   padding: EdgeInsets.zero,
@@ -1007,29 +1041,14 @@ class HomePage extends StatelessWidget {
                     // Like
                     GestureDetector(
                       onTap: () => controller.likePost(post.id, index),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        transitionBuilder:
-                            (child, anim) =>
-                            ScaleTransition(scale: anim, child: child),
-                        child:  Icon(
-                          post.stats.isLiked == true
-                              ? Icons.favorite
-                              : Icons.favorite_border,
-                          key: ValueKey(post.stats.isLiked),
-                          color:
-                          post.stats.isLiked == true
-                              ? Colors.red
-                              : Colors.black87,
-                          size: 28,
-                        // Image.asset(
-                        //   post.stats.isLiked == true
-                        //       ? 'assets/images/likeexclamation.png'
-                        //       : 'assets/images/likeexclamation2.png',
-                        //   key: ValueKey(post.stats.isLiked),
-                        //   width: 28,
-                        //   height: 28,
-                         ),
+                      child: Icon(
+                        post.stats.isLiked == true
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color: post.stats.isLiked == true
+                            ? Colors.red
+                            : Colors.white,
+                        size: 28,
                       ),
                     ),
                     SizedBox(width: 4),
@@ -1039,6 +1058,7 @@ class HomePage extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
+                          color: Colors.white,
                         ),
                       ),
 
@@ -1056,7 +1076,7 @@ class HomePage extends StatelessWidget {
                       },
                       child: Icon(
                         Icons.comment,
-                        color: Colors.black87,
+                        color: Colors.white,
                         size: 24,
                       ),
                     ),
@@ -1067,6 +1087,7 @@ class HomePage extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
+                          color: Colors.white,
                         ),
                       ),
 
@@ -1081,7 +1102,7 @@ class HomePage extends StatelessWidget {
                       },
                       child: Icon(
                         Icons.share,
-                        color: Colors.black87,
+                        color: Colors.white,
                         size: 24,
                       ),
                     ),
@@ -1092,6 +1113,7 @@ class HomePage extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
+                          color: Colors.white,
                         ),
                       ),
 
@@ -1101,7 +1123,7 @@ class HomePage extends StatelessWidget {
                       onTap: () => controller.toggleBookmark(post.id),
                       child: Icon(
                         post.stats.isSaved ? Icons.bookmark : Icons.bookmark_border,
-                        color: post.stats.isSaved ? Colors.black : Colors.black87,
+                        color: post.stats.isSaved ? Colors.white : Colors.white70,
                         size: 26,
                       ),
                     ),
@@ -1109,23 +1131,25 @@ class HomePage extends StatelessWidget {
                 ),
 
                 // Like Count
-                if ((post.stats.likeCount ?? 0) > 0)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      "${post.stats.likeCount} likes",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
+                // if ((post.stats.likeCount ?? 0) > 0)
+                //   Padding(
+                //     padding: const EdgeInsets.only(top: 8),
+                //     child: Text(
+                //       "${post.stats.likeCount} likes",
+                //       style: TextStyle(
+                //         fontWeight: FontWeight.w600,
+                //         fontSize: 13,
+                //         color: Colors.white,
+                //       ),
+                //     ),
+                //   ),
 
                 // Caption with Username + Rich Text
                 if (post.caption != null && post.caption!.isNotEmpty) ...[
                   SizedBox(height: 6),
                   ExpandableCaption(
                     text: post.caption!,
+                    textColor: Colors.white,
                     username:
                     post.user.username.isNotEmpty
                         ? post.user.username
@@ -1140,10 +1164,10 @@ class HomePage extends StatelessWidget {
             ),
           ),
 
-          Divider(height: 1, thickness: 0.5, color: Colors.grey.shade200),
         ],
-      ),
-    );
+       ),
+      ), // Close ClipRRect
+    ); // Close Container
   }
 
   void _showSideMenu(BuildContext context, int postId, String username, int userId) {

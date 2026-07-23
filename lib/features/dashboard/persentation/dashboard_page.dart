@@ -43,49 +43,118 @@ class DashboardPage extends StatelessWidget {
       },
       child: Scaffold(
         extendBody: true,
-        backgroundColor: AppColors.white,
-        body: Stack(
-          children: [
-            PageView(
-              controller: controller.pageController,
-              physics: const NeverScrollableScrollPhysics(),
-              onPageChanged: controller.onPageChanged,
-              children: controller.screenList,
+        backgroundColor: Colors.black, // Fallback
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFF384D2B), // Deep Moss Green matching the screenshot
+                Color(0xFF121810), // Smooth transition
+                Color(0xFF0C0C0E), // Very dark grey, not pure black
+              ],
+              stops: [0.0, 0.5, 1.0], // Fade smoothly
             ),
+          ),
+          child: Stack(
+            children: [
+              // Soft glowing circles on the surface to break up the dark areas
+              Positioned(
+                bottom: 100,
+                left: -100,
+                child: Container(
+                  width: 400,
+                  height: 400,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.05),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 200,
+                right: -150,
+                child: Container(
+                  width: 350,
+                  height: 350,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.03),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: -50,
+                right: -50,
+                child: Container(
+                  width: 450,
+                  height: 450,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.04),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              PageView(
+                controller: controller.pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                onPageChanged: controller.onPageChanged,
+                children: controller.screenList,
+              ),
 
             // Global Upload Progress
             _buildGlobalUploadProgress(),
           ],
         ),
+        ),
         bottomNavigationBar: SafeArea(
           child: Padding(
             padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-            child: Container(
-              height: 76,
-              decoration: BoxDecoration(
-                color: const Color(0xFF1B1B1B), // Dark background like image
-                borderRadius: BorderRadius.circular(38),
-                border: Border.all(color: Colors.white12, width: 1.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(38),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(38),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _item(context, Icons.home_rounded, Icons.home_outlined, 0, label: "Home"),
-                      _item(context, Icons.search_rounded, Icons.search_rounded, 1, label: "Search"),
-                      _item(context, Icons.play_circle_fill_rounded, Icons.play_circle_outline_rounded, 2, label: "Video"),
-                      _item(context, Icons.video_library_rounded, Icons.video_library_outlined, 3, label: "Shorts"),
-                      _item(context, Icons.account_circle_rounded, Icons.account_circle_outlined, 4, imageUrl: controller.userProfileImage, label: "Profile"),
+                  height: 76,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.08), // Frosted glass
+                    borderRadius: BorderRadius.circular(38),
+                    border: Border.all(color: Colors.white.withOpacity(0.15), width: 1.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                      _item(context, CupertinoIcons.house_fill, CupertinoIcons.house, 0, label: "Home"),
+                      _item(context, CupertinoIcons.search, CupertinoIcons.search, 1, label: "Search"),
+                      _item(context, CupertinoIcons.play_circle_fill, CupertinoIcons.play_circle, 2, label: "Video"),
+                      _item(context, CupertinoIcons.film_fill, CupertinoIcons.film, 3, label: "Shorts"),
+                      _item(context, CupertinoIcons.person_solid, CupertinoIcons.person, 4, imageUrl: controller.userProfileImage, label: "Profile"),
                     ],
                   ),
                 ),
@@ -93,6 +162,7 @@ class DashboardPage extends StatelessWidget {
             ),
           ),
         ),
+        )
       ),
     );
   }
@@ -179,7 +249,7 @@ class DashboardPage extends StatelessWidget {
                 height: 38,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFF30333E) : Colors.transparent, // Highlight background matching Samsung Health
+                  color: isSelected ? const Color(0xFFB6D8FF).withOpacity(0.2) : Colors.transparent,
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: index == 4
@@ -189,7 +259,7 @@ class DashboardPage extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: isSelected ? Colors.white : Colors.transparent,
+                            color: isSelected ? const Color(0xFFB6D8FF) : Colors.transparent,
                             width: 1.2,
                           ),
                         ),
@@ -208,8 +278,8 @@ class DashboardPage extends StatelessWidget {
                       )
                     : Icon(
                         isSelected ? iconDataSelected : iconDataUnselected,
-                        size: 22,
-                        color: isSelected ? Colors.white : const Color(0xFFA0A0A0),
+                        size: 24,
+                        color: isSelected ? const Color(0xFFB6D8FF) : const Color(0xFFA0A0A0),
                       ),
               ),
             ],

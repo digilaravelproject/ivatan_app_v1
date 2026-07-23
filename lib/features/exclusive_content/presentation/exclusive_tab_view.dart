@@ -68,7 +68,12 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
           
           String imageUrl = "";
           if (post.media != null && post.media!.isNotEmpty) {
-            imageUrl = post.media!.first.url ?? "";
+            final media = post.media!.first;
+            if (media.type == 'video' || post.type == 'video' || post.type == 'reel') {
+              imageUrl = media.thumbnail.isNotEmpty ? media.thumbnail : media.url;
+            } else {
+              imageUrl = media.url;
+            }
           }
 
           void openPost() {

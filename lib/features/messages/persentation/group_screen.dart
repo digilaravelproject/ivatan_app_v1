@@ -146,20 +146,27 @@ class GroupScreen extends StatelessWidget {
                 );
               }
               return Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: controller.filteredGroupList.length,
-                  separatorBuilder: (ctx, i) => Divider(height: 1, indent: 80, color: Colors.grey.shade100),
-                  itemBuilder: (context, index) {
-                    final message = controller.filteredGroupList[index];
-                    return InkWell(
-                      onTap: () {
-                        Get.toNamed(
-                          AppRoutes.chattingScreen,
-                          arguments: message,
-                        );
-                      },
-                      child: Padding(
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    await controller.fetchInboxGroup();
+                  },
+                  color: AppColors.primary,
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    itemCount: controller.filteredGroupList.length,
+                    separatorBuilder: (ctx, i) => Divider(height: 1, indent: 80, color: Colors.grey.shade100),
+                    itemBuilder: (context, index) {
+                      final message = controller.filteredGroupList[index];
+                      return InkWell(
+                        onTap: () async {
+                          await Get.toNamed(
+                            AppRoutes.chattingScreen,
+                            arguments: message,
+                          );
+                          // Refresh list when returning from chat (e.g. if they left a group)
+                          controller.fetchInboxGroup();
+                        },
+                        child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         child: Row(
                           children: [
@@ -278,6 +285,7 @@ class GroupScreen extends StatelessWidget {
                     );
                   },
                 ),
+                )
               );
             }),
           ],
