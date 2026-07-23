@@ -8,6 +8,7 @@ import '../../../core/network/api_services.dart';
 import '../../../core/network/websocket_service.dart';
 import '../../../db/shared_pref_manager.dart';
 import '../model/chat_model.dart';
+import '../../../core/helper/custom_snack_bar.dart';
 
 class ChattController extends GetxController {
   RxBool isLoading = false.obs;
@@ -171,12 +172,16 @@ class ChattController extends GetxController {
 
       print("createSinglePrivateChat : "+userId.toString());
 
-      if (response != null && response["status"] == true) {
-        final data = response["data"];
+      if (response != null) {
+        if (response["status"] == true) {
+          final data = response["data"];
 
-        if (data is Map) {
-          final map = Map<String, dynamic>.from(data);
-          return map["id"];
+          if (data is Map) {
+            final map = Map<String, dynamic>.from(data);
+            return map["id"];
+          }
+        } else if (response["message"] != null) {
+          CustomSnackBar.showError(message: response["message"]);
         }
       }
     } catch (e, stk) {

@@ -286,9 +286,7 @@ class ContactPerson extends StatelessWidget {
               arguments: chatModel,
             );
           } else {
-            CustomSnackBar.showInfo(message: "Creating chat user id ${contact.id}");
             final newChatId = await chatController.createSinglePrivateChat(contact.id!.toInt());
-            CustomSnackBar.showInfo(message: "Creating chat...$newChatId");
             if (newChatId != null) {
               final chatModel = ChatListModel(
                 id: int.parse(newChatId.toString()),

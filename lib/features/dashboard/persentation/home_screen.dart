@@ -1012,7 +1012,7 @@ class HomePage extends StatelessWidget {
                         transitionBuilder:
                             (child, anim) =>
                             ScaleTransition(scale: anim, child: child),
-                        child: Icon(
+                        child:  Icon(
                           post.stats.isLiked == true
                               ? Icons.favorite
                               : Icons.favorite_border,
@@ -1022,7 +1022,14 @@ class HomePage extends StatelessWidget {
                               ? Colors.red
                               : Colors.black87,
                           size: 28,
-                        ),
+                        // Image.asset(
+                        //   post.stats.isLiked == true
+                        //       ? 'assets/images/likeexclamation.png'
+                        //       : 'assets/images/likeexclamation2.png',
+                        //   key: ValueKey(post.stats.isLiked),
+                        //   width: 28,
+                        //   height: 28,
+                         ),
                       ),
                     ),
                     SizedBox(width: 4),
@@ -1559,10 +1566,14 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                         Row(
                           children: [
                             _buildActionButton(
-                              icon:
-                              comment.hasLiked
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
+                              customIcon: Image.asset(
+                                comment.hasLiked == true
+                                    ? 'assets/images/likeexclamation.png'
+                                    : 'assets/images/likeexclamation2.png',
+                                key: ValueKey(comment.hasLiked),
+                                width: 18,
+                                height: 18,
+                              ),
                               label: "${comment.likesCount}",
                               color:
                               comment.hasLiked
@@ -1714,7 +1725,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   }
 
   Widget _buildActionButton({
-    required IconData icon,
+    IconData? icon,
+    Widget? customIcon,
     required String label,
     required Color color,
     required VoidCallback onTap,
@@ -1723,7 +1735,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       onTap: onTap,
       child: Row(
         children: [
-          Icon(icon, size: 18, color: color),
+          if (customIcon != null) customIcon else if (icon != null) Icon(icon, size: 18, color: color),
           const SizedBox(width: 4),
           Text(
             label,

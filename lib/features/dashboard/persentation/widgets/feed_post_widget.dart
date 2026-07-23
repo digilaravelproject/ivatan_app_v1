@@ -278,7 +278,8 @@ class FeedPostWidget extends StatelessWidget {
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 300),
                         transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
-                        child: Icon(
+                        child:
+                        Icon(
                           post.stats.isLiked == true
                               ? Icons.favorite
                               : Icons.favorite_border,
@@ -287,6 +288,13 @@ class FeedPostWidget extends StatelessWidget {
                               ? Colors.red
                               : Colors.black87,
                           size: 28,
+                        // Image.asset(
+                        //   post.stats.isLiked == true
+                        //       ? 'assets/images/likeexclamation.png'
+                        //       : 'assets/images/likeexclamation2.png',
+                        //   key: ValueKey(post.stats.isLiked),
+                        //   width: 28,
+                        //   height: 28,
                         ),
                       ),
                     ),

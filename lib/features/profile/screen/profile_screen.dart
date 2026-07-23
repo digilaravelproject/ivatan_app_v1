@@ -252,13 +252,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 RefreshIndicator(
                   onRefresh: () async {
                     await profileController.fetchUserDetails(finalUserName);
-                    if (showExclusiveTab) {
-                      exclusivePostController.fetchOwnPosts(
-                        filterType: "exclusive",
-                        username: finalUserName,
+                    
+                    // Always try to fetch exclusive posts to see if they just bought subscription or got approved
+                    exclusivePostController.fetchOwnPosts(
+                      filterType: "exclusive",
+                      username: finalUserName,
+                    );
+
+                    if (Get.isRegistered<OwnPostController>(tag: "${finalUserName}_posts")) {
+                      Get.find<OwnPostController>(tag: "${finalUserName}_posts").fetchOwnPosts(
+                        filterType: "posts", username: finalUserName
                       );
                     }
-                    // You can add more controllers to refresh here if needed
+
+                    if (Get.isRegistered<OwnPostController>(tag: "${finalUserName}_videos")) {
+                      Get.find<OwnPostController>(tag: "${finalUserName}_videos").fetchOwnPosts(
+                        filterType: "videos", username: finalUserName
+                      );
+                    }
                   },
                   child: NestedScrollView(
                     headerSliverBuilder: (
@@ -1377,11 +1388,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           AppRoutes
                                                               .chattingScreen,
                                                           arguments: chatId,
-                                                        );
-                                                      } else {
-                                                        CustomSnackBar.showError(
-                                                          message:
-                                                              "Could not initiate chat",
                                                         );
                                                       }
                                                     },
