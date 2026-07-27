@@ -101,8 +101,8 @@ class UserSearchScreen extends StatelessWidget {
               leading: CircleAvatar(
                 radius: 24,
                 backgroundColor: Colors.grey.shade200,
-                backgroundImage: user.avtar != null ? CachedNetworkImageProvider(user.avtar!) : null,
-                child: user.avtar == null ? const Icon(CupertinoIcons.person, color: Colors.grey) : null,
+                backgroundImage: (user.avtar != null && !user.avtar!.contains("ui-avatars.com")) ? CachedNetworkImageProvider(user.avtar!) : null,
+                child: (user.avtar == null || user.avtar!.contains("ui-avatars.com")) ? const Icon(CupertinoIcons.person, color: Colors.grey) : null,
               ),
               title: Row(
                 children: [

@@ -131,93 +131,6 @@ class ChatMessagesController extends GetxController {
         }
       }
 
-      // if (chatProfile.value != null) {
-      //   await initPusher(); // 🔥 IMPORTANT
-      // }
-
-
-      if (messages.isNotEmpty) {
-        await readMessage(messages.last.id.toString());
-      }
-    } catch (e) {
-      print("error = $e");
-    } finally {
-      isProfileLoading.value = false;
-    }
-  }
-
-  @override
-  void onClose() {
-    pusher.unsubscribe(channelName: "private-chat-${chatProfile.value?.id}");
-    pusher.disconnect();
-    messageController.dispose();
-    super.onClose();
-  }
-
-  Future<void> sendMessage() async {
-    try {
-      isSendingMessage.value = true;
-      var p = chatProfile.value;
-      var m = messageController.text;
-      if (p == null) {
-        return;
-      }
-      if (m.isEmpty) {
-        CustomSnackBar.showError(message: "Message can't be empty");
-        return;
-      }
-      final response = await api.callPost(
-        "api/v1/chats/${p.id}/messages",
-        data: {"content": m, "message_type": "text"},
-      );
-      log("sendMessage : " + response.toString());
-      if (response == null) {
-        return;
-      }
-      if (response["status"] == true) {
-        messages.add(ChatMessage.fromJson(response['data']));
-        messageController.clear();
-      }
-      if (response.containsKey("Message")) {
-        CustomSnackBar.showSuccess(message: response['Message'].toString());
-      }
-    } catch (e, stk) {
-      print("fetchMessages error: $e,\n$stk");
-    } finally {
-      isSendingMessage.value = false;
-    }
-  }
-
-  Future<void> readMessage(String messageID) async {
-    try {
-      var p = chatProfile.value;
-      if (p == null) {
-        return;
-      }
-      final response = await api.callPost(
-        "api/v1/chats/${p.id}/read",
-        data: {"last_read_message_id": messageID},
-        isFormData: true,
-      );
-      log("readMessage : " + response.toString());
-      if (response == null) {
-        return;
-      }
-      if (response["status"] == true) {
-        messages.add(ChatMessage.fromJson(response['data']));
-        messageController.clear();
-      }
-      if (response.containsKey("Message")) {
-        CustomSnackBar.showSuccess(message: response['Message'].toString());
-      }
-    } catch (e, stk) {
-      print("readMessage error: $e,\n$stk");
-    }
-  }
-
-  Future<void> deleteMessage(
-    String messageID, {
-    bool deleteForEveryOne = false,
   }) async {
     try {
       final response = await api.callDelete(
@@ -897,60 +810,64 @@ class ChatMessagesController extends GetxController {
 
       log("sendMessage : " + response.toString());
 
-      if (response != null && response["status"] == true) {
-        // Add sent message locally immediately at the BOTTOM (Index 0)
-        final newMessage = ChatMessage.fromJson(response['data']);
-        final index = messages.indexWhere((m) => m.id == newMessage.id);
-        if (index == -1) {
-          messages.insert(0, newMessage);
-        } else {
-          messages[index] = newMessage;
-        }
-        messages.refresh();
-        messageController.clear();
-
-        // 🔥 CRITICAL: Update Dashboard List "Last Message"
-        try {
-          if (Get.isRegistered<ChattController>()) {
-            final chattController = Get.find<ChattController>();
-            
-            // Find this chat in the main list
-            final index = chattController.chatList.indexWhere((e) => e.id == p.id);
-            if (index != -1) {
-              var chatItem = chattController.chatList[index];
-              
-              // Create LastMessage from response data
-              // We use the response map directly since fields are compatible
-              final newLastMessage = LastMessage.fromJson(response['data']);
-              
-              // Create NEW ChatListModel with updated lastMessage (Immutability pattern)
-              final updatedChatItem = ChatListModel(
-                id: chatItem.id,
-                uuid: chatItem.uuid,
-                type: chatItem.type,
-                name: chatItem.name,
-                avatar: chatItem.avatar,
-                isOnline: chatItem.isOnline,
-                isAdmin: chatItem.isAdmin,
-                unreadCount: chatItem.unreadCount, // keeping unread count same
-                lastMessage: newLastMessage, // <--- UPDATE THIS
-                updatedAt: DateTime.now(), // Update timestamp
-                participantsCount: chatItem.participantsCount,
-                participants: chatItem.participants,
-              );
-
-              // Update List and Refresh
-              chattController.chatList[index] = updatedChatItem;
-              
-              // Optional: Move to top
-              chattController.chatList.removeAt(index);
-              chattController.chatList.insert(0, updatedChatItem);
-              
-              chattController.chatList.refresh();
-            }
+      if (response != null) {
+        if (response["status"] == true) {
+          // Add sent message locally immediately at the BOTTOM (Index 0)
+          final newMessage = ChatMessage.fromJson(response['data']);
+          final index = messages.indexWhere((m) => m.id == newMessage.id);
+          if (index == -1) {
+            messages.insert(0, newMessage);
+          } else {
+            messages[index] = newMessage;
           }
-        } catch (e) {
-          print("Error updating chat list: $e");
+          messages.refresh();
+          messageController.clear();
+
+          // 🔥 CRITICAL: Update Dashboard List "Last Message"
+          try {
+            if (Get.isRegistered<ChattController>()) {
+              final chattController = Get.find<ChattController>();
+              
+              // Find this chat in the main list
+              final index = chattController.chatList.indexWhere((e) => e.id == p.id);
+              if (index != -1) {
+                var chatItem = chattController.chatList[index];
+                
+                // Create LastMessage from response data
+                // We use the response map directly since fields are compatible
+                final newLastMessage = LastMessage.fromJson(response['data']);
+                
+                // Create NEW ChatListModel with updated lastMessage (Immutability pattern)
+                final updatedChatItem = ChatListModel(
+                  id: chatItem.id,
+                  uuid: chatItem.uuid,
+                  type: chatItem.type,
+                  name: chatItem.name,
+                  avatar: chatItem.avatar,
+                  isOnline: chatItem.isOnline,
+                  isAdmin: chatItem.isAdmin,
+                  unreadCount: chatItem.unreadCount, // keeping unread count same
+                  lastMessage: newLastMessage, // <--- UPDATE THIS
+                  updatedAt: DateTime.now(), // Update timestamp
+                  participantsCount: chatItem.participantsCount,
+                  participants: chatItem.participants,
+                );
+
+                // Update List and Refresh
+                chattController.chatList[index] = updatedChatItem;
+                
+                // Optional: Move to top
+                chattController.chatList.removeAt(index);
+                chattController.chatList.insert(0, updatedChatItem);
+                
+                chattController.chatList.refresh();
+              }
+            }
+          } catch (e) {
+            print("Error updating chat list: $e");
+          }
+        } else if (response["message"] != null) {
+          CustomSnackBar.showError(message: response["message"]);
         }
       }
     } catch (e, stk) {

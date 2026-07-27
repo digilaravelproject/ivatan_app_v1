@@ -125,108 +125,94 @@ class _CreateExclusivePostScreenState extends State<CreateExclusivePostScreen> {
           "New Exclusive Post",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 16),
         ),
-        actions: [
-          _isLoading 
-            ? const Center(child: Padding(padding: EdgeInsets.only(right: 16.0), child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.blue))))
-            : TextButton(
-                onPressed: _uploadPost,
-                child: Text(
-                  "Share",
-                  style: TextStyle(
-                    color: _selectedMedia == null ? Colors.blue.withOpacity(0.5) : Colors.blue,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16
-                  ),
-                ),
-              ),
-        ],
       ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Row for Media Preview and Caption Input
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Media Preview Square
-                  GestureDetector(
-                    onTap: () => _showMediaPickerOptions(context),
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.grey.shade300, width: 0.5),
-                      ),
-                      child: _selectedMedia == null
-                          ? const Center(child: Icon(Icons.add_photo_alternate_outlined, color: Colors.grey, size: 30))
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: _mediaType == 'video' && _videoController != null && _videoController!.value.isInitialized
-                                  ? AspectRatio(
-                                      aspectRatio: 1,
-                                      child: VideoPlayer(_videoController!),
-                                    )
-                                  : Image.file(_selectedMedia!, fit: BoxFit.cover),
-                            ),
-                    ),
+            // Media Preview Area (Large)
+            GestureDetector(
+              onTap: () => _showMediaPickerOptions(context),
+              child: AspectRatio(
+                aspectRatio: 4 / 3,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade300, width: 1),
                   ),
-                  const SizedBox(width: 16),
-                  
-                  // Caption Input
-                  Expanded(
-                    child: TextField(
-                      controller: _captionController,
-                      maxLines: 4,
-                      minLines: 1,
-                      maxLength: 2200, // Insta style limit
-                      decoration: const InputDecoration(
-                        hintText: "Write a caption...",
-                        hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                        border: InputBorder.none,
-                        counterText: "",
-                      ),
-                    ),
-                  ),
-                ],
+                  child: _selectedMedia == null
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.add_photo_alternate_outlined, color: Colors.grey, size: 48),
+                            SizedBox(height: 8),
+                            Text("Tap to select media", style: TextStyle(color: Colors.grey, fontSize: 14)),
+                          ],
+                        )
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: _mediaType == 'video' && _videoController != null && _videoController!.value.isInitialized
+                              ? VideoPlayer(_videoController!)
+                              : Image.file(_selectedMedia!, fit: BoxFit.cover),
+                        ),
+                ),
               ),
             ),
+            const SizedBox(height: 24),
             
-            Divider(height: 1, thickness: 0.5, color: Colors.grey.shade200),
+            // Caption Input
+            const Text("Caption", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 8),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: TextField(
+                controller: _captionController,
+                maxLines: 5,
+                minLines: 3,
+                maxLength: 2200, // Insta style limit
+                decoration: const InputDecoration(
+                  hintText: "Write a captivating description...",
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.all(16),
+                  counterText: "",
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
             
             // Premium Settings Section
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
-              child: Text(
-                "Exclusive Settings",
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black54),
-              ),
-            ),
-            
-            // Price Input Tile
+            const Text("Premium Settings", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 8),
             Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.blue.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
+              ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.amber.shade50,
+                      color: Colors.blue.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.star, color: Colors.amber, size: 20),
+                    child: const Icon(Icons.lock, color: Colors.blue, size: 20),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
-                        Text("Unlock Price", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                        Text("Unlock Price", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                         SizedBox(height: 2),
                         Text("Amount followers pay to view", style: TextStyle(fontSize: 12, color: Colors.grey)),
                       ],
@@ -240,18 +226,26 @@ class _CreateExclusivePostScreenState extends State<CreateExclusivePostScreen> {
                       controller: _priceController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       textAlign: TextAlign.right,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
                       decoration: InputDecoration(
                         prefixText: "₹ ",
-                        prefixStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                        prefixStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
                         hintText: "0.00",
-                        hintStyle: TextStyle(color: Colors.grey.shade400),
+                        hintStyle: TextStyle(color: Colors.blue.withValues(alpha: 0.4)),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                         filled: true,
-                        fillColor: Colors.grey.shade50,
+                        fillColor: Colors.white,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide.none,
+                          borderSide: BorderSide(color: Colors.blue.withValues(alpha: 0.3)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.blue.withValues(alpha: 0.3)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: Colors.blue, width: 2),
                         ),
                       ),
                     ),
@@ -259,9 +253,23 @@ class _CreateExclusivePostScreenState extends State<CreateExclusivePostScreen> {
                 ],
               ),
             ),
+            const SizedBox(height: 32),
             
-            const SizedBox(height: 10),
-            Divider(height: 1, thickness: 0.5, color: Colors.grey.shade200),
+            // Big Share Button
+            ElevatedButton(
+              onPressed: _isLoading ? null : _uploadPost,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 0,
+              ),
+              child: _isLoading 
+                ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                : const Text("Share Exclusive Post", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),

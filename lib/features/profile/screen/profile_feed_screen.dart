@@ -68,47 +68,51 @@ class _ProfileFeedScreenState extends State<ProfileFeedScreen> {
         ),
         centerTitle: true,
       ),
-      body: Obx(() {
-        // If the controller has a 'posts' observable list, utilize it.
-        // Otherwise, fallback to the initial list passed (non-reactive).
-        // Check if finalController has 'posts' property and if it is RxList?
-        // Dart dynamic dispatch handles property access. 
-        // We assume OwnPostController/HomeController has 'posts' which is RxList.
-        
-        List<PostItem> displayPosts = [];
-        try {
-          displayPosts = finalController.posts;
-        } catch (e) {
-          displayPosts = widget.posts;
-        }
-        
-        // If empty from controller, maybe use widget.posts as fallback or show empty
-        if (displayPosts.isEmpty && widget.posts.isNotEmpty) {
-           displayPosts = widget.posts;
-        }
-
-        // Filter out locked exclusive posts so they don't appear in the feed
-        displayPosts = displayPosts.where((post) {
-           bool isPurchased = post.isPurchased ?? false;
-           bool hasAccess = post.hasAccess ?? false;
-           bool isLocked = !post.is_mine && !isPurchased && !hasAccess && (post.price != null || post.isExclusive == true);
-           return !isLocked;
-        }).toList();
-
-        return ListView.builder(
-          controller: _scrollController,
-          itemCount: displayPosts.length,
-          padding: const EdgeInsets.only(bottom: 20),
-          itemBuilder: (context, index) {
-            final post = displayPosts[index];
-            return FeedPostWidget(
-              post: post,
-              index: index,
-              controller: finalController,
-            );
-          },
-        );
+      body: widget.controller != null ? Obx(() {
+        return _buildList();
+      }) : Builder(builder: (context) {
+        return _buildList();
       }),
+    );
+  }
+
+  Widget _buildList() {
+    List<PostItem> displayPosts = [];
+    try {
+      if (widget.controller != null) {
+        displayPosts = finalController.posts;
+      } else {
+        displayPosts = widget.posts;
+      }
+    } catch (e) {
+      displayPosts = widget.posts;
+    }
+    
+    // If empty from controller, maybe use widget.posts as fallback or show empty
+    if (displayPosts.isEmpty && widget.posts.isNotEmpty) {
+        displayPosts = widget.posts;
+    }
+
+    // Filter out locked exclusive posts so they don't appear in the feed
+    displayPosts = displayPosts.where((post) {
+        bool isPurchased = post.isPurchased ?? false;
+        bool hasAccess = post.hasAccess ?? false;
+        bool isLocked = !post.is_mine && !isPurchased && !hasAccess && (post.price != null || post.isExclusive == true);
+        return !isLocked;
+    }).toList();
+
+    return ListView.builder(
+      controller: _scrollController,
+      itemCount: displayPosts.length,
+      padding: const EdgeInsets.only(bottom: 20),
+      itemBuilder: (context, index) {
+        final post = displayPosts[index];
+        return FeedPostWidget(
+          post: post,
+          index: index,
+          controller: finalController,
+        );
+      },
     );
   }
 }

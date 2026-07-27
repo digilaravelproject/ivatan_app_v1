@@ -28,21 +28,16 @@ class _ExclusiveDashboardScreenState extends State<ExclusiveDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Exclusive Content"),
+        title: const Text("Exclusive Content", style: TextStyle(color: Colors.black)),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: "Reset Status for Testing",
-            onPressed: () {
-              controller.enablementStatus.value = 'not_requested';
-              Get.snackbar("Debug", "Status reset to Not Requested for testing");
-            },
-          ),
-        ],
+        iconTheme: const IconThemeData(color: Colors.black),
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Obx(() {
-        // Removed full screen circular progress indicator so button can show loading state
+        if (controller.isLoading.value && controller.enablementStatus.value == 'not_requested') {
+          return const Center(child: CircularProgressIndicator());
+        }
 
         if (controller.enablementStatus.value == 'pending') {
           return _buildPendingState();
@@ -87,6 +82,11 @@ class _ExclusiveDashboardScreenState extends State<ExclusiveDashboardScreen> {
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               child: controller.isLoading.value 
                   ? const SizedBox(
@@ -94,7 +94,7 @@ class _ExclusiveDashboardScreenState extends State<ExclusiveDashboardScreen> {
                       height: 20, 
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
                     )
-                  : const Text("Pay & Request Enablement"),
+                  : const Text("Pay & Request Enablement", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             )),
           ],
         ),
@@ -136,6 +136,11 @@ class _ExclusiveDashboardScreenState extends State<ExclusiveDashboardScreen> {
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 child: controller.isLoading.value 
                     ? const SizedBox(
@@ -143,7 +148,7 @@ class _ExclusiveDashboardScreenState extends State<ExclusiveDashboardScreen> {
                         height: 20, 
                         child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
                       )
-                    : const Text("Retry Payment & Request"),
+                    : const Text("Retry Payment & Request", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ]
           ],

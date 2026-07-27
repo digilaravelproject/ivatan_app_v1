@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
@@ -55,9 +56,13 @@ class FeedPostWidget extends StatelessWidget {
                         color: Colors.grey.shade100
                     ),
                     child: ClipOval(
-                      child: post.user.avatar != null && post.user.avatar!.isNotEmpty
-                          ? Image.network(post.user.avatar!, fit: BoxFit.cover)
-                          : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                      child: post.user.avatar != null && post.user.avatar!.isNotEmpty && !post.user.avatar!.contains("ui-avatars.com")
+                          ? Image.network(
+                              post.user.avatar!, 
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => const Icon(CupertinoIcons.person, color: Colors.grey),
+                            )
+                          : const Icon(CupertinoIcons.person, color: Colors.grey),
                     ),
                   ),
                 ),
@@ -89,7 +94,6 @@ class FeedPostWidget extends StatelessWidget {
                           if (post.user.isVerified) ...[
                             const SizedBox(width: 4),
                             Image.asset(AppAssets.imgverified,height: 16,width: 16,),
-                           // const Icon(Icons.verified, color: Colors.blue, size: 14),
                           ],
                           
                           // Date / Time
@@ -274,7 +278,8 @@ class FeedPostWidget extends StatelessWidget {
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 300),
                         transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
-                        child: Icon(
+                        child:
+                        Icon(
                           post.stats.isLiked == true
                               ? Icons.favorite
                               : Icons.favorite_border,
@@ -283,6 +288,13 @@ class FeedPostWidget extends StatelessWidget {
                               ? Colors.red
                               : Colors.black87,
                           size: 28,
+                        // Image.asset(
+                        //   post.stats.isLiked == true
+                        //       ? 'assets/images/likeexclamation.png'
+                        //       : 'assets/images/likeexclamation2.png',
+                        //   key: ValueKey(post.stats.isLiked),
+                        //   width: 28,
+                        //   height: 28,
                         ),
                       ),
                     ),
@@ -310,7 +322,7 @@ class FeedPostWidget extends StatelessWidget {
                         final link = "https://ivatan.in/post/${post.id}?type=${post.media.first.type}";
                         Share.share("Check this post 👇\n$link");
                       },
-                      child: const Icon(Icons.send_outlined, color: Colors.black87, size: 24),
+                      child: const Icon(Icons.share, color: Colors.black87, size: 24),
                     ),
 
                     const Spacer(),
