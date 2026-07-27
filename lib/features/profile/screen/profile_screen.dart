@@ -56,6 +56,7 @@ import '../../exclusive_content/controller/exclusive_controller.dart';
 import '../../exclusive_content/presentation/exclusive_dashboard_screen.dart';
 import '../../exclusive_content/presentation/exclusive_tab_view.dart';
 import '../../exclusive_content/presentation/create_exclusive_post_screen.dart';
+
 class ProfileScreen extends StatefulWidget {
   //ProfileScreen({Key? key}) : super(key: key);
   final String? viewUserName; // add this
@@ -75,7 +76,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final StoryController storyController = Get.put(StoryController());
   final ChattController chatController = Get.put(ChattController());
   final CartController cartController = Get.put(CartController());
-  final ExclusiveController exclusiveController = Get.put(ExclusiveController());
+  final ExclusiveController exclusiveController = Get.put(
+    ExclusiveController(),
+  );
 
   //final HomeController homeController= Get.put(HomeController());
 
@@ -96,13 +99,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
       isOtherProfile = true;
       finalUserName = selected;
       // For other profiles, use a tag with their username
-      profileController = Get.put(SettingsController(userName: finalUserName), tag: finalUserName);
+      profileController = Get.put(
+        SettingsController(userName: finalUserName),
+        tag: finalUserName,
+      );
     } else {
       // CASE 2: Coming from bottom navigation → load own profile
       isOtherProfile = false;
       finalUserName = currentUserName ?? "";
       // For own profile, use the same tag as used in SettingsPage
-      profileController = Get.put(SettingsController(userName: finalUserName), tag: finalUserName);
+      profileController = Get.put(
+        SettingsController(userName: finalUserName),
+        tag: finalUserName,
+      );
     }
 
     // NOW CALL API WITH CORRECT USERNAME
@@ -123,192 +132,322 @@ class _ProfileScreenState extends State<ProfileScreen> {
           if (user == null) {
             return _buildProfileShimmer();
           }
-          
-          final bool isCurrentlyOther = finalUserName != (SharedPrefManager().user?.username ?? "");
-          
-          final bool isFollowing = profileController.followController.isUserFollowing(user.id!).value;
-          final bool isPrivateHidden = isCurrentlyOther && 
-                                     (user.accountPrivacy?.toLowerCase() == "private") && 
-                                     !isFollowing;
-              debugPrint("Profile Debug: user=${user.username}, isOtherProfile=$isOtherProfile, isCurrentlyOther=$isCurrentlyOther, isSeller=${user.isSeller}, profileType=${user.profileType}, profileSubType=${user.profileSubType}");
-              
-             // Fetch exclusive posts to determine if we should show the tab
-             final exclusivePostController = Get.put(
-               OwnPostController(filterType: "exclusive", UserName: finalUserName),
-               tag: "${finalUserName}_exclusive_posts",
-             );
-             bool showExclusiveTab = exclusivePostController.posts.isNotEmpty;
 
-             // Build dynamic tabs and views
-             bool showProductTab = false;
-             bool showServiceTab = false;
+          final bool isCurrentlyOther =
+              finalUserName != (SharedPrefManager().user?.username ?? "");
 
-             if (isCurrentlyOther) {
-               final pType = user.profileType?.toLowerCase();
-               showProductTab = (pType == 'product' || pType == 'both');
-               showServiceTab = (pType == 'service' || pType == 'both');
-             } else {
-               showProductTab = ProfilePermissionManager.canProfileSellProducts(user, isCurrentlyOther);
-               showServiceTab = ProfilePermissionManager.canProfileProvideServices(user, isCurrentlyOther);
-             }
+          final bool isFollowing =
+              profileController.followController
+                  .isUserFollowing(user.id!)
+                  .value;
+          final bool isPrivateHidden =
+              isCurrentlyOther &&
+              (user.accountPrivacy?.toLowerCase() == "private") &&
+              !isFollowing;
+          debugPrint(
+            "Profile Debug: user=${user.username}, isOtherProfile=$isOtherProfile, isCurrentlyOther=$isCurrentlyOther, isSeller=${user.isSeller}, profileType=${user.profileType}, profileSubType=${user.profileSubType}",
+          );
 
-             List<Tab> tabs = [
-               Tab(child: Image.asset(AppAssets.icCategory, width: 24, height: 24)), 
-               Tab(child: Image.asset(AppAssets.icVideo, width: 24, height: 24)),
-             ];
-             
-             List<Widget> tabViews = [
-               MyPostScreen(username: finalUserName),
-               MyVideoScreen(username: finalUserName),
-             ];
+          // Fetch exclusive posts to determine if we should show the tab
+          final exclusivePostController = Get.put(
+            OwnPostController(filterType: "exclusive", UserName: finalUserName),
+            tag: "${finalUserName}_exclusive_posts",
+          );
+          bool showExclusiveTab = exclusivePostController.posts.isNotEmpty;
 
-             if (showExclusiveTab) {
-               tabs.add(Tab(child: Icon(Icons.star_border, color: Colors.amber, size: 26)));
-               tabViews.add(
-                 ExclusiveTabView(username: finalUserName, isOwnProfile: !isOtherProfile),
-               );
-             }
+          // Build dynamic tabs and views
+          bool showProductTab = false;
+          bool showServiceTab = false;
 
-             if (showProductTab) {
-               tabs.add(Tab(child: Image.asset(AppAssets.icProduct, width: 24, height: 24)));
-               tabViews.add(
-                 (!isOtherProfile && ProfilePermissionManager.canSellProducts)
-                   ? ProductGridScreen(isOwnProfile: true, userId: user.id?.toString())
-                   : ProductGridScreen(isOwnProfile: false, userId: user.id?.toString()),
-               );
-             }
+          if (isCurrentlyOther) {
+            final pType = user.profileType?.toLowerCase();
+            showProductTab = (pType == 'product' || pType == 'both');
+            showServiceTab = (pType == 'service' || pType == 'both');
+          } else {
+            showProductTab = ProfilePermissionManager.canProfileSellProducts(
+              user,
+              isCurrentlyOther,
+            );
+            showServiceTab = ProfilePermissionManager.canProfileProvideServices(
+              user,
+              isCurrentlyOther,
+            );
+          }
 
-             if (showServiceTab) {
-               tabs.add(Tab(child: Icon(Icons.miscellaneous_services_outlined, color: Colors.black, size: 26)));
-               tabViews.add(
-                 (!isOtherProfile && ProfilePermissionManager.canProvideServices)
-                   ? DigitalProductListScreen(isOwnProfile: true, userId: user.id?.toString())
-                   : DigitalProductListScreen(isOwnProfile: false, userId: user.id?.toString()),
-               );
-             }
+          List<Tab> tabs = [
+            Tab(
+              child: Image.asset(AppAssets.icCategory, width: 24, height: 24),
+            ),
+            Tab(child: Image.asset(AppAssets.icVideo, width: 24, height: 24)),
+          ];
 
-             return DefaultTabController(
-               key: ValueKey("${user.id}_${showProductTab}_${showServiceTab}_${showExclusiveTab}"),
-               length: tabs.length,
-              child: Stack(
-                children: [
-                  NestedScrollView(
-                    headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          List<Widget> tabViews = [
+            MyPostScreen(username: finalUserName),
+            MyVideoScreen(username: finalUserName),
+          ];
+
+          if (showExclusiveTab) {
+            tabs.add(
+              Tab(
+                child: Icon(Icons.star_border, color: Colors.amber, size: 26),
+              ),
+            );
+            tabViews.add(
+              ExclusiveTabView(
+                username: finalUserName,
+                isOwnProfile: !isOtherProfile,
+              ),
+            );
+          }
+
+          if (showProductTab) {
+            tabs.add(
+              Tab(
+                child: Image.asset(AppAssets.icProduct, width: 24, height: 24),
+              ),
+            );
+            tabViews.add(
+              (!isOtherProfile && ProfilePermissionManager.canSellProducts)
+                  ? ProductGridScreen(
+                    isOwnProfile: true,
+                    userId: user.id?.toString(),
+                  )
+                  : ProductGridScreen(
+                    isOwnProfile: false,
+                    userId: user.id?.toString(),
+                  ),
+            );
+          }
+
+          if (showServiceTab) {
+            tabs.add(
+              Tab(
+                child: Icon(
+                  Icons.miscellaneous_services_outlined,
+                  color: Colors.black,
+                  size: 26,
+                ),
+              ),
+            );
+            tabViews.add(
+              (!isOtherProfile && ProfilePermissionManager.canProvideServices)
+                  ? DigitalProductListScreen(
+                    isOwnProfile: true,
+                    userId: user.id?.toString(),
+                  )
+                  : DigitalProductListScreen(
+                    isOwnProfile: false,
+                    userId: user.id?.toString(),
+                  ),
+            );
+          }
+
+          return DefaultTabController(
+            key: ValueKey(
+              "${user.id}_${showProductTab}_${showServiceTab}_${showExclusiveTab}",
+            ),
+            length: tabs.length,
+            child: Stack(
+              children: [
+                RefreshIndicator(
+                  onRefresh: () async {
+                    await profileController.fetchUserDetails(finalUserName);
+                    
+                    // Always try to fetch exclusive posts to see if they just bought subscription or got approved
+                    exclusivePostController.fetchOwnPosts(
+                      filterType: "exclusive",
+                      username: finalUserName,
+                    );
+
+                    if (Get.isRegistered<OwnPostController>(tag: "${finalUserName}_posts")) {
+                      Get.find<OwnPostController>(tag: "${finalUserName}_posts").fetchOwnPosts(
+                        filterType: "posts", username: finalUserName
+                      );
+                    }
+
+                    if (Get.isRegistered<OwnPostController>(tag: "${finalUserName}_videos")) {
+                      Get.find<OwnPostController>(tag: "${finalUserName}_videos").fetchOwnPosts(
+                        filterType: "videos", username: finalUserName
+                      );
+                    }
+                  },
+                  child: NestedScrollView(
+                    headerSliverBuilder: (
+                      BuildContext context,
+                      bool innerBoxIsScrolled,
+                    ) {
                       return <Widget>[
                         SliverToBoxAdapter(
                           child: Stack(
                             clipBehavior: Clip.none,
                             children: [
                               // ... existing cover and info container code ...
-                              // (I will keep the existing code here by using the multi_replace_file_content if needed, 
+                              // (I will keep the existing code here by using the multi_replace_file_content if needed,
                               // but since this is a continuous block I'll use it carefully)
-                            // 1. Cover Image & Info Container
-                            Column(
-                              children: [
-                                // Cover Area
-                                Container(
-                                  height: 240,
-                                  width: double.infinity,
-                                  child: Stack(
-                                    fit: StackFit.expand,
-                                    children: [
-                                      Image.network(
-                                        user.profilePhotoPath != null && user.profilePhotoPath!.isNotEmpty
-                                            ? "${user.profilePhotoPath}"
-                                            : "",
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
-                                      ),
-                                      ClipRect(
-                                        child: BackdropFilter(
-                                          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                                          child: Container(color: Colors.black.withOpacity(0.3)),
+                              // 1. Cover Image & Info Container
+                              Column(
+                                children: [
+                                  // Cover Area
+                                  Container(
+                                    height: 240,
+                                    width: double.infinity,
+                                    child: Stack(
+                                      fit: StackFit.expand,
+                                      children: [
+                                        Image.network(
+                                          user.profilePhotoPath != null &&
+                                                  user
+                                                      .profilePhotoPath!
+                                                      .isNotEmpty
+                                              ? "${user.profilePhotoPath}"
+                                              : "",
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (_, __, ___) => Image.asset(
+                                                AppAssets.imgAppLogo,
+                                                fit: BoxFit.cover,
+                                              ),
                                         ),
-                                      ),
-                                       Container(
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                            colors: [Colors.black54, Colors.transparent, Colors.black54],
-                                          ),
-                                        ),
-                                      ),
-                                      // Back Button (Only for other profiles)
-
-                                      if (isOtherProfile)
-                                        Positioned(
-                                          top: 40,
-                                          left: 10,
-                                          child: IconButton(
-                                            icon: Container(
-                                              padding: const EdgeInsets.all(6),
-                                              decoration: const BoxDecoration(color: Colors.black26, shape: BoxShape.circle),
-                                              child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+                                        ClipRect(
+                                          child: BackdropFilter(
+                                            filter: ImageFilter.blur(
+                                              sigmaX: 20,
+                                              sigmaY: 20,
                                             ),
-                                            onPressed: () => Get.back(),
+                                            child: Container(
+                                              color: Colors.black.withOpacity(
+                                                0.3,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                              colors: [
+                                                Colors.black54,
+                                                Colors.transparent,
+                                                Colors.black54,
+                                              ],
+                                            ),
                                           ),
                                         ),
 
-                                       if (!isOtherProfile)
-                                         Positioned(
-                                           top: 44,
-                                           right: 110,
-                                           child: const AnimatedProBadge(),
-                                         ),
+                                        // Back Button (Only for other profiles)
+                                        if (isOtherProfile)
+                                          Positioned(
+                                            top: 40,
+                                            left: 10,
+                                            child: IconButton(
+                                              icon: Container(
+                                                padding: const EdgeInsets.all(
+                                                  6,
+                                                ),
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.black26,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(
+                                                  Icons.arrow_back,
+                                                  color: Colors.white,
+                                                  size: 20,
+                                                ),
+                                              ),
+                                              onPressed: () => Get.back(),
+                                            ),
+                                          ),
 
-                                       // Cart Icon (Visible ONLY on own profile)
-                                       if (!isOtherProfile)
-                                         Positioned(
-                                           top: 40,
-                                           right: 60,
-                                           child: GestureDetector(
-                                             onTap: () => Get.to(() => CartScreen()),
-                                             child: Stack(
-                                               clipBehavior: Clip.none,
-                                               children: [
-                                                 Container(
-                                                   padding: const EdgeInsets.all(6),
-                                                   decoration: const BoxDecoration(
-                                                     color: Colors.black26,
-                                                     shape: BoxShape.circle,
-                                                   ),
-                                                   child: const Icon(
-                                                     Icons.shopping_cart_outlined,
-                                                     color: Colors.white,
-                                                     size: 22,
-                                                   ),
-                                                 ),
-                                                 Obx(() => cartController.totalItems.value > 0
-                                                     ? Positioned(
-                                                         right: -4,
-                                                         top: -4,
-                                                         child: Container(
-                                                           padding: const EdgeInsets.all(4),
-                                                           decoration: const BoxDecoration(
-                                                             color: Colors.red,
-                                                             shape: BoxShape.circle,
-                                                           ),
-                                                           constraints: const BoxConstraints(
-                                                             minWidth: 16,
-                                                             minHeight: 16,
-                                                           ),
-                                                           child: Text(
-                                                             '${cartController.totalItems.value}',
-                                                             style: const TextStyle(
-                                                               color: Colors.white,
-                                                               fontSize: 10,
-                                                               fontWeight: FontWeight.bold,
-                                                             ),
-                                                             textAlign: TextAlign.center,
-                                                           ),
-                                                         ),
-                                                       )
-                                                     : const SizedBox.shrink()),
-                                               ],
-                                             ),
-                                           ),
-                                         ),
+                                        if (!isOtherProfile)
+                                          Positioned(
+                                            top: 44,
+                                            right: 110,
+                                            child: const AnimatedProBadge(),
+                                          ),
+
+                                        // Cart Icon (Visible ONLY on own profile)
+                                        if (!isOtherProfile)
+                                          Positioned(
+                                            top: 40,
+                                            right: 60,
+                                            child: GestureDetector(
+                                              onTap:
+                                                  () => Get.to(
+                                                    () => CartScreen(),
+                                                  ),
+                                              child: Stack(
+                                                clipBehavior: Clip.none,
+                                                children: [
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.all(6),
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                          color: Colors.black26,
+                                                          shape:
+                                                              BoxShape.circle,
+                                                        ),
+                                                    child: const Icon(
+                                                      Icons
+                                                          .shopping_cart_outlined,
+                                                      color: Colors.white,
+                                                      size: 22,
+                                                    ),
+                                                  ),
+                                                  Obx(
+                                                    () =>
+                                                        cartController
+                                                                    .totalItems
+                                                                    .value >
+                                                                0
+                                                            ? Positioned(
+                                                              right: -4,
+                                                              top: -4,
+                                                              child: Container(
+                                                                padding:
+                                                                    const EdgeInsets.all(
+                                                                      4,
+                                                                    ),
+                                                                decoration: const BoxDecoration(
+                                                                  color:
+                                                                      Colors
+                                                                          .red,
+                                                                  shape:
+                                                                      BoxShape
+                                                                          .circle,
+                                                                ),
+                                                                constraints:
+                                                                    const BoxConstraints(
+                                                                      minWidth:
+                                                                          16,
+                                                                      minHeight:
+                                                                          16,
+                                                                    ),
+                                                                child: Text(
+                                                                  '${cartController.totalItems.value}',
+                                                                  style: const TextStyle(
+                                                                    color:
+                                                                        Colors
+                                                                            .white,
+                                                                    fontSize:
+                                                                        10,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                              ),
+                                                            )
+                                                            : const SizedBox.shrink(),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
 
                                         // 3 Dot Menu
                                         Positioned(
@@ -318,20 +457,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             builder: (context) {
                                               return GestureDetector(
                                                 onTap: () {
-                                                  final RenderBox? button = context.findRenderObject() as RenderBox?;
-                                                  final RenderBox? overlay = Navigator.of(context).overlay?.context.findRenderObject() as RenderBox?;
-                                                  
-                                                  if (button == null || !button.hasSize || overlay == null || !overlay.hasSize) {
+                                                  final RenderBox? button =
+                                                      context.findRenderObject()
+                                                          as RenderBox?;
+                                                  final RenderBox? overlay =
+                                                      Navigator.of(context)
+                                                              .overlay
+                                                              ?.context
+                                                              .findRenderObject()
+                                                          as RenderBox?;
+
+                                                  if (button == null ||
+                                                      !button.hasSize ||
+                                                      overlay == null ||
+                                                      !overlay.hasSize) {
                                                     return;
                                                   }
-                                                  
-                                                  final RelativeRect position = RelativeRect.fromRect(
-                                                    Rect.fromPoints(
-                                                      button.localToGlobal(Offset.zero, ancestor: overlay),
-                                                      button.localToGlobal(button.size.bottomRight(Offset.zero), ancestor: overlay),
-                                                    ),
-                                                    Offset.zero & overlay.size,
-                                                  );
+
+                                                  final RelativeRect position =
+                                                      RelativeRect.fromRect(
+                                                        Rect.fromPoints(
+                                                          button.localToGlobal(
+                                                            Offset.zero,
+                                                            ancestor: overlay,
+                                                          ),
+                                                          button.localToGlobal(
+                                                            button.size
+                                                                .bottomRight(
+                                                                  Offset.zero,
+                                                                ),
+                                                            ancestor: overlay,
+                                                          ),
+                                                        ),
+                                                        Offset.zero &
+                                                            overlay.size,
+                                                      );
 
                                                   showMenu<String>(
                                                     context: context,
@@ -342,9 +502,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           value: 'profile',
                                                           child: Row(
                                                             children: [
-                                                              Icon(CupertinoIcons.person_add, size: 20),
-                                                              const SizedBox(width: 10),
-                                                              Text("Profile Settings"),
+                                                              Icon(
+                                                                CupertinoIcons
+                                                                    .person_add,
+                                                                size: 20,
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 10,
+                                                              ),
+                                                              Text(
+                                                                "Profile Settings",
+                                                              ),
                                                             ],
                                                           ),
                                                         ),
@@ -352,8 +520,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           value: 'bookmarks',
                                                           child: Row(
                                                             children: [
-                                                              Icon(CupertinoIcons.bookmark, size: 20),
-                                                              const SizedBox(width: 10),
+                                                              Icon(
+                                                                CupertinoIcons
+                                                                    .bookmark,
+                                                                size: 20,
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 10,
+                                                              ),
                                                               Text("Bookmarks"),
                                                             ],
                                                           ),
@@ -362,8 +536,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           value: 'orders',
                                                           child: Row(
                                                             children: [
-                                                              Icon(CupertinoIcons.bag, size: 20),
-                                                              const SizedBox(width: 10),
+                                                              Icon(
+                                                                CupertinoIcons
+                                                                    .bag,
+                                                                size: 20,
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 10,
+                                                              ),
                                                               Text("My Orders"),
                                                             ],
                                                           ),
@@ -372,20 +552,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           value: 'enquiries',
                                                           child: Row(
                                                             children: [
-                                                              Icon(CupertinoIcons.bag, size: 20),
-                                                              const SizedBox(width: 10),
-                                                              Text("My Enquiries"),
+                                                              Icon(
+                                                                CupertinoIcons
+                                                                    .bag,
+                                                                size: 20,
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 10,
+                                                              ),
+                                                              Text(
+                                                                "My Enquiries",
+                                                              ),
                                                             ],
                                                           ),
                                                         ),
-                                                        if (ProfilePermissionManager.canSellProducts) ...[
+                                                        if (ProfilePermissionManager
+                                                            .canSellProducts) ...[
                                                           const PopupMenuItem(
                                                             value: 'products',
                                                             child: Row(
                                                               children: [
-                                                                Icon(CupertinoIcons.cube_box, size: 20),
-                                                                const SizedBox(width: 10),
-                                                                Text("Your Products"),
+                                                                Icon(
+                                                                  CupertinoIcons
+                                                                      .cube_box,
+                                                                  size: 20,
+                                                                ),
+                                                                const SizedBox(
+                                                                  width: 10,
+                                                                ),
+                                                                Text(
+                                                                  "Your Products",
+                                                                ),
                                                               ],
                                                             ),
                                                           ),
@@ -393,9 +590,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             value: 'dashboard',
                                                             child: Row(
                                                               children: [
-                                                                Icon(CupertinoIcons.doc_append, size: 20),
-                                                                const SizedBox(width: 10),
-                                                                Text("Dashboard"),
+                                                                Icon(
+                                                                  CupertinoIcons
+                                                                      .doc_append,
+                                                                  size: 20,
+                                                                ),
+                                                                const SizedBox(
+                                                                  width: 10,
+                                                                ),
+                                                                Text(
+                                                                  "Dashboard",
+                                                                ),
                                                               ],
                                                             ),
                                                           ),
@@ -404,20 +609,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           value: 'exclusive',
                                                           child: Row(
                                                             children: [
-                                                              Icon(Icons.star, color: Colors.amber, size: 20),
-                                                              SizedBox(width: 10),
-                                                              Text("Exclusive Content"),
+                                                              Icon(
+                                                                Icons.star,
+                                                                color:
+                                                                    Colors
+                                                                        .amber,
+                                                                size: 20,
+                                                              ),
+                                                              SizedBox(
+                                                                width: 10,
+                                                              ),
+                                                              Text(
+                                                                "Exclusive Content",
+                                                              ),
                                                             ],
                                                           ),
                                                         ),
-                                                        if (ProfilePermissionManager.canProvideServices) ...[
+                                                        if (ProfilePermissionManager
+                                                            .canProvideServices) ...[
                                                           const PopupMenuItem(
                                                             value: 'services',
                                                             child: Row(
                                                               children: [
-                                                                Icon(Icons.room_service_outlined, size: 20),
-                                                                const SizedBox(width: 10),
-                                                                Text("Your Services"),
+                                                                Icon(
+                                                                  Icons
+                                                                      .room_service_outlined,
+                                                                  size: 20,
+                                                                ),
+                                                                const SizedBox(
+                                                                  width: 10,
+                                                                ),
+                                                                Text(
+                                                                  "Your Services",
+                                                                ),
                                                               ],
                                                             ),
                                                           ),
@@ -425,8 +649,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             value: 'enquiry',
                                                             child: Row(
                                                               children: [
-                                                                Icon(CupertinoIcons.chat_bubble_text, size: 20),
-                                                                const SizedBox(width: 10),
+                                                                Icon(
+                                                                  CupertinoIcons
+                                                                      .chat_bubble_text,
+                                                                  size: 20,
+                                                                ),
+                                                                const SizedBox(
+                                                                  width: 10,
+                                                                ),
                                                                 Text("Enquiry"),
                                                               ],
                                                             ),
@@ -437,9 +667,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           value: 'block',
                                                           child: Row(
                                                             children: [
-                                                              Icon(user.isBlocked == true ? Icons.person_off_outlined : Icons.block, size: 20, color: Colors.red),
-                                                              const SizedBox(width: 10),
-                                                              Text(user.isBlocked == true ? "Unblock User" : "Block User", style: const TextStyle(color: Colors.red)),
+                                                              Icon(
+                                                                user.isBlocked ==
+                                                                        true
+                                                                    ? Icons
+                                                                        .person_off_outlined
+                                                                    : Icons
+                                                                        .block,
+                                                                size: 20,
+                                                                color:
+                                                                    Colors.red,
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 10,
+                                                              ),
+                                                              Text(
+                                                                user.isBlocked ==
+                                                                        true
+                                                                    ? "Unblock User"
+                                                                    : "Block User",
+                                                                style: const TextStyle(
+                                                                  color:
+                                                                      Colors
+                                                                          .red,
+                                                                ),
+                                                              ),
                                                             ],
                                                           ),
                                                         ),
@@ -448,62 +700,131 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   ).then((value) async {
                                                     if (value == null) return;
                                                     if (value == 'profile') {
-                                                      Get.to(() => SettingsScreen());
-                                                    } else if (value == 'bookmarks') {
-                                                      profileController.openBookmarks();
-                                                    } else if (value == 'block') {
+                                                      Get.to(
+                                                        () => SettingsScreen(),
+                                                      );
+                                                    } else if (value ==
+                                                        'bookmarks') {
+                                                      profileController
+                                                          .openBookmarks();
+                                                    } else if (value ==
+                                                        'block') {
                                                       // Show confirmation dialog for block
                                                       Get.dialog(
                                                         CupertinoAlertDialog(
-                                                          title: Text(user.isBlocked == true ? "Unblock User?" : "Block User?"),
-                                                          content: Text(user.isBlocked == true 
-                                                            ? "Are you sure you want to unblock @${user.username}?" 
-                                                            : "Are you sure you want to block @${user.username}? They will no longer be able to see your content or interact with you."),
+                                                          title: Text(
+                                                            user.isBlocked ==
+                                                                    true
+                                                                ? "Unblock User?"
+                                                                : "Block User?",
+                                                          ),
+                                                          content: Text(
+                                                            user.isBlocked ==
+                                                                    true
+                                                                ? "Are you sure you want to unblock @${user.username}?"
+                                                                : "Are you sure you want to block @${user.username}? They will no longer be able to see your content or interact with you.",
+                                                          ),
                                                           actions: [
                                                             CupertinoDialogAction(
-                                                              child: const Text("Cancel"),
-                                                              onPressed: () => Get.back(),
+                                                              child: const Text(
+                                                                "Cancel",
+                                                              ),
+                                                              onPressed:
+                                                                  () =>
+                                                                      Get.back(),
                                                             ),
                                                             CupertinoDialogAction(
-                                                              isDestructiveAction: true,
-                                                              child: Text(user.isBlocked == true ? "Unblock" : "Block"),
+                                                              isDestructiveAction:
+                                                                  true,
+                                                              child: Text(
+                                                                user.isBlocked ==
+                                                                        true
+                                                                    ? "Unblock"
+                                                                    : "Block",
+                                                              ),
                                                               onPressed: () {
                                                                 Get.back();
-                                                                profileController.toggleBlockUser(user.id!);
+                                                                profileController
+                                                                    .toggleBlockUser(
+                                                                      user.id!,
+                                                                    );
                                                               },
                                                             ),
                                                           ],
-                                                        )
+                                                        ),
                                                       );
-                                                    } else if (value == 'enquiry') {
-                                                      Get.to(() => EnquiriesListScreen());
-                                                    } else if (value == 'orders') {
-                                                      Get.to(() => MyOrdersScreen());
-                                                    } else if (value == 'enquiries') {
-                                                      Get.to(() => MyEnquiryListScreen());
-                                                    } else if (value == 'products') {
-                                                      await Get.to(() => MyProductsScreen());
-                                                      if (Get.isRegistered<MarketplaceProductController>()) {
-                                                        Get.find<MarketplaceProductController>().fetchMarketplaceProducts(isRefresh: true);
+                                                    } else if (value ==
+                                                        'enquiry') {
+                                                      Get.to(
+                                                        () =>
+                                                            EnquiriesListScreen(),
+                                                      );
+                                                    } else if (value ==
+                                                        'orders') {
+                                                      Get.to(
+                                                        () => MyOrdersScreen(),
+                                                      );
+                                                    } else if (value ==
+                                                        'enquiries') {
+                                                      Get.to(
+                                                        () =>
+                                                            MyEnquiryListScreen(),
+                                                      );
+                                                    } else if (value ==
+                                                        'products') {
+                                                      await Get.to(
+                                                        () =>
+                                                            MyProductsScreen(),
+                                                      );
+                                                      if (Get.isRegistered<
+                                                        MarketplaceProductController
+                                                      >()) {
+                                                        Get.find<
+                                                              MarketplaceProductController
+                                                            >()
+                                                            .fetchMarketplaceProducts(
+                                                              isRefresh: true,
+                                                            );
                                                       }
-                                                    } else if (value == 'services') {
-                                                      await Get.to(() => MyServicesScreen());
-                                                      if (Get.isRegistered<ServiceController>()) {
-                                                        Get.find<ServiceController>().fetchMarketplaceServices(isRefresh: true);
+                                                    } else if (value ==
+                                                        'services') {
+                                                      await Get.to(
+                                                        () =>
+                                                            MyServicesScreen(),
+                                                      );
+                                                      if (Get.isRegistered<
+                                                        ServiceController
+                                                      >()) {
+                                                        Get.find<
+                                                              ServiceController
+                                                            >()
+                                                            .fetchMarketplaceServices(
+                                                              isRefresh: true,
+                                                            );
                                                       }
-                                                    } else if (value == 'dashboard') {
-                                                      Get.to(() => SellerDashboard());
-                                                    } else if (value == 'exclusive') {
-                                                      Get.to(() => ExclusiveDashboardScreen());
+                                                    } else if (value ==
+                                                        'dashboard') {
+                                                      Get.to(
+                                                        () => SellerDashboard(),
+                                                      );
+                                                    } else if (value ==
+                                                        'exclusive') {
+                                                      Get.to(
+                                                        () =>
+                                                            ExclusiveDashboardScreen(),
+                                                      );
                                                     }
                                                   });
                                                 },
                                                 child: Container(
-                                                  padding: const EdgeInsets.all(6),
-                                                  decoration: const BoxDecoration(
-                                                    color: Colors.black26,
-                                                    shape: BoxShape.circle,
+                                                  padding: const EdgeInsets.all(
+                                                    6,
                                                   ),
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                        color: Colors.black26,
+                                                        shape: BoxShape.circle,
+                                                      ),
                                                   child: const Icon(
                                                     Icons.more_vert,
                                                     color: Colors.white,
@@ -515,349 +836,611 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ),
                                         ),
 
-
-
-                                      // Stats Pill
-                                      // Positioned(
-                                      //   top: 0,
-                                      //   bottom: 0,
-                                      //   left: 16,
-                                      //   child: Container(
-                                      //     padding: const EdgeInsets.all(6),
-                                      //     child: Row(
-                                      //       children: [
-                                      //         Text(
-                                      //             "@${user.username ?? ""}".toTitleCase(),
-                                      //             style: const TextStyle(color: Colors.white, fontSize: 20)
-                                      //         ),
-                                      //         if (user.isVerified ?? false) ...[
-                                      //           const SizedBox(width: 4),
-                                      //           Image.asset(AppAssets.imgverified,height: 16,width: 16,),
-                                      //          // const Icon(Icons.verified, color: Colors.blue, size: 16),
-                                      //         ]
-                                      //       ],
-                                      //     ),
-                                      //   ),
-                                      // ),
-                                      Positioned(
-                                        right: 16,
-                                        bottom: 20,
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(0.2),
-                                            borderRadius: BorderRadius.circular(12),
-                                            border: Border.all(color: Colors.white30, width: 0.5),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              _buildStatItem("${user.followersCount ?? 0} Followers", user, 0),
-                                              Container(width: 1, height: 16, color: Colors.white30),
-                                              _buildStatItem("${user.followingCount ?? 0} Following", user, 1),
-                                            ],
+                                        // Stats Pill
+                                        // Positioned(
+                                        //   top: 0,
+                                        //   bottom: 0,
+                                        //   left: 16,
+                                        //   child: Container(
+                                        //     padding: const EdgeInsets.all(6),
+                                        //     child: Row(
+                                        //       children: [
+                                        //         Text(
+                                        //             "@${user.username ?? ""}".toTitleCase(),
+                                        //             style: const TextStyle(color: Colors.white, fontSize: 20)
+                                        //         ),
+                                        //         if (user.isVerified ?? false) ...[
+                                        //           const SizedBox(width: 4),
+                                        //           Image.asset(AppAssets.imgverified,height: 16,width: 16,),
+                                        //          // const Icon(Icons.verified, color: Colors.blue, size: 16),
+                                        //         ]
+                                        //       ],
+                                        //     ),
+                                        //   ),
+                                        // ),
+                                        Positioned(
+                                          right: 16,
+                                          bottom: 20,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 4,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(
+                                                0.2,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              border: Border.all(
+                                                color: Colors.white30,
+                                                width: 0.5,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                _buildStatItem(
+                                                  "${user.followersCount ?? 0} Followers",
+                                                  user,
+                                                  0,
+                                                ),
+                                                Container(
+                                                  width: 1,
+                                                  height: 16,
+                                                  color: Colors.white30,
+                                                ),
+                                                _buildStatItem(
+                                                  "${user.followingCount ?? 0} Following",
+                                                  user,
+                                                  1,
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                // Body Info Container
-                                Container(
-                                  color: AppColors.white,
-                                  padding: const EdgeInsets.only(top: 60, left: 16, right: 16, bottom: 20),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
+                                  // Body Info Container
+                                  Container(
+                                    color: AppColors.white,
+                                    padding: const EdgeInsets.only(
+                                      top: 60,
+                                      left: 16,
+                                      right: 16,
+                                      bottom: 20,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
                                                   // Name
                                                   Text(
                                                     user.name ?? "User",
                                                     style: const TextStyle(
                                                       color: Colors.black,
                                                       fontSize: 20,
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                     ),
                                                   ),
                                                   const SizedBox(height: 2),
-                                                  
+
                                                   // Username & Verification
                                                   Row(
                                                     children: [
                                                       Text(
-                                                        "@${user.username ?? ""}", 
-                                                        style: const TextStyle(color: Colors.black54, fontSize: 14)
+                                                        "@${user.username ?? ""}",
+                                                        style: const TextStyle(
+                                                          color: Colors.black54,
+                                                          fontSize: 14,
+                                                        ),
                                                       ),
-                                                      if (user.isVerified ?? false) ...[
-                                                        const SizedBox(width: 4),
-                                                        Image.asset(AppAssets.imgverified,height: 16,width: 16,),
-                                                      //  const Icon(Icons.verified, color: Colors.blue, size: 16),
+                                                      if (user.isVerified ??
+                                                          false) ...[
+                                                        const SizedBox(
+                                                          width: 4,
+                                                        ),
+                                                        Image.asset(
+                                                          AppAssets.imgverified,
+                                                          height: 16,
+                                                          width: 16,
+                                                        ),
+                                                        //  const Icon(Icons.verified, color: Colors.blue, size: 16),
                                                       ],
-                                                      if (user.accountPrivacy?.toLowerCase() == "private") ...[
-                                                        const SizedBox(width: 4),
-                                                        const Icon(Icons.lock_outline, color: Colors.black54, size: 16),
-                                                      ]
+                                                      if (user.accountPrivacy
+                                                              ?.toLowerCase() ==
+                                                          "private") ...[
+                                                        const SizedBox(
+                                                          width: 4,
+                                                        ),
+                                                        const Icon(
+                                                          Icons.lock_outline,
+                                                          color: Colors.black54,
+                                                          size: 16,
+                                                        ),
+                                                      ],
                                                     ],
                                                   ),
                                                   const SizedBox(height: 8),
 
                                                   // Occupation pill
                                                   Container(
-                                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                                     decoration: BoxDecoration(
-                                                       color: Colors.grey.shade100,
-                                                       borderRadius: BorderRadius.circular(4),
-                                                     ),
-                                                     child: Text(
-                                                        user.occupation?.isNotEmpty == true ? user.occupation! : "Digital Creator",
-                                                        style: TextStyle(
-                                                          color: Colors.grey.shade800,
-                                                          fontSize: 12,
-                                                          fontWeight: FontWeight.w500,
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 2,
                                                         ),
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          Colors.grey.shade100,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            4,
+                                                          ),
+                                                    ),
+                                                    child: Text(
+                                                      user
+                                                                  .occupation
+                                                                  ?.isNotEmpty ==
+                                                              true
+                                                          ? user.occupation!
+                                                          : "Digital Creator",
+                                                      style: TextStyle(
+                                                        color:
+                                                            Colors
+                                                                .grey
+                                                                .shade800,
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w500,
                                                       ),
+                                                    ),
                                                   ),
                                                   const SizedBox(height: 8),
 
                                                   // Bio
-                                                  if (user.bio != null && user.bio!.isNotEmpty)
+                                                  if (user.bio != null &&
+                                                      user.bio!.isNotEmpty)
                                                     Text(
                                                       user.bio!,
                                                       style: const TextStyle(
                                                         color: Colors.black87,
                                                         fontSize: 14,
                                                       ),
-                                                      maxLines: 3, 
-                                                      overflow: TextOverflow.ellipsis,
+                                                      maxLines: 3,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     ),
-                                              ]
-                                            ),
-                                          ),
-
-                                          if (!isOtherProfile)
-                                            InkWell(
-                                              onTap: () {
-                                                final bottomPad = MediaQuery.of(context).padding.bottom;
-                                                Get.bottomSheet(
-                                                  Container(
-                                                    decoration: const BoxDecoration(
-                                                      color: Colors.white,
-                                                      borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-                                                    ),
-                                                    padding: EdgeInsets.fromLTRB(20, 12, 20, 30 + bottomPad),
-                                                    child: Column(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      children: [
-                                                        // Drag Handle
-                                                        Container(
-                                                          width: 40,
-                                                          height: 4,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.grey.shade300,
-                                                            borderRadius: BorderRadius.circular(2),
-                                                          ),
-                                                        ),
-                                                        const SizedBox(height: 20),
-                                                        const Text("Create New", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                                                        const SizedBox(height: 20),
-                                                        
-                                                        // Options
-                                                        _buildCreateOption(
-                                                          icon: Icons.post_add_rounded,
-                                                          color: Colors.blueAccent,
-                                                          title: "Post",
-                                                          subtitle: "Share a photo or write something",
-                                                          onTap: () { 
-                                                            Get.back();
-                                                            // Square format picker (1:1)
-                                                            Get.to(() => const PostMediaPickerScreen());
-                                                          },
-                                                        ),
-                                                        const SizedBox(height: 10),
-                                                        _buildCreateOption(
-                                                          icon: Icons.movie_creation_outlined,
-                                                          color: Colors.pink,
-                                                          title: "Clip",
-                                                          subtitle: "Share a short video",
-                                                          onTap: () { 
-                                                            Get.back(); 
-                                                            // Vertical format picker (9:16)
-                                                            Get.to(() => const ReelMediaPickerScreen());
-                                                          },
-                                                        ),
-                                                        const SizedBox(height: 10),
-                                                        _buildCreateOption(
-                                                          icon: Icons.live_tv_rounded,
-                                                          color: Colors.redAccent,
-                                                          title: "Live",
-                                                          subtitle: "Go live with your followers",
-                                                          onTap: () { 
-                                                            Get.back();
-                                                            showComingSoonDialog(
-                                                              Get.context!,
-                                                              title: "Live Streaming",
-                                                              message: "Go live feature is coming soon!",
-                                                            );
-                                                          },
-                                                        ),
-                                                        const SizedBox(height: 10),
-                                                        _buildCreateOption(
-                                                          icon: Icons.play_circle_outline,
-                                                          color: Colors.purple,
-                                                          title: "I-Play",
-                                                          subtitle: "Share a longer video",
-                                                           onTap: () { 
-                                                             Get.back();
-                                                             Get.to(() => const PostMediaPickerScreen(initialFilter: 'Videos', initialType: 'video'));
-                                                           },
-                                                        ),
-                                                        const SizedBox(height: 10),
-                                                        _buildCreateOption(
-                                                          icon: Icons.camera_alt_rounded,
-                                                          color: Colors.orange,
-                                                          title: "Story",
-                                                          subtitle: "Capture a moment",
-                                                          onTap: () { 
-                                                            Get.back(); 
-                                                            // Use same logic as home screen add story
-                                                            storyController.showPickerOptions();
-                                                          },
-                                                        ),
-                                                        const SizedBox(height: 10),
-                                                        if (ProfilePermissionManager.canSellProducts)
-                                                          _buildCreateOption(
-                                                            icon: Icons.shopping_bag,
-                                                            color: Colors.orange,
-                                                            title: "Product",
-                                                            subtitle: "Add your product",
-                                                            onTap: () async {
-                                                              Get.back();
-                                                              await Get.to(() => CreateProductScreen());
-                                                              if (Get.isRegistered<MarketplaceProductController>()) {
-                                                                Get.find<MarketplaceProductController>().fetchMarketplaceProducts(isRefresh: true);
-                                                              }
-                                                            },
-                                                          ),
-                                                        Obx(() => (exclusiveController.enablementStatus.value == 'active' || exclusiveController.enablementStatus.value == 'approved')
-                                                            ? Column(
-                                                                children: [
-                                                                  const SizedBox(height: 10),
-                                                                  _buildCreateOption(
-                                                                    icon: Icons.star,
-                                                                    color: Colors.amber,
-                                                                    title: "Exclusive Post",
-                                                                    subtitle: "Share premium content",
-                                                                    onTap: () {
-                                                                      Get.back();
-                                                                      Get.to(() => const CreateExclusivePostScreen());
-                                                                    },
-                                                                  ),
-                                                                ],
-                                                              )
-                                                            : const SizedBox.shrink()),
-                                                        if (ProfilePermissionManager.canProvideServices)
-                                                          const SizedBox(height: 10),
-                                                        if (ProfilePermissionManager.canProvideServices)
-                                                          _buildCreateOption(
-                                                            icon: Icons.miscellaneous_services,
-                                                            color: Colors.orange,
-                                                            title: "Service",
-                                                            subtitle: "Add your service",
-                                                            onTap: () async {
-                                                              Get.back();
-                                                              await Get.to(CreateServiceScreen());
-                                                              if (Get.isRegistered<ServiceController>()) {
-                                                                Get.find<ServiceController>().fetchMarketplaceServices(isRefresh: true);
-                                                              }
-                                                            },
-                                                          ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  isScrollControlled: true,
-                                                );
-                                              },
-                                              child: Container(
-                                                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey.shade100,
-                                                  borderRadius: BorderRadius.circular(20),
-                                                ),
-                                                child: Row(
-                                                  children: [
-                                                    Icon(Icons.add, size: 14, color: AppColors.black),
-                                                    SizedBox(width: 6),
-                                                    Text("Create", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                                                  ],
-                                                ),
+                                                ],
                                               ),
                                             ),
+
+                                            if (!isOtherProfile)
+                                              InkWell(
+                                                onTap: () {
+                                                  final bottomPad =
+                                                      MediaQuery.of(
+                                                        context,
+                                                      ).padding.bottom;
+                                                  Get.bottomSheet(
+                                                    Container(
+                                                      decoration: const BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius.vertical(
+                                                              top:
+                                                                  Radius.circular(
+                                                                    25,
+                                                                  ),
+                                                            ),
+                                                      ),
+                                                      padding:
+                                                          EdgeInsets.fromLTRB(
+                                                            20,
+                                                            12,
+                                                            20,
+                                                            30 + bottomPad,
+                                                          ),
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          // Drag Handle
+                                                          Container(
+                                                            width: 40,
+                                                            height: 4,
+                                                            decoration: BoxDecoration(
+                                                              color:
+                                                                  Colors
+                                                                      .grey
+                                                                      .shade300,
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    2,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 20,
+                                                          ),
+                                                          const Text(
+                                                            "Create New",
+                                                            style: TextStyle(
+                                                              fontSize: 20,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 20,
+                                                          ),
+
+                                                          // Options
+                                                          _buildCreateOption(
+                                                            icon:
+                                                                Icons
+                                                                    .post_add_rounded,
+                                                            color:
+                                                                Colors
+                                                                    .blueAccent,
+                                                            title: "Post",
+                                                            subtitle:
+                                                                "Share a photo or write something",
+                                                            onTap: () {
+                                                              Get.back();
+                                                              // Square format picker (1:1)
+                                                              Get.to(
+                                                                () =>
+                                                                    const PostMediaPickerScreen(),
+                                                              );
+                                                            },
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          _buildCreateOption(
+                                                            icon:
+                                                                Icons
+                                                                    .movie_creation_outlined,
+                                                            color: Colors.pink,
+                                                            title: "Clip",
+                                                            subtitle:
+                                                                "Share a short video",
+                                                            onTap: () {
+                                                              Get.back();
+                                                              // Vertical format picker (9:16)
+                                                              Get.to(
+                                                                () =>
+                                                                    const ReelMediaPickerScreen(),
+                                                              );
+                                                            },
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          _buildCreateOption(
+                                                            icon:
+                                                                Icons
+                                                                    .live_tv_rounded,
+                                                            color:
+                                                                Colors
+                                                                    .redAccent,
+                                                            title: "Live",
+                                                            subtitle:
+                                                                "Go live with your followers",
+                                                            onTap: () {
+                                                              Get.back();
+                                                              showComingSoonDialog(
+                                                                Get.context!,
+                                                                title:
+                                                                    "Live Streaming",
+                                                                message:
+                                                                    "Go live feature is coming soon!",
+                                                              );
+                                                            },
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          _buildCreateOption(
+                                                            icon:
+                                                                Icons
+                                                                    .play_circle_outline,
+                                                            color:
+                                                                Colors.purple,
+                                                            title: "I-Play",
+                                                            subtitle:
+                                                                "Share a longer video",
+                                                            onTap: () {
+                                                              Get.back();
+                                                              Get.to(
+                                                                () => const PostMediaPickerScreen(
+                                                                  initialFilter:
+                                                                      'Videos',
+                                                                  initialType:
+                                                                      'video',
+                                                                ),
+                                                              );
+                                                            },
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          _buildCreateOption(
+                                                            icon:
+                                                                Icons
+                                                                    .camera_alt_rounded,
+                                                            color:
+                                                                Colors.orange,
+                                                            title: "Story",
+                                                            subtitle:
+                                                                "Capture a moment",
+                                                            onTap: () {
+                                                              Get.back();
+                                                              // Use same logic as home screen add story
+                                                              storyController
+                                                                  .showPickerOptions();
+                                                            },
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          if (ProfilePermissionManager
+                                                              .canSellProducts)
+                                                            _buildCreateOption(
+                                                              icon:
+                                                                  Icons
+                                                                      .shopping_bag,
+                                                              color:
+                                                                  Colors.orange,
+                                                              title: "Product",
+                                                              subtitle:
+                                                                  "Add your product",
+                                                              onTap: () async {
+                                                                Get.back();
+                                                                await Get.to(
+                                                                  () =>
+                                                                      CreateProductScreen(),
+                                                                );
+                                                                if (Get.isRegistered<
+                                                                  MarketplaceProductController
+                                                                >()) {
+                                                                  Get.find<
+                                                                        MarketplaceProductController
+                                                                      >()
+                                                                      .fetchMarketplaceProducts(
+                                                                        isRefresh:
+                                                                            true,
+                                                                      );
+                                                                }
+                                                              },
+                                                            ),
+                                                          Obx(
+                                                            () =>
+                                                                (exclusiveController.enablementStatus.value ==
+                                                                            'active' ||
+                                                                        exclusiveController.enablementStatus.value ==
+                                                                            'approved')
+                                                                    ? Column(
+                                                                      children: [
+                                                                        const SizedBox(
+                                                                          height:
+                                                                              10,
+                                                                        ),
+                                                                        _buildCreateOption(
+                                                                          icon:
+                                                                              Icons.star,
+                                                                          color:
+                                                                              Colors.amber,
+                                                                          title:
+                                                                              "Exclusive Post",
+                                                                          subtitle:
+                                                                              "Share premium content",
+                                                                          onTap: () {
+                                                                            Get.back();
+                                                                            Get.to(
+                                                                              () =>
+                                                                                  const CreateExclusivePostScreen(),
+                                                                            );
+                                                                          },
+                                                                        ),
+                                                                      ],
+                                                                    )
+                                                                    : const SizedBox.shrink(),
+                                                          ),
+                                                          if (ProfilePermissionManager
+                                                              .canProvideServices)
+                                                            const SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                          if (ProfilePermissionManager
+                                                              .canProvideServices)
+                                                            _buildCreateOption(
+                                                              icon:
+                                                                  Icons
+                                                                      .miscellaneous_services,
+                                                              color:
+                                                                  Colors.orange,
+                                                              title: "Service",
+                                                              subtitle:
+                                                                  "Add your service",
+                                                              onTap: () async {
+                                                                Get.back();
+                                                                await Get.to(
+                                                                  CreateServiceScreen(),
+                                                                );
+                                                                if (Get.isRegistered<
+                                                                  ServiceController
+                                                                >()) {
+                                                                  Get.find<
+                                                                        ServiceController
+                                                                      >()
+                                                                      .fetchMarketplaceServices(
+                                                                        isRefresh:
+                                                                            true,
+                                                                      );
+                                                                }
+                                                              },
+                                                            ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    isScrollControlled: true,
+                                                  );
+                                                },
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 16,
+                                                    vertical: 8,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey.shade100,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.add,
+                                                        size: 14,
+                                                        color: AppColors.black,
+                                                      ),
+                                                      SizedBox(width: 6),
+                                                      Text(
+                                                        "Create",
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 16),
+                                        // Edit Profile & Share Profile Buttons Row
+                                        if (!isOtherProfile) ...[
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: _buildActionButton(
+                                                  "Edit Profile",
+                                                  () {
+                                                    Get.to(
+                                                      () => EditProfileScreen(),
+                                                    );
+                                                  },
+                                                  isExpanded: true,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Expanded(
+                                                child: _buildActionButton(
+                                                  "Share Profile",
+                                                  () {
+                                                    Share.share(
+                                                      "Check out ${user.name} (@${user.username}) on iVatan!",
+                                                    );
+                                                  },
+                                                  isExpanded: true,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ],
-                                      ),
-                                      const SizedBox(height: 16),
-                                       // Edit Profile & Share Profile Buttons Row
-                                       if (!isOtherProfile) ...[
-                                         Row(
-                                           children: [
-                                             Expanded(
-                                               child: _buildActionButton("Edit Profile", () {
-                                                  Get.to(() => EditProfileScreen());
-                                               }, isExpanded: true),
-                                             ),
-                                             const SizedBox(width: 10),
-                                             Expanded(
-                                               child: _buildActionButton("Share Profile", () {
-                                                  Share.share("Check out ${user.name} (@${user.username}) on iVatan!");
-                                               }, isExpanded: true),
-                                             ),
-                                           ],
-                                         ),
-                                       ],
-                                       
-                                       if (isOtherProfile) ...[
-                                         Row(
-                                           children: [
-                                             Expanded(child: _buildFollowButton(user)),
-                                             if (!isPrivateHidden) ...[
-                                               const SizedBox(width: 8),
-                                               Expanded(
-                                                 child: _buildActionButton("Message", () async {
-                                                   final chatId = await chatController.createSinglePrivateChat(user.id!);
-                                                   if (chatId != null) {
-                                                     Get.toNamed(AppRoutes.chattingScreen, arguments: chatId);
-                                                   } else {
-                                                     CustomSnackBar.showError(message: "Could not initiate chat");
-                                                   }
-                                                 }, isExpanded: true),
-                                               ),
-                                               const SizedBox(width: 8),
-                                               if (profileController.userProfile.value?.contactVisibility != 'none')
-                                                 Expanded(
-                                                   child: _buildActionButton("Contact", () {
-                                                    _showContactBottomSheet(user);
-                                                   }, isExpanded: true),
-                                                 ),
-                                             ],
-                                           ],
-                                         ),
-                                       ],
-                                       Obx(() {
-                                           final bool isCurrentlyOtherHighlight = finalUserName != (SharedPrefManager().user?.username ?? "");
-                                           final isFollowing = profileController.followController.isUserFollowing(user.id!).value;
-                                           final bool isPrivateHidden = isCurrentlyOtherHighlight && 
-                                                                      (user.accountPrivacy?.toLowerCase() == "private") && 
-                                                                      !isFollowing;
-                                                                      
-                                          if (controller.isLoading.value || isPrivateHidden) return const SizedBox.shrink();
+
+                                        if (isOtherProfile) ...[
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: _buildFollowButton(user),
+                                              ),
+                                              if (!isPrivateHidden) ...[
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: _buildActionButton(
+                                                    "Message",
+                                                    () async {
+                                                      final chatId =
+                                                          await chatController
+                                                              .createSinglePrivateChat(
+                                                                user.id!,
+                                                              );
+                                                      if (chatId != null) {
+                                                        Get.toNamed(
+                                                          AppRoutes
+                                                              .chattingScreen,
+                                                          arguments: chatId,
+                                                        );
+                                                      }
+                                                    },
+                                                    isExpanded: true,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                if (profileController
+                                                        .userProfile
+                                                        .value
+                                                        ?.contactVisibility !=
+                                                    'none')
+                                                  Expanded(
+                                                    child: _buildActionButton(
+                                                      "Contact",
+                                                      () {
+                                                        _showContactBottomSheet(
+                                                          user,
+                                                        );
+                                                      },
+                                                      isExpanded: true,
+                                                    ),
+                                                  ),
+                                              ],
+                                            ],
+                                          ),
+                                        ],
+                                        Obx(() {
+                                          final bool isCurrentlyOtherHighlight =
+                                              finalUserName !=
+                                              (SharedPrefManager()
+                                                      .user
+                                                      ?.username ??
+                                                  "");
+                                          final isFollowing =
+                                              profileController.followController
+                                                  .isUserFollowing(user.id!)
+                                                  .value;
+                                          final bool isPrivateHidden =
+                                              isCurrentlyOtherHighlight &&
+                                              (user.accountPrivacy
+                                                      ?.toLowerCase() ==
+                                                  "private") &&
+                                              !isFollowing;
+
+                                          if (controller.isLoading.value ||
+                                              isPrivateHidden)
+                                            return const SizedBox.shrink();
 
                                           // Hide entire section (including space) if other profile has no highlights
-                                          if (isOtherProfile && controller.highlights.isEmpty) return const SizedBox.shrink();
+                                          if (isOtherProfile &&
+                                              controller.highlights.isEmpty)
+                                            return const SizedBox.shrink();
 
                                           return Column(
                                             children: [
@@ -865,58 +1448,143 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               SizedBox(
                                                 height: 90,
                                                 child: ListView.builder(
-                                                  scrollDirection: Axis.horizontal,
-                                                  itemCount: isOtherProfile 
-                                                      ? controller.highlights.length 
-                                                      : controller.highlights.length + 1,
-                                                  itemBuilder: (context, index) {
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  itemCount:
+                                                      isOtherProfile
+                                                          ? controller
+                                                              .highlights
+                                                              .length
+                                                          : controller
+                                                                  .highlights
+                                                                  .length +
+                                                              1,
+                                                  itemBuilder: (
+                                                    context,
+                                                    index,
+                                                  ) {
                                                     if (!isOtherProfile) {
                                                       if (index == 0) {
                                                         return GestureDetector(
                                                           onTap: () {
-                                                            storyController.onCreateHighlightFromProfile();
-                                                          }, 
-                                                          child: _buildAddStory()
+                                                            storyController
+                                                                .onCreateHighlightFromProfile();
+                                                          },
+                                                          child:
+                                                              _buildAddStory(),
                                                         );
                                                       }
-                                                      
-                                                      final story = controller.highlights[index - 1];
-                                                      String? displayUrl = story.cover_media_url;
-                                                      if ((displayUrl == null || displayUrl.isEmpty) && story.stories.isNotEmpty) {
-                                                        displayUrl = story.stories.first.thumbnailUrl.isNotEmpty 
-                                                            ? story.stories.first.thumbnailUrl 
-                                                            : story.stories.first.mediaUrl;
+
+                                                      final story =
+                                                          controller
+                                                              .highlights[index -
+                                                              1];
+                                                      String? displayUrl =
+                                                          story.cover_media_url;
+                                                      if ((displayUrl == null ||
+                                                              displayUrl
+                                                                  .isEmpty) &&
+                                                          story
+                                                              .stories
+                                                              .isNotEmpty) {
+                                                        displayUrl =
+                                                            story
+                                                                    .stories
+                                                                    .first
+                                                                    .thumbnailUrl
+                                                                    .isNotEmpty
+                                                                ? story
+                                                                    .stories
+                                                                    .first
+                                                                    .thumbnailUrl
+                                                                : story
+                                                                    .stories
+                                                                    .first
+                                                                    .mediaUrl;
                                                       }
-    
+
                                                       return GestureDetector(
-                                                          onTap: () {
-                                                            if (story.stories.isNotEmpty) {
-                                                              Get.to(() => HighlightScreenStoryViewer(stories: story.stories, highlightId: story.id, initialIndex: 0));
-                                                            } else {
-                                                              CustomSnackBar.showError(message: "This highlight has no stories.");
-                                                            }
-                                                          },
-                                                          child: _buildStoryItem(story.title, displayUrl)
+                                                        onTap: () {
+                                                          if (story
+                                                              .stories
+                                                              .isNotEmpty) {
+                                                            Get.to(
+                                                              () => HighlightScreenStoryViewer(
+                                                                stories:
+                                                                    story
+                                                                        .stories,
+                                                                highlightId:
+                                                                    story.id,
+                                                                initialIndex: 0,
+                                                              ),
+                                                            );
+                                                          } else {
+                                                            CustomSnackBar.showError(
+                                                              message:
+                                                                  "This highlight has no stories.",
+                                                            );
+                                                          }
+                                                        },
+                                                        child: _buildStoryItem(
+                                                          story.title,
+                                                          displayUrl,
+                                                        ),
                                                       );
                                                     } else {
                                                       // Other profile: No "New" icon, index matches directly
-                                                      final story = controller.highlights[index];
-                                                      String? displayUrl = story.cover_media_url;
-                                                      if ((displayUrl == null || displayUrl.isEmpty) && story.stories.isNotEmpty) {
-                                                        displayUrl = story.stories.first.thumbnailUrl.isNotEmpty 
-                                                            ? story.stories.first.thumbnailUrl 
-                                                            : story.stories.first.mediaUrl;
+                                                      final story =
+                                                          controller
+                                                              .highlights[index];
+                                                      String? displayUrl =
+                                                          story.cover_media_url;
+                                                      if ((displayUrl == null ||
+                                                              displayUrl
+                                                                  .isEmpty) &&
+                                                          story
+                                                              .stories
+                                                              .isNotEmpty) {
+                                                        displayUrl =
+                                                            story
+                                                                    .stories
+                                                                    .first
+                                                                    .thumbnailUrl
+                                                                    .isNotEmpty
+                                                                ? story
+                                                                    .stories
+                                                                    .first
+                                                                    .thumbnailUrl
+                                                                : story
+                                                                    .stories
+                                                                    .first
+                                                                    .mediaUrl;
                                                       }
-    
+
                                                       return GestureDetector(
-                                                          onTap: () {
-                                                            if (story.stories.isNotEmpty) {
-                                                              Get.to(() => HighlightScreenStoryViewer(stories: story.stories, highlightId: story.id, initialIndex: 0));
-                                                            } else {
-                                                              CustomSnackBar.showError(message: "This highlight has no stories.");
-                                                            }
-                                                          },
-                                                          child: _buildStoryItem(story.title, displayUrl)
+                                                        onTap: () {
+                                                          if (story
+                                                              .stories
+                                                              .isNotEmpty) {
+                                                            Get.to(
+                                                              () => HighlightScreenStoryViewer(
+                                                                stories:
+                                                                    story
+                                                                        .stories,
+                                                                highlightId:
+                                                                    story.id,
+                                                                initialIndex: 0,
+                                                              ),
+                                                            );
+                                                          } else {
+                                                            CustomSnackBar.showError(
+                                                              message:
+                                                                  "This highlight has no stories.",
+                                                            );
+                                                          }
+                                                        },
+                                                        child: _buildStoryItem(
+                                                          story.title,
+                                                          displayUrl,
+                                                        ),
                                                       );
                                                     }
                                                   },
@@ -924,167 +1592,233 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               ),
                                             ],
                                           );
-                                       }),
+                                        }),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              // Profile Picture (Moved to ensure top z-index)
+                              Positioned(
+                                top: 190, // 240 - 50
+                                left: 20,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppColors.white,
+                                      width: 3,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 4),
+                                      ),
                                     ],
                                   ),
+                                  child: Container(
+                                        width: 90,
+                                        height: 90,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: ClipOval(
+                                          child:
+                                              (user.profilePhotoPath != null &&
+                                                      user
+                                                          .profilePhotoPath!
+                                                          .isNotEmpty &&
+                                                      user.profilePhotoPath !=
+                                                          "null" &&
+                                                      !user.profilePhotoPath!.contains("ui-avatars.com"))
+                                                  ? Image.network(
+                                                    AppUrls.getFullImageUrl(
+                                                      user.profilePhotoPath,
+                                                    ),
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (
+                                                      context,
+                                                      error,
+                                                      stackTrace,
+                                                    ) {
+                                                      return Icon(
+                                                        Icons.person,
+                                                        color:
+                                                            Colors
+                                                                .grey
+                                                                .shade600,
+                                                        size: 60,
+                                                      );
+                                                    },
+                                                  )
+                                                  : Icon(
+                                                    Icons.person,
+                                                    color: Colors.grey.shade600,
+                                                    size: 60,
+                                                  ),
+                                        ),
+                                      )
+                                      .animate(
+                                        onPlay:
+                                            (controller) => controller.repeat(
+                                              reverse: true,
+                                            ),
+                                      )
+                                      .scale(
+                                        duration: 600.ms,
+                                        curve: Curves.easeOutBack,
+                                      )
+                                      .fadeIn()
+                                      .then(delay: 500.ms)
+                                      .moveY(
+                                        begin: 0,
+                                        end: -3,
+                                        duration: 1500.ms,
+                                        curve: Curves.easeInOut,
+                                      ),
                                 ),
-                              ],
-                            ),
-                            // Profile Picture (Moved to ensure top z-index)
-                            Positioned(
-                              top: 190, // 240 - 50
-                              left: 20,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: AppColors.white, width: 3),
-                                  boxShadow: [
-                                    BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4)),
-                                  ],
-                                ),
-                                child: Container(
-                                   width: 90,
-                                   height: 90,
-                                   decoration: BoxDecoration(
-                                     color: Colors.grey.shade200,
-                                     shape: BoxShape.circle,
-                                   ),
-                                   child: ClipOval(
-                                     child: (user.profilePhotoPath != null &&
-                                             user.profilePhotoPath!.isNotEmpty &&
-                                             user.profilePhotoPath != "null")
-                                         ? Image.network(
-                                             AppUrls.getFullImageUrl(user.profilePhotoPath),
-                                             fit: BoxFit.cover,
-                                             errorBuilder: (context, error, stackTrace) {
-                                               return Icon(Icons.person, color: Colors.grey.shade600, size: 60);
-                                             },
-                                           )
-                                         : Icon(Icons.person, color: Colors.grey.shade600, size: 60),
-                                   ),
-                                 ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                                 .scale(duration: 600.ms, curve: Curves.easeOutBack)
-                                 .fadeIn()
-                                    .then(delay: 500.ms)
-                                 .moveY(begin: 0, end: -3, duration: 1500.ms, curve: Curves.easeInOut),
                               ),
-                              ),
-
-                          ],
-                        ),
-                      ),
-                      
-                      if (!isPrivateHidden)
-                        SliverAppBar(
-                          pinned: true,
-                          floating: false,
-                          backgroundColor: AppColors.white,
-                          automaticallyImplyLeading: false,
-                          primary: false,
-                          toolbarHeight: 0,
-                          elevation: 0,
-                          bottom: TabBar(
-                            isScrollable: false,
-                            dividerColor: Colors.grey.shade200,
-                            labelColor: Colors.black,
-                            unselectedLabelColor: Colors.grey,
-                            indicatorColor: Colors.blue,
-                            indicatorWeight: 2,
-                            labelPadding: const EdgeInsets.symmetric(horizontal: 12),
-                            tabs: tabs,
+                            ],
                           ),
                         ),
-                    ];
-                  },
-                  body: isPrivateHidden 
-                    ? _buildPrivatePlaceholder()
-                    : TabBarView(
-                    children: tabViews,
+
+                        if (!isPrivateHidden)
+                          SliverAppBar(
+                            pinned: true,
+                            floating: false,
+                            backgroundColor: AppColors.white,
+                            automaticallyImplyLeading: false,
+                            primary: false,
+                            toolbarHeight: 0,
+                            elevation: 0,
+                            bottom: TabBar(
+                              isScrollable: false,
+                              dividerColor: Colors.grey.shade200,
+                              labelColor: Colors.black,
+                              unselectedLabelColor: Colors.grey,
+                              indicatorColor: Colors.blue,
+                              indicatorWeight: 2,
+                              labelPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              tabs: tabs,
+                            ),
+                          ),
+                      ];
+                    },
+                    body:
+                        isPrivateHidden
+                            ? _buildPrivatePlaceholder()
+                            : TabBarView(children: tabViews),
                   ),
-                ),
-
-
-
+                ), // Close RefreshIndicator
               ],
             ),
           );
         }),
-        ),
-      );
-   // );
+      ),
+    );
+    // );
   }
 
   Widget _buildStatItem(String label, UserData user, int index) {
-      return InkWell(
-          onTap: () {
-               final isFollowing = profileController.followController.isUserFollowing(user.id!, initialValue: user.is_following).value;
-               final bool isPrivateHidden = isOtherProfile && 
-                                          user.accountPrivacy?.toLowerCase() == "private" && 
-                                          !isFollowing;
-               
-               if (isPrivateHidden) return;
-               Get.to(() => FollowTabs(initialTab: index, userId: user.id!))?.then((_) {
-                 // Refresh profile data when coming back
-                 profileController.fetchUserDetails(finalUserName);
-               });
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Text(
-              label,
-              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-            ),
+    return InkWell(
+      onTap: () {
+        final isFollowing =
+            profileController.followController
+                .isUserFollowing(user.id!, initialValue: user.is_following)
+                .value;
+        final bool isPrivateHidden =
+            isOtherProfile &&
+            user.accountPrivacy?.toLowerCase() == "private" &&
+            !isFollowing;
+
+        if (isPrivateHidden) return;
+        Get.to(() => FollowTabs(initialTab: index, userId: user.id!))?.then((
+          _,
+        ) {
+          // Refresh profile data when coming back
+          profileController.fetchUserDetails(finalUserName);
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
           ),
-      );
+        ),
+      ),
+    );
   }
 
-  Widget _buildActionButton(String label, VoidCallback onTap, {required bool isExpanded}) {
+  Widget _buildActionButton(
+    String label,
+    VoidCallback onTap, {
+    required bool isExpanded,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100, // Light grey background
+          borderRadius: BorderRadius.circular(8),
+          // border: Border.all(color: Colors.grey.shade300)
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFollowButton(UserData user) {
+    return Obx(() {
+      final isFollowing =
+          profileController.followController
+              .isUserFollowing(user.id!, initialValue: user.is_following)
+              .value;
       return InkWell(
-        onTap: onTap,
+        onTap: () {
+          if (isFollowing) {
+            _showUnfollowBottomSheet(user);
+          } else {
+            profileController.toggleFollowForPostUser(user.id!);
+          }
+        },
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+          width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.grey.shade100, // Light grey background
+            color: isFollowing ? Colors.grey.shade100 : Colors.blueAccent,
             borderRadius: BorderRadius.circular(8),
-             // border: Border.all(color: Colors.grey.shade300)
           ),
           child: Center(
             child: Text(
-              label,
-              style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 13),
+              isFollowing ? "Following" : "Follow",
+              style: TextStyle(
+                color: isFollowing ? Colors.black : Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
             ),
           ),
         ),
       );
-  }
-  
-  Widget _buildFollowButton(UserData user) {
-       return Obx(() {
-        final isFollowing = profileController.followController.isUserFollowing(user.id!, initialValue: user.is_following).value;
-        return InkWell(
-          onTap: () {
-            if (isFollowing) {
-              _showUnfollowBottomSheet(user);
-            } else {
-              profileController.toggleFollowForPostUser(user.id!);
-            }
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: isFollowing ? Colors.grey.shade100 : Colors.blueAccent,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Center(
-              child: Text(
-                isFollowing ? "Following" : "Follow",
-                style: TextStyle( color: isFollowing ? Colors.black : Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
-              ),
-            ),
-          ),
-        );
-       });
+    });
   }
 
   Widget _buildPrivatePlaceholder() {
@@ -1098,7 +1832,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               shape: BoxShape.circle,
               border: Border.all(color: Colors.grey.shade300, width: 2),
             ),
-            child: Icon(Icons.lock_outline, size: 50, color: Colors.grey.shade600),
+            child: Icon(
+              Icons.lock_outline,
+              size: 50,
+              color: Colors.grey.shade600,
+            ),
           ),
           const SizedBox(height: 20),
           const Text(
@@ -1129,12 +1867,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             CircleAvatar(
               radius: 40,
-              backgroundImage: (user.profilePhotoPath != null && user.profilePhotoPath!.isNotEmpty)
-                  ? NetworkImage(AppUrls.getFullImageUrl(user.profilePhotoPath))
-                  : null,
-              child: (user.profilePhotoPath == null || user.profilePhotoPath!.isEmpty)
-                  ? const Icon(Icons.person, size: 40)
-                  : null,
+              backgroundImage:
+                  (user.profilePhotoPath != null &&
+                          user.profilePhotoPath!.isNotEmpty &&
+                          !user.profilePhotoPath!.contains("ui-avatars.com"))
+                      ? NetworkImage(
+                        AppUrls.getFullImageUrl(user.profilePhotoPath),
+                      )
+                      : null,
+              child:
+                  (user.profilePhotoPath == null ||
+                          user.profilePhotoPath!.isEmpty ||
+                          user.profilePhotoPath!.contains("ui-avatars.com"))
+                      ? const Icon(Icons.person, size: 40)
+                      : null,
             ),
             const SizedBox(height: 16),
             Text(
@@ -1146,7 +1892,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: const Center(
                 child: Text(
                   "Unfollow",
-                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               onTap: () {
@@ -1214,7 +1963,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-
 
   // Widget build(BuildContext context) {
   //   return
@@ -2013,32 +2761,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Container(
             width: 55,
             height: 55,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: (imageUrl == null || imageUrl.isEmpty) 
-                ? _buildPlaceholderImage()
-                : CustomImageView(
-              url: imageUrl,
-              height: 55,
-              width: 55,
-              fit: BoxFit.cover,
-              radius: BorderRadius.circular(15),
-              placeHolder: (context, url) => Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Center(
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
-              ),
-              errorWidget: (context, url, error) => _buildPlaceholderImage(),
-            ),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
+            child:
+                (imageUrl == null || imageUrl.isEmpty)
+                    ? _buildPlaceholderImage()
+                    : CustomImageView(
+                      url: imageUrl,
+                      height: 55,
+                      width: 55,
+                      fit: BoxFit.cover,
+                      radius: BorderRadius.circular(15),
+                      placeHolder:
+                          (context, url) => Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            ),
+                          ),
+                      errorWidget:
+                          (context, url, error) => _buildPlaceholderImage(),
+                    ),
           ),
           const SizedBox(height: 4),
           Text(
@@ -2055,10 +2806,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: Colors.grey.shade300,
-          width: 0.5,
-        ),
+        border: Border.all(color: Colors.grey.shade300, width: 0.5),
       ),
       child: Center(
         child: Icon(
@@ -2073,7 +2821,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildCreateOption({
     required IconData icon,
     required Color color,
-    required String title, 
+    required String title,
     required String subtitle,
     required VoidCallback onTap,
   }) {
@@ -2101,12 +2849,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87)),
-                Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                ),
               ],
             ),
             const Spacer(),
-            const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 16,
+              color: Colors.grey,
+            ),
           ],
         ),
       ),
@@ -2153,7 +2915,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
           const SizedBox(height: 50),
-          
+
           // 2. Info text placeholders
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -2215,45 +2977,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          
+
           // 3. Stats row
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.generate(3, (index) => Column(
-                children: [
-                  Shimmer.fromColors(
-                    baseColor: Colors.grey[300]!,
-                    highlightColor: Colors.grey[100]!,
-                    child: Container(
-                      width: 50,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(4),
+              children: List.generate(
+                3,
+                (index) => Column(
+                  children: [
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        width: 50,
+                        height: 16,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Shimmer.fromColors(
-                    baseColor: Colors.grey[300]!,
-                    highlightColor: Colors.grey[100]!,
-                    child: Container(
-                      width: 60,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(4),
+                    const SizedBox(height: 6),
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(
+                        width: 60,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              )),
+                  ],
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 20),
-          
+
           // 4. Action buttons
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -2290,7 +3055,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 25),
-          
+
           // 5. Highlights row
           SizedBox(
             height: 90,
@@ -2335,7 +3100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          
+
           // 6. Tabs layout placeholder
           Shimmer.fromColors(
             baseColor: Colors.grey[300]!,
@@ -2373,13 +3138,15 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
 
-    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.04).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.95,
+      end: 1.04,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    _glowAnimation = Tween<double>(begin: 4.0, end: 12.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _glowAnimation = Tween<double>(
+      begin: 4.0,
+      end: 12.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -2397,11 +3164,12 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
           scale: _scaleAnimation.value,
           child: GestureDetector(
             onTap: () async {
-              final homeController = Get.isRegistered<HomeController>()
-                  ? Get.find<HomeController>()
-                  : Get.put(HomeController());
+              final homeController =
+                  Get.isRegistered<HomeController>()
+                      ? Get.find<HomeController>()
+                      : Get.put(HomeController());
               var config = homeController.profileConfig.value;
-              
+
               if (config == null) {
                 // Try reading from SharedPreferences
                 final cached = SharedPrefManager().profileConfig;
@@ -2417,17 +3185,19 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
               if (config == null) {
                 // Show loading spinner
                 Get.dialog(
-                  const Center(child: CircularProgressIndicator(color: Colors.black)),
+                  const Center(
+                    child: CircularProgressIndicator(color: Colors.black),
+                  ),
                   barrierDismissible: false,
                 );
-                
+
                 try {
                   await homeController.fetchProfileConfig();
                   config = homeController.profileConfig.value;
                 } catch (e) {
                   debugPrint("Error fetching profile config: $e");
                 }
-                
+
                 Get.back(); // close loading dialog
               }
 
@@ -2442,7 +3212,8 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
               }
 
               // Resolve current active profile from config
-              final currentProfileName = config.data?.userProfile?.currentProfileName;
+              final currentProfileName =
+                  config.data?.userProfile?.currentProfileName;
               if (currentProfileName == null || currentProfileName.isEmpty) {
                 Get.snackbar(
                   "Error",
@@ -2459,36 +3230,45 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
               bool isSubscribedActive = false;
               dynamic profileObj;
 
-              if (currentProfileName == 'personal' || currentProfileName == 'personal_profile') {
+              if (currentProfileName == 'personal' ||
+                  currentProfileName == 'personal_profile') {
                 mappedProfileType = 'personal';
                 profileObj = config.data?.personalProfile;
                 profileId = profileObj?.profileId;
                 activePlanSlug = profileObj?.subscription?.planSlug;
-                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
+                isSubscribedActive =
+                    profileObj?.subscription?.isActive ?? false;
               } else if (currentProfileName == 'employer') {
                 mappedProfileType = 'employer';
                 profileObj = config.data?.employer;
                 profileId = profileObj?.profileId;
                 activePlanSlug = profileObj?.subscription?.planSlug;
-                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
-              } else if (currentProfileName == 'ecommerce' || currentProfileName == 'seller') {
+                isSubscribedActive =
+                    profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'ecommerce' ||
+                  currentProfileName == 'seller') {
                 mappedProfileType = 'seller';
                 profileObj = config.data?.ecommerce;
                 profileId = profileObj?.profileId;
                 activePlanSlug = profileObj?.subscription?.planSlug;
-                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
-              } else if (currentProfileName == 'music_play' || currentProfileName == 'music') {
+                isSubscribedActive =
+                    profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'music_play' ||
+                  currentProfileName == 'music') {
                 mappedProfileType = 'music';
                 profileObj = config.data?.musicPlay;
                 profileId = profileObj?.profileId;
                 activePlanSlug = profileObj?.subscription?.planSlug;
-                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
-              } else if (currentProfileName == 'content_creation' || currentProfileName == 'creator') {
+                isSubscribedActive =
+                    profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'content_creation' ||
+                  currentProfileName == 'creator') {
                 mappedProfileType = 'creator';
                 profileObj = config.data?.contentCreation;
                 profileId = profileObj?.profileId;
                 activePlanSlug = profileObj?.subscriptionDetails?.planSlug;
-                isSubscribedActive = profileObj?.subscriptionDetails?.isActive ?? false;
+                isSubscribedActive =
+                    profileObj?.subscriptionDetails?.isActive ?? false;
               }
 
               if (profileObj == null) {
@@ -2502,21 +3282,25 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
               }
 
               try {
-                final subscriptionController = Get.isRegistered<SubscriptionController>()
-                    ? Get.find<SubscriptionController>()
-                    : Get.put(SubscriptionController());
+                final subscriptionController =
+                    Get.isRegistered<SubscriptionController>()
+                        ? Get.find<SubscriptionController>()
+                        : Get.put(SubscriptionController());
 
                 Get.dialog(
-                  const Center(child: CircularProgressIndicator(color: Colors.black)),
+                  const Center(
+                    child: CircularProgressIndicator(color: Colors.black),
+                  ),
                   barrierDismissible: false,
                 );
 
-                final resolvedSub = await subscriptionController.fetchPlansForProfileType(
-                  mappedProfileType,
-                  activePlanSlug: activePlanSlug,
-                  isSubscribedActive: isSubscribedActive,
-                  profileId: profileId,
-                );
+                final resolvedSub = await subscriptionController
+                    .fetchPlansForProfileType(
+                      mappedProfileType,
+                      activePlanSlug: activePlanSlug,
+                      isSubscribedActive: isSubscribedActive,
+                      profileId: profileId,
+                    );
 
                 Get.back(); // Close loading dialog
 
@@ -2561,10 +3345,7 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
                     spreadRadius: 1,
                   ),
                 ],
-                border: Border.all(
-                  color: const Color(0xFFFFF7C2),
-                  width: 1.2,
-                ),
+                border: Border.all(color: const Color(0xFFFFF7C2), width: 1.2),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -2600,4 +3381,3 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
     );
   }
 }
-

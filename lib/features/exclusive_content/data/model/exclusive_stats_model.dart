@@ -1,6 +1,6 @@
 class ExclusiveStatsModel {
   final GlobalStats globalStats;
-  final SpotlightStats spotlight;
+  final List<SpotlightItem> spotlight;
 
   ExclusiveStatsModel({
     required this.globalStats,
@@ -8,9 +8,16 @@ class ExclusiveStatsModel {
   });
 
   factory ExclusiveStatsModel.fromJson(Map<String, dynamic> json) {
+    var spotlightList = <SpotlightItem>[];
+    if (json['spotlight'] != null && json['spotlight'] is List) {
+      spotlightList = (json['spotlight'] as List)
+          .map((item) => SpotlightItem.fromJson(item))
+          .toList();
+    }
+
     return ExclusiveStatsModel(
       globalStats: GlobalStats.fromJson(json['global_stats'] ?? {}),
-      spotlight: SpotlightStats.fromJson(json['spotlight'] ?? {}),
+      spotlight: spotlightList,
     );
   }
 }
@@ -34,26 +41,6 @@ class GlobalStats {
       totalEarnings: double.tryParse(json['global_total_earnings']?.toString() ?? '0') ?? 0.0,
       totalPurchases: json['global_total_purchases'] ?? 0,
       totalExclusiveContent: json['global_total_exclusive_content'] ?? 0,
-    );
-  }
-}
-
-class SpotlightStats {
-  final SpotlightItem? mostViewed;
-  final SpotlightItem? mostPurchased;
-  final SpotlightItem? highestEarning;
-
-  SpotlightStats({
-    this.mostViewed,
-    this.mostPurchased,
-    this.highestEarning,
-  });
-
-  factory SpotlightStats.fromJson(Map<String, dynamic> json) {
-    return SpotlightStats(
-      mostViewed: json['most_viewed'] != null ? SpotlightItem.fromJson(json['most_viewed']) : null,
-      mostPurchased: json['most_purchased'] != null ? SpotlightItem.fromJson(json['most_purchased']) : null,
-      highestEarning: json['highest_earning'] != null ? SpotlightItem.fromJson(json['highest_earning']) : null,
     );
   }
 }

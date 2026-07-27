@@ -7,6 +7,7 @@ class AppAssets {
   static const String imgOnbording4 = "assets/images/onbording4.jpg";
   static const String imgOnbording5 = "assets/images/onbording5.jpg";
   static const String imgAuthBack = "assets/images/auth_background.jpg";
+  static const String imgBackgroundApp = "assets/images/background_app.png";
   static const String imgGmail = "assets/images/gmail.png";
   static const String imgLive = "assets/images/live.png";
   static const String imgAppLogo = "assets/images/imageApplogo.jpg";
