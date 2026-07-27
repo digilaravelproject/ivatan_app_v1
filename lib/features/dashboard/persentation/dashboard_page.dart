@@ -222,21 +222,23 @@ class DashboardPage extends StatelessWidget {
       final color = isSelected ? Colors.white : const Color(0xFFA0A0A0);
 
       if (isCenter) {
-        return GestureDetector(
-          onTap: () => controller.changeIndex(index),
-          behavior: HitTestBehavior.opaque,
-          child: Container(
-            width: 46,
-            height: 46,
-            margin: const EdgeInsets.only(bottom: 6),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              iconDataSelected,
-              color: Colors.black,
-              size: 24, // Slightly reduced
+        return Expanded(
+          child: GestureDetector(
+            onTap: () => controller.changeIndex(index),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              width: 46,
+              height: 46,
+              margin: const EdgeInsets.only(bottom: 6),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                iconDataSelected,
+                color: Colors.black,
+                size: 24, // Slightly reduced
+              ),
             ),
           ),
         );

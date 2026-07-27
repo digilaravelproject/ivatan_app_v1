@@ -78,35 +78,14 @@ class HomePage extends StatelessWidget {
                 await controller.fetchUnreadNotificationCount();
               },
               child: Container(
-                color: const Color(0xFF121212),
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(AppAssets.imgBackgroundApp),
+                    fit: BoxFit.cover,
+                  ),
+                ),
                 child: Stack(
                   children: [
-                    Positioned(
-                      top: -100,
-                      right: -100,
-                      child: Container(
-                        width: 300,
-                        height: 300,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.white.withOpacity(0.05),
-                              blurRadius: 50,
-                              spreadRadius: 10,
-                            ),
-                          ],
-                          gradient: RadialGradient(
-                            colors: [
-                              Colors.white.withOpacity(0.12),
-                              Colors.white.withOpacity(0.12),
-                              Colors.transparent,
-                            ],
-                            stops: const [0.0, 0.6, 1.0],
-                          ),
-                        ),
-                      ),
-                    ),
                     CustomScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [

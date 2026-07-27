@@ -38,10 +38,17 @@ class _SearchScreenState extends State<SearchScreen> {
       length: 3,
       child: Scaffold(
         extendBody: true,
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          bottom: false,
-          child: NestedScrollView(
+        backgroundColor: Colors.transparent,
+        body: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(AppAssets.imgBackgroundApp),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: SafeArea(
+            bottom: false,
+            child: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
               return [
                 // 1. Search Bar
@@ -94,11 +101,11 @@ class _SearchScreenState extends State<SearchScreen> {
                     TabBar(
                       isScrollable: true,
                       dividerColor: Colors.transparent,
-                      indicatorColor: Colors.black,
+                      indicatorColor: Colors.white,
                       indicatorSize: TabBarIndicatorSize.label,
                       tabAlignment: TabAlignment.start,
-                      labelColor: Colors.black,
-                      unselectedLabelColor: Colors.grey,
+                      labelColor: Colors.white,
+                      unselectedLabelColor: Colors.white54,
                       labelPadding: const EdgeInsets.symmetric(horizontal: 16),
                       labelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       tabs: const [
@@ -122,6 +129,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ForYouGridScreen(),
               ],
             ),
+            ),
           ),
         ),
       ),
@@ -142,7 +150,7 @@ class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      color: Colors.white, // Ensure TabBar has solid background when pinned
+      color: Colors.transparent, // Let background image show through
       child: _tabBar,
     );
   }
