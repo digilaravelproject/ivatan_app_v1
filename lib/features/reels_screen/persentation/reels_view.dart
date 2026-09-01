@@ -22,7 +22,7 @@ import '../../post/presentation/image_post_screen.dart';
 import '../controller/short_play_controller.dart';
 import '../model/reel_model.dart';
 import 'package:share_plus/share_plus.dart';
-
+import '../../../db/shared_pref_manager.dart';
 typedef LikeCallback = void Function(String reelId);
 typedef CommentCallback = void Function(String reelId);
 typedef ShareCallback = void Function(String reelId);
@@ -537,7 +537,7 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
               top: MediaQuery.of(context).padding.top + 20,
               left: 0,
               right: 0,
-              child: Center(
+              child: const Center(
                 child: Text(
                   'Clips',
                   style: TextStyle(
@@ -981,6 +981,8 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                     ),
                   ],
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
         ],
@@ -1142,31 +1144,39 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                         ),
                       ),
                     ),
+                    if (true)
+                      const Padding(
+                        padding: EdgeInsets.only(left: 4),
+                        child: Icon(
+                          Icons.verified,
+                          color: AppColors.premiumGold,
+                          size: 16,
+                        ),
+                      ),
                     const SizedBox(width: 8),
-                    // Simple Follow Button (Visual)
+                    // Golden Follow Button
                     Obx(() {
                       final isFollowing = Get.find<FollowController>()
                           .isUserFollowing(item.user.id, initialValue: item.isFollowing)
                           .value;
 
-                      // Hide follow button if it's my own reel
                       if (item.isMine) return const SizedBox.shrink();
 
                       return GestureDetector(
                         onTap: () => Get.find<HomeController>().toggleFollowForPostUser(item.user.id),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
-                            color: isFollowing ? Colors.white.withOpacity(0.15) : Colors.transparent,
-                            border: Border.all(color: Colors.white, width: 1),
-                            borderRadius: BorderRadius.circular(6),
+                            color: isFollowing ? AppColors.secondaryBackground : Colors.transparent,
+                            border: Border.all(color: AppColors.premiumGold, width: 1),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
                             isFollowing ? "Following" : "Follow",
                             style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
+                              color: AppColors.premiumGold,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
@@ -1202,28 +1212,31 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(
-                      width: 50,
-                      height: 50,
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.6),
+                        shape: BoxShape.circle,
+                      ),
                       child: Center(
                         child: controller.getIsLiked(item.id, item.stats.isLiked).value == true
-                            ? Image.asset(
-                          "assets/icon/ic_liked.png",
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.contain,
-                        )
+                            ? const Icon(
+                                CupertinoIcons.heart_fill,
+                                size: 24,
+                                color: AppColors.premiumGold,
+                              )
                             : const Icon(
-                                CupertinoIcons.suit_heart,
+                                CupertinoIcons.heart,
                                 size: 24,
                                 color: Colors.white,
                               ),
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 6),
                     Text(
                       controller.getLikeCount(item.id, item.stats.likeCount).value.toString(),
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -1232,16 +1245,12 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
           ),
         ),
 
-       // const SizedBox(height: 16),
         Obx(
-              () => _buildIconButton(
-            icon:
-            //Image.asset(AppAssets.imgShare),
-            CustomIcon(
-              icon: Icons.comment,
+          () => _buildIconButton(
+            icon: const Icon(
+              Icons.chat_bubble_outline_rounded,
               color: Colors.white,
-              size: 20,
-              removeColor: false,
+              size: 24,
             ),
             label: controller.getCommentCount(item.id, item.stats.commentCount).value.toString(),
             onPressed: () {
@@ -1255,13 +1264,23 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
           ),
         ),
 
-       // const SizedBox(height: 16),
         _buildIconButton(
-          icon: CustomIcon(
-            icon: Icons.share,
+          icon: const Icon(
+            Icons.bookmark_border_rounded,
             color: Colors.white,
-            size: 18,
-            removeColor: false,
+            size: 24,
+          ),
+          label: "4.3K", // Bookmark count placeholder or real data if available
+          onPressed: () {
+            // Bookmark action
+          },
+        ),
+
+        _buildIconButton(
+          icon: const Icon(
+            Icons.send_rounded, // Assuming this matches the share icon in screenshot better
+            color: Colors.white,
+            size: 24,
           ),
           label: controller.getShareCount(item.id, item.stats.shareCount).value.toString(),
           onPressed: () {
@@ -1272,6 +1291,18 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
 
             // Use share_plus to share
             Share.share(shareText);
+          },
+        ),
+        
+        _buildIconButton(
+          icon: const Icon(
+            Icons.more_vert_rounded,
+            color: Colors.white,
+            size: 24,
+          ),
+          label: null,
+          onPressed: () {
+            // More options
           },
         ),
       ],
@@ -1287,17 +1318,21 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
       onTap: onPressed,
       behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
-              width: 40,
-              height: 40,
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                shape: BoxShape.circle,
+              ),
               child: Center(child: icon),
             ),
             if (label != null) ...[
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 label,
                 style: const TextStyle(

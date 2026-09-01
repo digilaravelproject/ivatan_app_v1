@@ -6,10 +6,10 @@ import 'package:get/get.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/iconoir.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../controller/navigationController.dart';
 import '../controller/homeController.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/network/app_urls.dart';
 
@@ -44,91 +44,24 @@ class DashboardPage extends StatelessWidget {
       },
       child: Scaffold(
         extendBody: true,
-        backgroundColor: Colors.black, // Fallback
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFF384D2B), // Deep Moss Green matching the screenshot
-                Color(0xFF121810), // Smooth transition
-                Color(0xFF0C0C0E), // Very dark grey, not pure black
-              ],
-              stops: [0.0, 0.5, 1.0], // Fade smoothly
+        backgroundColor: AppColors.mainBackground,
+        body: Stack(
+          children: [
+            PageView(
+              controller: controller.pageController,
+              physics: const NeverScrollableScrollPhysics(),
+              onPageChanged: controller.onPageChanged,
+              children: controller.screenList,
             ),
-          ),
-          child: Stack(
-            children: [
-              // Soft glowing circles on the surface to break up the dark areas
-              Positioned(
-                bottom: 100,
-                left: -100,
-                child: Container(
-                  width: 400,
-                  height: 400,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        Colors.white.withOpacity(0.05),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 200,
-                right: -150,
-                child: Container(
-                  width: 350,
-                  height: 350,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        Colors.white.withOpacity(0.03),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: -50,
-                right: -50,
-                child: Container(
-                  width: 450,
-                  height: 450,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        Colors.white.withOpacity(0.04),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              PageView(
-                controller: controller.pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                onPageChanged: controller.onPageChanged,
-                children: controller.screenList,
-              ),
 
             // Global Upload Progress
             _buildGlobalUploadProgress(),
           ],
         ),
-        ),
         bottomNavigationBar: Container(
           decoration: const BoxDecoration(
-            color: Color(0xFF0C0C0E),
-            border: Border(top: BorderSide(color: Colors.white12, width: 0.5)),
+            color: AppColors.mainBackground,
+            border: Border(top: BorderSide(color: AppColors.border, width: 0.5)),
           ),
           child: SafeArea(
             child: Container(
@@ -219,7 +152,7 @@ class DashboardPage extends StatelessWidget {
   Widget _item(BuildContext context, dynamic iconDataSelected, dynamic iconDataUnselected, int index, {String? imageUrl, String label = "", bool isCenter = false}) {
     return Obx(() {
       final isSelected = controller.selectedIndex.value == index;
-      final color = isSelected ? Colors.white : const Color(0xFFA0A0A0);
+      final color = isSelected ? AppColors.premiumGold : AppColors.secondaryText;
 
       if (isCenter) {
         return Expanded(
@@ -230,14 +163,14 @@ class DashboardPage extends StatelessWidget {
               width: 46,
               height: 46,
               margin: const EdgeInsets.only(bottom: 6),
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
+                border: Border.all(color: AppColors.premiumGold, width: 1.5),
               ),
               child: Icon(
-                iconDataSelected,
-                color: Colors.black,
-                size: 24, // Slightly reduced
+                Icons.add,
+                color: AppColors.secondaryText,
+                size: 24,
               ),
             ),
           ),
@@ -259,7 +192,7 @@ class DashboardPage extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isSelected ? Colors.white : Colors.transparent,
+                      color: isSelected ? AppColors.premiumGold : Colors.transparent,
                       width: 1.2,
                     ),
                   ),
@@ -279,7 +212,7 @@ class DashboardPage extends StatelessWidget {
               else
                 Icon(
                   isSelected ? iconDataSelected : iconDataUnselected,
-                  size: 22, // Reduced from 24 for a sharper look
+                  size: 22,
                   color: color,
                 ),
               const SizedBox(height: 4),
@@ -292,6 +225,17 @@ class DashboardPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
+              if (isSelected)
+                Container(
+                  width: 4,
+                  height: 4,
+                  decoration: const BoxDecoration(
+                    color: AppColors.premiumGold,
+                    shape: BoxShape.circle,
+                  ),
+                )
+              else
+                const SizedBox(height: 4),
             ],
           ),
         ),

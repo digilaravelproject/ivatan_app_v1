@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/helper/date_helper.dart';
 import '../../../../core/helper/expandable_text.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../profile/screen/profile_screen.dart';
 import '../../controller/homeController.dart';
 import '../../../reels_screen/persentation/reels_view.dart';
@@ -35,7 +36,10 @@ class FeedPostWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      decoration: BoxDecoration(
+        color: AppColors.cardSurface,
+        borderRadius: BorderRadius.circular(16),
+      ),
       margin: const EdgeInsets.only(bottom: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +57,7 @@ class FeedPostWidget extends StatelessWidget {
                     height: 40,
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.grey.shade100
+                        color: AppColors.secondaryBackground
                     ),
                     child: ClipOval(
                       child: post.user.avatar != null && post.user.avatar!.isNotEmpty && !post.user.avatar!.contains("ui-avatars.com")
@@ -84,7 +88,7 @@ class FeedPostWidget extends StatelessWidget {
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
-                                  color: Colors.black87,
+                                  color: AppColors.primaryText,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -93,15 +97,15 @@ class FeedPostWidget extends StatelessWidget {
                           ),
                           if (post.user.isVerified) ...[
                             const SizedBox(width: 4),
-                            Image.asset(AppAssets.imgverified,height: 16,width: 16,),
+                            Image.asset(AppAssets.imgverified,height: 16,width: 16, color: AppColors.successSoftGold),
                           ],
                           
                           // Date / Time
                           Text(
                             " • ${DateHelper.formatPostDate(post.createdAt)}",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 12,
-                              color: Colors.grey.shade500,
+                              color: AppColors.secondaryText,
                             ),
                           ),
                         ],
@@ -113,7 +117,7 @@ class FeedPostWidget extends StatelessWidget {
                         child: Row(
                           children: [
                             if (post.type == 'video') ...[
-                               const Icon(Icons.music_note, size: 12, color: Colors.black87),
+                               const Icon(Icons.music_note, size: 12, color: AppColors.premiumGold),
                                const SizedBox(width: 4),
                             ],
                             
@@ -122,7 +126,7 @@ class FeedPostWidget extends StatelessWidget {
                                 post.type == 'video' ? "Original Audio" : post.user.occupation,
                                 style: const TextStyle(
                                   fontSize: 11,
-                                  color: Colors.black87,
+                                  color: AppColors.premiumGold,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -151,9 +155,9 @@ class FeedPostWidget extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                         decoration: BoxDecoration(
-                          color: following ? Colors.grey.shade100 : Colors.transparent,
+                          color: following ? AppColors.secondaryBackground : Colors.transparent,
                           border: Border.all(
-                              color: following ? Colors.grey.shade300 : Colors.blue.shade600,
+                              color: following ? AppColors.border : AppColors.premiumGold,
                               width: 1
                           ),
                           borderRadius: BorderRadius.circular(6),
@@ -161,7 +165,7 @@ class FeedPostWidget extends StatelessWidget {
                         child: Text(
                           following ? "Following" : "Follow",
                           style: TextStyle(
-                            color: following ? Colors.black87 : Colors.blue.shade600,
+                            color: following ? AppColors.primaryText : AppColors.premiumGold,
                             fontWeight: FontWeight.w600,
                             fontSize: 12,
                           ),
@@ -173,7 +177,7 @@ class FeedPostWidget extends StatelessWidget {
 
                 // More Menu
                 IconButton(
-                   icon: const Icon(Icons.more_horiz, color: Colors.black87),
+                   icon: const Icon(Icons.more_horiz, color: AppColors.primaryText),
                    onPressed: () => _showSideMenu(context, post.id, post.user.username, post.user.id),
                    padding: EdgeInsets.zero,
                    constraints: const BoxConstraints(),
@@ -275,31 +279,30 @@ class FeedPostWidget extends StatelessWidget {
                     // Like
                     GestureDetector(
                       onTap: () => controller.likePost(post.id, index),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
-                        child:
-                        Icon(
-                          post.stats.isLiked == true
-                              ? Icons.favorite
-                              : Icons.favorite_border,
-                          key: ValueKey(post.stats.isLiked),
-                          color: post.stats.isLiked == true
-                              ? Colors.red
-                              : Colors.black87,
-                          size: 28,
-                        // Image.asset(
-                        //   post.stats.isLiked == true
-                        //       ? 'assets/images/likeexclamation.png'
-                        //       : 'assets/images/likeexclamation2.png',
-                        //   key: ValueKey(post.stats.isLiked),
-                        //   width: 28,
-                        //   height: 28,
-                        ),
+                      child: Row(
+                        children: [
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                            child: Icon(
+                              post.stats.isLiked == true ? Icons.favorite : Icons.favorite_border,
+                              key: ValueKey(post.stats.isLiked),
+                              color: post.stats.isLiked == true ? Colors.red : AppColors.premiumGold,
+                              size: 26,
+                            ),
+                          ),
+                          if ((post.stats.likeCount ?? 0) > 0) ...[
+                            const SizedBox(width: 6),
+                            Text(
+                              "${post.stats.likeCount}",
+                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.premiumGold),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                     
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 20),
 
                     // Comment
                     GestureDetector(
@@ -311,10 +314,21 @@ class FeedPostWidget extends StatelessWidget {
                           builder: (_) => CommentsBottomSheet(postId: post.id),
                         );
                       },
-                      child: const Icon(Icons.chat_bubble_outline, color: Colors.black87, size: 24),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.chat_bubble_outline, color: AppColors.premiumGold, size: 24),
+                          if ((post.stats.commentCount ?? 0) > 0) ...[
+                            const SizedBox(width: 6),
+                            Text(
+                              "${post.stats.commentCount}",
+                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.premiumGold),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
 
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 20),
 
                     // Share
                     GestureDetector(
@@ -322,7 +336,7 @@ class FeedPostWidget extends StatelessWidget {
                         final link = "https://ivatan.in/post/${post.id}?type=${post.media.first.type}";
                         Share.share("Check this post 👇\n$link");
                       },
-                      child: const Icon(Icons.share, color: Colors.black87, size: 24),
+                      child: const Icon(Icons.share, color: AppColors.premiumGold, size: 24),
                     ),
 
                     const Spacer(),
@@ -331,24 +345,11 @@ class FeedPostWidget extends StatelessWidget {
                       onTap: () => controller.toggleBookmark(post.id),
                       child: Icon(
                         post.stats.isSaved ? Icons.bookmark : Icons.bookmark_border, 
-                        color: post.stats.isSaved ? Colors.black : Colors.black87, 
+                        color: AppColors.premiumGold, 
                         size: 26
                       ),
                     ),
                   ],
-                ),
-                
-                // Like Count
-                if ((post.stats.likeCount ?? 0) > 0)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Text(
-                    "${post.stats.likeCount} likes",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                    ),
-                  ),
                 ),
 
                 // Caption with Username + Rich Text

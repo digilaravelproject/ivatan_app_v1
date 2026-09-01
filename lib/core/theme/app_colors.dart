@@ -3,90 +3,103 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // ================= BRAND COLORS =================
-  // Black primary – premium & minimal
-  static const Color primary = Color(0xFF000000);
-  static const Color primaryDark = Color(0xFF0A0A0A);
-  static const Color primaryLight = Color(0xFF1F2937);
+  // ================= CLIENT BRAND COLORS =================
+  static const Color mainBackground = Color(0xFF050505);
+  static const Color secondaryBackground = Color(0xFF111111);
+  static const Color cardSurface = Color(0xFF181818);
+  static const Color elevatedSurface = Color(0xFF222222);
+  static const Color primaryText = Color(0xFFFFFFFF);
+  static const Color secondaryText = Color(0xFFB8B8B8);
+  static const Color border = Color(0xFF3A3A3A);
+  
+  static const Color premiumGold = Color(0xFFC0A062); // Deeper, more authentic metallic gold
+  static const Color goldHighlight = Color(0xFFD4B776);
+  static const Color goldGlow = Color(0xFFA68748);
+  static const Color successSoftGold = Color(0xFFC0A062);
 
-  static const Color secondary = Color(0xFF06B6D4); // Cyan
-  static const Color secondaryDark = Color(0xFF0891B2);
-  static const Color secondaryLight = Color(0xFF22D3EE);
+  // ================= BACKWARD COMPATIBILITY & ALIASES =================
+  static const Color primary = mainBackground;
+  static const Color primaryDark = Color(0xFF000000);
+  static const Color primaryLight = secondaryBackground;
 
-  static const Color accent = Color(0xFF10B981); // Emerald
-  static const Color accentGold = Color(0xFFF59E0B); // Gold
+  static const Color secondary = premiumGold;
+  static const Color secondaryDark = premiumGold;
+  static const Color secondaryLight = goldHighlight;
+
+  static const Color accent = premiumGold;
+  static const Color accentGold = premiumGold;
 
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
   static const Color transparent = Color(0x00000000);
 
   // ================= SEMANTIC COLORS =================
-  static const Color success = Color(0xFF10B981);
-  static const Color warning = Color(0xFFF59E0B);
+  static const Color success = successSoftGold;
+  static const Color warning = goldHighlight;
   static const Color error = Color(0xFFEF4444);
   static const Color info = Color(0xFF3B82F6);
 
-  static const Color bullishGreen = Color(0xFF059669);
+  static const Color bullishGreen = successSoftGold;
   static const Color bearishRed = Color(0xFFDC2626);
-  static const Color neutralGray = Color(0xFF9CA3AF);
+  static const Color neutralGray = secondaryText;
 
-  // ================= LIGHT THEME =================
-  static const Color lightBackground = Color(0xFFFAFAFA);
-  static const Color lightSurface = Color(0xFFFFFFFF);
+  // ================= LIGHT THEME (Mapped to Dark for this design) =================
+  static const Color lightBackground = mainBackground;
+  static const Color lightSurface = secondaryBackground;
 
-  static const Color lightTextPrimary = Color(0xFF111827);
-  static const Color lightTextSecondary = Color(0xFF4B5563);
-  static const Color lightTextDisabled = Color(0xFF9CA3AF);
+  static const Color lightTextPrimary = primaryText;
+  static const Color lightTextSecondary = secondaryText;
+  static const Color lightTextDisabled = border;
 
-  static const Color lightBorder = Color(0xFFD1D5DB);
-  static const Color lightDivider = Color(0xFFE5E7EB);
+  static const Color lightBorder = border;
+  static const Color lightDivider = border;
 
   static const Color lightShadowLight = Color(0x0A000000);
   static const Color lightShadowMedium = Color(0x14000000);
   static const Color lightShadowStrong = Color(0x1F000000);
 
   static const List<Color> lightGradientPrimary = [
-    Color(0xFF000000),
-    Color(0xFF1F2937),
+    premiumGold,
+    goldHighlight,
   ];
 
   static const List<Color> lightBackgroundGradient = [
-    Color(0xFFF9FAFB),
-    lightTextSecondary,
-    lightTextSecondary,
+    mainBackground,
+    secondaryBackground,
+    mainBackground,
   ];
 
   // ================= DARK THEME =================
-  static const Color darkBackground = Color(0xFF000000);
-  static const Color darkSurface = Color(0xFF111827);
+  static const Color darkBackground = mainBackground;
+  static const Color darkSurface = cardSurface;
 
-  static const Color darkTextPrimary = Color(0xFFFFFFFF);
-  static const Color darkTextSecondary = Color(0xFFD1D5DB);
-  static const Color darkTextDisabled = Color(0xFF6B7280);
+  static const Color darkTextPrimary = primaryText;
+  static const Color darkTextSecondary = secondaryText;
+  static const Color darkTextDisabled = border;
 
-  static const Color darkBorder = Color(0xFF374151);
-  static const Color darkDivider = Color(0xFF1F2937);
+  static const Color darkBorder = border;
+  static const Color darkDivider = border;
 
-  static const Color darkShadowLight = Color(0x14FFFFFF);
-  static const Color darkShadowMedium = Color(0x1FFFFFFF);
-  static const Color darkShadowStrong = Color(0x29FFFFFF);
+  static const Color darkShadowLight = Color(0x14000000);
+  static const Color darkShadowMedium = Color(0x1F000000);
+  static const Color darkShadowStrong = Color(0x29000000);
 
   static const List<Color> darkGradientPrimary = [
-    Color(0xFF000000),
-    Color(0xFF1F2937),
+    premiumGold,
+    goldHighlight,
   ];
 
   static const List<Color> darkBackgroundGradient = [
-    Color(0xFF000000),
-    Color(0xFF0F172A),
-    Color(0xFF1E293B),
+    mainBackground,
+    secondaryBackground,
+    cardSurface,
   ];
 
   // ================= UTILITIES =================
   static Color textColorForBackground(Color background) {
     return background.computeLuminance() > 0.5
-        ? lightTextPrimary
-        : darkTextPrimary;
+        ? mainBackground
+        : primaryText;
   }
 
   static Color shadowColor(bool isDark, {bool strong = false}) {

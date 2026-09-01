@@ -37,7 +37,7 @@ class HomePage extends StatelessWidget {
     final imageUrl = user?.profilePhotoPath ?? "";
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: AppColors.mainBackground,
       key: controller.scaffoldKey,
       endDrawer: DrawerScreen(),
       endDrawerEnableOpenDragGesture: false,
@@ -68,7 +68,7 @@ class HomePage extends StatelessWidget {
           },
           child: Obx(() {
             final isStoriesShown = controller.showStories.value;
-            return RefreshIndicator(color: Colors.black, 
+            return RefreshIndicator(color: AppColors.premiumGold, 
               notificationPredicate: (notification) {
                 return isStoriesShown;
               },
@@ -117,7 +117,7 @@ class HomePage extends StatelessWidget {
                             IconButton(
                               icon: const Icon(
                                 CupertinoIcons.bell,
-                                color: Colors.white,
+                                color: AppColors.premiumGold,
                                 size: 26,
                               ),
                               onPressed: () async {
@@ -160,9 +160,9 @@ class HomePage extends StatelessWidget {
                         children: [
 
                           IconButton(
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.wechat_outlined,
-                              color: Colors.white,
+                              color: AppColors.premiumGold,
                               size: 26,
                             ),
                             onPressed: () => Get.to(dashboard()),
@@ -185,9 +185,9 @@ class HomePage extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(right: 12.0),
                         child: IconButton(
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.menu_rounded,
-                            color: Colors.white,
+                            color: AppColors.premiumGold,
                             size: 28,
                           ),
                           onPressed: () => controller.openDrawer(),
@@ -355,7 +355,7 @@ class HomePage extends StatelessWidget {
                 width: 80,
                 height: 114,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade900,
+                  color: AppColors.cardSurface,
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
@@ -508,18 +508,18 @@ class HomePage extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           gradient: hasStory
               ? const LinearGradient(
-                  colors: [Color(0xFFF58529), Color(0xFFDD2A7B), Color(0xFF8134AF)],
+                  colors: [AppColors.premiumGold, AppColors.goldHighlight, AppColors.goldGlow],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 )
               : null,
-          color: !hasStory ? Colors.grey.shade900 : null,
+          color: !hasStory ? AppColors.secondaryBackground : null,
         ),
         padding: hasStory ? const EdgeInsets.all(2.0) : EdgeInsets.zero,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            color: Colors.black, // Inner dark color
+            color: AppColors.mainBackground, // Inner dark color
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
@@ -550,7 +550,7 @@ class HomePage extends StatelessWidget {
                     gradient: LinearGradient(
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
-                      colors: [Colors.black.withOpacity(0.75), Colors.transparent],
+                      colors: [AppColors.mainBackground.withOpacity(0.75), Colors.transparent],
                     ),
                   ),
                 ),
@@ -580,7 +580,7 @@ class HomePage extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFFF58529), Color(0xFFDD2A7B), Color(0xFF8134AF)],
+                      colors: [AppColors.premiumGold, AppColors.goldHighlight, AppColors.goldGlow],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -614,7 +614,7 @@ class HomePage extends StatelessWidget {
                       width: 22,
                       height: 22,
                       decoration: BoxDecoration(
-                        color: Colors.black,
+                        color: AppColors.mainBackground,
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 1.5),
                         boxShadow: [
@@ -666,18 +666,18 @@ class HomePage extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           gradient: hasUnseen
               ? const LinearGradient(
-                  colors: [Color(0xFFF58529), Color(0xFFDD2A7B), Color(0xFF8134AF)],
+                  colors: [AppColors.premiumGold, AppColors.goldHighlight, AppColors.goldGlow],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 )
               : null,
-          color: !hasUnseen ? Colors.grey.shade900 : null,
+          color: !hasUnseen ? AppColors.secondaryBackground : null,
         ),
         padding: hasUnseen ? const EdgeInsets.all(2.0) : EdgeInsets.zero,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            color: Colors.black, // Inner dark color
+            color: AppColors.mainBackground, // Inner dark color
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
@@ -698,7 +698,7 @@ class HomePage extends StatelessWidget {
                     gradient: LinearGradient(
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
-                      colors: [Colors.black.withOpacity(0.75), Colors.transparent],
+                      colors: [AppColors.mainBackground.withOpacity(0.75), Colors.transparent],
                     ),
                   ),
                 ),
@@ -729,7 +729,7 @@ class HomePage extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFFF58529), Color(0xFFDD2A7B), Color(0xFF8134AF)],
+                        colors: [AppColors.premiumGold, AppColors.goldHighlight, AppColors.goldGlow],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -809,7 +809,7 @@ class HomePage extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF242426), // Lighter grey to match the screenshot
+        color: AppColors.cardSurface, // Dark surface
         borderRadius: BorderRadius.circular(24),
       ),
       child: ClipRRect(
@@ -874,7 +874,7 @@ class HomePage extends StatelessWidget {
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
-                                  color: Colors.white,
+                                  color: AppColors.primaryText,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -883,7 +883,7 @@ class HomePage extends StatelessWidget {
                           ),
                           if (post.user.isVerified) ...[
                             SizedBox(width: 4),
-                            Image.asset(AppAssets.imgverified,height: 16,width: 16,),
+                            Image.asset(AppAssets.imgverified,height: 16,width: 16, color: AppColors.successSoftGold),
                             //Icon(Icons.verified, color: Colors.blue, size: 14),
                           ],
 
@@ -892,7 +892,7 @@ class HomePage extends StatelessWidget {
                             " • ${DateHelper.formatPostDate(post.createdAt)}",
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey.shade400,
+                              color: AppColors.secondaryText,
                             ),
                           ),
                         ],
@@ -907,7 +907,7 @@ class HomePage extends StatelessWidget {
                               Icon(
                                 Icons.music_note,
                                 size: 12,
-                                color: Colors.grey.shade400,
+                                color: AppColors.premiumGold,
                               ),
                               SizedBox(width: 4),
                             ],
@@ -919,7 +919,7 @@ class HomePage extends StatelessWidget {
                                     : post.user.occupation,
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: Colors.grey.shade400,
+                                  color: AppColors.premiumGold,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -966,10 +966,10 @@ class HomePage extends StatelessWidget {
                         decoration: BoxDecoration(
                           color:
                           following
-                              ? Colors.grey.shade100
+                              ? AppColors.secondaryBackground
                               : Colors.transparent,
                           border: Border.all(
-                            color: following ? Colors.grey.shade300 : Colors.white,
+                            color: AppColors.premiumGold,
                             width: 1,
                           ),
                           borderRadius: BorderRadius.circular(6),
@@ -977,7 +977,7 @@ class HomePage extends StatelessWidget {
                         child: Text(
                           following ? "Following" : "Follow",
                           style: TextStyle(
-                            color: following ? Colors.black87 : Colors.white,
+                            color: AppColors.premiumGold,
                             fontWeight: FontWeight.w600,
                             fontSize: 12,
                           ),
@@ -989,7 +989,7 @@ class HomePage extends StatelessWidget {
 
                 // More Menu
                 IconButton(
-                  icon: Icon(Icons.more_horiz, color: Colors.white),
+                  icon: Icon(Icons.more_horiz, color: AppColors.primaryText),
                   onPressed:
                       () => _showSideMenu(context, post.id, post.user.username, post.user.id),
                   padding: EdgeInsets.zero,
@@ -1026,7 +1026,7 @@ class HomePage extends StatelessWidget {
                             : Icons.favorite_border,
                         color: post.stats.isLiked == true
                             ? Colors.red
-                            : Colors.white,
+                            : AppColors.premiumGold,
                         size: 28,
                       ),
                     ),
@@ -1037,7 +1037,7 @@ class HomePage extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
-                          color: Colors.white,
+                          color: AppColors.premiumGold,
                         ),
                       ),
 
@@ -1054,8 +1054,8 @@ class HomePage extends StatelessWidget {
                         );
                       },
                       child: Icon(
-                        Icons.comment,
-                        color: Colors.white,
+                        Icons.chat_bubble_outline,
+                        color: AppColors.premiumGold,
                         size: 24,
                       ),
                     ),
@@ -1066,7 +1066,7 @@ class HomePage extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
-                          color: Colors.white,
+                          color: AppColors.premiumGold,
                         ),
                       ),
 
@@ -1081,7 +1081,7 @@ class HomePage extends StatelessWidget {
                       },
                       child: Icon(
                         Icons.share,
-                        color: Colors.white,
+                        color: AppColors.premiumGold,
                         size: 24,
                       ),
                     ),
@@ -1092,7 +1092,7 @@ class HomePage extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
-                          color: Colors.white,
+                          color: AppColors.premiumGold,
                         ),
                       ),
 
@@ -1102,7 +1102,7 @@ class HomePage extends StatelessWidget {
                       onTap: () => controller.toggleBookmark(post.id),
                       child: Icon(
                         post.stats.isSaved ? Icons.bookmark : Icons.bookmark_border,
-                        color: post.stats.isSaved ? Colors.white : Colors.white70,
+                        color: AppColors.premiumGold,
                         size: 26,
                       ),
                     ),
@@ -1128,7 +1128,7 @@ class HomePage extends StatelessWidget {
                   SizedBox(height: 6),
                   ExpandableCaption(
                     text: post.caption!,
-                    textColor: Colors.white,
+                    textColor: AppColors.primaryText,
                     username:
                     post.user.username.isNotEmpty
                         ? post.user.username
@@ -4657,11 +4657,7 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFFFFF099),
-                    Color(0xFFD4AF37),
-                    Color(0xFF9F7A1A),
-                  ],
+                  colors: [AppColors.premiumGold, AppColors.goldHighlight, AppColors.goldGlow],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
