@@ -124,9 +124,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(AppAssets.imgBackgroundApp),
+          fit: BoxFit.cover,
+        ),
+      ),
       child: Scaffold(
         extendBody: true,
-        backgroundColor: AppColors.white,
+        backgroundColor: Colors.transparent,
         body: Obx(() {
           final user = profileController.userProfile.value;
           if (user == null) {
@@ -175,10 +181,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
 
           List<Tab> tabs = [
-            Tab(
-              child: Image.asset(AppAssets.icCategory, width: 24, height: 24),
+            const Tab(
+              child: Icon(Icons.grid_view_outlined, size: 24),
             ),
-            Tab(child: Image.asset(AppAssets.icVideo, width: 24, height: 24)),
+            const Tab(child: Icon(Icons.play_circle_outline, size: 24)),
           ];
 
           List<Widget> tabViews = [
@@ -188,8 +194,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           if (showExclusiveTab) {
             tabs.add(
-              Tab(
-                child: Icon(Icons.star_border, color: Colors.amber, size: 26),
+              const Tab(
+                child: Icon(Icons.star_border, size: 26),
               ),
             );
             tabViews.add(
@@ -202,8 +208,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           if (showProductTab) {
             tabs.add(
-              Tab(
-                child: Image.asset(AppAssets.icProduct, width: 24, height: 24),
+              const Tab(
+                child: Icon(Icons.shopping_bag_outlined, size: 24),
               ),
             );
             tabViews.add(
@@ -221,10 +227,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           if (showServiceTab) {
             tabs.add(
-              Tab(
+              const Tab(
                 child: Icon(
                   Icons.miscellaneous_services_outlined,
-                  color: Colors.black,
                   size: 26,
                 ),
               ),
@@ -351,7 +356,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 ),
                                                 child: const Icon(
                                                   Icons.arrow_back,
-                                                  color: Colors.white,
+                                                  color: AppColors.premiumGold,
                                                   size: 20,
                                                 ),
                                               ),
@@ -391,7 +396,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     child: const Icon(
                                                       Icons
                                                           .shopping_cart_outlined,
-                                                      color: Colors.white,
+                                                      color: AppColors.premiumGold,
                                                       size: 22,
                                                     ),
                                                   ),
@@ -827,7 +832,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                       ),
                                                   child: const Icon(
                                                     Icons.more_vert,
-                                                    color: Colors.white,
+                                                    color: AppColors.premiumGold,
                                                     size: 22,
                                                   ),
                                                 ),
@@ -904,7 +909,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   // Body Info Container
                                   Container(
-                                    color: AppColors.white,
+                                    color: Colors.transparent,
                                     padding: const EdgeInsets.only(
                                       top: 60,
                                       left: 16,
@@ -928,7 +933,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   Text(
                                                     user.name ?? "User",
                                                     style: const TextStyle(
-                                                      color: Colors.black,
+                                                      color: Colors.white,
                                                       fontSize: 20,
                                                       fontWeight:
                                                           FontWeight.bold,
@@ -941,8 +946,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     children: [
                                                       Text(
                                                         "@${user.username ?? ""}",
-                                                        style: const TextStyle(
-                                                          color: Colors.black54,
+                                                        style: TextStyle(
+                                                          color: Colors.grey.shade400,
                                                           fontSize: 14,
                                                         ),
                                                       ),
@@ -956,7 +961,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           height: 16,
                                                           width: 16,
                                                         ),
-                                                        //  const Icon(Icons.verified, color: Colors.blue, size: 16),
                                                       ],
                                                       if (user.accountPrivacy
                                                               ?.toLowerCase() ==
@@ -964,9 +968,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         const SizedBox(
                                                           width: 4,
                                                         ),
-                                                        const Icon(
+                                                        Icon(
                                                           Icons.lock_outline,
-                                                          color: Colors.black54,
+                                                          color: Colors.grey.shade400,
                                                           size: 16,
                                                         ),
                                                       ],
@@ -983,11 +987,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         ),
                                                     decoration: BoxDecoration(
                                                       color:
-                                                          Colors.grey.shade100,
+                                                          Colors.transparent,
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                             4,
                                                           ),
+                                                      border: Border.all(
+                                                        color: AppColors.premiumGold,
+                                                        width: 1,
+                                                      ),
                                                     ),
                                                     child: Text(
                                                       user
@@ -996,11 +1004,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                               true
                                                           ? user.occupation!
                                                           : "Digital Creator",
-                                                      style: TextStyle(
+                                                      style: const TextStyle(
                                                         color:
-                                                            Colors
-                                                                .grey
-                                                                .shade800,
+                                                            AppColors.premiumGold,
                                                         fontSize: 12,
                                                         fontWeight:
                                                             FontWeight.w500,
@@ -1015,7 +1021,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     Text(
                                                       user.bio!,
                                                       style: const TextStyle(
-                                                        color: Colors.black87,
+                                                        color: Colors.white,
                                                         fontSize: 14,
                                                       ),
                                                       maxLines: 3,
@@ -1301,12 +1307,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   );
                                                 },
                                                 child: Container(
-                                                  padding: EdgeInsets.symmetric(
+                                                  padding: const EdgeInsets.symmetric(
                                                     horizontal: 16,
                                                     vertical: 8,
                                                   ),
                                                   decoration: BoxDecoration(
-                                                    color: Colors.grey.shade100,
+                                                    color: Colors.transparent,
+                                                    border: Border.all(color: AppColors.premiumGold),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                           20,
@@ -1314,16 +1321,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   ),
                                                   child: Row(
                                                     children: [
-                                                      Icon(
+                                                      const Icon(
                                                         Icons.add,
                                                         size: 14,
-                                                        color: AppColors.black,
+                                                        color: AppColors.premiumGold,
                                                       ),
-                                                      SizedBox(width: 6),
-                                                      Text(
+                                                      const SizedBox(width: 6),
+                                                      const Text(
                                                         "Create",
                                                         style: TextStyle(
                                                           fontSize: 12,
+                                                          color: AppColors.premiumGold,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                         ),
@@ -1688,17 +1696,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           SliverAppBar(
                             pinned: true,
                             floating: false,
-                            backgroundColor: AppColors.white,
+                            backgroundColor: Colors.transparent,
                             automaticallyImplyLeading: false,
                             primary: false,
                             toolbarHeight: 0,
                             elevation: 0,
                             bottom: TabBar(
                               isScrollable: false,
-                              dividerColor: Colors.grey.shade200,
-                              labelColor: Colors.black,
+                              dividerColor: Colors.grey.shade900,
+                              labelColor: AppColors.premiumGold,
                               unselectedLabelColor: Colors.grey,
-                              indicatorColor: Colors.blue,
+                              indicatorColor: AppColors.premiumGold,
                               indicatorWeight: 2,
                               labelPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
@@ -1765,17 +1773,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100, // Light grey background
+          color: Colors.transparent,
           borderRadius: BorderRadius.circular(8),
-          // border: Border.all(color: Colors.grey.shade300)
+          border: Border.all(color: AppColors.border),
         ),
         child: Center(
           child: Text(
             label,
-            style: TextStyle(
-              color: Colors.black87,
+            style: const TextStyle(
+              color: Colors.white,
               fontWeight: FontWeight.w600,
               fontSize: 13,
             ),
@@ -1803,14 +1811,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
           width: double.infinity,
           decoration: BoxDecoration(
-            color: isFollowing ? Colors.grey.shade100 : Colors.blueAccent,
+            color: Colors.transparent,
+            border: Border.all(color: AppColors.premiumGold),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(
             child: Text(
               isFollowing ? "Following" : "Follow",
               style: TextStyle(
-                color: isFollowing ? Colors.black : Colors.white,
+                color: isFollowing ? Colors.white : AppColors.premiumGold,
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
               ),
@@ -1830,18 +1839,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.grey.shade300, width: 2),
+              border: Border.all(color: AppColors.border, width: 2),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.lock_outline,
               size: 50,
-              color: Colors.grey.shade600,
+              color: AppColors.premiumGold,
             ),
           ),
           const SizedBox(height: 20),
           const Text(
             "This Account is Private",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           const SizedBox(height: 8),
           const Text(

@@ -24,7 +24,7 @@ class MyVideoScreen extends StatelessWidget {
       tag: "${username}_videos"
     );
     return Container(
-      color: AppColors.white,
+      color: Colors.transparent,
       child: NotificationListener<ScrollNotification>(
         onNotification: (scroll) {
           if (!controller.isLoading.value &&

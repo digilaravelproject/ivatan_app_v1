@@ -49,30 +49,38 @@ class _ProfileFeedScreenState extends State<ProfileFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Get.back(),
+    return Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/background_app.png'),
+          fit: BoxFit.cover,
         ),
-        title: const Text(
-          "Posts",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-          ),
-        ),
-        centerTitle: true,
       ),
-      body: widget.controller != null ? Obx(() {
-        return _buildList();
-      }) : Builder(builder: (context) {
-        return _buildList();
-      }),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Color(0xFFD4AF37)),
+            onPressed: () => Get.back(),
+          ),
+          title: const Text(
+            "Posts",
+            style: TextStyle(
+              color: Color(0xFFD4AF37),
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+            ),
+          ),
+          centerTitle: true,
+        ),
+        body: widget.controller != null ? Obx(() {
+          return _buildList();
+        }) : Builder(builder: (context) {
+          return _buildList();
+        }),
+      ),
     );
   }
 

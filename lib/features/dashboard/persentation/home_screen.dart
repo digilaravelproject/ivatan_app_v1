@@ -37,7 +37,7 @@ class HomePage extends StatelessWidget {
     final imageUrl = user?.profilePhotoPath ?? "";
 
     return Scaffold(
-      backgroundColor: AppColors.mainBackground,
+      backgroundColor: Colors.transparent,
       key: controller.scaffoldKey,
       endDrawer: DrawerScreen(),
       endDrawerEnableOpenDragGesture: false,

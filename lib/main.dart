@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:i_vatan_app/features/auth/persentation/splash_page.dart';
 import 'package:i_vatan_app/route/app_pages.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 
 import 'core/network/api_services.dart';
 import 'core/network/websocket_service.dart';
@@ -72,10 +73,39 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           title: 'iVatan',
           debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-            fontFamily: 'DMSans',
-            progressIndicatorTheme: const ProgressIndicatorThemeData(color: Colors.black),
+          theme: ThemeData.dark().copyWith(
+            scaffoldBackgroundColor: AppColors.mainBackground,
+            primaryColor: AppColors.premiumGold,
+            colorScheme: const ColorScheme.dark(
+              primary: AppColors.premiumGold,
+              secondary: AppColors.goldHighlight,
+              surface: AppColors.mainBackground,
+            ),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: AppColors.mainBackground,
+              elevation: 0,
+              iconTheme: IconThemeData(color: AppColors.premiumGold),
+              titleTextStyle: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'DMSans',
+              ),
+            ),
+            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+              backgroundColor: AppColors.mainBackground,
+              selectedItemColor: AppColors.premiumGold,
+              unselectedItemColor: Colors.white54,
+            ),
+            iconTheme: const IconThemeData(color: Colors.white),
+            textTheme: ThemeData.dark().textTheme.apply(
+              bodyColor: Colors.white,
+              displayColor: Colors.white,
+              fontFamily: 'DMSans',
+            ),
+            progressIndicatorTheme: const ProgressIndicatorThemeData(
+              color: AppColors.premiumGold,
+            ),
           ),
           initialRoute: AppRoutes.splash,
           getPages: AppRoutes.appPages,

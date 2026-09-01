@@ -101,11 +101,11 @@ class _SearchScreenState extends State<SearchScreen> {
                     TabBar(
                       isScrollable: true,
                       dividerColor: Colors.transparent,
-                      indicatorColor: Colors.white,
+                      indicatorColor: AppColors.premiumGold,
                       indicatorSize: TabBarIndicatorSize.label,
                       tabAlignment: TabAlignment.start,
-                      labelColor: Colors.white,
-                      unselectedLabelColor: Colors.white54,
+                      labelColor: AppColors.premiumGold,
+                      unselectedLabelColor: AppColors.lightTextSecondary,
                       labelPadding: const EdgeInsets.symmetric(horizontal: 16),
                       labelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       tabs: const [

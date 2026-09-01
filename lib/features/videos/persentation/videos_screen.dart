@@ -326,9 +326,16 @@ class _VideosScreenState extends State<VideosScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(AppAssets.imgBackgroundApp),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Scaffold(
         extendBody: true,
-        backgroundColor: const Color(0xFFF8F9FA),
+        backgroundColor: Colors.transparent,
         body: SafeArea(
           bottom: false,
           child: Column(
@@ -336,16 +343,7 @@ class _VideosScreenState extends State<VideosScreen> {
               // Custom Header
               Container(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 12,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
-                ),
+                color: Colors.transparent,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -360,7 +358,7 @@ class _VideosScreenState extends State<VideosScreen> {
                               style: TextStyle(
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: Colors.white,
                                 letterSpacing: -0.5,
                               ),
                             ),
@@ -369,7 +367,7 @@ class _VideosScreenState extends State<VideosScreen> {
                               'Trending videos for you',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey.shade600,
+                                color: Colors.grey.shade400,
                               ),
                             ),
                           ],
@@ -381,12 +379,13 @@ class _VideosScreenState extends State<VideosScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
+                              color: AppColors.secondaryBackground,
+                              border: Border.all(color: AppColors.premiumGold, width: 1),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Icon(
+                            child: const Icon(
                               Icons.tune_rounded,
-                              color: Colors.grey.shade700,
+                              color: AppColors.premiumGold,
                               size: 22,
                             ),
                           ),
@@ -399,12 +398,13 @@ class _VideosScreenState extends State<VideosScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       height: 48,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
+                        color: AppColors.secondaryBackground,
+                        border: Border.all(color: AppColors.border),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.search, color: Colors.grey.shade600, size: 22),
+                          const Icon(Icons.search, color: AppColors.premiumGold, size: 22),
                           const SizedBox(width: 12),
                           Expanded(
                             child: TextField(
@@ -421,7 +421,7 @@ class _VideosScreenState extends State<VideosScreen> {
                               ),
                               style: const TextStyle(
                                 fontSize: 15,
-                                color: Colors.black87,
+                                color: Colors.white,
                               ),
                             ),
                           ),
@@ -495,6 +495,7 @@ class _VideosScreenState extends State<VideosScreen> {
             ],
           ),
         ),
+      ),
     );
   }
 
@@ -1050,7 +1051,7 @@ class CustomSearchBar extends StatelessWidget {
                       ),
                       style: const TextStyle(
                         fontSize: 15,
-                        color: Colors.black87,
+                        color: AppColors.primaryText,
                       ),
                     ),
                   ),

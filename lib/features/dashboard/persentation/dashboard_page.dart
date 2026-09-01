@@ -42,22 +42,29 @@ class DashboardPage extends StatelessWidget {
         }
         return true;
       },
-      child: Scaffold(
-        extendBody: true,
-        backgroundColor: AppColors.mainBackground,
-        body: Stack(
-          children: [
-            PageView(
-              controller: controller.pageController,
-              physics: const NeverScrollableScrollPhysics(),
-              onPageChanged: controller.onPageChanged,
-              children: controller.screenList,
-            ),
-
-            // Global Upload Progress
-            _buildGlobalUploadProgress(),
-          ],
+      child: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/background_app.png'),
+            fit: BoxFit.cover,
+          ),
         ),
+        child: Scaffold(
+          extendBody: true,
+          backgroundColor: Colors.transparent,
+          body: Stack(
+            children: [
+              PageView(
+                controller: controller.pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                onPageChanged: controller.onPageChanged,
+                children: controller.screenList,
+              ),
+
+              // Global Upload Progress
+              _buildGlobalUploadProgress(),
+            ],
+          ),
         bottomNavigationBar: Container(
           decoration: const BoxDecoration(
             color: AppColors.mainBackground,
@@ -81,6 +88,7 @@ class DashboardPage extends StatelessWidget {
             ),
           ),
         ),
+        ),
       ),
     );
   }
@@ -96,10 +104,10 @@ class DashboardPage extends StatelessWidget {
         right: 0,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.cardSurface,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withOpacity(0.4),
                 blurRadius: 10,
                 offset: const Offset(0, -5),
               ),
@@ -119,13 +127,13 @@ class DashboardPage extends StatelessWidget {
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
-                      color: Colors.blue,
+                      color: Colors.white,
                     ),
                   )),
                   Obx(() => Text(
                     "${(homeController.uploadProgress.value * 100).toInt()}%",
                     style: const TextStyle(
-                      color: Colors.blue,
+                      color: AppColors.premiumGold,
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
                     ),
@@ -137,8 +145,8 @@ class DashboardPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
                 child: Obx(() => LinearProgressIndicator(
                   value: homeController.uploadProgress.value,
-                  backgroundColor: Colors.blue.withOpacity(0.1),
-                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+                  backgroundColor: AppColors.mainBackground,
+                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.premiumGold),
                   minHeight: 3,
                 )),
               ),

@@ -24,38 +24,36 @@ class CustomSearchBar extends StatelessWidget {
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14),
-              height: 40, // Reduced height for compact look
+              height: 45,
               decoration: BoxDecoration(
-                color: Colors.grey.shade100, // Flat Grey
-                borderRadius: BorderRadius.circular(12),
-                // Removed BoxShadow
+                color: AppColors.cardSurface,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.border, width: 0.5),
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.search,
-                    color: AppColors.lightTextSecondary,
-                    size: 20,
-                  ),
-                  SizedBox(width: 8),
                   Expanded(
                     child: TextField(
                       readOnly: readOnly,
                       onTap: onTap,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Search...',
                         hintStyle: TextStyle(
                           color: AppColors.lightTextSecondary,
-                          fontSize: 14,
+                          fontSize: 15,
                         ),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.only(bottom: 10)
                       ),
                       style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black87,
+                        fontSize: 15,
+                        color: AppColors.primaryText,
                       ),
                     ),
+                  ),
+                  const Icon(
+                    Icons.search,
+                    color: AppColors.lightTextSecondary,
+                    size: 22,
                   ),
                 ],
               ),
