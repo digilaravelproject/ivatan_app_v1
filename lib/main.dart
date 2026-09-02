@@ -6,6 +6,7 @@ import 'package:i_vatan_app/features/auth/persentation/splash_page.dart';
 import 'package:i_vatan_app/route/app_pages.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:i_vatan_app/core/theme/app_colors.dart';
+import 'package:i_vatan_app/core/constants/app_assets.dart';
 
 import 'core/network/api_services.dart';
 import 'core/network/websocket_service.dart';
@@ -74,15 +75,15 @@ class MyApp extends StatelessWidget {
           title: 'iVatan',
           debugShowCheckedModeBanner: false,
           theme: ThemeData.dark().copyWith(
-            scaffoldBackgroundColor: AppColors.mainBackground,
+            scaffoldBackgroundColor: Colors.transparent,
             primaryColor: AppColors.premiumGold,
             colorScheme: const ColorScheme.dark(
               primary: AppColors.premiumGold,
               secondary: AppColors.goldHighlight,
-              surface: AppColors.mainBackground,
+              surface: Colors.transparent,
             ),
             appBarTheme: const AppBarTheme(
-              backgroundColor: AppColors.mainBackground,
+              backgroundColor: Colors.transparent,
               elevation: 0,
               iconTheme: IconThemeData(color: AppColors.premiumGold),
               titleTextStyle: TextStyle(
@@ -97,7 +98,7 @@ class MyApp extends StatelessWidget {
               selectedItemColor: AppColors.premiumGold,
               unselectedItemColor: Colors.white54,
             ),
-            iconTheme: const IconThemeData(color: Colors.white),
+            iconTheme: const IconThemeData(color: AppColors.premiumGold),
             textTheme: ThemeData.dark().textTheme.apply(
               bodyColor: Colors.white,
               displayColor: Colors.white,
@@ -107,6 +108,17 @@ class MyApp extends StatelessWidget {
               color: AppColors.premiumGold,
             ),
           ),
+          builder: (context, child) {
+            return Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(AppAssets.imgBackgroundApp),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: child,
+            );
+          },
           initialRoute: AppRoutes.splash,
           getPages: AppRoutes.appPages,
           initialBinding: NotificationBinding(),
