@@ -231,7 +231,7 @@ class RegistrationScreen extends GetWidget<RegisterController> {
                     GestureDetector(
                       onTap: () {
                         HapticFeedback.lightImpact();
-                        Get.to(() => LoginPage());
+                        Get.offAll(() => LoginPage());
                       },
                       child: const Text(
                         "Login",
