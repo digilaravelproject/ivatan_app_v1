@@ -1,11 +1,18 @@
 class AppAssets {
 
-  static const String imgOnbording1 = "assets/images/onbording1.jpg";
-  static const String imgOnboarding6 = "assets/images/onboarding6.png";
-  static const String imgOnbording2 = "assets/images/onbording2.jpg";
-  static const String imgOnbording3 = "assets/images/onbording3.jpg";
-  static const String imgOnbording4 = "assets/images/onbording4.jpg";
-  static const String imgOnbording5 = "assets/images/onbording5.jpg";
+  // static const String imgOnbording1 = "assets/images/onbording1.jpg";
+  // static const String imgOnboarding6 = "assets/images/onboarding6.png";
+  // static const String imgOnbording2 = "assets/images/onbording2.jpg";
+  // static const String imgOnbording3 = "assets/images/onbording3.jpg";
+  // static const String imgOnbording4 = "assets/images/onbording4.jpg";
+  // static const String imgOnbording5 = "assets/images/onbording5.jpg";
+
+  static const String imgOnbording1 = "assets/images/onboardingScreen1.png";
+  static const String imgOnbording2 = "assets/images/onboardingScreen2.png";
+  static const String imgOnbording3 = "assets/images/onboardingScreen3.png";
+  static const String imgOnbording4 = "assets/images/onboardingScreen4.png";
+  static const String imgOnbording5 = "assets/images/onboardingScreen5.png";
+
   static const String imgAuthBack = "assets/images/auth_background.jpg";
   static const String imgBackgroundApp = "assets/images/background_app.png";
   static const String imgGmail = "assets/images/gmail.png";

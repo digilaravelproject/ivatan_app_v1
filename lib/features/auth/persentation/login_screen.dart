@@ -168,7 +168,7 @@ class LoginPage extends GetWidget<LoginController> {
                       child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: AppColors.white,
+                          color: AppColors.black,
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(35),
                             topRight: Radius.circular(35),
@@ -221,11 +221,11 @@ class LoginPage extends GetWidget<LoginController> {
                               const SizedBox(height: 32),
 
                               // Input Fields
-                              Obx(() {
-                                return AnimatedSize(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                  child: Column(
+                              AnimatedSize(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                                child: Obx(() {
+                                  return Column(
                                     children: [
                                       CustomPhoneField(
                                         controller: controller.mobileController,
@@ -249,9 +249,9 @@ class LoginPage extends GetWidget<LoginController> {
                                         ),
                                       ],
                                     ],
-                                  ),
-                                );
-                              }),
+                                  );
+                                }),
+                              ),
 
                               const SizedBox(height: 20),
 
@@ -327,10 +327,11 @@ class LoginPage extends GetWidget<LoginController> {
                                     }
                                   },
                                   gradient: const LinearGradient(
-                                    colors: [AppColors.primary, AppColors.primaryDark],
+                                    colors: [AppColors.premiumGold, AppColors.premiumGold],
                                     begin: Alignment.centerLeft,
                                     end: Alignment.centerRight,
                                   ),
+                                  textColor: AppColors.black,
                                   height: 54,
                                   borderRadius: 12,
                                   isLoading: controller.isLoading.value,
@@ -354,7 +355,7 @@ class LoginPage extends GetWidget<LoginController> {
                                   child: Text(
                                     "Forgot Password?",
                                     style: TextStyle(
-                                      color: AppColors.primary,
+                                      color: AppColors.white,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 14,
                                     ),

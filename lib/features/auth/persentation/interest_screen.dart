@@ -227,30 +227,35 @@ class _InterestScreenState extends State<InterestScreen> with SingleTickerProvid
                 const SizedBox(height: 40),
 
                 // Button Inline (No Card)
-                MyButton(
-                  title: selectedItems.isEmpty
-                      ? "Continue"
-                      : "Continue (${selectedItems.length})",
-                  onPressed: () {
-                    if (selectedItems.isEmpty) {
-                      CustomSnackBar.showError(message: 'Pick at least one interest to start!');
-                      HapticFeedback.heavyImpact();
-                      return;
-                    }
-
-                    HapticFeedback.mediumImpact();
-                    registerController.interestsController.text =
-                        selectedItems.join(",");
-
-                    Get.to(() => RegistrationScreen());
-                  },
-                  gradient: LinearGradient(
-                    colors: selectedItems.isEmpty
-                        ? [AppColors.premiumGold, AppColors.premiumGold]
-                        : [AppColors.primary, AppColors.primaryDark],
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.premiumGold, width: 1.5),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  height: 52,
-                  borderRadius: 12,
+                  child: MyButton(
+                    title: selectedItems.isEmpty
+                        ? "Continue"
+                        : "Continue (${selectedItems.length})",
+                    onPressed: () {
+                      if (selectedItems.isEmpty) {
+                        CustomSnackBar.showError(message: 'Pick at least one interest to start!');
+                        HapticFeedback.heavyImpact();
+                        return;
+                      }
+
+                      HapticFeedback.mediumImpact();
+                      registerController.interestsController.text =
+                          selectedItems.join(",");
+
+                      Get.to(() => RegistrationScreen());
+                    },
+                    gradient: const LinearGradient(
+                      colors: [AppColors.black, AppColors.black],
+                    ),
+                    textColor: AppColors.premiumGold,
+                    height: 52,
+                    borderRadius: 12,
+                  ),
                 ),
                 const SizedBox(height: 20),
               ],
@@ -312,16 +317,16 @@ class _InterestScreenState extends State<InterestScreen> with SingleTickerProvid
         padding: EdgeInsets.symmetric(
             horizontal: isSelected ? 18 : 20, vertical: 12), // Slight squeeze effect
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.white,
+          color: isSelected ? AppColors.premiumGold.withOpacity(0.15) : AppColors.transparent,
           borderRadius: BorderRadius.circular(30),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.premiumGold,
-            width: isSelected ? 0 : 1.5,
+            color: AppColors.premiumGold,
+            width: isSelected ? 2.0 : 1.5,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.4),
+                    color: AppColors.premiumGold.withOpacity(0.2),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   )
@@ -332,14 +337,14 @@ class _InterestScreenState extends State<InterestScreen> with SingleTickerProvid
           mainAxisSize: MainAxisSize.min,
           children: [
             if (isSelected) ...[
-              const Icon(Icons.check, color: AppColors.white, size: 16),
+              const Icon(Icons.check, color: AppColors.premiumGold, size: 16),
               const SizedBox(width: 8),
             ],
             Text(
               item,
               style: TextStyle(
-                color: isSelected ? AppColors.white : AppColors.white,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? AppColors.premiumGold : AppColors.white,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                 fontSize: 15,
               ),
             ),

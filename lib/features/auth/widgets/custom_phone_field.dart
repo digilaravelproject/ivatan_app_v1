@@ -44,14 +44,14 @@ class CustomPhoneField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: const BorderSide(color: AppColors.premiumGold, width: 2),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: AppColors.premiumGold),
         ),
         filled: true,
-        fillColor: AppColors.white,
+        fillColor: AppColors.transparent,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         suffixIcon: suffixIcon,
         prefixIcon: InkWell(

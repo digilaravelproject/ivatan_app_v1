@@ -207,8 +207,9 @@ class RegistrationScreen extends GetWidget<RegisterController> {
                       }
                     },
                     gradient: const LinearGradient(
-                      colors: [AppColors.primary, AppColors.primaryDark], // Black Gradient
+                      colors: [AppColors.premiumGold, AppColors.premiumGold],
                     ),
+                    textColor: AppColors.black,
                     height: 52,
                     borderRadius: 12,
                   ),
@@ -235,7 +236,7 @@ class RegistrationScreen extends GetWidget<RegisterController> {
                       child: const Text(
                         "Login",
                         style: TextStyle(
-                          color: AppColors.primary,
+                          color: AppColors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),

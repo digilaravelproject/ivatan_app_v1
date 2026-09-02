@@ -148,23 +148,31 @@ class _VerifyOtpState extends State<VerifyOtp> {
               const SizedBox(height: 40),
 
               // Verify Button
-              Obx(() => MyButton(
-                title: _controller.isLoading.value ? "Verifying..." : "Verify & Continue",
-                onPressed: _controller.isLoading.value
-                    ? () {}
-                    : () async {
-                        String otp = _otpController.text.trim();
-                        if (otp.length != 6) {
-                          Get.snackbar("Invalid Code", "Please enter a 6-digit code");
-                          return;
-                        }
-                        await _controller.verifyOTP(widget.verificationId, otp, phoneNumber: widget.phoneNumber);
-                      },
-                gradient: const LinearGradient(
-                  colors: [AppColors.primary, AppColors.primaryDark],
+              // Verify Button
+              Obx(() => Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.premiumGold, width: 1.5),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                height: 52,
-                borderRadius: 16,
+                child: MyButton(
+                  title: _controller.isLoading.value ? "Verifying..." : "Verify & Continue",
+                  onPressed: _controller.isLoading.value
+                      ? () {}
+                      : () async {
+                          String otp = _otpController.text.trim();
+                          if (otp.length != 6) {
+                            Get.snackbar("Invalid Code", "Please enter a 6-digit code");
+                            return;
+                          }
+                          await _controller.verifyOTP(widget.verificationId, otp, phoneNumber: widget.phoneNumber);
+                        },
+                  gradient: const LinearGradient(
+                    colors: [AppColors.black, AppColors.black],
+                  ),
+                  textColor: AppColors.premiumGold,
+                  height: 52,
+                  borderRadius: 16,
+                ),
               )),
               
               const SizedBox(height: 20),

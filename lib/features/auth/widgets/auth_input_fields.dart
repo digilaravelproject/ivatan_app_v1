@@ -222,7 +222,7 @@ class _AuthInputFieldsState extends State<AuthInputFields> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: BorderSide(color: AppColors.premiumGold, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
@@ -298,17 +298,17 @@ class _CustomTextFieldState extends State<CustomTextField> {
         suffixIcon: widget.suffixIcon,
         labelText: widget.labelText,
         labelStyle: TextStyle(
-          color: _isFocused ? Colors.blue : AppColors.premiumGold,
+          color: _isFocused ? AppColors.premiumGold : AppColors.premiumGold,
           fontSize: 14,
         ),
         enabledBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: AppColors.premiumGold, width: 1),
         ),
         focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.blue, width: 1.5),
+          borderSide: BorderSide(color: AppColors.premiumGold, width: 1.5),
         ),
         filled: true,
-        fillColor: AppColors.white,
+        fillColor: AppColors.transparent,
         contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
       ),
       style: const TextStyle(color: AppColors.white, fontSize: 15),

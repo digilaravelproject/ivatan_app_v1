@@ -454,21 +454,24 @@ class LoginController extends GetxController {
       );
 
       if (response != null && response["status"] !=false) {
-      String msg = response["message"].toString();
-      resetToken = response["reset_token"];
-      print("verifyForgetPassword : "+response.toString());
-      CustomSnackBar.showSuccess(message: msg);
-      await Future.delayed(const Duration(milliseconds: 300));
-      Get.offAllNamed(AppRoutes.NewPasswordPage);
+        String msg = response["message"].toString();
+        resetToken = response["reset_token"];
+        print("verifyForgetPassword : "+response.toString());
+        
+        CustomLoader.hide(); // Hide before navigating
+        
+        CustomSnackBar.showSuccess(message: msg);
+        await Future.delayed(const Duration(milliseconds: 300));
+        Get.offAllNamed(AppRoutes.NewPasswordPage);
       }
 
 
     } catch (e, stk) {
+      CustomLoader.hide(); // Hide on error
       printMessage("Exception : " + e.toString() + "\n$stk");
       CustomSnackBar.showError(message: e.toString());
     } finally {
       isCallingApi.value = false;
-      CustomLoader.hide();
     }
   }
 
@@ -488,12 +491,30 @@ class LoginController extends GetxController {
         },
       );
 
-      if (response != null && response["status"]!=false) {
+      if (response != null && response["status"] != false) {
         String msg = response["message"].toString();
         print("resetPassword : "+response.toString());
         CustomSnackBar.showSuccess(message: msg);
 
         Get.offAllNamed(AppRoutes.login);
+      } else if (response != null && response["status"] == false) {
+        String errorMsg = "Something went wrong";
+        if (response["message"] != null) {
+          if (response["message"] is String) {
+            errorMsg = response["message"];
+          } else if (response["message"] is Map) {
+            final Map msgMap = response["message"];
+            if (msgMap.isNotEmpty) {
+              final firstValue = msgMap.values.first;
+              if (firstValue is List && firstValue.isNotEmpty) {
+                errorMsg = firstValue.first.toString();
+              } else {
+                errorMsg = firstValue.toString();
+              }
+            }
+          }
+        }
+        CustomSnackBar.showError(message: errorMsg);
       }
 
 

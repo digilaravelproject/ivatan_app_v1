@@ -71,7 +71,7 @@ class ForgetPassword extends GetWidget<LoginController> {
                     borderSide: const BorderSide(color: AppColors.primary, width: 2),
                   ),
                   filled: true,
-                  fillColor: AppColors.white,
+                  fillColor: AppColors.transparent,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                 ),
                 initialCountryCode: 'IN',
@@ -129,10 +129,11 @@ class ForgetPassword extends GetWidget<LoginController> {
                   controller.sendOTP(flowType: OtpFlowType.forgetPassword);
                 },
                 gradient: const LinearGradient(
-                  colors: [AppColors.primary, AppColors.primaryLight],
+                  colors: [AppColors.premiumGold, AppColors.premiumGold],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
+                textColor: AppColors.black,
                 height: 50,
                 borderRadius: 12,
                 isLoading: controller.isLoading.value,

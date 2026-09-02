@@ -10,29 +10,29 @@ class OnboardingController extends GetxController {
 
   final List<OnboardingModel> onboardingList = [
     OnboardingModel(
-      image: AppAssets.imgOnboarding6,
+      image: AppAssets.imgOnbording1,
       title: '',
       description: '',
     ),
     OnboardingModel(
       image: AppAssets.imgOnbording2,
-      title: 'i-Play & i-clips \n Your Content, Your Ownership',
-      description: 'Post reels, videos & thoughts — no algorithms \n dictating your voice.',
+      title: '',
+      description: '',
     ),
     OnboardingModel(
       image: AppAssets.imgOnbording3,
-      title: 'i-Mart \n (In-Built Marketplace)',
-      description: 'Buy. Sell. Discover — grow your \n business locally and digitally.',
+      title: '',
+      description: '',
     ),
     OnboardingModel(
       image: AppAssets.imgOnbording4,
-      title: 'i-QuickHire',
-      description: 'Hire fast. Get hired faster — built for \n India’s real workforce.',
+      title: '',
+      description: '',
     ),
     OnboardingModel(
       image: AppAssets.imgOnbording5,
-      title: 'i-Secure \n Built on Trust',
-      description: 'Your data stays yours. No tracking. \n No manipulation. Ever.',
+      title: '',
+      description: '',
     ),
   ];
 
