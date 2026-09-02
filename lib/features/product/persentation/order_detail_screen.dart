@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -13,23 +14,26 @@ class OrderDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(OrderDetailController(orderId: orderId), tag: orderId.toString());
+    final controller = Get.put(
+      OrderDetailController(orderId: orderId),
+      tag: orderId.toString(),
+    );
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
         title: const Text(
           "Order Details",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.white),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: AppColors.transparent,
+        foregroundColor: AppColors.white,
         elevation: 0,
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(
-            child: CircularProgressIndicator(color: AppColors.black),
+            child: CircularProgressIndicator(color: AppColors.white),
           );
         }
 
@@ -40,7 +44,7 @@ class OrderDetailScreen extends StatelessWidget {
 
         return RefreshIndicator(
           onRefresh: () async => controller.fetchOrderDetails(),
-          color: AppColors.black,
+          color: AppColors.white,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(16),
@@ -69,9 +73,9 @@ class OrderDetailScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.premiumGold.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.premiumGold),
       ),
       child: Column(
         children: [
@@ -83,12 +87,22 @@ class OrderDetailScreen extends StatelessWidget {
                 children: [
                   Text(
                     "Order #${order.id}",
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    order.createdAt != null ? DateFormat('dd MMM yyyy, hh:mm a').format(order.createdAt!) : '',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    order.createdAt != null
+                        ? DateFormat(
+                          'dd MMM yyyy, hh:mm a',
+                        ).format(order.createdAt!)
+                        : '',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.premiumGold,
+                    ),
                   ),
                 ],
               ),
@@ -114,34 +128,44 @@ class OrderDetailScreen extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.black,
+            border: Border.all(color: AppColors.premiumGold),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 address.name ?? '',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
                 "${address.addressLine1}${address.addressLine2 != null ? ', ${address.addressLine2}' : ''}",
-                style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                style: TextStyle(color: AppColors.premiumGold, fontSize: 13),
               ),
               Text(
                 "${address.city}, ${address.state} - ${address.postalCode}",
-                style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                style: TextStyle(color: AppColors.premiumGold, fontSize: 13),
               ),
               const SizedBox(height: 8),
               Row(
                 children: [
-                  const Icon(Icons.phone_outlined, size: 14, color: Colors.grey),
+                  const Icon(
+                    Icons.phone_outlined,
+                    size: 14,
+                    color: AppColors.premiumGold,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     address.phone ?? '',
-                    style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                    style: TextStyle(
+                      color: AppColors.premiumGold,
+                      fontSize: 13,
+                    ),
                   ),
                 ],
               ),
@@ -171,9 +195,9 @@ class OrderDetailScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.black,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: AppColors.premiumGold),
       ),
       child: Row(
         children: [
@@ -181,18 +205,26 @@ class OrderDetailScreen extends StatelessWidget {
             width: 70,
             height: 70,
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: AppColors.premiumGold,
               borderRadius: BorderRadius.circular(8),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: item.image != null
-                  ? Image.network(
-                      AppUrls.getFullImageUrl(item.image),
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.grey),
-                    )
-                  : const Icon(Icons.shopping_bag_outlined, color: Colors.grey),
+              child:
+                  item.image != null
+                      ? Image.network(
+                        AppUrls.getFullImageUrl(item.image),
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (_, __, ___) => const Icon(
+                              Icons.broken_image,
+                              color: AppColors.black,
+                            ),
+                      )
+                      : const Icon(
+                        Icons.shopping_bag_outlined,
+                        color: AppColors.black,
+                      ),
             ),
           ),
           const SizedBox(width: 12),
@@ -202,14 +234,17 @@ class OrderDetailScreen extends StatelessWidget {
               children: [
                 Text(
                   item.title ?? "Product ID: ${item.itemId}",
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   "₹${double.tryParse(item.price ?? '0')?.toStringAsFixed(0)} × ${item.quantity}",
-                  style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                  style: TextStyle(color: AppColors.premiumGold, fontSize: 13),
                 ),
               ],
             ),
@@ -235,19 +270,29 @@ class OrderDetailScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.black,
+            border: Border.all(color: AppColors.premiumGold),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200),
           ),
           child: Column(
             children: [
-              _buildSummaryRow("Payment Method", order.payment?.gateway?.toUpperCase() ?? 'N/A'),
+              _buildSummaryRow(
+                "Payment Method",
+                order.payment?.gateway?.toUpperCase() ?? 'N/A',
+              ),
               const Divider(height: 24),
-              _buildSummaryRow("Subtotal", "₹${double.tryParse(order.totalAmount ?? '0')?.toStringAsFixed(0)}"),
+              _buildSummaryRow(
+                "Subtotal",
+                "₹${double.tryParse(order.totalAmount ?? '0')?.toStringAsFixed(0)}",
+              ),
               _buildSummaryRow("Shipping Fee", "₹0", isGreen: true),
               const Divider(height: 24),
-              _buildSummaryRow("Total Amount", "₹${double.tryParse(order.totalAmount ?? '0')?.toStringAsFixed(0)}", 
-                  isBold: true, fontSize: 18),
+              _buildSummaryRow(
+                "Total Amount",
+                "₹${double.tryParse(order.totalAmount ?? '0')?.toStringAsFixed(0)}",
+                isBold: true,
+                fontSize: 18,
+              ),
             ],
           ),
         ),
@@ -255,19 +300,28 @@ class OrderDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryRow(String label, String value, {bool isBold = false, double fontSize = 14, bool isGreen = false}) {
+  Widget _buildSummaryRow(
+    String label,
+    String value, {
+    bool isBold = false,
+    double fontSize = 14,
+    bool isGreen = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
+          Text(
+            label,
+            style: TextStyle(color: AppColors.premiumGold, fontSize: 14),
+          ),
           Text(
             value,
             style: TextStyle(
               fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
               fontSize: fontSize,
-              color: isGreen ? Colors.green : Colors.black,
+              color: isGreen ? Colors.green : AppColors.white,
             ),
           ),
         ],
@@ -277,10 +331,26 @@ class OrderDetailScreen extends StatelessWidget {
 
   Widget _buildTimeline(String currentStatus) {
     final statuses = [
-      {"status": "pending", "title": "Order Placed", "subtitle": "Your order has been placed"},
-      {"status": "processing", "title": "Processing", "subtitle": "We are preparing your order"},
-      {"status": "shipped", "title": "Shipped", "subtitle": "Your order is on the way"},
-      {"status": "delivered", "title": "Delivered", "subtitle": "Order delivered successfully"},
+      {
+        "status": "pending",
+        "title": "Order Placed",
+        "subtitle": "Your order has been placed",
+      },
+      {
+        "status": "processing",
+        "title": "Processing",
+        "subtitle": "We are preparing your order",
+      },
+      {
+        "status": "shipped",
+        "title": "Shipped",
+        "subtitle": "Your order is on the way",
+      },
+      {
+        "status": "delivered",
+        "title": "Delivered",
+        "subtitle": "Order delivered successfully",
+      },
     ];
 
     int currentIdx = 0;
@@ -310,7 +380,12 @@ class OrderDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTimelineItem({required String title, required String subtitle, required bool isCompleted, required bool isLast}) {
+  Widget _buildTimelineItem({
+    required String title,
+    required String subtitle,
+    required bool isCompleted,
+    required bool isLast,
+  }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -320,16 +395,23 @@ class OrderDetailScreen extends StatelessWidget {
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                color: isCompleted ? AppColors.success : Colors.grey.shade300,
+                color: isCompleted ? AppColors.success : AppColors.premiumGold,
                 shape: BoxShape.circle,
               ),
-              child: isCompleted ? const Icon(Icons.check, color: Colors.white, size: 16) : null,
+              child:
+                  isCompleted
+                      ? const Icon(
+                        Icons.check,
+                        color: AppColors.white,
+                        size: 16,
+                      )
+                      : null,
             ),
             if (!isLast)
               Container(
                 width: 2,
                 height: 40,
-                color: isCompleted ? AppColors.success : Colors.grey.shade300,
+                color: isCompleted ? AppColors.success : AppColors.premiumGold,
               ),
           ],
         ),
@@ -343,12 +425,12 @@ class OrderDetailScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: isCompleted ? Colors.black : Colors.grey,
+                  color: isCompleted ? AppColors.white : AppColors.premiumGold,
                 ),
               ),
               Text(
                 subtitle,
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 12, color: AppColors.premiumGold),
               ),
               const SizedBox(height: 20),
             ],
@@ -361,12 +443,23 @@ class OrderDetailScreen extends StatelessWidget {
   Widget _buildStatusChip(String status) {
     Color color;
     switch (status.toLowerCase()) {
-      case 'pending': color = Colors.orange; break;
-      case 'processing': color = Colors.blue; break;
-      case 'shipped': color = Colors.purple; break;
-      case 'delivered': color = AppColors.success; break;
-      case 'cancelled': color = AppColors.error; break;
-      default: color = Colors.grey;
+      case 'pending':
+        color = Colors.orange;
+        break;
+      case 'processing':
+        color = Colors.blue;
+        break;
+      case 'shipped':
+        color = Colors.purple;
+        break;
+      case 'delivered':
+        color = AppColors.success;
+        break;
+      case 'cancelled':
+        color = AppColors.error;
+        break;
+      default:
+        color = AppColors.premiumGold;
     }
 
     return Container(
@@ -377,7 +470,11 @@ class OrderDetailScreen extends StatelessWidget {
       ),
       child: Text(
         status.capitalizeFirst!,
-        style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          color: color,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

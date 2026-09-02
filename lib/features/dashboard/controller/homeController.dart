@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -54,7 +55,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
 
   // Trim settings for Reels
   RxDouble trimStartTime = 0.0.obs; // In milliseconds
-  RxDouble trimDuration = 0.0.obs;  // In milliseconds
+  RxDouble trimDuration = 0.0.obs; // In milliseconds
 
   RxInt unreadNotificationCount = 0.obs;
   Rxn<ProfileConfigModel> profileConfig = Rxn<ProfileConfigModel>();
@@ -120,9 +121,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     }
   }
 
-
-
-  void showWelcomeDialog(BuildContext context) async{
+  void showWelcomeDialog(BuildContext context) async {
     GreetingDialogHelper.showGreetingDialogIfNeeded(
       context,
       userName: currentUser.value?.name ?? 'User',
@@ -172,8 +171,6 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       ],
     );
   }
-
-
 
   void loadCurrentUser() {
     final userData = SharedPrefManager().user;
@@ -230,7 +227,10 @@ class HomeController extends GetxController with WidgetsBindingObserver {
 
       // ✅ Sync follow status with FollowController map
       for (var post in fetchedPosts) {
-        followController.setInitialFollowStatus(post.user.id, post.is_following);
+        followController.setInitialFollowStatus(
+          post.user.id,
+          post.is_following,
+        );
       }
 
       posts.addAll(fetchedPosts);
@@ -252,7 +252,10 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     }
   }
 
-  Future<void> uploadMediaInBackground(String endpoint, Map<String, dynamic> body) async {
+  Future<void> uploadMediaInBackground(
+    String endpoint,
+    Map<String, dynamic> body,
+  ) async {
     try {
       isUploading.value = true;
       uploadProgress.value = 0.0;
@@ -300,12 +303,14 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       if (videoToCompress != null) {
         isCompressing.value = true;
         print("STARTING BACKGROUND COMPRESSION: ${videoToCompress!.path}");
-        
+
         bool shouldTrim = trimDuration.value > 0;
-        
+
         final info = await VideoCompress.compressVideo(
           videoToCompress!.path,
-          quality: VideoQuality.MediumQuality, // Reduced from HighestQuality for faster upload
+          quality:
+              VideoQuality
+                  .MediumQuality, // Reduced from HighestQuality for faster upload
           deleteOrigin: false,
           startTime: shouldTrim ? (trimStartTime.value / 1000).toInt() : null,
           duration: shouldTrim ? (trimDuration.value / 1000).toInt() : null,
@@ -333,20 +338,24 @@ class HomeController extends GetxController with WidgetsBindingObserver {
         },
       );
 
-      if (response != null && response.statusCode! >= 200 && response.statusCode! < 300) {
-        CustomSnackBar.showSuccess(message: response.data["message"] ?? "Upload successful!");
+      if (response != null &&
+          response.statusCode! >= 200 &&
+          response.statusCode! < 300) {
+        CustomSnackBar.showSuccess(
+          message: response.data["message"] ?? "Upload successful!",
+        );
         fetchPosts(); // Refresh home feed
-        
+
         // Refresh Discover videos list if VideoController is registered
         if (Get.isRegistered<VideoController>()) {
           Get.find<VideoController>().fetchVideo();
         }
-        
+
         // Refresh reels/clips list if ShortPlayController is registered
         if (Get.isRegistered<ShortPlayController>()) {
           Get.find<ShortPlayController>().fetchReels();
         }
-        
+
         // Refresh user's own profile post/video tabs if registered
         final currentUsername = SharedPrefManager().user?.username;
         if (currentUsername != null && currentUsername.isNotEmpty) {
@@ -354,17 +363,15 @@ class HomeController extends GetxController with WidgetsBindingObserver {
           for (var filter in filters) {
             final tag = "${currentUsername}_$filter";
             if (Get.isRegistered<OwnPostController>(tag: tag)) {
-              Get.find<OwnPostController>(tag: tag).fetchOwnPosts(
-                username: currentUsername,
-                filterType: filter,
-              );
+              Get.find<OwnPostController>(
+                tag: tag,
+              ).fetchOwnPosts(username: currentUsername, filterType: filter);
             }
           }
           if (Get.isRegistered<OwnPostController>(tag: currentUsername)) {
-            Get.find<OwnPostController>(tag: currentUsername).fetchOwnPosts(
-              username: currentUsername,
-              filterType: "posts",
-            );
+            Get.find<OwnPostController>(
+              tag: currentUsername,
+            ).fetchOwnPosts(username: currentUsername, filterType: "posts");
           }
         }
       } else {
@@ -380,6 +387,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       uploadProgress.value = 0.0;
     }
   }
+
   Future<void> fetchStories() async {
     isStoryLoading.value = true;
 
@@ -410,10 +418,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
 
   Future<void> likePost(int postId, int index) async {
     try {
-      final response = await api.callPost(
-        AppUrls.likePost(postId),
-        data: {},
-      );
+      final response = await api.callPost(AppUrls.likePost(postId), data: {});
 
       print("likeResponse : $response");
 
@@ -437,7 +442,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   Future<void> toggleFollowForPostUser(int userId) async {
     try {
       await followController.toggleFollow(userId);
-      
+
       // 1️⃣ Sync with current Home feed posts
       for (var post in posts) {
         if (post.user.id == userId) {
@@ -448,22 +453,24 @@ class HomeController extends GetxController with WidgetsBindingObserver {
 
       // 2️⃣ Sync with SettingsController (Profile screen)
       // Check if SettingsController with this user's tag is registered
-      // Usually the user's username is the tag. In HomeController we might not 
+      // Usually the user's username is the tag. In HomeController we might not
       // have the username easily for all tags, so we can iterate or check active ones.
       // But typically, only ONE profile is open at a time.
       if (Get.isRegistered<SettingsController>()) {
-         // Generic check (might need logic for tagged ones if multiple exist)
-         // For now, if any SettingsController exists and matches the ID, refresh it.
-         final settings = Get.find<SettingsController>();
-         if (settings.userProfile.value?.id == userId) {
-           await settings.fetchUserDetails(settings.userProfile.value?.username ?? "");
-         }
+        // Generic check (might need logic for tagged ones if multiple exist)
+        // For now, if any SettingsController exists and matches the ID, refresh it.
+        final settings = Get.find<SettingsController>();
+        if (settings.userProfile.value?.id == userId) {
+          await settings.fetchUserDetails(
+            settings.userProfile.value?.username ?? "",
+          );
+        }
       }
 
       // 3️⃣ Sync with PostController (Search/Trending Feed)
       if (Get.isRegistered<PostController>()) {
         final postController = Get.find<PostController>();
-        
+
         // Sync trending posts
         for (var post in postController.posts) {
           if (post.user.id == userId) {
@@ -486,14 +493,13 @@ class HomeController extends GetxController with WidgetsBindingObserver {
         final shortPlayController = Get.find<ShortPlayController>();
         for (var reel in shortPlayController.reelsList) {
           if (reel.user.id == userId) {
-            // we don't have a direct is_following reactive field in ReelModel 
+            // we don't have a direct is_following reactive field in ReelModel
             // but the UI uses FollowController.isUserFollowing map which IS reactive.
             // Still, refreshing the list can help if anything else depends on it.
           }
         }
         shortPlayController.reelsList.refresh();
       }
-      
     } catch (e) {
       print("Follow Error: $e");
     }
@@ -552,10 +558,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
 
   Future<void> likeStory(int storyId) async {
     try {
-      final response = await api.callPost(
-        AppUrls.likeStory(storyId),
-        data: {},
-      );
+      final response = await api.callPost(AppUrls.likeStory(storyId), data: {});
 
       print("likeResponse : $response");
 
@@ -586,18 +589,24 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   Future<void> blockUser(int userId) async {
     CustomDialog.showConfirmation(
       title: "Block User",
-      message: "Are you sure you want to block this user? They will no longer see your content or interact with you.",
+      message:
+          "Are you sure you want to block this user? They will no longer see your content or interact with you.",
       confirmText: "Block",
       confirmColor: Colors.redAccent,
       icon: Icons.block,
       onConfirm: () async {
         try {
-          final response = await api.callPost(AppUrls.blockUser(userId), data: {});
+          final response = await api.callPost(
+            AppUrls.blockUser(userId),
+            data: {},
+          );
           if (response != null && response["success"] == true) {
             // Remove all posts from this user from the feed
             posts.removeWhere((p) => p.user.id == userId);
             posts.refresh();
-            CustomSnackBar.showSuccess(message: response["message"] ?? "User blocked successfully.");
+            CustomSnackBar.showSuccess(
+              message: response["message"] ?? "User blocked successfully.",
+            );
           }
         } catch (e) {
           print("Block User Error: $e");
@@ -614,9 +623,14 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       icon: Icons.star_border_rounded,
       onConfirm: () async {
         try {
-          final response = await api.callPost(AppUrls.markInterested(postId), data: {});
+          final response = await api.callPost(
+            AppUrls.markInterested(postId),
+            data: {},
+          );
           if (response != null && response["success"] == true) {
-            CustomSnackBar.showSuccess(message: response["message"] ?? "Post marked as interested.");
+            CustomSnackBar.showSuccess(
+              message: response["message"] ?? "Post marked as interested.",
+            );
           }
         } catch (e) {
           print("Interested Error: $e");
@@ -628,18 +642,24 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   Future<void> markNotInterested(int postId) async {
     CustomDialog.showConfirmation(
       title: "Not Interested?",
-      message: "Are you sure you want to hide this post? We will show you less content like this.",
+      message:
+          "Are you sure you want to hide this post? We will show you less content like this.",
       confirmText: "Hide",
       confirmColor: Colors.redAccent,
       icon: Icons.visibility_off_outlined,
       onConfirm: () async {
         try {
-          final response = await api.callPost(AppUrls.markNotInterested(postId), data: {});
+          final response = await api.callPost(
+            AppUrls.markNotInterested(postId),
+            data: {},
+          );
           if (response != null && response["success"] == true) {
             // Remove the specific post from the feed
             posts.removeWhere((p) => p.id == postId);
             posts.refresh();
-            CustomSnackBar.showSuccess(message: response["message"] ?? "Post marked as not interested.");
+            CustomSnackBar.showSuccess(
+              message: response["message"] ?? "Post marked as not interested.",
+            );
           }
         } catch (e) {
           print("Not Interested Error: $e");
@@ -653,9 +673,10 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     Get.bottomSheet(
       Container(
         padding: EdgeInsets.fromLTRB(20, 12, 20, 30 + bottomPad),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration:  BoxDecoration(
+          color: AppColors.black,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          border: Border.all(color: AppColors.premiumGold),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -665,7 +686,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
               width: 48,
               height: 5,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: AppColors.premiumGold,
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -673,14 +694,18 @@ class HomeController extends GetxController with WidgetsBindingObserver {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.report_gmailerrorred_rounded, color: Colors.redAccent, size: 28),
+                const Icon(
+                  Icons.report_gmailerrorred_rounded,
+                  color: Colors.redAccent,
+                  size: 28,
+                ),
                 const SizedBox(width: 10),
                 const Text(
                   "Report Post",
                   style: TextStyle(
-                    fontSize: 20, 
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: AppColors.white,
                   ),
                 ),
               ],
@@ -689,10 +714,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
             Text(
               "Your report is anonymous. If someone is in immediate danger, call the local emergency services. Don't wait.",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey.shade600,
-              ),
+              style: TextStyle(fontSize: 13, color: AppColors.premiumGold),
             ),
             const SizedBox(height: 24),
 
@@ -701,17 +723,23 @@ class HomeController extends GetxController with WidgetsBindingObserver {
               controller: reasonController,
               decoration: InputDecoration(
                 hintText: "Why are you reporting this post?",
-                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                hintStyle: TextStyle(color: AppColors.white, fontSize: 14),
                 filled: true,
-                fillColor: Colors.grey.shade100,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                fillColor: AppColors.transparent,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+                  borderSide: BorderSide(color: AppColors.premiumGold),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.black12, width: 1),
+                  borderSide: const BorderSide(
+                    color: AppColors.white,
+                    width: 1,
+                  ),
                 ),
               ),
             ),
@@ -723,17 +751,23 @@ class HomeController extends GetxController with WidgetsBindingObserver {
               maxLines: 4,
               decoration: InputDecoration(
                 hintText: "Provide additional details (optional)",
-                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                hintStyle: TextStyle(color: AppColors.white, fontSize: 14),
                 filled: true,
-                fillColor: Colors.grey.shade100,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                fillColor: AppColors.transparent,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+                  borderSide: BorderSide(color: AppColors.premiumGold),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.black12, width: 1),
+                  borderSide: const BorderSide(
+                    color: AppColors.white,
+                    width: 1,
+                  ),
                 ),
               ),
             ),
@@ -758,18 +792,21 @@ class HomeController extends GetxController with WidgetsBindingObserver {
                   child:
                       isSubmitting.value
                           ? const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
-                            )
-                          : const Text(
-                              "Submit Report",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(
+                              color: AppColors.white,
+                              strokeWidth: 2.5,
                             ),
+                          )
+                          : const Text(
+                            "Submit Report",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.white,
+                            ),
+                          ),
                 ),
               ),
             ),
@@ -818,18 +855,26 @@ class HomeController extends GetxController with WidgetsBindingObserver {
 
   Future<void> toggleBookmark(int postId) async {
     try {
-      final response = await api.callPost(AppUrls.bookmarkPost(postId), data: {});
-      
+      final response = await api.callPost(
+        AppUrls.bookmarkPost(postId),
+        data: {},
+      );
+
       if (response != null && response["success"] == true) {
         int index = posts.indexWhere((p) => p.id == postId);
         if (index != -1) {
           // Toggle the local state based on API response
-          posts[index].stats.isSaved = response["is_bookmarked"] ?? !posts[index].stats.isSaved;
+          posts[index].stats.isSaved =
+              response["is_bookmarked"] ?? !posts[index].stats.isSaved;
           posts.refresh(); // Reactive UI update
         }
-        
+
         CustomSnackBar.showSuccess(
-          message: response["message"] ?? (response["is_bookmarked"] == true ? "Post bookmarked" : "Bookmark removed")
+          message:
+              response["message"] ??
+              (response["is_bookmarked"] == true
+                  ? "Post bookmarked"
+                  : "Bookmark removed"),
         );
       }
     } catch (e) {

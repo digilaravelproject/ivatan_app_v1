@@ -29,11 +29,11 @@ class _VerifyOtpState extends State<VerifyOtp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
-        leading: BackButton(color: Colors.black, onPressed: () => Get.back()),
+        leading: BackButton(color: AppColors.white, onPressed: () => Get.back()),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -65,7 +65,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w800,
-                  color: Colors.black,
+                  color: AppColors.white,
                 ),
               ),
               const SizedBox(height: 8),
@@ -76,7 +76,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey.shade600,
+                  color: AppColors.premiumGold,
                   height: 1.5,
                 ),
               ),
@@ -86,12 +86,12 @@ class _VerifyOtpState extends State<VerifyOtp> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
+                  color: AppColors.premiumGold.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(color: AppColors.premiumGold),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: AppColors.white.withOpacity(0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -114,7 +114,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
                     hintText: "- - - - - -",
                     hintStyle: TextStyle(
                       letterSpacing: 16,
-                      color: Colors.black12,
+                      color: AppColors.white,
                     ),
                   ),
                 ),
@@ -128,7 +128,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
                 children: [
                   Text(
                     "Didn't receive code? ",
-                    style: TextStyle(color: Colors.grey.shade600),
+                    style: TextStyle(color: AppColors.premiumGold),
                   ),
                   GestureDetector(
                     onTap: () {

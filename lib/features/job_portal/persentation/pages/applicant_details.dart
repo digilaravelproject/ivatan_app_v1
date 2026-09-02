@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/network/app_urls.dart';
@@ -18,9 +19,9 @@ class ApplicantDetail extends GetView<ApplicantController> {
 
     if (application == null) {
       return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.transparent,
           elevation: 0,
           iconTheme: const IconThemeData(color: Color(0xFF1A2E3F)),
           leading: IconButton(
@@ -50,7 +51,7 @@ class ApplicantDetail extends GetView<ApplicantController> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0.5,
         iconTheme: const IconThemeData(color: Color(0xFF1A2E3F)),
         leading: IconButton(
@@ -66,16 +67,16 @@ class ApplicantDetail extends GetView<ApplicantController> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 28),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 border: Border(
-                  bottom: BorderSide(color: Colors.grey.shade200),
+                  bottom: BorderSide(color: AppColors.premiumGold),
                 ),
               ),
               child: Column(
                 children: [
                   CircleAvatar(
                     radius: 45,
-                    backgroundColor: Colors.grey.shade100,
+                    backgroundColor: AppColors.premiumGold,
                     backgroundImage: applicant.profilePhotoPath != null 
                       ? NetworkImage(AppUrls.imageurl+applicant.profilePhotoPath!)
                       : null,
@@ -108,7 +109,7 @@ class ApplicantDetail extends GetView<ApplicantController> {
                     applicant.occupation ?? 'Applicant',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey.shade600,
+                      color: AppColors.premiumGold,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -125,7 +126,7 @@ class ApplicantDetail extends GetView<ApplicantController> {
                     child: Text(
                       'Applied on ${_formatDate(application.createdAt)}',
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AppColors.white,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -157,7 +158,7 @@ class ApplicantDetail extends GetView<ApplicantController> {
                   Text(
                     applicant.bio!,
                     style: TextStyle(
-                      color: Colors.grey.shade700,
+                      color: AppColors.premiumGold,
                       fontSize: 14,
                       height: 1.5,
                     ),
@@ -184,14 +185,14 @@ class ApplicantDetail extends GetView<ApplicantController> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade50,
+                      color: AppColors.premiumGold.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey.shade200),
+                      border: Border.all(color: AppColors.premiumGold),
                     ),
                     child: Text(
                       application.coverMessage!,
                       style: TextStyle(
-                        color: Colors.grey.shade700,
+                        color: AppColors.premiumGold,
                         fontSize: 14,
                         height: 1.4,
                       ),
@@ -218,14 +219,14 @@ class ApplicantDetail extends GetView<ApplicantController> {
                       ),
                      // _cvIconButton(
                       //   icon: Icons.visibility_outlined,
-                      //   color: Colors.white,
-                      //   background: Colors.grey.shade300,
+                      //   color: AppColors.white,
+                      //   background: AppColors.premiumGold,
                       //   onPressed: () {},
                       // ),
                       const SizedBox(width: 8),
                       _cvIconButton(
                         icon: Icons.download_outlined,
-                        color: Colors.white,
+                        color: AppColors.white,
                         background: const Color(0xFF1A2E3F),
                         onPressed: () {
                           controller.downloadResume(
@@ -253,7 +254,7 @@ class ApplicantDetail extends GetView<ApplicantController> {
                 child: Text(
                   currentApp.status.toUpperCase(),
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -338,11 +339,11 @@ class ApplicantDetail extends GetView<ApplicantController> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: AppColors.white.withOpacity(0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -378,7 +379,7 @@ class ApplicantDetail extends GetView<ApplicantController> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: Colors.grey.shade500),
+          Icon(icon, size: 18, color: AppColors.premiumGold),
           const SizedBox(width: 12),
           Expanded(
             flex: 3,
@@ -386,7 +387,7 @@ class ApplicantDetail extends GetView<ApplicantController> {
               label,
               style: TextStyle(
                 fontSize: 13,
-                color: Colors.grey.shade600,
+                color: AppColors.premiumGold,
               ),
             ),
           ),

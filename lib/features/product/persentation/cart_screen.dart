@@ -18,15 +18,15 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
         title: Text(
           'My Cart',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w600),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 1,
-        iconTheme: IconThemeData(color: Colors.black),
+        iconTheme: IconThemeData(color: AppColors.white),
         actions: [
           Obx(() => controller.cartItems.isNotEmpty
               ? IconButton(
@@ -39,7 +39,7 @@ class CartScreen extends StatelessWidget {
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return Center(child: CircularProgressIndicator(color: Colors.black));
+          return Center(child: CircularProgressIndicator(color: AppColors.white));
         }
         return controller.cartItems.isEmpty
             ? _buildEmptyCart()
@@ -56,7 +56,7 @@ class CartScreen extends StatelessWidget {
           Icon(
             Icons.shopping_cart_outlined,
             size: 100,
-            color: Colors.black12,
+            color: AppColors.white,
           ),
           SizedBox(height: 16),
           Text(
@@ -64,14 +64,14 @@ class CartScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: AppColors.white,
             ),
           ),
           SizedBox(height: 8),
           Text(
             'Add items to get started',
             style: TextStyle(
-              color: Colors.black45,
+              color: AppColors.white,
             ),
           ),
           SizedBox(height: 24),
@@ -80,8 +80,8 @@ class CartScreen extends StatelessWidget {
               Get.back();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
+              backgroundColor: AppColors.transparent,
+              foregroundColor: AppColors.white,
               padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -97,7 +97,7 @@ class CartScreen extends StatelessWidget {
   Widget _buildCartContent(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () => controller.fetchCartData(),
-      color: Colors.black,
+      color: AppColors.white,
       child: Column(
         children: [
           Expanded(
@@ -144,12 +144,12 @@ class CartScreen extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: AppColors.white),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: AppColors.white.withOpacity(0.02),
             blurRadius: 4,
             offset: Offset(0, 2),
           ),
@@ -170,10 +170,10 @@ class CartScreen extends StatelessWidget {
                   width: 70,
                   height: 70,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
+                    color: AppColors.premiumGold,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(Icons.image_not_supported, color: Colors.grey),
+                  child: Icon(Icons.image_not_supported, color: AppColors.premiumGold),
                 );
               },
             ),
@@ -194,7 +194,7 @@ class CartScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: AppColors.white,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -225,7 +225,7 @@ class CartScreen extends StatelessWidget {
                         '₹${originalPrice.toStringAsFixed(0)}',
                         style: TextStyle(
                           decoration: TextDecoration.lineThrough,
-                          color: Colors.black38,
+                          color: AppColors.white,
                           fontSize: 10,
                         ),
                       ),
@@ -249,11 +249,11 @@ class CartScreen extends StatelessWidget {
                         width: 20,
                         height: 20,
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
+                          color: AppColors.premiumGold,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black12,
+                              color: AppColors.white,
                               blurRadius: 3,
                             )
                           ],
@@ -261,7 +261,7 @@ class CartScreen extends StatelessWidget {
                         child: Icon(
                           Icons.remove,
                           size: 16,
-                          color: Colors.black87,
+                          color: AppColors.white,
                         ),
                       ),
                     ),
@@ -284,13 +284,13 @@ class CartScreen extends StatelessWidget {
                         width: 20,
                         height: 20,
                         decoration: BoxDecoration(
-                          color: Colors.black,
+                          color: AppColors.white,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.add,
                           size: 16,
-                          color: Colors.white,
+                          color: AppColors.white,
                         ),
                       ),
                     ),
@@ -320,9 +320,9 @@ class CartScreen extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.02),
+        color: AppColors.white.withOpacity(0.02),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: AppColors.white),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -332,14 +332,14 @@ class CartScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(Icons.location_on, color: Colors.black54, size: 20),
+                  Icon(Icons.location_on, color: AppColors.white, size: 20),
                   SizedBox(width: 8),
                   Text(
                     'Delivery Address',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: AppColors.white,
                     ),
                   ),
                 ],
@@ -348,11 +348,11 @@ class CartScreen extends StatelessWidget {
                 onPressed: () {
                   _showAddressBottomSheet(context);
                 },
-                style: TextButton.styleFrom(foregroundColor: Colors.black),
+                style: TextButton.styleFrom(foregroundColor: AppColors.white),
                 child: Text(
                   'Change',
                   style: TextStyle(
-                    color: Colors.black,
+                    color: AppColors.white,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -366,9 +366,9 @@ class CartScreen extends StatelessWidget {
             return Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.black12),
+                border: Border.all(color: AppColors.white),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,13 +378,13 @@ class CartScreen extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.05),
+                          color: AppColors.white.withOpacity(0.05),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           address.type,
                           style: TextStyle(
-                            color: Colors.black54,
+                            color: AppColors.white,
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
                           ),
@@ -396,7 +396,7 @@ class CartScreen extends StatelessWidget {
                           address.fullName,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: AppColors.white,
                           ),
                         ),
                       ),
@@ -406,7 +406,7 @@ class CartScreen extends StatelessWidget {
                   Text(
                     address.fullAddress,
                     style: TextStyle(
-                      color: Colors.black54,
+                      color: AppColors.white,
                       fontSize: 13,
                     ),
                   ),
@@ -414,7 +414,7 @@ class CartScreen extends StatelessWidget {
                   Text(
                     'Phone: ${address.phone}',
                     style: TextStyle(
-                      color: Colors.black54,
+                      color: AppColors.white,
                       fontSize: 12,
                     ),
                   ),
@@ -431,9 +431,9 @@ class CartScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.02),
+        color: AppColors.white.withOpacity(0.02),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
+        border: Border.all(color: AppColors.white),
       ),
       child: Column(
         children: [
@@ -445,24 +445,24 @@ class CartScreen extends StatelessWidget {
           _buildPriceRow('Addons', '(+) ₹${controller.addonsPrice}'),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
-            child: Divider(color: Colors.black12),
+            child: Divider(color: AppColors.white),
           ),
           _buildPriceRow('Subtotal', '₹${controller.subtotal}',
-              isBold: true, fontSize: 18, valueColor: Colors.black87),
+              isBold: true, fontSize: 18, valueColor: AppColors.white),
         ],
       ),
     );
   }
 
   Widget _buildPriceRow(String label, String value,
-      {Color valueColor = Colors.black54, bool isBold = false, double fontSize = 14}) {
+      {Color valueColor = AppColors.white, bool isBold = false, double fontSize = 14}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
           style: TextStyle(
-            color: Colors.black54,
+            color: AppColors.white,
             fontSize: fontSize - 2,
           ),
         ),
@@ -482,10 +482,10 @@ class CartScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.white.withOpacity(0.05),
             blurRadius: 10,
             offset: Offset(0, -5),
           ),
@@ -497,8 +497,8 @@ class CartScreen extends StatelessWidget {
             ? null 
             : () => controller.checkout(),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black,
-            foregroundColor: Colors.white,
+            backgroundColor: AppColors.transparent,
+            foregroundColor: AppColors.white,
             padding: EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -506,7 +506,7 @@ class CartScreen extends StatelessWidget {
             minimumSize: Size(double.infinity, 50),
           ),
           child: controller.isLoading.value
-            ? CircularProgressIndicator(color: Colors.white)
+            ? CircularProgressIndicator(color: AppColors.white)
             : Text(
                 'Checkout',
                 style: TextStyle(
@@ -525,7 +525,7 @@ class CartScreen extends StatelessWidget {
       Container(
         height: Get.height * 0.7,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Padding(
@@ -537,7 +537,7 @@ class CartScreen extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.black12,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -551,7 +551,7 @@ class CartScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: AppColors.white,
                     ),
                   ),
                   TextButton(
@@ -559,11 +559,11 @@ class CartScreen extends StatelessWidget {
                       Get.back();
                       Get.toNamed(AppRoutes.addAddressScreen);
                     },
-                    style: TextButton.styleFrom(foregroundColor: Colors.black),
+                    style: TextButton.styleFrom(foregroundColor: AppColors.white),
                     child: Text(
                       '+ Add New',
                       style: TextStyle(
-                        color: Colors.black,
+                        color: AppColors.white,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -575,7 +575,7 @@ class CartScreen extends StatelessWidget {
               child: Obx(() {
                 if (controller.isLoadingAddresses.value) {
                   return Center(
-                    child: CircularProgressIndicator(color: Colors.black),
+                    child: CircularProgressIndicator(color: AppColors.white),
                   );
                 }
                 
@@ -584,7 +584,7 @@ class CartScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.location_off, size: 50, color: Colors.grey),
+                        Icon(Icons.location_off, size: 50, color: AppColors.premiumGold),
                         SizedBox(height: 16),
                         Text('No addresses found'),
                       ],
@@ -619,10 +619,10 @@ class CartScreen extends StatelessWidget {
         margin: EdgeInsets.only(bottom: 12),
         padding: EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.black.withOpacity(0.05) : Colors.white,
+          color: isSelected ? AppColors.white.withOpacity(0.05) : AppColors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? Colors.black54 : Colors.black12,
+            color: isSelected ? AppColors.white : AppColors.white,
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -637,13 +637,13 @@ class CartScreen extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: isSelected ? Colors.black : Colors.black.withOpacity(0.05),
+                          color: isSelected ? AppColors.white : AppColors.white.withOpacity(0.05),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           address.type,
                           style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black54,
+                            color: isSelected ? AppColors.white : AppColors.white,
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
                           ),
@@ -655,7 +655,7 @@ class CartScreen extends StatelessWidget {
                           address.fullName,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: AppColors.white,
                           ),
                         ),
                       ),
@@ -665,7 +665,7 @@ class CartScreen extends StatelessWidget {
                   Text(
                     address.fullAddress,
                     style: TextStyle(
-                      color: Colors.black54,
+                      color: AppColors.white,
                       fontSize: 13,
                     ),
                   ),
@@ -673,7 +673,7 @@ class CartScreen extends StatelessWidget {
                   Text(
                     'Phone: ${address.phone}',
                     style: TextStyle(
-                      color: Colors.black54,
+                      color: AppColors.white,
                       fontSize: 12,
                     ),
                   ),
@@ -686,7 +686,7 @@ class CartScreen extends StatelessWidget {
               onChanged: (value) {
                 controller.selectAddress(address);
               },
-              activeColor: Colors.black,
+              activeColor: AppColors.white,
             ),
           ],
         ),

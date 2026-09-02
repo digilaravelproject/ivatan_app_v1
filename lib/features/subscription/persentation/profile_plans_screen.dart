@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../data/model/subscription_models.dart';
@@ -6,10 +7,7 @@ import 'plan_details_screen.dart';
 class ProfilePlansScreen extends StatefulWidget {
   final ProfileTypeSubscription profileTypeSub;
 
-  const ProfilePlansScreen({
-    super.key,
-    required this.profileTypeSub,
-  });
+  const ProfilePlansScreen({super.key, required this.profileTypeSub});
 
   @override
   State<ProfilePlansScreen> createState() => _ProfilePlansScreenState();
@@ -23,9 +21,9 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
     super.initState();
     // Default select the first plan or the active plan if one exists
     if (widget.profileTypeSub.plans.isNotEmpty) {
-      selectedPlan = widget.profileTypeSub.plans.firstWhereOrNull(
-        (p) => p.isSubscribed,
-      ) ?? widget.profileTypeSub.plans.first;
+      selectedPlan =
+          widget.profileTypeSub.plans.firstWhereOrNull((p) => p.isSubscribed) ??
+          widget.profileTypeSub.plans.first;
     } else {
       selectedPlan = null;
     }
@@ -35,18 +33,18 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
   Widget build(BuildContext context) {
     if (widget.profileTypeSub.plans.isEmpty) {
       return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.transparent,
           elevation: 0,
           leading: BackButton(
-            color: Colors.black,
+            color: AppColors.white,
             onPressed: () => Get.back(),
           ),
           title: Text(
             "${widget.profileTypeSub.label} Plans",
             style: const TextStyle(
-              color: Colors.black,
+              color: AppColors.white,
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
@@ -56,23 +54,24 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.style_outlined, size: 48, color: Colors.grey),
+              Icon(
+                Icons.style_outlined,
+                size: 48,
+                color: AppColors.premiumGold,
+              ),
               SizedBox(height: 16),
               Text(
                 "No plans available here",
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.black87,
+                  color: AppColors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               SizedBox(height: 6),
               Text(
                 "This profile type doesn't have any subscription plans.",
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: 13, color: AppColors.premiumGold),
               ),
             ],
           ),
@@ -81,18 +80,18 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: BackButton(
-          color: Colors.black,
+          color: AppColors.white,
           onPressed: () => Get.back(),
         ),
         title: Text(
           "${widget.profileTypeSub.label} Plans",
           style: const TextStyle(
-            color: Colors.black,
+            color: AppColors.white,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -103,7 +102,10 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -112,21 +114,22 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
                         "Choose a plan that fits your business needs.",
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey,
+                          color: AppColors.premiumGold,
                         ),
                       ),
                     ),
                     const SizedBox(height: 10),
-                    
+
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: widget.profileTypeSub.plans.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 8),
+                      separatorBuilder:
+                          (context, index) => const SizedBox(height: 8),
                       itemBuilder: (context, index) {
                         final plan = widget.profileTypeSub.plans[index];
                         final isCurrentlySelected = selectedPlan?.id == plan.id;
-                        
+
                         return _buildPlanCard(plan, isCurrentlySelected);
                       },
                     ),
@@ -134,7 +137,7 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
                 ),
               ),
             ),
-            
+
             // Bottom Action Button
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -142,16 +145,19 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: selectedPlan == null
-                      ? null
-                      : () {
-                          Get.to(() => PlanDetailsScreen(
-                            profileTypeSub: widget.profileTypeSub,
-                            plan: selectedPlan!,
-                          ));
-                        },
+                  onPressed:
+                      selectedPlan == null
+                          ? null
+                          : () {
+                            Get.to(
+                              () => PlanDetailsScreen(
+                                profileTypeSub: widget.profileTypeSub,
+                                plan: selectedPlan!,
+                              ),
+                            );
+                          },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: AppColors.premiumGold,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -160,7 +166,7 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
                   child: const Text(
                     "View Plan Details",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.black,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -178,10 +184,10 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
     // Check if the plan is active/subscribed
     final isActive = plan.status == 'active';
     final isPending = plan.status == 'pending';
-    
+
     // Highlights if active, pending, or user selected
     final shouldHighlight = isSelected || isActive || isPending;
-    
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -192,15 +198,21 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.black,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: shouldHighlight ? const Color(0xFFD4AF37) : Colors.grey.shade200,
+            color:
+                shouldHighlight
+                    ? const Color(0xFFD4AF37)
+                    : AppColors.premiumGold,
             width: shouldHighlight ? 1.5 : 1.0,
           ),
           boxShadow: [
             BoxShadow(
-              color: shouldHighlight ? const Color(0xFFD4AF37).withOpacity(0.02) : Colors.transparent,
+              color:
+                  shouldHighlight
+                      ? const Color(0xFFD4AF37).withOpacity(0.02)
+                      : AppColors.transparent,
               blurRadius: 6,
               offset: const Offset(0, 1),
             ),
@@ -221,23 +233,28 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: AppColors.white,
                         ),
                       ),
                       const SizedBox(height: 4),
                       RichText(
                         text: TextSpan(
-                          style: const TextStyle(color: Colors.black, fontSize: 20),
+                          style: const TextStyle(
+                            color: AppColors.white,
+                            fontSize: 20,
+                          ),
                           children: [
                             TextSpan(
                               text: plan.price,
-                              style: const TextStyle(fontWeight: FontWeight.w800),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
                             TextSpan(
                               text: " / ${plan.period}",
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey.shade500,
+                                color: AppColors.premiumGold,
                                 fontWeight: FontWeight.normal,
                               ),
                             ),
@@ -247,17 +264,29 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
                     ],
                   ),
                 ),
-                
+
                 // Badges (MOST POPULAR, SUBSCRIBED, PENDING)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     if (isActive)
-                      _buildPlanBadge("SUBSCRIBED & APPROVED", Colors.black, Colors.white)
+                      _buildPlanBadge(
+                        "SUBSCRIBED",
+                        AppColors.premiumGold,
+                        AppColors.black,
+                      )
                     else if (isPending)
-                      _buildPlanBadge("PENDING APPROVAL", const Color(0xFFFEF3C7), const Color(0xFFD97706))
+                      _buildPlanBadge(
+                        "PENDING APPROVAL",
+                        const Color(0xFFFEF3C7),
+                        const Color(0xFFD97706),
+                      )
                     else if (plan.isPopular)
-                      _buildPlanBadge("MOST POPULAR", Colors.black, Colors.white),
+                      _buildPlanBadge(
+                        "MOST POPULAR",
+                        AppColors.premiumGold,
+                        AppColors.black,
+                      ),
                   ],
                 ),
               ],
@@ -267,11 +296,10 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
               plan.description,
               style: TextStyle(
                 fontSize: 11,
-                color: Colors.grey.shade600,
+                color: AppColors.premiumGold,
                 height: 1.3,
               ),
             ),
-
           ],
         ),
       ),

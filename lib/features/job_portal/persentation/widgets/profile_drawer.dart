@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -21,7 +22,7 @@ class ProfileDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.black,
       child: SafeArea(
         child: Column(
           children: [
@@ -44,7 +45,7 @@ class ProfileDrawer extends StatelessWidget {
                                 height: 40,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.black, width: 2),
+                                  border: Border.all(color: AppColors.white, width: 2),
                                 ),
                                 child: ClipOval(
                                   child: SharedPrefManager().user!.profilePhotoPath != null &&
@@ -54,13 +55,13 @@ class ProfileDrawer extends StatelessWidget {
                                           fit: BoxFit.cover,
                                           errorBuilder: (context, error, stackTrace) => const Icon(
                                             Icons.person,
-                                            color: Colors.black,
+                                            color: AppColors.white,
                                             size: 24,
                                           ),
                                         )
                                       : const Icon(
                                           Icons.person,
-                                          color: Colors.black,
+                                          color: AppColors.white,
                                           size: 24,
                                         ),
                                 ),
@@ -80,7 +81,7 @@ class ProfileDrawer extends StatelessWidget {
                                     style: GoogleFonts.poppins(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
-                                      color: Colors.black,
+                                      color: AppColors.white,
                                     ),
                                   ),
     
@@ -91,7 +92,7 @@ class ProfileDrawer extends StatelessWidget {
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.poppins(
                                       fontSize: 12,
-                                      color: Colors.grey[600],
+                                      color: AppColors.premiumGold.withOpacity(0.6),
                                     ),
                                   ),
                                 ],
@@ -108,41 +109,16 @@ class ProfileDrawer extends StatelessWidget {
                           height: 40,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.grey[300]!),
+                            border: Border.all(color: AppColors.premiumGold.withOpacity(0.3)),
                           ),
                           child: const Icon(
                             Icons.close,
-                            color: Colors.black,
+                            color: AppColors.white,
                             size: 20,
                           ),
                         ),
                       ),
                     ],
-                  ),
-                  SizedBox(height: 20,),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Get.to(() => EditProfileScreen());
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        'Edit Profile',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
                   ),
                 ],
               ),
@@ -150,7 +126,7 @@ class ProfileDrawer extends StatelessWidget {
 
 
 
-           // const Divider(color: Colors.grey),
+           // const Divider(color: AppColors.premiumGold),
 
             // Profile Section
             // Padding(
@@ -163,7 +139,7 @@ class ProfileDrawer extends StatelessWidget {
             //         height: 80,
             //         decoration: BoxDecoration(
             //           shape: BoxShape.circle,
-            //           border: Border.all(color: Colors.black, width: 2),
+            //           border: Border.all(color: AppColors.white, width: 2),
             //           image: const DecorationImage(
             //             image: NetworkImage('https://i.pravatar.cc/300'),
             //             fit: BoxFit.cover,
@@ -182,8 +158,8 @@ class ProfileDrawer extends StatelessWidget {
             //         child: ElevatedButton(
             //           onPressed: () {},
             //           style: ElevatedButton.styleFrom(
-            //             backgroundColor: Colors.black,
-            //             foregroundColor: Colors.white,
+            //             backgroundColor: AppColors.black,
+            //             foregroundColor: AppColors.white,
             //             padding: const EdgeInsets.symmetric(vertical: 12),
             //             shape: RoundedRectangleBorder(
             //               borderRadius: BorderRadius.circular(10),
@@ -203,7 +179,7 @@ class ProfileDrawer extends StatelessWidget {
             //   ),
             // ),
             //
-            // const Divider(color: Colors.grey),
+            // const Divider(color: AppColors.premiumGold),
 
             // Menu Items
             Expanded(
@@ -244,7 +220,7 @@ class ProfileDrawer extends StatelessWidget {
                         Get.to(JobHistoryScreen());
                       },
                     ),
-                  const Divider(color: Colors.grey),
+                  const Divider(color: AppColors.premiumGold),
                   _buildDrawerItem(
                     icon: Icons.help_outline,
                     title: 'Help & Privacy',
@@ -273,7 +249,7 @@ class ProfileDrawer extends StatelessWidget {
               ),
             ),
 
-            //const Divider(color: Colors.grey),
+            //const Divider(color: AppColors.premiumGold),
 
             // Logout Button
             // Padding(
@@ -283,12 +259,12 @@ class ProfileDrawer extends StatelessWidget {
             //     child: ElevatedButton(
             //       onPressed: () {},
             //       style: ElevatedButton.styleFrom(
-            //         backgroundColor: Colors.grey[100],
-            //         foregroundColor: Colors.black,
+            //         backgroundColor: AppColors.premiumGold.withOpacity(0.1),
+            //         foregroundColor: AppColors.white,
             //         padding: const EdgeInsets.symmetric(vertical: 12),
             //         shape: RoundedRectangleBorder(
             //           borderRadius: BorderRadius.circular(10),
-            //           side: BorderSide(color: Colors.grey[300]!),
+            //           side: BorderSide(color: AppColors.premiumGold.withOpacity(0.3)),
             //         ),
             //         elevation: 0,
             //       ),
@@ -297,7 +273,7 @@ class ProfileDrawer extends StatelessWidget {
             //         style: GoogleFonts.poppins(
             //           fontSize: 14,
             //           fontWeight: FontWeight.w600,
-            //           color: Colors.black,
+            //           color: AppColors.white,
             //         ),
             //       ),
             //     ),
@@ -318,20 +294,20 @@ class ProfileDrawer extends StatelessWidget {
     return ListTile(
       dense: true,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: Icon(icon, color: Colors.black, size: 24),
+      leading: Icon(icon, color: AppColors.white, size: 24),
       title: Text(
         title,
         style: GoogleFonts.poppins(
           fontSize: 15,
           fontWeight: FontWeight.w500,
-          color: Colors.black,
+          color: AppColors.white,
         ),
       ),
       trailing: badge != null
           ? Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
@@ -339,7 +315,7 @@ class ProfileDrawer extends StatelessWidget {
           style: GoogleFonts.poppins(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Colors.white,
+            color: AppColors.white,
           ),
         ),
       )

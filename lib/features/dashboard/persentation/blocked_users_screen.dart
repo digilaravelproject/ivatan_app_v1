@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,32 +14,33 @@ class BlockedUsersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
         controller.fetchBlockedUsers(loadMore: true);
       }
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         centerTitle: true,
-        leading: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Container(
-                margin: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5)
-                    ]),
-                child: const Icon(CupertinoIcons.back, color: Colors.black, size: 20))),
-        title: const Text("Blocked Accounts",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 0.5)),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(CupertinoIcons.back, color: AppColors.white),
+        ),
+        title: const Text(
+          "Blocked Accounts",
+          style: TextStyle(
+            color: AppColors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            letterSpacing: 0.5,
+          ),
+        ),
       ),
       body: Obx(() {
         if (controller.isLoading.value && controller.blockedUsers.isEmpty) {
@@ -49,7 +51,7 @@ class BlockedUsersScreen extends StatelessWidget {
           return const Center(
             child: Text(
               "No blocked users.",
-              style: TextStyle(fontSize: 16, color: Colors.black54),
+              style: TextStyle(fontSize: 16, color: AppColors.white),
             ),
           );
         }
@@ -59,7 +61,9 @@ class BlockedUsersScreen extends StatelessWidget {
           child: ListView.builder(
             controller: _scrollController,
             padding: const EdgeInsets.all(16),
-            itemCount: controller.blockedUsers.length + (controller.hasMore.value ? 1 : 0),
+            itemCount:
+                controller.blockedUsers.length +
+                (controller.hasMore.value ? 1 : 0),
             itemBuilder: (context, index) {
               if (index == controller.blockedUsers.length) {
                 return const Padding(
@@ -74,11 +78,12 @@ class BlockedUsersScreen extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.black,
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.premiumGold),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.03),
+                      color: AppColors.premiumGold.withOpacity(0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -88,9 +93,18 @@ class BlockedUsersScreen extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 26,
-                      backgroundColor: Colors.grey[200],
-                      backgroundImage: user.avatar != null ? NetworkImage(user.avatar!) : null,
-                      child: user.avatar == null ? const Icon(CupertinoIcons.person, color: Colors.grey) : null,
+                      backgroundColor: AppColors.premiumGold.withOpacity(0.2),
+                      backgroundImage:
+                          user.avatar != null
+                              ? NetworkImage(user.avatar!)
+                              : null,
+                      child:
+                          user.avatar == null
+                              ? const Icon(
+                                CupertinoIcons.person,
+                                color: AppColors.premiumGold,
+                              )
+                              : null,
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -102,26 +116,40 @@ class BlockedUsersScreen extends StatelessWidget {
                               Flexible(
                                 child: Text(
                                   user.name ?? "Unknown",
-                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: AppColors.white,
+                                  ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               if (user.isVerified == true) ...[
                                 const SizedBox(width: 4),
-                                const Icon(Icons.verified, color: Colors.blue, size: 16),
-                              ]
+                                const Icon(
+                                  Icons.verified,
+                                  color: Colors.blue,
+                                  size: 16,
+                                ),
+                              ],
                             ],
                           ),
                           const SizedBox(height: 4),
                           Text(
                             "@${user.username ?? ''}",
-                            style: const TextStyle(color: Colors.black54, fontSize: 13),
+                            style: const TextStyle(
+                              color: AppColors.white,
+                              fontSize: 13,
+                            ),
                           ),
                           if (user.blockedHuman != null) ...[
                             const SizedBox(height: 4),
                             Text(
                               "Blocked ${user.blockedHuman}",
-                              style: const TextStyle(color: Colors.redAccent, fontSize: 11),
+                              style: const TextStyle(
+                                color: Colors.redAccent,
+                                fontSize: 11,
+                              ),
                             ),
                           ],
                         ],
@@ -135,19 +163,25 @@ class BlockedUsersScreen extends StatelessWidget {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.premiumGold,
+                        foregroundColor: AppColors.black,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                       child: const Text(
                         "Unblock",
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],

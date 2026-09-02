@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,14 +23,13 @@ class DrawerScreen extends StatelessWidget {
   DrawerScreen({super.key});
   final HomeController controller = Get.put(HomeController());
 
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-      ),
-      width: MediaQuery.of(context).size.width * 0.75, // Slightly wider for better layout
+      decoration: const BoxDecoration(color: AppColors.black),
+      width:
+          MediaQuery.of(context).size.width *
+          0.75, // Slightly wider for better layout
       child: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -50,7 +50,7 @@ class DrawerScreen extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: AppColors.lightBackground,
+                              color: AppColors.premiumGold,
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -65,14 +65,14 @@ class DrawerScreen extends StatelessWidget {
                           "Quick Access",
                           style: TextStyle(
                             fontSize: 20,
-                            color: AppColors.black,
+                            color: AppColors.premiumGold,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 24),
-                    
+
                     // --- SOS & BELL ROW ---
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -90,15 +90,21 @@ class DrawerScreen extends StatelessWidget {
                             icon: CupertinoIcons.exclamationmark_shield_fill,
                             label: "SOS HELP",
                             isAlert: true,
-                            onTap: () => showComingSoonDialog(context, title: "Emergency SOS", message: "Emergency services integration is coming soon to your region."),
+                            onTap:
+                                () => showComingSoonDialog(
+                                  context,
+                                  title: "Emergency SOS",
+                                  message:
+                                      "Emergency services integration is coming soon to your region.",
+                                ),
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
-              
+
               const Divider(height: 1, color: AppColors.lightDivider),
               const SizedBox(height: 10),
 
@@ -106,27 +112,46 @@ class DrawerScreen extends StatelessWidget {
               Column(
                 children: [
                   drawerItem(Icons.live_help_outlined, "Live Chat", () {
-                     Get.to(LiveChatList());
-                   // showComingSoonDialog(context, title: "Live Chat", message: "Connect with community members in real-time. Feature launching soon.");
+                    Get.to(LiveChatList());
+                    // showComingSoonDialog(context, title: "Live Chat", message: "Connect with community members in real-time. Feature launching soon.");
                   }),
-                  drawerItem(Icons.perm_contact_calendar_rounded, "Contact", () {
-                    Get.to(ContactPerson());
-                  }),
+                  drawerItem(
+                    Icons.perm_contact_calendar_rounded,
+                    "Contact",
+                    () {
+                      Get.to(ContactPerson());
+                    },
+                  ),
                   drawerItem(Icons.format_list_numbered_rounded, "Playlist", () {
-                    showComingSoonDialog(context, title: "Playlist", message: "Create and manage your favorite video playlists soon.");
+                    showComingSoonDialog(
+                      context,
+                      title: "Playlist",
+                      message:
+                          "Create and manage your favorite video playlists soon.",
+                    );
                   }),
                   drawerItem(Icons.history_rounded, "History", () {
-                     Get.to(HistoryScreen());
-                   // showComingSoonDialog(context, title: "History", message: "View your browsing and activity history. Feature coming soon.");
+                    Get.to(HistoryScreen());
+                    // showComingSoonDialog(context, title: "History", message: "View your browsing and activity history. Feature coming soon.");
                   }),
                   drawerItem(Icons.account_balance_rounded, "Banking", () {
-                    showComingSoonDialog(context, title: "Banking", message: "Secure digital banking and wallet features are under development.");
+                    showComingSoonDialog(
+                      context,
+                      title: "Banking",
+                      message:
+                          "Secure digital banking and wallet features are under development.",
+                    );
                   }),
                   drawerItem(Icons.settings_outlined, "Settings", () {
                     Get.to(SettingsScreen());
                   }),
                   const SizedBox(height: 10),
-                  const Divider(height: 1, color: AppColors.lightDivider, indent: 20, endIndent: 20),
+                  const Divider(
+                    height: 1,
+                    color: AppColors.lightDivider,
+                    indent: 20,
+                    endIndent: 20,
+                  ),
                   drawerItem(Icons.logout, "Logout", () {
                     _showLogoutDialog(context);
                   }, isDestructive: true),
@@ -137,53 +162,59 @@ class DrawerScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.lightBackground,
-                  border: const Border(top: BorderSide(color: AppColors.lightDivider)),
+                  color: AppColors.black,
+                  border: const Border(
+                    top: BorderSide(color: AppColors.premiumGold),
+                  ),
                 ),
                 child: Column(
                   children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildBottomCard(
-                              context,
-                              "i-QuickHire",
-                              CupertinoIcons.briefcase_fill,
-                              "Job Board",
-                              onTap: () {
-                                Get.toNamed(AppRoutes.jobSearchScreen);
-                              },
-                            ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildBottomCard(
+                            context,
+                            "i-QuickHire",
+                            CupertinoIcons.briefcase_fill,
+                            "Job Board",
+                            onTap: () {
+                              Get.toNamed(AppRoutes.jobSearchScreen);
+                            },
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildBottomCard(
-                              context,
-                              "Universal App",
-                              CupertinoIcons.app_badge_fill,
-                              "Mini Apps",
-                            ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildBottomCard(
+                            context,
+                            "Universal App",
+                            CupertinoIcons.app_badge_fill,
+                            "Mini Apps",
                           ),
-                        ],
-                      ),
-                     const SizedBox(height: 16),
-                     GestureDetector(
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    GestureDetector(
                       onTap: () => Get.to(HelpCenter()),
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
-                          color: AppColors.black,
+                          color: AppColors.premiumGold,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
-                            Icon(Icons.support_agent_rounded, color: Colors.white, size: 20),
+                            Icon(
+                              Icons.support_agent_rounded,
+                              color: AppColors.black,
+                              size: 20,
+                            ),
                             SizedBox(width: 8),
                             Text(
                               "Help Center",
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.black,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
                               ),
@@ -191,7 +222,7 @@ class DrawerScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                     ),
+                    ),
                   ],
                 ),
               ),
@@ -202,11 +233,17 @@ class DrawerScreen extends StatelessWidget {
     );
   }
 
-  Widget drawerItem(IconData icon, String title, VoidCallback onTap, {bool isDestructive = false}) {
+  Widget drawerItem(
+    IconData icon,
+    String title,
+    VoidCallback onTap, {
+    bool isDestructive = false,
+  }) {
     return InkWell(
       onTap: onTap,
-      splashColor: (isDestructive ? AppColors.error : AppColors.black).withOpacity(0.05),
-      highlightColor: Colors.transparent,
+      splashColor: (isDestructive ? AppColors.error : AppColors.black)
+          .withOpacity(0.05),
+      highlightColor: AppColors.transparent,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Row(
@@ -214,13 +251,16 @@ class DrawerScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: isDestructive ? AppColors.error.withOpacity(0.1) : Colors.grey.shade50,
+                color:
+                    isDestructive
+                        ? AppColors.error.withOpacity(0.1)
+                        : AppColors.premiumGold,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
-                icon, 
-                size: 20, 
-                color: isDestructive ? AppColors.error : AppColors.black.withOpacity(0.7),
+                icon,
+                size: 20,
+                color: isDestructive ? AppColors.error : AppColors.black,
               ),
             ),
             const SizedBox(width: 16),
@@ -228,29 +268,40 @@ class DrawerScreen extends StatelessWidget {
               title,
               style: TextStyle(
                 fontSize: 15,
-                color: isDestructive ? AppColors.error : AppColors.black,
+                color: isDestructive ? AppColors.error : AppColors.white,
                 fontWeight: FontWeight.w600,
               ),
             ),
             const Spacer(),
-            Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Colors.grey.shade300),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 12,
+              color: AppColors.premiumGold,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildQuickActionButton({required BuildContext context, required IconData icon, String? label, bool isAlert = false, VoidCallback? onTap}) {
+  Widget _buildQuickActionButton({
+    required BuildContext context,
+    required IconData icon,
+    String? label,
+    bool isAlert = false,
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: isAlert ? AppColors.error : AppColors.black,
+          color: isAlert ? AppColors.error : AppColors.premiumGold,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: (isAlert ? AppColors.error : AppColors.black).withOpacity(0.2),
+              color: (isAlert ? AppColors.error : AppColors.premiumGold)
+                  .withOpacity(0.2),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -261,52 +312,58 @@ class DrawerScreen extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: Colors.white,
+              color: isAlert ? AppColors.white : AppColors.black,
               size: 22,
             ),
             if (label != null) ...[
               const SizedBox(width: 10),
               Text(
                 label,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: isAlert ? AppColors.white : AppColors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                   letterSpacing: 0.5,
                 ),
               ),
-            ]
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBottomCard(BuildContext context, String title, IconData icon, String subtitle, {VoidCallback? onTap}) {
+  Widget _buildBottomCard(
+    BuildContext context,
+    String title,
+    IconData icon,
+    String subtitle, {
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
-      onTap: onTap ?? () {
-        showComingSoonDialog(context, title: title, message: "We're building a unique $subtitle experience for you. Stay tuned!");
-      },
+      onTap:
+          onTap ??
+          () {
+            showComingSoonDialog(
+              context,
+              title: title,
+              message:
+                  "We're building a unique $subtitle experience for you. Stay tuned!",
+            );
+          },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.black,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.lightDivider.withOpacity(0.5)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          border: Border.all(color: AppColors.premiumGold),
         ),
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.lightBackground,
+                color: AppColors.premiumGold,
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: AppColors.black, size: 20),
@@ -317,7 +374,7 @@ class DrawerScreen extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
-                color: AppColors.black,
+                color: AppColors.white,
               ),
               textAlign: TextAlign.center,
             ),
@@ -327,7 +384,6 @@ class DrawerScreen extends StatelessWidget {
     );
   }
 
-
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -336,9 +392,10 @@ class DrawerScreen extends StatelessWidget {
         return Dialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: AppColors.premiumGold),
           ),
           elevation: 2,
-          backgroundColor: theme.cardColor,
+          backgroundColor: AppColors.black,
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -354,12 +411,15 @@ class DrawerScreen extends StatelessWidget {
                   'Logout',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600, // Less bold
+                    color: AppColors.white,
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   'Are you sure you want to logout?',
-                  style: theme.textTheme.bodyMedium,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.white,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -377,10 +437,12 @@ class DrawerScreen extends StatelessWidget {
                     Expanded(
                       child: MyButton(
                         onPressed: () async {
-                         // await SharedPrefManager().userLogOut();
+                          // await SharedPrefManager().userLogOut();
                           controller.logout();
                         },
                         title: "Logout",
+                        textColor: AppColors.warning,
+                       // color: AppColors.premiumGold,
                       ),
                     ),
                   ],
@@ -392,6 +454,4 @@ class DrawerScreen extends StatelessWidget {
       },
     );
   }
-
-
 }

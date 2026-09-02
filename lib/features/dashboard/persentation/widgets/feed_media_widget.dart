@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/network/app_urls.dart';
@@ -38,7 +39,7 @@ class _FeedMediaWidgetState extends State<FeedMediaWidget> {
     
     // 2. Determine color and show animation
     setState(() {
-      _heartColor = widget.isLiked ? Colors.white : Colors.red;
+      _heartColor = widget.isLiked ? AppColors.white : Colors.red;
       _showHeartAnimation = true;
     });
 
@@ -88,7 +89,7 @@ class _FeedMediaWidgetState extends State<FeedMediaWidget> {
                     size: 110,
                     shadows: [
                       Shadow(
-                        color: Colors.black26,
+                        color: AppColors.white,
                         blurRadius: 10,
                         offset: Offset(0, 4),
                       ),
@@ -117,7 +118,7 @@ class _FeedMediaWidgetState extends State<FeedMediaWidget> {
                       shape: BoxShape.circle,
                       color: _currentIndex == index
                           ? Colors.blue
-                          : Colors.grey.withOpacity(0.5),
+                          : AppColors.premiumGold.withOpacity(0.5),
                     ),
                   ),
                 ),
@@ -132,13 +133,13 @@ class _FeedMediaWidgetState extends State<FeedMediaWidget> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
+                  color: AppColors.white.withOpacity(0.6),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   "${_currentIndex + 1}/${widget.media.length}",
                   style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 12,
                       fontWeight: FontWeight.w600),
                 ),
@@ -181,8 +182,8 @@ class _FeedMediaWidgetState extends State<FeedMediaWidget> {
             fit: BoxFit.cover,
             placeholder: (context, url) => const _ShimmerPlaceholder(),
             errorWidget: (context, url, error) => Container(
-              color: Colors.grey.shade100,
-              child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+              color: AppColors.premiumGold,
+              child: const Icon(Icons.broken_image, size: 50, color: AppColors.premiumGold),
             ),
           );
         },
@@ -232,9 +233,9 @@ class _ShimmerPlaceholderState extends State<_ShimmerPlaceholder>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Colors.grey.shade300,
-                Colors.grey.shade100,
-                Colors.grey.shade300,
+                AppColors.premiumGold,
+                AppColors.premiumGold,
+                AppColors.premiumGold,
               ],
               stops: const [
                 0.1,

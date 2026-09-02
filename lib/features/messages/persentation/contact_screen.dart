@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -7,6 +8,7 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/constants/app_assets.dart';
+import '../../../core/helper/custom_serchbar.dart';
 import '../../dashboard/persentation/comming_soon.dart'; // For CustomEmptyState
 import '../../../core/helper/custom_image_view.dart';
 import '../../../core/helper/custom_snack_bar.dart';
@@ -30,9 +32,9 @@ class ContactPerson extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: AppColors.transparent,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(70),
           child: AppBar(
@@ -48,10 +50,25 @@ class ContactPerson extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
+                    border: Border.all(color: AppColors.white, width: 2),
                   ),
-                  child: CircleAvatar(
-                    backgroundImage: NetworkImage(AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString()),
+                  child: ClipOval(
+                    child: SharedPrefManager().user!.profilePhotoPath != null &&
+                            SharedPrefManager().user!.profilePhotoPath!.toString().isNotEmpty
+                        ? Image.network(
+                            AppUrls.getFullImageUrl(SharedPrefManager().user!.profilePhotoPath!.toString()),
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => const Icon(
+                              Icons.person,
+                              color: AppColors.white,
+                              size: 24,
+                            ),
+                          )
+                        : const Icon(
+                            Icons.person,
+                            color: AppColors.white,
+                            size: 24,
+                          ),
                   ),
                 ),
               ),
@@ -59,7 +76,7 @@ class ContactPerson extends StatelessWidget {
             title: const Text(
               'Contacts', // Changed from i-contact
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
                 letterSpacing: 0.5,
@@ -69,7 +86,7 @@ class ContactPerson extends StatelessWidget {
             //    IconButton(
             //       icon: const Icon(
             //         Icons.search,
-            //         color: Colors.white,
+            //         color: AppColors.white,
             //         size: 26,
             //       ),
             //       onPressed: () {},
@@ -79,7 +96,7 @@ class ContactPerson extends StatelessWidget {
             //     child: IconButton(
             //       icon: const Icon(
             //         Icons.more_vert,
-            //         color: Colors.white,
+            //         color: AppColors.white,
             //         size: 26,
             //       ),
             //       onPressed: () {},
@@ -95,45 +112,11 @@ class ContactPerson extends StatelessWidget {
             // Search Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                height: 48,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      CupertinoIcons.search,
-                      color: Colors.grey.shade500,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextField(
-                        onChanged: (value) {
-                          print("onchange value = "+value);
-                          contactController.searchedPerson(value);
-                        },
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 15,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Search contacts...',
-                          hintStyle: TextStyle(
-                            color: Colors.grey.shade500,
-                            fontSize: 14,
-                          ),
-                          isDense: true,
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              child: CustomSearchBar(
+                onChanged: (value) {
+                  print("onchange value = " + value);
+                  contactController.searchedPerson(value);
+                },
               ),
             ),
             
@@ -159,7 +142,7 @@ class ContactPerson extends StatelessWidget {
                 return ListView.separated(
                   padding: const EdgeInsets.only(top: 8, bottom: 20),
                   itemCount: contactController.filteredContactList.length,
-                  separatorBuilder: (ctx, i) => Divider(height: 1, indent: 80, color: Colors.grey.shade100),
+                  separatorBuilder: (ctx, i) => Divider(height: 1, indent: 80, color: AppColors.premiumGold),
                   itemBuilder: (context, index) {
                     final contact = contactController.filteredContactList[index];
                     return Padding(
@@ -172,7 +155,7 @@ class ContactPerson extends StatelessWidget {
                             height: 50,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.grey.shade200,
+                              color: AppColors.premiumGold,
                             ),
                             child: ClipOval(
                               child: contact.avatar != null && contact.avatar!.isNotEmpty
@@ -180,13 +163,10 @@ class ContactPerson extends StatelessWidget {
                                       contact.avatar!,
                                       fit: BoxFit.cover,
                                       errorBuilder: (context, error, stackTrace) {
-                                        return Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Image.asset(AppAssets.imgAppLogo),
-                                        );
+                                        return const Center(child: Icon(Icons.person, color: AppColors.black, size: 26));
                                       },
                                     )
-                                  : const Icon(Icons.person, color: Colors.grey),
+                                  : const Center(child: Icon(Icons.person, color: AppColors.black, size: 26)),
                             ),
                           ),
                           const SizedBox(width: 14),
@@ -201,7 +181,7 @@ class ContactPerson extends StatelessWidget {
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
+                                    color: AppColors.white,
                                   ),
                                 ),
                                 if (contact.username != null && contact.username!.isNotEmpty)
@@ -211,7 +191,7 @@ class ContactPerson extends StatelessWidget {
                                       "@${contact.username!}", // Added @ for style
                                       style: TextStyle(
                                         fontSize: 13,
-                                        color: Colors.grey.shade600,
+                                        color: AppColors.premiumGold,
                                       ),
                                     ),
                                   ),
@@ -240,13 +220,13 @@ class ContactPerson extends StatelessWidget {
       // Determine button text and color
       String buttonText;
       Color backgroundColor;
-      Color textColor = Colors.white;
+      Color textColor = AppColors.white;
       VoidCallback? onTapAction;
 
       // Invite button
       if (contact.is_invite.value) {
         buttonText = "Invite";
-        backgroundColor = Colors.transparent; // Transparent for Outline
+        backgroundColor = AppColors.transparent; // Transparent for Outline
         textColor = Colors.blue;
         onTapAction = () {
              final link = "https://ivatan.app/post";
@@ -255,8 +235,8 @@ class ContactPerson extends StatelessWidget {
         };
       } else if (contact.isFollowing.value) {
         buttonText = "Message";
-        backgroundColor = Colors.grey;
-        textColor = Colors.white;
+        backgroundColor = AppColors.premiumGold;
+        textColor = AppColors.white;
 
         // Action for Message button
         onTapAction= () async {
@@ -320,7 +300,7 @@ class ContactPerson extends StatelessWidget {
       } else if (contact.isFollower.value) {
         buttonText = "Following";
         backgroundColor = Colors.blue;
-        textColor = Colors.white;
+        textColor = AppColors.white;
 
         // Optional: onTap can do nothing or open message screen
         onTapAction = () {
@@ -329,7 +309,7 @@ class ContactPerson extends StatelessWidget {
       } else {
         buttonText = "Follow";
         backgroundColor = Colors.blue;
-        textColor = Colors.white;
+        textColor = AppColors.white;
 
         // Toggle follow/unfollow
         onTapAction = () {

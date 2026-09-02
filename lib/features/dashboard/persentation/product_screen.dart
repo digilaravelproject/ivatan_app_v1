@@ -42,7 +42,7 @@ class ProductCard extends GetWidget<ProductController> {
 
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: AppColors.premiumGold),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -65,11 +65,11 @@ class ProductCard extends GetWidget<ProductController> {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      color: Colors.grey.shade200,
+                      color: AppColors.premiumGold,
                       child: Icon(
                         Icons.shopping_bag,
                         size: 50,
-                        color: Colors.grey.shade600,
+                        color: AppColors.premiumGold,
                       ),
                     );
                   },
@@ -105,7 +105,7 @@ class ProductCard extends GetWidget<ProductController> {
                         product.description,
                         style: TextStyle(
                           fontSize: 11,
-                          color: Colors.grey.shade600,
+                          color: AppColors.premiumGold,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -119,7 +119,7 @@ class ProductCard extends GetWidget<ProductController> {
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
-                              color: Colors.black,
+                              color: AppColors.white,
                             ),
                           ),
                           if (product.originalPrice != null) ...[
@@ -128,7 +128,7 @@ class ProductCard extends GetWidget<ProductController> {
                               '₹${product.originalPrice!.toStringAsFixed(0)}',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.grey.shade500,
+                                color: AppColors.premiumGold,
                                 decoration: TextDecoration.lineThrough,
                               ),
                             ),
@@ -164,13 +164,13 @@ class ProductCard extends GetWidget<ProductController> {
                                       width: 28,
                                       height: 28,
                                       decoration: BoxDecoration(
-                                        color: Colors.grey.shade200,
+                                        color: AppColors.premiumGold,
                                         shape: BoxShape.circle,
                                       ),
                                       child: const Icon(
                                         Icons.remove,
                                         size: 18,
-                                        color: Colors.black87,
+                                        color: AppColors.white,
                                       ),
                                     ),
                                   ),
@@ -183,7 +183,7 @@ class ProductCard extends GetWidget<ProductController> {
                                       style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.black,
+                                        color: AppColors.white,
                                       ),
                                     ),
                                   ),
@@ -202,7 +202,7 @@ class ProductCard extends GetWidget<ProductController> {
                                       child: const Icon(
                                         Icons.add,
                                         size: 18,
-                                        color: Colors.white,
+                                        color: AppColors.white,
                                       ),
                                     ),
                                   ),
@@ -235,14 +235,14 @@ class ProductCard extends GetWidget<ProductController> {
                                               height: 16,
                                               width: 16,
                                               child: CircularProgressIndicator(
-                                                color: Colors.white,
+                                                color: AppColors.white,
                                                 strokeWidth: 2,
                                               ),
                                             )
                                             : const Text(
                                               'ADD TO CART',
                                               style: TextStyle(
-                                                color: Colors.white,
+                                                color: AppColors.white,
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 11,
                                               ),
@@ -286,19 +286,19 @@ class ProductCard extends GetWidget<ProductController> {
         width: double.infinity,
         height: 32,
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(6),
         ),
         child: const Center(
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.edit_outlined, color: Colors.white, size: 14),
+              Icon(Icons.edit_outlined, color: AppColors.white, size: 14),
               SizedBox(width: 6),
               Text(
                 'EDIT',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 11,
                 ),
@@ -379,12 +379,12 @@ class _BrowseProductsView extends StatelessWidget {
               Icon(
                 Icons.shopping_bag_outlined,
                 size: 40,
-                color: Colors.grey.shade300,
+                color: AppColors.premiumGold,
               ),
               const SizedBox(height: 8),
               Text(
                 'No products available',
-                style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 16, color: AppColors.premiumGold),
               ),
             ],
           ),
@@ -393,7 +393,7 @@ class _BrowseProductsView extends StatelessWidget {
 
       final products = productsData.map((item) => Product.fromJson(item)).toList();
 
-      return RefreshIndicator(color: Colors.black, 
+      return RefreshIndicator(color: AppColors.white, 
         onRefresh: () => marketplaceController.fetchMarketplaceProducts(isRefresh: true),
         child: Padding(
           padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
@@ -434,14 +434,14 @@ class _MyProductsTabView extends StatelessWidget {
               Icon(
                 Icons.shopping_bag_outlined,
                 size: 80,
-                color: Colors.grey.shade300,
+                color: AppColors.premiumGold,
               ),
               const SizedBox(height: 16),
               Text(
                 'No products yet',
                 style: TextStyle(
                   fontSize: 18,
-                  color: Colors.grey.shade600,
+                  color: AppColors.premiumGold,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -482,12 +482,12 @@ class _MyProductsTabView extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: AppColors.premiumGold),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: AppColors.white.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -515,12 +515,12 @@ class _MyProductsTabView extends StatelessWidget {
                             child: Icon(
                               Icons.image_not_supported,
                               size: 50,
-                              color: Colors.grey.shade400,
+                              color: AppColors.premiumGold,
                             ),
                           ),
                       /*Container(
-                        color: Colors.grey.shade200,
-                        child: const Icon(Icons.shopping_bag, size: 40, color: Colors.grey),
+                        color: AppColors.premiumGold,
+                        child: const Icon(Icons.shopping_bag, size: 40, color: AppColors.premiumGold),
                       ),*/
                     ),
                   ),
@@ -544,7 +544,7 @@ class _MyProductsTabView extends StatelessWidget {
                         product.status.toString().toUpperCase(),
                         //? 'Active' : 'Inactive',
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.white,
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
                         ),
@@ -587,7 +587,7 @@ class _MyProductsTabView extends StatelessWidget {
                           'Stock: ${product.stock}',
                           style: TextStyle(
                             fontSize: 10,
-                            color: Colors.grey.shade600,
+                            color: AppColors.premiumGold,
                           ),
                         ),
                       ],

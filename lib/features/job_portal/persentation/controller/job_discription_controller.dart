@@ -1,4 +1,5 @@
 
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../data/model/job_model.dart';
@@ -29,7 +30,7 @@ class JobDescriptionController extends GetxController {
             'No job slug provided',
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.red,
-            colorText: Colors.white,
+            colorText: AppColors.white,
           );
         }
       });
@@ -79,7 +80,7 @@ class JobDescriptionController extends GetxController {
                     'Job deleted successfully.',
                     snackPosition: SnackPosition.BOTTOM,
                     backgroundColor: Colors.green,
-                    colorText: Colors.white,
+                    colorText: AppColors.white,
                   );
                   Get.find<JobController>().fetchJobs();
                 } else {
@@ -88,7 +89,7 @@ class JobDescriptionController extends GetxController {
                     'Failed to delete job.',
                     snackPosition: SnackPosition.BOTTOM,
                     backgroundColor: Colors.red,
-                    colorText: Colors.white,
+                    colorText: AppColors.white,
                   );
                 }
               },
@@ -118,8 +119,8 @@ class JobDescriptionController extends GetxController {
       Get.snackbar(
         'Application Submitted',
         'You have successfully applied for ${job.value!.title} at ${job.value!.companyName}',
-        backgroundColor: Colors.black,
-        colorText: Colors.white,
+        backgroundColor: AppColors.transparent,
+        colorText: AppColors.white,
         snackPosition: SnackPosition.BOTTOM,
         duration: const Duration(seconds: 3),
       );
@@ -139,8 +140,8 @@ class JobDescriptionController extends GetxController {
     Get.snackbar(
       message,
       '',
-      backgroundColor: Colors.black,
-      colorText: Colors.white,
+      backgroundColor: AppColors.transparent,
+      colorText: AppColors.white,
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 2),
     );

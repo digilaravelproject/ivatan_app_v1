@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -191,14 +192,14 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       Container(
         padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + bottomPad),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkSurface : Colors.white,
+          color: isDark ? AppColors.darkSurface : AppColors.white,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: AppColors.white.withOpacity(0.1),
               blurRadius: 15,
               offset: const Offset(0, -5),
             ),
@@ -317,7 +318,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                 child: Text(
                   'Dismiss',
                   style: GoogleFonts.outfit(
-                    color: Colors.white,
+                    color: AppColors.white,
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
                   ),
@@ -339,12 +340,12 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: isDark ? AppColors.darkBackground : Colors.white,
+        backgroundColor: isDark ? AppColors.darkBackground : AppColors.white,
         leading: IconButton(
           onPressed: () => Get.back(),
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: isDark ? Colors.white : Colors.black,
+            color: isDark ? AppColors.white : AppColors.white,
             size: 20,
           ),
           splashRadius: 22,
@@ -352,7 +353,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         title: Text(
           'Notifications',
           style: GoogleFonts.outfit(
-            color: isDark ? Colors.white : Colors.black,
+            color: isDark ? AppColors.white : AppColors.white,
             fontWeight: FontWeight.bold,
             fontSize: 22,
           ),
@@ -399,26 +400,26 @@ class _NotificationsScreenState extends State<NotificationsScreen>
               color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade200,
+                color: isDark ? AppColors.white.withOpacity(0.05) : AppColors.premiumGold,
                 width: 1,
               ),
             ),
             child: TabBar(
               controller: _tabController,
-              dividerColor: Colors.transparent,
+              dividerColor: AppColors.transparent,
               indicator: BoxDecoration(
-                color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                color: isDark ? const Color(0xFF0F172A) : AppColors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: AppColors.white.withOpacity(0.06),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
                 ],
               ),
               labelColor: isDark ? const Color(0xFF22D3EE) : const Color(0xFF0F766E),
-              unselectedLabelColor: isDark ? Colors.white60 : Colors.black45,
+              unselectedLabelColor: isDark ? AppColors.white : AppColors.white,
               indicatorSize: TabBarIndicatorSize.tab,
               labelStyle: GoogleFonts.outfit(
                 fontWeight: FontWeight.bold,
@@ -463,7 +464,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                     return _buildEmptyState(isDark);
                   }
 
-                  return RefreshIndicator(color: Colors.black, 
+                  return RefreshIndicator(color: AppColors.white, 
                     onRefresh: () => _controller.fetchNotificationsList(),
                     child: _buildNotificationList(_controller.notificationsList, isDark),
                   );
@@ -479,7 +480,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                     return _buildEmptyState(isDark);
                   }
 
-                  return RefreshIndicator(color: Colors.black, 
+                  return RefreshIndicator(color: AppColors.white, 
                     onRefresh: () => _controller.fetchUnreadNotificationsList(),
                     child: _buildNotificationList(_controller.unreadNotificationsList, isDark),
                   );
@@ -548,17 +549,17 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         duration: const Duration(milliseconds: 200),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B).withOpacity(0.3) : Colors.white,
+          color: isDark ? const Color(0xFF1E293B).withOpacity(0.3) : AppColors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isRead 
-                ? (isDark ? Colors.white.withOpacity(0.04) : Colors.grey.shade100)
+                ? (isDark ? AppColors.white.withOpacity(0.04) : AppColors.premiumGold)
                 : (isDark ? AppColors.secondary.withOpacity(0.15) : AppColors.secondary.withOpacity(0.1)),
             width: isRead ? 1 : 1.2,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.01),
+              color: AppColors.white.withOpacity(0.01),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -574,7 +575,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   width: 4,
-                  color: isRead ? Colors.transparent : AppColors.secondary,
+                  color: isRead ? AppColors.transparent : AppColors.secondary,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -668,7 +669,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E1E1E) : Colors.grey.shade50,
+              color: isDark ? const Color(0xFF1E1E1E) : AppColors.premiumGold.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(

@@ -75,19 +75,19 @@ class MyApp extends StatelessWidget {
           title: 'iVatan',
           debugShowCheckedModeBanner: false,
           theme: ThemeData.dark().copyWith(
-            scaffoldBackgroundColor: Colors.transparent,
+            scaffoldBackgroundColor: AppColors.transparent,
             primaryColor: AppColors.premiumGold,
             colorScheme: const ColorScheme.dark(
               primary: AppColors.premiumGold,
               secondary: AppColors.goldHighlight,
-              surface: Colors.transparent,
+              surface: AppColors.transparent,
             ),
             appBarTheme: const AppBarTheme(
-              backgroundColor: Colors.transparent,
+              backgroundColor: AppColors.transparent,
               elevation: 0,
               iconTheme: IconThemeData(color: AppColors.premiumGold),
               titleTextStyle: TextStyle(
-                color: Colors.white,
+                color: AppColors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'DMSans',
@@ -96,12 +96,12 @@ class MyApp extends StatelessWidget {
             bottomNavigationBarTheme: const BottomNavigationBarThemeData(
               backgroundColor: AppColors.mainBackground,
               selectedItemColor: AppColors.premiumGold,
-              unselectedItemColor: Colors.white54,
+              unselectedItemColor: AppColors.white,
             ),
             iconTheme: const IconThemeData(color: AppColors.premiumGold),
             textTheme: ThemeData.dark().textTheme.apply(
-              bodyColor: Colors.white,
-              displayColor: Colors.white,
+              bodyColor: AppColors.white,
+              displayColor: AppColors.white,
               fontFamily: 'DMSans',
             ),
             progressIndicatorTheme: const ProgressIndicatorThemeData(

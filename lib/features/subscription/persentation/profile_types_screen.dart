@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -12,17 +13,17 @@ class ProfileTypesScreen extends StatelessWidget {
     final controller = Get.put(SubscriptionController());
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: BackButton(
-          color: Colors.black,
+          color: AppColors.white,
           onPressed: () => Get.back(),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none_rounded, color: Colors.black),
+            icon: const Icon(Icons.notifications_none_rounded, color: AppColors.white),
             onPressed: () {},
           ),
         ],
@@ -41,7 +42,7 @@ class ProfileTypesScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w800,
-                        color: Colors.black,
+                        color: AppColors.white,
                         letterSpacing: -0.5,
                       ),
                     ),
@@ -50,7 +51,7 @@ class ProfileTypesScreen extends StatelessWidget {
                       "Manage subscription status and approval for all profile types.",
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade600,
+                        color: AppColors.premiumGold,
                         height: 1.3,
                       ),
                     ),
@@ -94,11 +95,11 @@ class ProfileTypesScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: AppColors.white.withOpacity(0.02),
               blurRadius: 6,
               offset: const Offset(0, 1),
             ),
@@ -106,7 +107,7 @@ class ProfileTypesScreen extends StatelessWidget {
           border: Border.all(
             color: isActive 
                 ? const Color(0xFFD4AF37) 
-                : (sub.status == 'pending' ? const Color(0xFFF59E0B) : Colors.grey.shade100),
+                : (sub.status == 'pending' ? const Color(0xFFF59E0B) : AppColors.premiumGold),
             width: hasSubscription ? 1.5 : 1,
           ),
         ),
@@ -116,11 +117,11 @@ class ProfileTypesScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.black,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(8),
                 border: hasSubscription ? Border.all(color: const Color(0xFFD4AF37), width: 1) : null,
               ),
-              child: Icon(sub.icon, color: Colors.white, size: 18),
+              child: Icon(sub.icon, color: AppColors.white, size: 18),
             ),
             const SizedBox(width: 10),
             
@@ -134,7 +135,7 @@ class ProfileTypesScreen extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: AppColors.white,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -142,7 +143,7 @@ class ProfileTypesScreen extends StatelessWidget {
                     "${sub.plansCount} Plans",
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey.shade500,
+                      color: AppColors.premiumGold,
                     ),
                   ),
                 ],
@@ -157,7 +158,7 @@ class ProfileTypesScreen extends StatelessWidget {
                 const SizedBox(width: 4),
                 Icon(
                   Icons.arrow_forward_ios_rounded,
-                  color: Colors.grey.shade400,
+                  color: AppColors.premiumGold,
                   size: 11,
                 ),
               ],
@@ -174,16 +175,16 @@ class ProfileTypesScreen extends StatelessWidget {
     String text;
 
     if (status == 'active') {
-      bgColor = Colors.black;
-      textColor = Colors.white;
+      bgColor = AppColors.white;
+      textColor = AppColors.white;
       text = "Subscribed & Approved";
     } else if (status == 'pending') {
       bgColor = const Color(0xFFFEF3C7);
       textColor = const Color(0xFFD97706);
       text = "Subscribed\nPending Approval";
     } else {
-      bgColor = Colors.grey.shade100;
-      textColor = Colors.grey.shade500;
+      bgColor = AppColors.premiumGold;
+      textColor = AppColors.premiumGold;
       text = "No Subscription";
     }
 
@@ -211,23 +212,23 @@ class ProfileTypesScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.premiumGold.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: AppColors.premiumGold),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.info_outline_rounded, color: Colors.black87, size: 14),
+              const Icon(Icons.info_outline_rounded, color: AppColors.white, size: 14),
               const SizedBox(width: 4),
               Text(
                 "Status Guide",
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade800,
+                  color: AppColors.premiumGold,
                 ),
               ),
             ],
@@ -252,7 +253,7 @@ class ProfileTypesScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Colors.grey.shade700,
+            color: AppColors.premiumGold,
           ),
         ),
         Expanded(
@@ -262,11 +263,11 @@ class ProfileTypesScreen extends StatelessWidget {
               children: [
                 TextSpan(
                   text: "$title – ",
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.white),
                 ),
                 TextSpan(
                   text: description,
-                  style: TextStyle(color: Colors.grey.shade600),
+                  style: TextStyle(color: AppColors.premiumGold),
                 ),
               ],
             ),

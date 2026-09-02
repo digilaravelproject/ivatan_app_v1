@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -68,7 +69,7 @@ class TransactionHistoryScreen extends StatelessWidget {
         centerTitle: true,
         elevation: 0,
       ),
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: AppColors.premiumGold,
       body: Obx(
             () => ListView.builder(
           padding: const EdgeInsets.all(16),
@@ -80,11 +81,11 @@ class TransactionHistoryScreen extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 16),
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: AppColors.white.withOpacity(0.05),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -125,7 +126,7 @@ class TransactionHistoryScreen extends StatelessWidget {
                               "${transaction.date} • ${transaction.time ?? ""}",
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey.shade600,
+                                color: AppColors.premiumGold,
                               ),
                             ),
                           ],
@@ -149,7 +150,7 @@ class TransactionHistoryScreen extends StatelessWidget {
                         "ID: ${transaction.id}",
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey.shade600,
+                          color: AppColors.premiumGold,
                         ),
                       ),
                       Container(
@@ -178,7 +179,7 @@ class TransactionHistoryScreen extends StatelessWidget {
                     "Method: ${transaction.paymentMethod}",
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.grey.shade600,
+                      color: AppColors.premiumGold,
                     ),
                   ),
                 ],

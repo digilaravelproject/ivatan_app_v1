@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
@@ -126,14 +127,14 @@ class ServiceController extends GetxController {
       if (response != null && response['success'] == true) {
         services.removeWhere((s) => s.id == id);
         Get.snackbar("Success", response['message'] ?? "Service deleted successfully",
-            backgroundColor: AppColors.success, colorText: Colors.white);
+            backgroundColor: AppColors.success, colorText: AppColors.white);
       } else {
         Get.snackbar("Error", response?['message'] ?? "Failed to delete service",
-            backgroundColor: AppColors.error, colorText: Colors.white);
+            backgroundColor: AppColors.error, colorText: AppColors.white);
       }
     } catch (e) {
       Get.snackbar("Error", "Failed to delete service: $e",
-          backgroundColor: AppColors.error, colorText: Colors.white);
+          backgroundColor: AppColors.error, colorText: AppColors.white);
     } finally {
       isLoading(false);
     }
@@ -166,7 +167,7 @@ class ServiceController extends GetxController {
           "Success",
           response['message'] ?? "Enquiry submitted successfully.",
           backgroundColor: AppColors.success,
-          colorText: Colors.white,
+          colorText: AppColors.white,
         );
         onSuccess();
       } else {
@@ -174,7 +175,7 @@ class ServiceController extends GetxController {
           "Error",
           response?['message'] ?? "Failed to submit enquiry",
           backgroundColor: AppColors.error,
-          colorText: Colors.white,
+          colorText: AppColors.white,
         );
       }
     } catch (e) {
@@ -182,7 +183,7 @@ class ServiceController extends GetxController {
         "Error",
         "An unexpected error occurred: $e",
         backgroundColor: AppColors.error,
-        colorText: Colors.white,
+        colorText: AppColors.white,
       );
     } finally {
       isLoading(false);
@@ -281,7 +282,7 @@ class ServiceController extends GetxController {
           "Success",
           "Status updated to $status",
           backgroundColor: Colors.green,
-          colorText: Colors.white,
+          colorText: AppColors.white,
         );
         // Refresh everything
         fetchSellerEnquiries();
@@ -291,7 +292,7 @@ class ServiceController extends GetxController {
           "Error",
           response?['message'] ?? "Failed to update status",
           backgroundColor: AppColors.error,
-          colorText: Colors.white,
+          colorText: AppColors.white,
         );
       }
     } catch (e) {
@@ -311,7 +312,7 @@ class ServiceController extends GetxController {
           "Success",
           "Enquiry deleted successfully",
           backgroundColor: Colors.green,
-          colorText: Colors.white,
+          colorText: AppColors.white,
         );
         // Refresh everything
         fetchSellerEnquiries();
@@ -321,7 +322,7 @@ class ServiceController extends GetxController {
           "Error",
           response?['message'] ?? "Failed to delete enquiry",
           backgroundColor: AppColors.error,
-          colorText: Colors.white,
+          colorText: AppColors.white,
         );
       }
     } catch (e) {

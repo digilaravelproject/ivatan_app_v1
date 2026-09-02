@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,9 +16,9 @@ class UserSearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: GestureDetector(
           onTap: () {
@@ -30,7 +31,7 @@ class UserSearchScreen extends StatelessWidget {
           height: 40,
           margin: const EdgeInsets.only(right: 16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
+            color: AppColors.white.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: TextField(
@@ -40,7 +41,7 @@ class UserSearchScreen extends StatelessWidget {
             decoration: InputDecoration(
               hintText: 'Search users...',
               hintStyle: TextStyle(
-                color: Colors.white54,
+                color: AppColors.white,
                 fontSize: 14,
               ),
               border: InputBorder.none,
@@ -51,13 +52,13 @@ class UserSearchScreen extends StatelessWidget {
                         textController.clear();
                         controller.searchUsers('');
                       },
-                      child: const Icon(Icons.clear, color: Colors.white54, size: 20),
+                      child: const Icon(Icons.clear, color: AppColors.white, size: 20),
                     )
                   : const SizedBox.shrink()),
             ),
             style: const TextStyle(
               fontSize: 14,
-              color: Colors.white,
+              color: AppColors.white,
             ),
           ),
         ),
@@ -71,7 +72,7 @@ class UserSearchScreen extends StatelessWidget {
           return Center(
             child: Text(
               "Search for users by name or username",
-              style: TextStyle(color: Colors.white70, fontSize: 14),
+              style: TextStyle(color: AppColors.white, fontSize: 14),
             ),
           );
         }
@@ -80,7 +81,7 @@ class UserSearchScreen extends StatelessWidget {
           return Center(
             child: Text(
               "No users found.",
-              style: TextStyle(color: Colors.white70, fontSize: 14),
+              style: TextStyle(color: AppColors.white, fontSize: 14),
             ),
           );
         }
@@ -100,16 +101,16 @@ class UserSearchScreen extends StatelessWidget {
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               leading: CircleAvatar(
                 radius: 24,
-                backgroundColor: Colors.white12,
+                backgroundColor: AppColors.transparent,
                 backgroundImage: (user.avtar != null && !user.avtar!.contains("ui-avatars.com")) ? CachedNetworkImageProvider(user.avtar!) : null,
-                child: (user.avtar == null || user.avtar!.contains("ui-avatars.com")) ? const Icon(CupertinoIcons.person, color: Colors.white) : null,
+                child: (user.avtar == null || user.avtar!.contains("ui-avatars.com")) ? const Icon(CupertinoIcons.person, color: AppColors.white) : null,
               ),
               title: Row(
                 children: [
                   Flexible(
                     child: Text(
                       user.name ?? "Unknown",
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: Colors.white),
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AppColors.white),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -121,10 +122,10 @@ class UserSearchScreen extends StatelessWidget {
               ),
               subtitle: Text(
                 user.username != null ? "@${user.username}" : "",
-                style: const TextStyle(color: Colors.white70, fontSize: 13),
+                style: const TextStyle(color: AppColors.white, fontSize: 13),
               ),
               trailing: user.isAuthUser == true
-                  ? const Text("You", style: TextStyle(color: Colors.white54, fontSize: 12))
+                  ? const Text("You", style: TextStyle(color: AppColors.white, fontSize: 12))
                   : null,
             );
           },

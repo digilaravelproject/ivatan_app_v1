@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../repository/financial_repository.dart';
@@ -64,7 +65,7 @@ class FinancialController extends GetxController {
           response['message'] ?? 'Bank account added successfully',
           snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.green,
-          colorText: Colors.white,
+          colorText: AppColors.white,
         );
         _clearFields();
         fetchBankDetails(); // Refresh list after adding
@@ -89,7 +90,7 @@ class FinancialController extends GetxController {
           errorMsg,
           snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.red,
-          colorText: Colors.white,
+          colorText: AppColors.white,
         );
         return false;
       }
@@ -99,7 +100,7 @@ class FinancialController extends GetxController {
         'Something went wrong: $e',
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.red,
-        colorText: Colors.white,
+        colorText: AppColors.white,
       );
       return false;
     } finally {
@@ -137,7 +138,7 @@ class FinancialController extends GetxController {
       message,
       snackPosition: SnackPosition.TOP,
       backgroundColor: Colors.orange,
-      colorText: Colors.white,
+      colorText: AppColors.white,
     );
   }
 

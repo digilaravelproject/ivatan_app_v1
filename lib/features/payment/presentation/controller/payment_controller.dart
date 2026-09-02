@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../widgets/payment_webview_page.dart';
@@ -21,7 +22,7 @@ class PaymentController extends GetxController {
   Future<void> initiatePayment(int orderId) async {
     try {
       Get.dialog(
-        const Center(child: CircularProgressIndicator(color: Colors.black)),
+        const Center(child: CircularProgressIndicator(color: AppColors.white)),
         barrierDismissible: false,
       );
 
@@ -43,7 +44,7 @@ class PaymentController extends GetxController {
             await _verifyTransaction(orderId, merchantTxnId);
           } else if (result == false) {
             Get.snackbar("Payment Failed", "Your payment failed or was cancelled on PhonePe. Please try again.",
-                backgroundColor: Colors.red, colorText: Colors.white);
+                backgroundColor: Colors.red, colorText: AppColors.white);
           } else {
             // result is null (e.g. user closed WebView)
             // Call verify transaction as a safety check in case the webhook processed it or they did pay.
@@ -51,16 +52,16 @@ class PaymentController extends GetxController {
           }
         } else {
           Get.snackbar("Error", "Payment redirect URL is empty.",
-              backgroundColor: Colors.red, colorText: Colors.white);
+              backgroundColor: Colors.red, colorText: AppColors.white);
         }
       } else {
         Get.snackbar("Error", response?['message'] ?? "Failed to initiate payment",
-            backgroundColor: Colors.red, colorText: Colors.white);
+            backgroundColor: Colors.red, colorText: AppColors.white);
       }
     } catch (e) {
       debugPrint('Payment initiation error: $e');
       Get.snackbar("Error", "Something went wrong: $e",
-          backgroundColor: Colors.red, colorText: Colors.white);
+          backgroundColor: Colors.red, colorText: AppColors.white);
     }
   }
 
@@ -68,7 +69,7 @@ class PaymentController extends GetxController {
     try {
       // Show loading indicator during verification
       Get.dialog(
-        const Center(child: CircularProgressIndicator(color: Colors.black)),
+        const Center(child: CircularProgressIndicator(color: AppColors.white)),
         barrierDismissible: false,
       );
 
@@ -129,8 +130,8 @@ class PaymentController extends GetxController {
                   Get.back(); // Close dialog
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppColors.transparent,
+                  foregroundColor: AppColors.white,
                   minimumSize: const Size(120, 45),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
@@ -142,12 +143,12 @@ class PaymentController extends GetxController {
         );
       } else {
         Get.snackbar("Verification Failed", verifyResponse?['message'] ?? "Could not verify payment.",
-            backgroundColor: Colors.red.shade600, colorText: Colors.white, duration: const Duration(seconds: 4));
+            backgroundColor: Colors.red.shade600, colorText: AppColors.white, duration: const Duration(seconds: 4));
       }
     } catch (e) {
       Get.back(); // Ensure loader closes on exception
       Get.snackbar("Error", "Payment verification error: $e",
-          backgroundColor: Colors.red, colorText: Colors.white);
+          backgroundColor: Colors.red, colorText: AppColors.white);
     }
   }
 }

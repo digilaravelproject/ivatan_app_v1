@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:io';
@@ -247,7 +248,7 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
           'Please fill all required fields correctly',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
-          colorText: Colors.white,
+          colorText: AppColors.white,
         );
         return;
       }
@@ -283,7 +284,7 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
           message,
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green,
-          colorText: Colors.white,
+          colorText: AppColors.white,
         );
         fetchJobs();
         clearForm();
@@ -293,7 +294,7 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
           isEditing.value ? 'Failed to update job.' : 'Failed to create job.',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
-          colorText: Colors.white,
+          colorText: AppColors.white,
         );
       }
     } catch (e) {
@@ -302,7 +303,7 @@ class JobController extends GetxController with GetSingleTickerProviderStateMixi
         e.toString().replaceAll('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
-        colorText: Colors.white,
+        colorText: AppColors.white,
       );
     } finally {
       isCreating.value = false;

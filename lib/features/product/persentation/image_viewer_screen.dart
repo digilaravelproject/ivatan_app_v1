@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/core/network/app_urls.dart';
@@ -38,17 +39,17 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: AppColors.white),
           onPressed: () => Get.back(),
         ),
         title: Text(
           '${currentIndex + 1}/${widget.images.length}',
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: AppColors.white),
         ),
         centerTitle: true,
       ),
@@ -65,11 +66,11 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error_outline, size: 80, color: Colors.grey.shade400),
+                    Icon(Icons.error_outline, size: 80, color: AppColors.premiumGold),
                     const SizedBox(height: 16),
                     const Text(
                       'Failed to load image',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: AppColors.white),
                     ),
                   ],
                 ),
@@ -84,7 +85,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
             height: 60,
             child: CircularProgressIndicator(
               value: event == null ? 0 : event.cumulativeBytesLoaded / event.expectedTotalBytes!,
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.white),
             ),
           ),
         ),

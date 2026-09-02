@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -40,7 +41,7 @@ class MyPostScreen extends StatelessWidget {
           }
           return true;
         },
-        child: RefreshIndicator(color: Colors.black, 
+        child: RefreshIndicator(color: AppColors.white, 
           onRefresh: () async {
             await controller.fetchOwnPosts(filterType: "posts", username: username);
           },
@@ -62,11 +63,11 @@ class MyPostScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.lock_outline_rounded, size: 50, color: Colors.grey.shade400),
+                      Icon(Icons.lock_outline_rounded, size: 50, color: AppColors.premiumGold),
                       const SizedBox(height: 12),
                       const Text("This account is private", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                       const SizedBox(height: 4),
-                      const Text("Follow to see their posts", style: TextStyle(color: Colors.grey)),
+                      const Text("Follow to see their posts", style: TextStyle(color: AppColors.premiumGold)),
                     ],
                   ),
                 );
@@ -76,9 +77,9 @@ class MyPostScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.post_add_outlined, size: 50, color: Colors.grey),
+                    Icon(Icons.post_add_outlined, size: 50, color: AppColors.premiumGold),
                     SizedBox(height: 12),
-                    Text("No posts found", style: TextStyle(color: Colors.grey)),
+                    Text("No posts found", style: TextStyle(color: AppColors.premiumGold)),
                   ],
                 ),
               );
@@ -160,14 +161,14 @@ class MyPostScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     child: Container(
                       height: (index % 2 == 0) ? 220 : 150,
-                      color: Colors.grey.shade300,
+                      color: AppColors.premiumGold,
                       child: CachedNetworkImage(
                         imageUrl: thumb,
                         placeholder: (context, url) => Shimmer.fromColors(
-                          baseColor: Colors.grey[300]!,
-                          highlightColor: Colors.grey[100]!,
+                          baseColor: AppColors.premiumGold.withOpacity(0.3),
+                          highlightColor: AppColors.premiumGold.withOpacity(0.1),
                           child: Container(
-                            color: Colors.white,
+                            color: AppColors.white,
                           ),
                         ),
                         errorWidget: (context, url, error) => Image.asset(

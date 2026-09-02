@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/network/api_services.dart';
@@ -151,7 +152,7 @@ class CartController extends GetxController {
           '$itemName has been removed from cart',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: AppColors.error,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           duration: const Duration(seconds: 2),
         );
         fetchCartData(showLoader: false);
@@ -189,7 +190,7 @@ class CartController extends GetxController {
           'All items have been removed from your cart',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: AppColors.error,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           duration: const Duration(seconds: 2),
         );
         fetchCartData(showLoader: false);
@@ -218,7 +219,7 @@ class CartController extends GetxController {
         "Address Required",
         "Please select a delivery address first",
         backgroundColor: Colors.orange,
-        colorText: Colors.white,
+        colorText: AppColors.white,
       );
       return;
     }
@@ -228,7 +229,7 @@ class CartController extends GetxController {
         "Cart Empty",
         "Your cart is empty",
         backgroundColor: Colors.orange,
-        colorText: Colors.white,
+        colorText: AppColors.white,
       );
       return;
     }
@@ -267,7 +268,7 @@ class CartController extends GetxController {
           "Checkout Failed",
           response?['message'] ?? "Something went wrong during checkout",
           backgroundColor: AppColors.error,
-          colorText: Colors.white,
+          colorText: AppColors.white,
         );
       }
     } catch (e) {

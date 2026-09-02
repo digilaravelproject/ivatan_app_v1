@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/features/product/persentation/transcation_history_screen.dart';
@@ -36,13 +37,13 @@ class SellerDashboard extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: AppColors.premiumGold,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
-        title: const Text('Seller Dashboard', style: TextStyle(color: Colors.black)),
+        title: const Text('Seller Dashboard', style: TextStyle(color: AppColors.white)),
       ),
-      body: RefreshIndicator(color: Colors.black, 
+      body: RefreshIndicator(color: AppColors.white, 
         onRefresh: () => controller.fetchDashboardStats(),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -56,7 +57,7 @@ class SellerDashboard extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Colors.black, Colors.black.withOpacity(0.6)],
+                      colors: [AppColors.white, AppColors.white.withOpacity(0.6)],
                     ),
                     borderRadius: BorderRadius.circular(15),
                   ),
@@ -67,26 +68,26 @@ class SellerDashboard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text('Welcome back,',
-                                style: TextStyle(color: Colors.white, fontSize: 14)),
+                                style: TextStyle(color: AppColors.white, fontSize: 14)),
                             const SizedBox(height: 4),
                             Text('${SharedPrefManager().user?.username} 👋',
                                 style: const TextStyle(
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold)),
                             const SizedBox(height: 8),
                             Text('${SharedPrefManager().user?.occupation}',
-                                style: TextStyle(color: Colors.white70, fontSize: 12)),
+                                style: TextStyle(color: AppColors.white, fontSize: 12)),
                           ],
                         ),
                       ),
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: const BoxDecoration(
-                          color: Colors.white24,
+                          color: AppColors.white,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.storefront, color: Colors.white, size: 32),
+                        child: const Icon(Icons.storefront, color: AppColors.white, size: 32),
                       ),
                     ],
                   ),
@@ -191,11 +192,11 @@ class SellerDashboard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: AppColors.premiumGold.withOpacity(0.1),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 3),
@@ -237,7 +238,7 @@ class SellerDashboard extends StatelessWidget {
                 title,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: AppColors.premiumGold.withOpacity(0.6),
                 ),
               ),
             ],
@@ -253,11 +254,11 @@ class SellerDashboard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.shade300,
+              color: AppColors.premiumGold,
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -282,11 +283,11 @@ class SellerDashboard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.shade300,
+              color: AppColors.premiumGold,
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -313,7 +314,7 @@ class SellerDashboard extends StatelessWidget {
                           fontWeight: FontWeight.w600, fontSize: 14)),
                   const SizedBox(height: 4),
                   Text(order['customer'],
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade500)),
+                      style: TextStyle(fontSize: 12, color: AppColors.premiumGold)),
                 ],
               ),
             ),
@@ -344,7 +345,7 @@ class SellerDashboard1 extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.white,
         elevation: 0,
         actions: [
           IconButton(
@@ -437,7 +438,7 @@ class SellerDashboard1 extends StatelessWidget {
         children: [
           const CircleAvatar(
             radius: 30,
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.transparent,
             backgroundImage: NetworkImage(
               'https://via.placeholder.com/150', // Replace with actual image URL
             ),
@@ -450,7 +451,7 @@ class SellerDashboard1 extends StatelessWidget {
                 const Text(
                   'John\'s Store',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -459,7 +460,7 @@ class SellerDashboard1 extends StatelessWidget {
                 Text(
                   'Member since Jan 2024',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: AppColors.white.withOpacity(0.9),
                     fontSize: 12,
                   ),
                 ),
@@ -475,7 +476,7 @@ class SellerDashboard1 extends StatelessWidget {
                     Text(
                       '4.8 (250 reviews)',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: AppColors.white.withOpacity(0.9),
                         fontSize: 12,
                       ),
                     ),
@@ -532,11 +533,11 @@ class SellerDashboard1 extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: AppColors.premiumGold.withOpacity(0.1),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 3),
@@ -578,7 +579,7 @@ class SellerDashboard1 extends StatelessWidget {
                 title,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: AppColors.premiumGold.withOpacity(0.6),
                 ),
               ),
             ],
@@ -594,11 +595,11 @@ class SellerDashboard1 extends StatelessWidget {
       height: 200,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: AppColors.premiumGold.withOpacity(0.1),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 3),
@@ -615,7 +616,7 @@ class SellerDashboard1 extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: Colors.grey[700],
+                  color: AppColors.premiumGold.withOpacity(0.7),
                 ),
               ),
               Container(
@@ -697,11 +698,11 @@ class SellerDashboard1 extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.05),
+                color: AppColors.premiumGold.withOpacity(0.05),
                 spreadRadius: 1,
                 blurRadius: 3,
                 offset: const Offset(0, 2),
@@ -739,7 +740,7 @@ class SellerDashboard1 extends StatelessWidget {
                       '${order['items']} items • ${order['amount']}',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey[600],
+                        color: AppColors.premiumGold.withOpacity(0.6),
                       ),
                     ),
                   ],
@@ -748,13 +749,13 @@ class SellerDashboard1 extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: AppColors.premiumGold.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   'status',
                   style: TextStyle(
-                    color: Colors.black,
+                    color: AppColors.white,
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
                   ),
@@ -779,7 +780,7 @@ class SellerDashboard1 extends StatelessWidget {
       case 'Pending':
         return Colors.red;
       default:
-        return Colors.grey;
+        return AppColors.premiumGold;
     }
   }
 
@@ -802,11 +803,11 @@ class SellerDashboard1 extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.05),
+                color: AppColors.premiumGold.withOpacity(0.05),
                 spreadRadius: 1,
                 blurRadius: 3,
                 offset: const Offset(0, 2),
@@ -846,7 +847,7 @@ class SellerDashboard1 extends StatelessWidget {
                           product['sales']!,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey[600],
+                            color: AppColors.premiumGold.withOpacity(0.6),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -854,7 +855,7 @@ class SellerDashboard1 extends StatelessWidget {
                           width: 4,
                           height: 4,
                           decoration: const BoxDecoration(
-                            color: Colors.grey,
+                            color: AppColors.premiumGold,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -863,7 +864,7 @@ class SellerDashboard1 extends StatelessWidget {
                           product['revenue']!,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey[600],
+                            color: AppColors.premiumGold.withOpacity(0.6),
                           ),
                         ),
                       ],

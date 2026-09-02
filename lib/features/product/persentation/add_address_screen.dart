@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -13,18 +14,18 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
   Widget build(BuildContext context) {
     //final AddAddressController controller = Get.put(AddAddressController());
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: AppColors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Add Address',
           style: TextStyle(
-            color: Colors.black,
+            color: AppColors.white,
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
@@ -43,7 +44,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: AppColors.white,
                 ),
               ),
               const SizedBox(height: 8),
@@ -51,7 +52,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
                 'Please enter your delivery address',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey.shade600,
+                  color: AppColors.premiumGold,
                 ),
               ),
               const SizedBox(height: 30),
@@ -146,7 +147,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: AppColors.white,
                 ),
               ),
               const SizedBox(height: 16),
@@ -170,8 +171,8 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
               //       child: Checkbox(
               //         value: true,
               //         onChanged: (value) {},
-              //         activeColor: Colors.black,
-              //         side: const BorderSide(color: Colors.grey),
+              //         activeColor: AppColors.white,
+              //         side: const BorderSide(color: AppColors.premiumGold),
               //         shape: RoundedRectangleBorder(
               //           borderRadius: BorderRadius.circular(4),
               //         ),
@@ -182,7 +183,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
               //       'Set as default address',
               //       style: TextStyle(
               //         fontSize: 14,
-              //         color: Colors.black87,
+              //         color: AppColors.white,
               //       ),
               //     ),
               //   ],
@@ -226,7 +227,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: AppColors.white,
           ),
         ),
         const SizedBox(height: 8),
@@ -235,7 +236,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
+                color: AppColors.premiumGold.withOpacity(0.1),
                 blurRadius: 5,
                 offset: const Offset(0, 2),
               ),
@@ -246,23 +247,23 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
             keyboardType: keyboardType,
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+              hintStyle: TextStyle(color: AppColors.premiumGold, fontSize: 14),
               prefixIcon: icon != null
-                  ? Icon(icon, color: Colors.grey.shade600, size: 20)
+                  ? Icon(icon, color: AppColors.premiumGold, size: 20)
                   : null,
               filled: true,
-              fillColor: Colors.white,
+              fillColor: AppColors.white,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
+                borderSide: BorderSide(color: AppColors.premiumGold),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
+                borderSide: BorderSide(color: AppColors.premiumGold),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.black, width: 2),
+                borderSide: const BorderSide(color: AppColors.white, width: 2),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
@@ -289,7 +290,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: AppColors.white,
           ),
         ),
         const SizedBox(height: 8),
@@ -297,25 +298,25 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
-            color: Colors.white,
+            border: Border.all(color: AppColors.premiumGold),
+            color: AppColors.white,
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: value,
               isExpanded: true,
-              icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey.shade600),
+              icon: Icon(Icons.keyboard_arrow_down, color: AppColors.premiumGold),
               items: items.map((String item) {
                 return DropdownMenuItem<String>(
                   value: item,
                   child: Text(
                     item,
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
+                    style: const TextStyle(fontSize: 14, color: AppColors.white),
                   ),
                 );
               }).toList(),
               onChanged: onChanged,
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
+              style: const TextStyle(fontSize: 14, color: AppColors.white),
             ),
           ),
         ),
@@ -333,13 +334,13 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(25),
             border: Border.all(
-              color: isSelected ? Colors.black : Colors.grey.shade300,
+              color: isSelected ? AppColors.white : AppColors.premiumGold,
             ),
             color:
-            isSelected ? Colors.black.withOpacity(0.05) : Colors.transparent,
+            isSelected ? AppColors.white.withOpacity(0.05) : AppColors.transparent,
           ),
           child: Material(
-            color: Colors.transparent,
+            color: AppColors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(25),
               onTap: () {
@@ -352,7 +353,7 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
                     icon,
                     size: 20,
                     color:
-                    isSelected ? Colors.black : Colors.grey.shade600,
+                    isSelected ? AppColors.white : AppColors.premiumGold,
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -363,8 +364,8 @@ class AddAddressScreen extends GetWidget<AddAddressController> {
                           ? FontWeight.w600
                           : FontWeight.normal,
                       color: isSelected
-                          ? Colors.black
-                          : Colors.grey.shade700,
+                          ? AppColors.white
+                          : AppColors.premiumGold,
                     ),
                   ),
                 ],

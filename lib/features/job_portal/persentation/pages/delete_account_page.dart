@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
@@ -59,12 +60,12 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: AppColors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -72,7 +73,7 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
           style: GoogleFonts.poppins(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: AppColors.white,
           ),
         ),
         centerTitle: true,
@@ -86,12 +87,12 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: AppColors.premiumGold.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.grey[200]!),
+                border: Border.all(color: AppColors.premiumGold.withOpacity(0.2)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.05),
+                    color: AppColors.premiumGold.withOpacity(0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -124,7 +125,7 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.black87,
+                                color: AppColors.white,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -173,7 +174,7 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.white,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(
@@ -230,7 +231,7 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: AppColors.white,
               ),
             ),
             const SizedBox(height: 8),
@@ -238,7 +239,7 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
               'Give us optional feedback to help us improve',
               style: GoogleFonts.poppins(
                 fontSize: 14,
-                color: Colors.grey[600],
+                color: AppColors.premiumGold.withOpacity(0.6),
               ),
             ),
 
@@ -298,21 +299,21 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
                     hintText: 'Please tell us more...',
                     hintStyle: GoogleFonts.poppins(
                       fontSize: 14,
-                      color: Colors.grey[500],
+                      color: AppColors.premiumGold.withOpacity(0.5),
                     ),
                     filled: true,
-                    fillColor: Colors.grey[50],
+                    fillColor: AppColors.premiumGold.withOpacity(0.1),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: Colors.grey[200]!),
+                      borderSide: BorderSide(color: AppColors.premiumGold.withOpacity(0.2)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: Colors.black, width: 1.5),
+                      borderSide: const BorderSide(color: AppColors.white, width: 1.5),
                     ),
                     contentPadding: const EdgeInsets.all(16),
                   ),
@@ -380,17 +381,17 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                color: value ? Colors.black : Colors.transparent,
+                color: value ? AppColors.white : AppColors.transparent,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: value ? Colors.black : Colors.grey[400]!,
+                  color: value ? AppColors.white : AppColors.premiumGold.withOpacity(0.4),
                   width: 2,
                 ),
               ),
               child: value
                   ? const Icon(
                       Icons.check_rounded,
-                      color: Colors.white,
+                      color: AppColors.white,
                       size: 18,
                     )
                   : null,
@@ -402,7 +403,7 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 15,
                   fontWeight: value ? FontWeight.w600 : FontWeight.normal,
-                  color: value ? Colors.black87 : Colors.grey[700],
+                  color: value ? AppColors.white : AppColors.premiumGold.withOpacity(0.7),
                 ),
               ),
             ),
@@ -422,8 +423,8 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
       return OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.black87,
-          side: BorderSide(color: Colors.grey[300]!),
+          foregroundColor: AppColors.white,
+          side: BorderSide(color: AppColors.premiumGold.withOpacity(0.3)),
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
@@ -442,8 +443,8 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isDelete ? Colors.red[700] : Colors.black,
-        foregroundColor: Colors.white,
+        backgroundColor: isDelete ? Colors.red[700] : AppColors.white,
+        foregroundColor: AppColors.white,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
@@ -455,7 +456,7 @@ class _AccountDeleteReasonScreenState extends State<AccountDeleteReasonScreen> {
         style: GoogleFonts.poppins(
           fontSize: 15,
           fontWeight: FontWeight.w600,
-          color: Colors.white,
+          color: AppColors.white,
         ),
       ),
     );
@@ -534,12 +535,12 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: AppColors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -547,7 +548,7 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
           style: GoogleFonts.poppins(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: AppColors.white,
           ),
         ),
         centerTitle: true,
@@ -594,7 +595,7 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
                 style: GoogleFonts.poppins(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: AppColors.white,
                 ),
               ),
             ),
@@ -608,7 +609,7 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: Colors.grey[700],
+                  color: AppColors.premiumGold.withOpacity(0.7),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -631,7 +632,7 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
@@ -666,7 +667,7 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.7),
+                      color: AppColors.white.withOpacity(0.7),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
@@ -735,9 +736,9 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: AppColors.premiumGold.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isConfirmed ? Colors.green[200]! : Colors.grey[200]!),
+        border: Border.all(color: isConfirmed ? Colors.green[200]! : AppColors.premiumGold.withOpacity(0.2)),
       ),
       child: InkWell(
         onTap: () => setState(() => isConfirmed = !isConfirmed),
@@ -750,17 +751,17 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
               width: 28,
               height: 28,
               decoration: BoxDecoration(
-                color: isConfirmed ? Colors.green : Colors.transparent,
+                color: isConfirmed ? Colors.green : AppColors.transparent,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: isConfirmed ? Colors.green : Colors.grey[400]!,
+                  color: isConfirmed ? Colors.green : AppColors.premiumGold.withOpacity(0.4),
                   width: 2,
                 ),
               ),
               child: isConfirmed
                   ? const Icon(
                       Icons.check_rounded,
-                      color: Colors.white,
+                      color: AppColors.white,
                       size: 20,
                     )
                   : null,
@@ -775,7 +776,7 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: AppColors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -783,7 +784,7 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
                     'I confirm that I want to permanently delete my account',
                     style: GoogleFonts.poppins(
                       fontSize: 13,
-                      color: Colors.grey[600],
+                      color: AppColors.premiumGold.withOpacity(0.6),
                     ),
                   ),
                 ],
@@ -806,8 +807,8 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
       return OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.black87,
-          side: BorderSide(color: Colors.grey[300]!),
+          foregroundColor: AppColors.white,
+          side: BorderSide(color: AppColors.premiumGold.withOpacity(0.3)),
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
@@ -827,9 +828,9 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
       onPressed: isEnabled ? onPressed : null,
       style: ElevatedButton.styleFrom(
         backgroundColor: isDelete
-            ? (isEnabled ? Colors.red[700] : Colors.grey[400])
-            : (isEnabled ? Colors.black : Colors.grey[400]),
-        foregroundColor: Colors.white,
+            ? (isEnabled ? Colors.red[700] : AppColors.premiumGold.withOpacity(0.4))
+            : (isEnabled ? AppColors.white : AppColors.premiumGold.withOpacity(0.4)),
+        foregroundColor: AppColors.white,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
@@ -841,7 +842,7 @@ class _AccountDeleteConfirmationScreenState extends State<AccountDeleteConfirmat
         style: GoogleFonts.poppins(
           fontSize: 15,
           fontWeight: FontWeight.w600,
-          color: Colors.white,
+          color: AppColors.white,
         ),
       ),
     );

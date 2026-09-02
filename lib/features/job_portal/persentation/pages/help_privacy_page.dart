@@ -22,10 +22,10 @@ class _HelpPrivacyPageState extends State<HelpPrivacyPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Help & Privacy'),
-        backgroundColor: isDarkMode ? Colors.black87 : Colors.white,
-        foregroundColor: isDarkMode ? Colors.white : Colors.black87,
+        backgroundColor: AppColors.black,
+        foregroundColor: isDarkMode ? AppColors.white : AppColors.white,
         elevation: 1,
-        shadowColor: Colors.grey.withOpacity(0.1),
+        shadowColor: AppColors.premiumGold.withOpacity(0.1),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -86,7 +86,7 @@ class _HelpPrivacyPageState extends State<HelpPrivacyPage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: AppColors.white.withOpacity(0.2),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -423,7 +423,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text...
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.3),
+            color: AppColors.premiumGold.withOpacity(0.3),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(

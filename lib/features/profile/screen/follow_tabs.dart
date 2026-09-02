@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -38,7 +39,7 @@ class CustomEmptyState extends StatelessWidget {
           Icon(
             icon,
             size: isSmall ? 48 : 64,
-            color: Colors.grey.shade400,
+            color: AppColors.premiumGold,
           ),
           SizedBox(height: isSmall ? 12 : 16),
           Text(
@@ -46,7 +47,7 @@ class CustomEmptyState extends StatelessWidget {
             style: TextStyle(
               fontSize: isSmall ? 16 : 18,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: AppColors.white,
             ),
           ),
           SizedBox(height: isSmall ? 4 : 8),
@@ -54,7 +55,7 @@ class CustomEmptyState extends StatelessWidget {
             subTitle,
             style: TextStyle(
               fontSize: isSmall ? 13 : 14,
-              color: Colors.grey.shade600,
+              color: AppColors.premiumGold,
             ),
             textAlign: TextAlign.center,
           ),
@@ -74,24 +75,24 @@ class FollowTabs extends StatelessWidget {
       length: 2,
       initialIndex: initialTab,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.transparent,
           elevation: 0,
           title: const Text(
             "Connections",
             style: TextStyle(
-              color: Colors.black,
+              color: AppColors.white,
               fontWeight: FontWeight.w600,
             ),
           ),
-          iconTheme: const IconThemeData(color: Colors.black),
+          iconTheme: const IconThemeData(color: AppColors.white),
           bottom: TabBar(
-            labelColor: Colors.black,
-            unselectedLabelColor: Colors.grey,
+            labelColor: AppColors.white,
+            unselectedLabelColor: AppColors.premiumGold,
             indicatorWeight: 2,
             indicatorSize: TabBarIndicatorSize.tab,
-            indicatorColor: Colors.black,
+            indicatorColor: AppColors.white,
             labelStyle: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 15,
@@ -126,7 +127,7 @@ class FollowingList extends StatelessWidget {
 
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Column(
@@ -136,12 +137,13 @@ class FollowingList extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               height: 48,
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: AppColors.black,
+                border: Border.all(color: AppColors.premiumGold),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.search, color: Colors.grey.shade600, size: 22),
+                  Icon(Icons.search, color: AppColors.premiumGold, size: 22),
                   const SizedBox(width: 12),
                   Expanded(
                     child: TextField(
@@ -151,14 +153,14 @@ class FollowingList extends StatelessWidget {
                       decoration: InputDecoration(
                         hintText: 'Search following...',
                         hintStyle: TextStyle(
-                          color: Colors.grey.shade500,
+                          color: AppColors.premiumGold,
                           fontSize: 15,
                         ),
                         border: InputBorder.none,
                       ),
                       style: const TextStyle(
                         fontSize: 15,
-                        color: Colors.black87,
+                        color: AppColors.white,
                       ),
                     ),
                   ),
@@ -205,7 +207,7 @@ class FollowingList extends StatelessWidget {
                             // Avatar
                             CircleAvatar(
                               radius: 26,
-                              backgroundColor: Colors.grey.shade200,
+                              backgroundColor: AppColors.premiumGold,
                               backgroundImage: (user.avatar != null && user.avatar!.isNotEmpty)
                                   ? NetworkImage(AppUrls.getFullImageUrl(user.avatar))
                                   : null,
@@ -224,7 +226,7 @@ class FollowingList extends StatelessWidget {
                                   Text(
                                     user.name,
                                     style: const TextStyle(
-                                      color: Colors.black87,
+                                      color: AppColors.white,
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -233,7 +235,7 @@ class FollowingList extends StatelessWidget {
                                   Text(
                                     "@${user.username}",
                                     style: TextStyle(
-                                      color: Colors.grey.shade600,
+                                      color: AppColors.premiumGold,
                                       fontSize: 13,
                                     ),
                                   ),
@@ -257,13 +259,13 @@ class FollowingList extends StatelessWidget {
                                     vertical: 8,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: user.isFollowedByAuthUser ? Colors.grey.shade200 : AppColors.primaryDark,
+                                    color: user.isFollowedByAuthUser ? AppColors.premiumGold : AppColors.primaryDark,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
                                     user.isFollowedByAuthUser ? "Following" : "Follow",
                                     style: TextStyle(
-                                      color: user.isFollowedByAuthUser ? Colors.black87 : Colors.white,
+                                      color: user.isFollowedByAuthUser ? AppColors.white : AppColors.white,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 13,
                                     ),
@@ -298,7 +300,7 @@ class FollowerList extends StatelessWidget {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Column(
@@ -308,12 +310,13 @@ class FollowerList extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               height: 48,
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: AppColors.black,
+                border: Border.all(color: AppColors.premiumGold),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.search, color: Colors.grey.shade600, size: 22),
+                  Icon(Icons.search, color: AppColors.premiumGold, size: 22),
                   const SizedBox(width: 12),
                   Expanded(
                     child: TextField(
@@ -323,14 +326,14 @@ class FollowerList extends StatelessWidget {
                       decoration: InputDecoration(
                         hintText: 'Search followers...',
                         hintStyle: TextStyle(
-                          color: Colors.grey.shade500,
+                          color: AppColors.premiumGold,
                           fontSize: 15,
                         ),
                         border: InputBorder.none,
                       ),
                       style: const TextStyle(
                         fontSize: 15,
-                        color: Colors.black87,
+                        color: AppColors.white,
                       ),
                     ),
                   ),
@@ -377,7 +380,7 @@ class FollowerList extends StatelessWidget {
                             // Avatar
                             CircleAvatar(
                               radius: 26,
-                              backgroundColor: Colors.grey.shade200,
+                              backgroundColor: AppColors.premiumGold,
                               backgroundImage: (user.avatar != null && user.avatar!.isNotEmpty)
                                   ? NetworkImage(AppUrls.getFullImageUrl(user.avatar))
                                   : null,
@@ -396,7 +399,7 @@ class FollowerList extends StatelessWidget {
                                   Text(
                                     user.name,
                                     style: const TextStyle(
-                                      color: Colors.black87,
+                                      color: AppColors.white,
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -405,7 +408,7 @@ class FollowerList extends StatelessWidget {
                                   Text(
                                     "@${user.username}",
                                     style: TextStyle(
-                                      color: Colors.grey.shade600,
+                                      color: AppColors.premiumGold,
                                       fontSize: 13,
                                     ),
                                   ),
@@ -429,13 +432,13 @@ class FollowerList extends StatelessWidget {
                                     vertical: 8,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: user.isFollowedByAuthUser ? Colors.grey.shade200 : AppColors.primaryDark,
+                                    color: user.isFollowedByAuthUser ? AppColors.premiumGold : AppColors.primaryDark,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
                                     user.isFollowedByAuthUser ? "Following" : "Follow",
                                     style: TextStyle(
-                                      color: user.isFollowedByAuthUser ? Colors.black87 : Colors.white,
+                                      color: user.isFollowedByAuthUser ? AppColors.white : AppColors.white,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 13,
                                     ),
@@ -464,7 +467,7 @@ void _showUnfollowBottomSheet(BuildContext context, dynamic user, dynamic contro
     Container(
       padding: EdgeInsets.only(top: 20, bottom: 20 + bottomPadding),
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -472,7 +475,7 @@ void _showUnfollowBottomSheet(BuildContext context, dynamic user, dynamic contro
         children: [
           CircleAvatar(
             radius: 40,
-            backgroundColor: Colors.grey.shade200,
+            backgroundColor: AppColors.premiumGold,
             backgroundImage: user.avatar != null && user.avatar!.isNotEmpty
                 ? NetworkImage(AppUrls.getFullImageUrl(user.avatar))
                 : null,
@@ -525,7 +528,7 @@ void _showUnfollowBottomSheet(BuildContext context, dynamic user, dynamic contro
       //   ),
       // ),
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         // appBar: AppBar(
         //     backgroundColor: AppColors.transparent,
         //     leading: GestureDetector(
@@ -551,7 +554,7 @@ void _showUnfollowBottomSheet(BuildContext context, dynamic user, dynamic contro
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: AppColors.white.withOpacity(0.05),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -578,7 +581,7 @@ void _showUnfollowBottomSheet(BuildContext context, dynamic user, dynamic contro
                         ),
                         style: const TextStyle(
                           fontSize: 18,
-                          color: Colors.black87,
+                          color: AppColors.white,
                         ),
                       ),
                     ),
@@ -673,7 +676,7 @@ void _showUnfollowBottomSheet(BuildContext context, dynamic user, dynamic contro
       //   ),
       // ),
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         // appBar: AppBar(
         //     backgroundColor: AppColors.transparent,
         //     leading: GestureDetector(
@@ -699,7 +702,7 @@ void _showUnfollowBottomSheet(BuildContext context, dynamic user, dynamic contro
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: AppColors.white.withOpacity(0.05),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -726,7 +729,7 @@ void _showUnfollowBottomSheet(BuildContext context, dynamic user, dynamic contro
                           ),
                           style: const TextStyle(
                             fontSize: 18,
-                            color: Colors.black87,
+                            color: AppColors.white,
                           ),
                         ),
                       ),

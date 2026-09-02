@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,7 +25,7 @@ class MyVideoScreen extends StatelessWidget {
       tag: "${username}_videos"
     );
     return Container(
-      color: Colors.transparent,
+      color: AppColors.transparent,
       child: NotificationListener<ScrollNotification>(
         onNotification: (scroll) {
           if (!controller.isLoading.value &&
@@ -34,7 +35,7 @@ class MyVideoScreen extends StatelessWidget {
           }
           return false;
         },
-        child: RefreshIndicator(color: Colors.black, 
+        child: RefreshIndicator(color: AppColors.white, 
           onRefresh: () async {
             await controller.fetchOwnPosts(filterType: "videos", username: username);
           },
@@ -62,11 +63,11 @@ class MyVideoScreen extends StatelessWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.lock_outline_rounded, size: 50, color: Colors.grey.shade400),
+                              Icon(Icons.lock_outline_rounded, size: 50, color: AppColors.premiumGold),
                               const SizedBox(height: 12),
                               const Text("This account is private", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                               const SizedBox(height: 4),
-                              const Text("Follow to see their videos", style: TextStyle(color: Colors.grey)),
+                              const Text("Follow to see their videos", style: TextStyle(color: AppColors.premiumGold)),
                             ],
                           ),
                         );
@@ -76,9 +77,9 @@ class MyVideoScreen extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.videocam_off_outlined, size: 50, color: Colors.grey),
+                            Icon(Icons.videocam_off_outlined, size: 50, color: AppColors.premiumGold),
                             const SizedBox(height: 12),
-                            Text("No videos found", style: TextStyle(color: Colors.grey)),
+                            Text("No videos found", style: TextStyle(color: AppColors.premiumGold)),
                           ],
                         ),
                       );
@@ -147,7 +148,7 @@ class MyVideoScreen extends StatelessWidget {
 
   Widget _buildVideoItem(String imageUrl, int viewCount) {
     return Container(
-      color: Colors.black12,
+      color: AppColors.white,
       child: Stack(
         children: [
           Positioned.fill(
@@ -156,15 +157,15 @@ class MyVideoScreen extends StatelessWidget {
                     imageUrl: imageUrl,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => Shimmer.fromColors(
-                      baseColor: Colors.grey[300]!,
-                      highlightColor: Colors.grey[100]!,
-                      child: Container(color: Colors.white),
+                      baseColor: AppColors.premiumGold.withOpacity(0.3),
+                      highlightColor: AppColors.premiumGold.withOpacity(0.1),
+                      child: Container(color: AppColors.white),
                     ),
                     errorWidget: (context, url, error) => const Center(
-                      child: Icon(Icons.videocam_off, color: Colors.grey),
+                      child: Icon(Icons.videocam_off, color: AppColors.premiumGold),
                     ),
                   )
-                : const Center(child: Icon(Icons.videocam_off, color: Colors.grey)),
+                : const Center(child: Icon(Icons.videocam_off, color: AppColors.premiumGold)),
           ),
           
           // Gradient Overlay
@@ -173,8 +174,8 @@ class MyVideoScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Colors.transparent,
-                    Colors.black.withOpacity(0.6),
+                    AppColors.transparent,
+                    AppColors.white.withOpacity(0.6),
                   ],
                   begin: Alignment.center,
                   end: Alignment.bottomCenter,
@@ -189,12 +190,12 @@ class MyVideoScreen extends StatelessWidget {
             left: 8,
             child: Row(
               children: [
-                const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
+                const Icon(Icons.play_arrow_rounded, color: AppColors.white, size: 20),
                 const SizedBox(width: 4),
                 Text(
                   _formatCount(viewCount),
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.white,
                     fontWeight: FontWeight.w600,
                     fontSize: 12,
                   ),

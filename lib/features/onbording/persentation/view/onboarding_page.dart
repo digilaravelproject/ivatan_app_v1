@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -14,7 +15,7 @@ class OnboardingPage extends StatelessWidget {
     final pageController = PageController();
 
     return Scaffold(
-      backgroundColor: Colors.black, // Ensure black background for blending
+      backgroundColor: AppColors.transparent, // Ensure black background for blending
       body: Stack(
         children: [
           PageView.builder(
@@ -49,9 +50,9 @@ class OnboardingPage extends StatelessWidget {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            Colors.transparent,
-                            Colors.black.withValues(alpha: 0.2), // Light top
-                            Colors.black.withValues(alpha: 0.8), // Dark bottom
+                            AppColors.transparent,
+                            AppColors.white.withValues(alpha: 0.2), // Light top
+                            AppColors.white.withValues(alpha: 0.8), // Dark bottom
                           ],
                           stops: const [0.5, 0.7, 1.0],
                         ),
@@ -72,7 +73,7 @@ class OnboardingPage extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: AppColors.white,
                               letterSpacing: 0.5,
                             ),
                           ),
@@ -82,7 +83,7 @@ class OnboardingPage extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 16,
-                              color: Colors.white70,
+                              color: AppColors.white,
                               height: 1.5,
                             ),
                           ),
@@ -103,9 +104,9 @@ class OnboardingPage extends StatelessWidget {
                 child: TextButton(
                   onPressed: controller.skipToLogin, // Directly skips to Login
                   style: TextButton.styleFrom(
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      backgroundColor: Colors.black12,
+                      backgroundColor: AppColors.transparent,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
                   ),
                   child: const Text("Skip"),
@@ -135,8 +136,8 @@ class OnboardingPage extends StatelessWidget {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(3),
                             color: controller.currentPage.value == index
-                                ? Colors.white // White for contrast on Black overlay
-                                : Colors.white38,
+                                ? AppColors.white // White for contrast on Black overlay
+                                : AppColors.white,
                           ),
                         ),
                       ),

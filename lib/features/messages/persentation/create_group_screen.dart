@@ -179,12 +179,12 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: AppColors.white),
           onPressed: () => Get.back(),
         ),
         title: Column(
@@ -193,7 +193,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             const Text(
               "New Group",
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -201,7 +201,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             Text(
               "Add participants",
               style: TextStyle(
-                color: Colors.white.withOpacity(0.8),
+                color: AppColors.white.withOpacity(0.8),
                 fontSize: 12,
               ),
             ),
@@ -212,7 +212,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         children: [
           // Group Info Section
           Container(
-            color: Colors.grey.shade50,
+            color: AppColors.premiumGold.withOpacity(0.1),
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
@@ -224,7 +224,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     height: 60,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.grey.shade200,
+                      color: AppColors.premiumGold,
                       image: selectedAvatar != null
                           ? DecorationImage(
                               image: FileImage(selectedAvatar!),
@@ -233,7 +233,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                           : null,
                     ),
                     child: selectedAvatar == null
-                        ? Icon(Icons.camera_alt, color: Colors.grey.shade600, size: 28)
+                        ? Icon(Icons.camera_alt, color: AppColors.premiumGold, size: 28)
                         : null,
                   ),
                 ),
@@ -245,7 +245,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     style: const TextStyle(fontSize: 16),
                     decoration: InputDecoration(
                       hintText: "Group name",
-                      hintStyle: TextStyle(color: Colors.grey.shade400),
+                      hintStyle: TextStyle(color: AppColors.premiumGold),
                       border: InputBorder.none,
                     ),
                   ),
@@ -260,7 +260,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           if (selectedUserIds.isNotEmpty)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: Colors.grey.shade50,
+              color: AppColors.premiumGold.withOpacity(0.1),
               child: Row(
                 children: [
                   Text(
@@ -289,7 +289,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         separatorBuilder: (ctx, i) => Divider(
                           height: 1,
                           indent: 80,
-                          color: Colors.grey.shade100,
+                          color: AppColors.premiumGold,
                         ),
                         itemBuilder: (context, index) {
                           final contact = contacts[index];
@@ -318,7 +318,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                                   // Avatar
                                   CircleAvatar(
                                     radius: 25,
-                                    backgroundColor: Colors.grey.shade200,
+                                    backgroundColor: AppColors.premiumGold,
                                     backgroundImage: (contactAvatar != null &&
                                             contactAvatar.toString().isNotEmpty)
                                         ? NetworkImage(contactAvatar.toString())
@@ -380,11 +380,11 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator(
-                        color: Colors.white,
+                        color: AppColors.white,
                         strokeWidth: 2,
                       ),
                     )
-                  : const Icon(Icons.arrow_forward, color: Colors.white),
+                  : const Icon(Icons.arrow_forward, color: AppColors.white),
             )
           : null,
     );

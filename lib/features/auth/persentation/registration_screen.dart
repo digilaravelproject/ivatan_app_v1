@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -19,12 +20,12 @@ class RegistrationScreen extends GetWidget<RegisterController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: BackButton(
-          color: Colors.black,
+          color: AppColors.white,
           onPressed: () => Get.back(),
         ),
         actions: [
@@ -34,7 +35,7 @@ class RegistrationScreen extends GetWidget<RegisterController> {
               child: Text(
                 "Step 2/2",
                 style: TextStyle(
-                  color: Colors.grey.shade500,
+                  color: AppColors.premiumGold,
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
@@ -66,7 +67,7 @@ class RegistrationScreen extends GetWidget<RegisterController> {
                   "Fill in the details below to complete your profile.",
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey.shade600,
+                    color: AppColors.premiumGold,
                     height: 1.5,
                   ),
                 ),
@@ -93,7 +94,7 @@ class RegistrationScreen extends GetWidget<RegisterController> {
                   labelText: 'Mobile No',
                   enabled: controller.phoneController.text.isEmpty,
                   suffixIcon: controller.phoneController.text.isNotEmpty
-                      ? const Icon(Icons.lock, color: Colors.grey)
+                      ? const Icon(Icons.lock, color: AppColors.premiumGold)
                       : null,
                 ),
                 const SizedBox(height: 20),
@@ -222,7 +223,7 @@ class RegistrationScreen extends GetWidget<RegisterController> {
                     Text(
                       "Already have an account? ",
                       style: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: AppColors.premiumGold,
                         fontSize: 14,
                       ),
                     ),

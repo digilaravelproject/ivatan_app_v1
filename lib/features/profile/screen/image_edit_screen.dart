@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
@@ -33,7 +34,7 @@ class _ImageEditScreenState extends State<ImageEditScreen> {
   final RxBool showTextInput = false.obs;
   final RxBool showStickerPicker = false.obs;
 
-  Color selectedColor = Colors.white;
+  Color selectedColor = AppColors.white;
   double strokeWidth = 5.0;
 
   final RxBool showTrash = false.obs;
@@ -41,7 +42,7 @@ class _ImageEditScreenState extends State<ImageEditScreen> {
 
   // Text Editor State
   final TextEditingController textInputCtrl = TextEditingController();
-  Color selectedTextColor = Colors.white;
+  Color selectedTextColor = AppColors.white;
 
   @override
   void initState() {
@@ -81,12 +82,12 @@ class _ImageEditScreenState extends State<ImageEditScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
+          icon: const Icon(Icons.close, color: AppColors.white),
           onPressed: () => Get.back(),
         ),
         actions: [
@@ -129,12 +130,12 @@ class _ImageEditScreenState extends State<ImageEditScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: isOverTrash.value ? Colors.red.withOpacity(0.8) : Colors.black54,
+                      color: isOverTrash.value ? Colors.red.withOpacity(0.8) : AppColors.white,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.delete_outline, 
-                      color: Colors.white, 
+                      color: AppColors.white, 
                       size: isOverTrash.value ? 35 : 28,
                     ),
                   ),
@@ -157,14 +158,14 @@ class _ImageEditScreenState extends State<ImageEditScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: Colors.black45,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(25),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: const Icon(Icons.crop_rotate, color: Colors.white),
+              icon: const Icon(Icons.crop_rotate, color: AppColors.white),
               onPressed: () async {
                 final croppedFile = await ImageCropper().cropImage(
                   sourcePath: currentFile.path,
@@ -172,8 +173,8 @@ class _ImageEditScreenState extends State<ImageEditScreen> {
                   uiSettings: [
                     AndroidUiSettings(
                       toolbarTitle: 'Crop Image',
-                      toolbarColor: Colors.black,
-                      toolbarWidgetColor: Colors.white,
+                      toolbarColor: AppColors.white,
+                      toolbarWidgetColor: AppColors.white,
                       initAspectRatio: CropAspectRatioPreset.original,
                       lockAspectRatio: false,
                     ),
@@ -186,15 +187,15 @@ class _ImageEditScreenState extends State<ImageEditScreen> {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.text_fields, color: Colors.white),
+              icon: const Icon(Icons.text_fields, color: AppColors.white),
               onPressed: () => showTextInput.value = true,
             ),
             IconButton(
-              icon: const Icon(Icons.emoji_emotions_outlined, color: Colors.white),
+              icon: const Icon(Icons.emoji_emotions_outlined, color: AppColors.white),
               onPressed: () => showStickerPicker.value = true,
             ),
             Obx(() => IconButton(
-              icon: Icon(Icons.brush, color: isDrawing.value ? Colors.blue : Colors.white),
+              icon: Icon(Icons.brush, color: isDrawing.value ? Colors.blue : AppColors.white),
               onPressed: () => isDrawing.value = !isDrawing.value,
             )),
           ],
@@ -298,14 +299,14 @@ class _ImageEditScreenState extends State<ImageEditScreen> {
             scale: overlay.scale,
             child: Container(
               padding: const EdgeInsets.all(15), 
-              color: Colors.transparent,
+              color: AppColors.transparent,
               child: overlay is TextOverlay 
                 ? Text(overlay.text, 
                     style: TextStyle(
                       color: overlay.color, 
                       fontSize: 30, 
                       fontWeight: FontWeight.bold,
-                      shadows: [Shadow(color: Colors.black.withOpacity(0.5), blurRadius: 4, offset: const Offset(2, 2))]
+                      shadows: [Shadow(color: AppColors.white.withOpacity(0.5), blurRadius: 4, offset: const Offset(2, 2))]
                     )
                   )
                 : Text(overlay.emoji, style: const TextStyle(fontSize: 50)),
@@ -318,7 +319,7 @@ class _ImageEditScreenState extends State<ImageEditScreen> {
 
   Widget _buildTextInputField() {
     return Container(
-      color: Colors.black54,
+      color: AppColors.white,
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -328,17 +329,17 @@ class _ImageEditScreenState extends State<ImageEditScreen> {
               autofocus: true,
               style: TextStyle(color: selectedTextColor, fontSize: 30, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
-              decoration: const InputDecoration(border: InputBorder.none, hintText: "Type something...", hintStyle: TextStyle(color: Colors.white24)),
+              decoration: const InputDecoration(border: InputBorder.none, hintText: "Type something...", hintStyle: TextStyle(color: AppColors.white)),
             ),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [Colors.white, Colors.red, Colors.green, Colors.blue, Colors.yellow].map((c) => GestureDetector(
+              children: [AppColors.white, Colors.red, Colors.green, Colors.blue, Colors.yellow].map((c) => GestureDetector(
                 onTap: () => setState(() => selectedTextColor = c),
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 5),
                   width: 30, height: 30,
-                  decoration: BoxDecoration(color: c, shape: BoxShape.circle, border: Border.all(color: selectedTextColor == c ? Colors.white : Colors.transparent, width: 2)),
+                  decoration: BoxDecoration(color: c, shape: BoxShape.circle, border: Border.all(color: selectedTextColor == c ? AppColors.white : AppColors.transparent, width: 2)),
                 ),
               )).toList(),
             ),
@@ -362,7 +363,7 @@ class _ImageEditScreenState extends State<ImageEditScreen> {
   Widget _buildStickerPicker() {
     final emojis = ["😂", "❤️", "🔥", "🙌", "✨", "🌟", "💯", "😎", "🌈", "🦋"];
     return Container(
-      color: Colors.black54,
+      color: AppColors.white,
       child: Center(
         child: Wrap(
           spacing: 15, runSpacing: 15,

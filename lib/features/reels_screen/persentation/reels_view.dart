@@ -166,8 +166,8 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
 
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        systemNavigationBarColor: Colors.transparent,
+        statusBarColor: AppColors.transparent,
+        systemNavigationBarColor: AppColors.transparent,
         statusBarIconBrightness: Brightness.light,
         systemNavigationBarIconBrightness: Brightness.light,
         systemNavigationBarContrastEnforced: false,
@@ -222,8 +222,8 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
       end: 0.8,
     ).animate(_dismissAnimationController);
     _backgroundAnimation = ColorTween(
-      begin: Colors.transparent,
-      end: Colors.black.withValues(alpha: 0.5),
+      begin: AppColors.transparent,
+      end: AppColors.white.withValues(alpha: 0.5),
     ).animate(_dismissAnimationController);
 
     _initializeControllersForPage(_currentPage);
@@ -434,15 +434,15 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
         );
       },
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         extendBodyBehindAppBar: true,
         body: Stack(
           children: [
             GestureDetector(
               onVerticalDragUpdate: _onVerticalDragUpdate,
               onVerticalDragEnd: _onVerticalDragEnd,
-              child: RefreshIndicator(color: Colors.white,
-                backgroundColor: Colors.black,
+              child: RefreshIndicator(color: AppColors.white,
+                backgroundColor: AppColors.transparent,
                 onRefresh: () async {
                   if (Get.isRegistered<ShortPlayController>()) {
                     await Get.find<ShortPlayController>().fetchReels();
@@ -541,13 +541,13 @@ class _ReelsViewState extends State<ReelsView> with TickerProviderStateMixin {
                 child: Text(
                   'Clips',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
                     shadows: [
                       Shadow(
-                        color: Colors.black54,
+                        color: AppColors.white,
                         offset: Offset(0, 1),
                         blurRadius: 6,
                       ),
@@ -750,7 +750,7 @@ class CustomReelPlayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black, // Background for letterboxing if needed
+      color: AppColors.white, // Background for letterboxing if needed
       child: ValueListenableBuilder(
         valueListenable: controller,
         builder: (context, value, child) {
@@ -778,13 +778,13 @@ class CustomReelPlayer extends StatelessWidget {
                     children: [
                       const Icon(
                         Icons.error_outline,
-                        color: Colors.white,
+                        color: AppColors.white,
                         size: 40,
                       ),
                       const SizedBox(height: 8),
                       const Text(
                         'Failed to load',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: AppColors.white),
                       ),
                     ],
                   ),
@@ -800,7 +800,7 @@ class CustomReelPlayer extends StatelessWidget {
                 loadingWidget ??
                     const Center(
                       child: CustomLoadingIndicator(
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                     ),
                 errorWidget: (context, url, error) => const SizedBox(),
@@ -829,11 +829,11 @@ class VideoOverlay extends StatelessWidget {
               const Center(child: CircularProgressIndicator()),
             if (value.position == value.duration && !value.isPlaying)
               const Center(
-                child: CircularProgressIndicator(color: Colors.white),
+                child: CircularProgressIndicator(color: AppColors.white),
               ),
             if (!value.isPlaying && value.position != value.duration)
               const Center(
-                child: Icon(Icons.play_arrow, size: 80, color: Colors.white),
+                child: Icon(Icons.play_arrow, size: 80, color: AppColors.white),
               ),
           ],
         );
@@ -880,13 +880,13 @@ class VolumeAnimation extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.5),
+            color: AppColors.white.withOpacity(0.5),
             shape: BoxShape.circle,
           ),
           child: Icon(
             isMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
             size: 50,
-            color: Colors.white,
+            color: AppColors.white,
           ),
         ),
       ),
@@ -905,9 +905,9 @@ class VideoGradient extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.black.withValues(alpha: 0.55),
-            Colors.transparent,
-            Colors.black.withValues(alpha: 0.3),
+            AppColors.white.withValues(alpha: 0.55),
+            AppColors.transparent,
+            AppColors.white.withValues(alpha: 0.3),
           ],
         ),
       ),
@@ -971,11 +971,11 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
               child: Text(
                 item.caption!,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.white,
                   fontSize: 14,
                   shadows: [
                     Shadow(
-                      color: Colors.black,
+                      color: AppColors.white,
                       offset: Offset(0, 1),
                       blurRadius: 4,
                     ),
@@ -1002,7 +1002,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
           showModalBottomSheet(
             context: context,
             isScrollControlled: true,
-            backgroundColor: Colors.transparent,
+            backgroundColor: AppColors.transparent,
             builder: (_) => CommentsBottomSheet(postId: item.id),
           );
         },
@@ -1016,7 +1016,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.35),
+                    color: AppColors.white.withOpacity(0.35),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -1028,12 +1028,12 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                           shadows: [
                             Shadow(
-                              color: Colors.black54,
+                              color: AppColors.white,
                               offset: Offset(0, 1),
                               blurRadius: 4,
                             ),
@@ -1046,11 +1046,11 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
+                          color: AppColors.white.withOpacity(0.9),
                           fontSize: 12,
                           shadows: const [
                             Shadow(
-                              color: Colors.black54,
+                              color: AppColors.white,
                               offset: Offset(0, 1),
                               blurRadius: 4,
                             ),
@@ -1067,12 +1067,12 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                   child: Text(
                     'View all ${comments.length} comments',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: AppColors.white.withOpacity(0.8),
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       shadows: const [
                         Shadow(
-                          color: Colors.black54,
+                          color: AppColors.white,
                           offset: Offset(0, 1),
                           blurRadius: 4,
                         ),
@@ -1100,7 +1100,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
           Container(
             padding: const EdgeInsets.all(1.5),
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               shape: BoxShape.circle,
             ),
             child: item.user.avatar.isNotEmpty
@@ -1112,8 +1112,8 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                   )
                 : const CircleAvatar(
                     radius: 19,
-                    backgroundColor: Colors.grey,
-                    child: Icon(Icons.person, size: 24, color: Colors.white),
+                    backgroundColor: AppColors.premiumGold,
+                    child: Icon(Icons.person, size: 24, color: AppColors.white),
                   ),
           ),
           const SizedBox(width: 12),
@@ -1131,12 +1131,12 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           shadows: [
                             Shadow(
-                              color: Colors.black,
+                              color: AppColors.white,
                               offset: Offset(0, 1),
                               blurRadius: 4,
                             ),
@@ -1167,7 +1167,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
-                            color: isFollowing ? AppColors.secondaryBackground : Colors.transparent,
+                            color: isFollowing ? AppColors.secondaryBackground : AppColors.transparent,
                             border: Border.all(color: AppColors.premiumGold, width: 1),
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -1216,7 +1216,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
+                        color: AppColors.white.withOpacity(0.6),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
@@ -1229,14 +1229,14 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                             : const Icon(
                                 CupertinoIcons.heart,
                                 size: 24,
-                                color: Colors.white,
+                                color: AppColors.white,
                               ),
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       controller.getLikeCount(item.id, item.stats.likeCount).value.toString(),
-                      style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                      style: const TextStyle(color: AppColors.white, fontSize: 12, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -1249,7 +1249,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
           () => _buildIconButton(
             icon: const Icon(
               Icons.chat_bubble_outline_rounded,
-              color: Colors.white,
+              color: AppColors.white,
               size: 24,
             ),
             label: controller.getCommentCount(item.id, item.stats.commentCount).value.toString(),
@@ -1257,7 +1257,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
               showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
-                backgroundColor: Colors.transparent,
+                backgroundColor: AppColors.transparent,
                 builder: (_) => CommentsBottomSheet(postId: item.id),
               );
             },
@@ -1267,7 +1267,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
         _buildIconButton(
           icon: const Icon(
             Icons.bookmark_border_rounded,
-            color: Colors.white,
+            color: AppColors.white,
             size: 24,
           ),
           label: "4.3K", // Bookmark count placeholder or real data if available
@@ -1279,7 +1279,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
         _buildIconButton(
           icon: const Icon(
             Icons.send_rounded, // Assuming this matches the share icon in screenshot better
-            color: Colors.white,
+            color: AppColors.white,
             size: 24,
           ),
           label: controller.getShareCount(item.id, item.stats.shareCount).value.toString(),
@@ -1297,7 +1297,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
         _buildIconButton(
           icon: const Icon(
             Icons.more_vert_rounded,
-            color: Colors.white,
+            color: AppColors.white,
             size: 24,
           ),
           label: null,
@@ -1326,7 +1326,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
+                color: AppColors.white.withOpacity(0.6),
                 shape: BoxShape.circle,
               ),
               child: Center(child: icon),
@@ -1336,12 +1336,12 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
               Text(
                 label,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.white,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   shadows: [
                     Shadow(
-                      color: Colors.black45,
+                      color: AppColors.white,
                       offset: Offset(0, 1),
                       blurRadius: 4,
                     ),
@@ -1423,7 +1423,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                       height: 4,
                       width: 60,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
+                        color: AppColors.premiumGold,
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
@@ -1463,7 +1463,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                             border: index == currentIndexOfVideo
                                 ? Border.all(color: primaryColor, width: 2)
                                 : Border.all(
-                                    color: Colors.grey.shade200,
+                                    color: AppColors.premiumGold,
                                     width: 1,
                                   ),
                             borderRadius: BorderRadius.circular(8),
@@ -1487,7 +1487,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                                       return Center(
                                         child: Icon(
                                           Icons.image_not_supported,
-                                          color: Colors.grey.shade200,
+                                          color: AppColors.premiumGold,
                                         ),
                                       );
                                     },
@@ -1560,9 +1560,9 @@ class VideoProgressBar extends GetWidget<ShortPlayController> {
                 // Provide no thumb options
                 overlayShape: SliderComponentShape.noOverlay,
                 trackHeight: 2.0,
-                activeTrackColor: Colors.black,
+                activeTrackColor: AppColors.white,
                 // Changed from Cyan to Black
-                inactiveTrackColor: Colors.black.withOpacity(0.3),
+                inactiveTrackColor: AppColors.white.withOpacity(0.3),
                 trackShape: const RectangularSliderTrackShape(), // Full width
               ),
               child: Slider(
@@ -1619,7 +1619,7 @@ class VideoControls extends StatelessWidget {
                 return IconButton(
                   icon: Icon(
                     value.volume == 0 ? Icons.volume_off : Icons.volume_up,
-                    color: Colors.white,
+                    color: AppColors.white,
                   ),
                   onPressed: () {
                     controller.setVolume(value.volume == 0 ? 1.0 : 0.0);
@@ -1629,12 +1629,12 @@ class VideoControls extends StatelessWidget {
             ),
           if (showSettings)
             IconButton(
-              icon: const Icon(Icons.settings, color: Colors.white),
+              icon: const Icon(Icons.settings, color: AppColors.white),
               onPressed: onSettings,
             ),
           if (showMoreOptions)
             IconButton(
-              icon: const Icon(Icons.more_vert, color: Colors.white),
+              icon: const Icon(Icons.more_vert, color: AppColors.white),
               onPressed: onMore,
             ),
         ],
@@ -1654,7 +1654,7 @@ class CustomIcon extends StatelessWidget {
   const CustomIcon({
     super.key,
     this.size = 24,
-    this.color = Colors.white,
+    this.color = AppColors.white,
     this.svgString,
     this.icon,
     this.removeColor = true,

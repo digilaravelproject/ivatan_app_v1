@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:i_vatan_app/features/product/persentation/product_detail_screen.dart';
@@ -31,7 +32,7 @@ class MyProductsController extends GetxController {
           "Error",
           response?['message'] ?? "Failed to fetch products",
           backgroundColor: AppColors.error,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           snackPosition: SnackPosition.BOTTOM,
         );
       }
@@ -40,7 +41,7 @@ class MyProductsController extends GetxController {
         "Error",
         e.toString(),
         backgroundColor: AppColors.error,
-        colorText: Colors.white,
+        colorText: AppColors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
@@ -62,7 +63,7 @@ class MyProductsController extends GetxController {
           "Success",
           "Product deleted successfully",
           backgroundColor: AppColors.success,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           snackPosition: SnackPosition.BOTTOM,
         );
       },
@@ -91,7 +92,7 @@ class MyProductsController extends GetxController {
           "Success",
           "Product ${newStatus == 'active' ? 'activated' : 'deactivated'} successfully",
           backgroundColor: AppColors.success,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           snackPosition: SnackPosition.BOTTOM,
         );
       } else {
@@ -99,7 +100,7 @@ class MyProductsController extends GetxController {
           "Error",
           response?['message'] ?? "Failed to update product status",
           backgroundColor: AppColors.error,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           snackPosition: SnackPosition.BOTTOM,
         );
       }
@@ -108,7 +109,7 @@ class MyProductsController extends GetxController {
         "Error",
         e.toString(),
         backgroundColor: AppColors.error,
-        colorText: Colors.white,
+        colorText: AppColors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
     }
@@ -193,13 +194,13 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
         title: const Text(
           "Your Products",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         foregroundColor: AppColors.black,
         elevation: 0,
         actions: [
@@ -223,19 +224,19 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.inventory_2_outlined, size: 80, color: Colors.grey.shade400),
+                Icon(Icons.inventory_2_outlined, size: 80, color: AppColors.premiumGold),
                 const SizedBox(height: 16),
                 Text(
                   "No products yet",
-                  style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
+                  style: TextStyle(fontSize: 18, color: AppColors.premiumGold),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: () {
                     Get.to(() => CreateProductScreen());
                   },
-                  icon: const Icon(Icons.add, color: Colors.white),
-                  label: const Text("Add Product", style: TextStyle(color: Colors.white)),
+                  icon: const Icon(Icons.add, color: AppColors.white),
+                  label: const Text("Add Product", style: TextStyle(color: AppColors.white)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.black,
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -277,12 +278,12 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.lightBorder),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: AppColors.white.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -305,8 +306,8 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                       return Container(
                         width: 80,
                         height: 80,
-                        color: Colors.grey.shade200,
-                        child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                        color: AppColors.premiumGold,
+                        child: const Icon(Icons.image_not_supported, color: AppColors.premiumGold),
                       );
                     },
                   ),
@@ -337,7 +338,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                             decoration: BoxDecoration(
                               color: _isPositiveStatus(product.status)
                                   ? AppColors.success.withOpacity(0.1)
-                                  : Colors.grey.shade300,
+                                  : AppColors.premiumGold,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -345,7 +346,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: _isPositiveStatus(product.status) ? AppColors.success : Colors.grey.shade700,
+                                color: _isPositiveStatus(product.status) ? AppColors.success : AppColors.premiumGold,
                               ),
                             ),
                           ),
@@ -367,7 +368,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                               "₹${product.price.toStringAsFixed(0)}",
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey.shade600,
+                                color: AppColors.premiumGold,
                                 decoration: TextDecoration.lineThrough,
                               ),
                             ),
@@ -387,14 +388,14 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                           Icon(
                             Icons.inventory_2_outlined,
                             size: 16,
-                            color: product.stock > 0 ? Colors.grey.shade600 : AppColors.error,
+                            color: product.stock > 0 ? AppColors.premiumGold : AppColors.error,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             product.stock > 0 ? "Stock: ${product.stock}" : "Out of Stock",
                             style: TextStyle(
                               fontSize: 13,
-                              color: product.stock > 0 ? Colors.grey.shade600 : AppColors.error,
+                              color: product.stock > 0 ? AppColors.premiumGold : AppColors.error,
                               fontWeight: product.stock == 0 ? FontWeight.bold : FontWeight.normal,
                             ),
                           ),

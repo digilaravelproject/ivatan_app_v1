@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -61,9 +62,9 @@ Future<void> initApp() async {
 
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   const uiStyle = SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
+    statusBarColor: AppColors.transparent,
     statusBarIconBrightness: Brightness.dark,
-    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarColor: AppColors.transparent,
     systemNavigationBarIconBrightness: Brightness.dark,
     systemNavigationBarContrastEnforced: false,
     systemStatusBarContrastEnforced: false,
@@ -216,7 +217,7 @@ void _handleNotificationNavigation(RemoteMessage message) {
         message.notification?.body ?? data['body'] ?? '',
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.redAccent.withValues(alpha: 0.9),
-        colorText: Colors.white,
+        colorText: AppColors.white,
       );
     } else {
       // Get.offAll(() => HomeScreen());

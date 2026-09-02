@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:io';
@@ -68,7 +69,7 @@ class CreateProductController extends GetxController {
         "Error",
         "Please fill all required fields",
         backgroundColor: AppColors.error,
-        colorText: Colors.white,
+        colorText: AppColors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -80,7 +81,7 @@ class CreateProductController extends GetxController {
         "Error",
         "Please select a cover image",
         backgroundColor: AppColors.error,
-        colorText: Colors.white,
+        colorText: AppColors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -93,7 +94,7 @@ class CreateProductController extends GetxController {
         "Error",
         "Please enter a valid price (must be greater than 0)",
         backgroundColor: AppColors.error,
-        colorText: Colors.white,
+        colorText: AppColors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -107,7 +108,7 @@ class CreateProductController extends GetxController {
           "Error",
           "Please enter a valid discount price",
           backgroundColor: AppColors.error,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           snackPosition: SnackPosition.BOTTOM,
         );
         return;
@@ -117,7 +118,7 @@ class CreateProductController extends GetxController {
           "Error",
           "Discount price must be less than regular price",
           backgroundColor: AppColors.error,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           snackPosition: SnackPosition.BOTTOM,
         );
         return;
@@ -134,7 +135,7 @@ class CreateProductController extends GetxController {
           "Error",
           "Cover image must be jpeg, jpg, png, or webp format",
           backgroundColor: AppColors.error,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           snackPosition: SnackPosition.BOTTOM,
         );
         return;
@@ -150,7 +151,7 @@ class CreateProductController extends GetxController {
             "Error",
             "All images must be jpeg, jpg, png, or webp format",
             backgroundColor: AppColors.error,
-            colorText: Colors.white,
+            colorText: AppColors.white,
             snackPosition: SnackPosition.BOTTOM,
           );
           return;
@@ -253,7 +254,7 @@ class CreateProductController extends GetxController {
           "Success",
           response['message'] ?? "Product ${isEditMode.value ? 'updated' : 'created'} successfully",
           backgroundColor: AppColors.success,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           snackPosition: SnackPosition.BOTTOM,
         );
       } else {
@@ -273,7 +274,7 @@ class CreateProductController extends GetxController {
           "Error",
           errorMsg,
           backgroundColor: AppColors.error,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           snackPosition: SnackPosition.BOTTOM,
         );
       }
@@ -282,7 +283,7 @@ class CreateProductController extends GetxController {
         "Error",
         e.toString(),
         backgroundColor: AppColors.error,
-        colorText: Colors.white,
+        colorText: AppColors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
@@ -331,13 +332,13 @@ class CreateProductScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
         title: Text(
           product != null ? "Edit Product" : "Add Product",
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         foregroundColor: AppColors.black,
         elevation: 0,
       ),
@@ -456,12 +457,12 @@ class CreateProductScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: controller.productStatus.value == 'active'
                         ? AppColors.success.withOpacity(0.1)
-                        : Colors.grey.shade200,
+                        : AppColors.premiumGold,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: controller.productStatus.value == 'active'
                           ? AppColors.success
-                          : Colors.grey.shade400,
+                          : AppColors.premiumGold,
                       width: 1.5,
                     ),
                   ),
@@ -475,7 +476,7 @@ class CreateProductScreen extends StatelessWidget {
                         size: 18,
                         color: controller.productStatus.value == 'active'
                             ? AppColors.success
-                            : Colors.grey.shade600,
+                            : AppColors.premiumGold,
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -485,7 +486,7 @@ class CreateProductScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: controller.productStatus.value == 'active'
                               ? AppColors.success
-                              : Colors.grey.shade600,
+                              : AppColors.premiumGold,
                         ),
                       ),
                     ],
@@ -531,14 +532,14 @@ class CreateProductScreen extends StatelessWidget {
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
-                            color: Colors.white,
+                            color: AppColors.white,
                             strokeWidth: 2,
                           ),
                         )
                       : Text(
                           product != null ? "Update Product" : "Add Product",
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -577,7 +578,7 @@ class CreateProductScreen extends StatelessWidget {
                       width: double.infinity,
                       height: 200,
                       errorBuilder: (_, __, ___) => Container(
-                        color: Colors.grey.shade200,
+                        color: AppColors.premiumGold,
                         height: 200,
                         child: const Icon(Icons.image, size: 40),
                       ),
@@ -591,15 +592,15 @@ class CreateProductScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: AppColors.white.withOpacity(0.7),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.edit, color: Colors.white, size: 16),
+                      Icon(Icons.edit, color: AppColors.white, size: 16),
                       SizedBox(width: 6),
-                      Text("Change", style: TextStyle(color: Colors.white, fontSize: 12)),
+                      Text("Change", style: TextStyle(color: AppColors.white, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -622,11 +623,11 @@ class CreateProductScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.image_outlined, size: 40, color: Colors.grey.shade600),
+              Icon(Icons.image_outlined, size: 40, color: AppColors.premiumGold),
               const SizedBox(height: 8),
               Text(
                 "Tap to select cover image",
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                style: TextStyle(color: AppColors.premiumGold, fontSize: 14),
               ),
             ],
           ),
@@ -664,13 +665,13 @@ class CreateProductScreen extends StatelessWidget {
                     Icon(
                       Icons.add_photo_alternate_outlined,
                       size: 28,
-                      color: Colors.grey.shade600,
+                      color: AppColors.premiumGold,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       "Add Image",
                       style: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: AppColors.premiumGold,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -699,7 +700,7 @@ class CreateProductScreen extends StatelessWidget {
                         width: double.infinity,
                         height: double.infinity,
                         errorBuilder: (_, __, ___) => Container(
-                          color: Colors.grey.shade200,
+                          color: AppColors.premiumGold,
                           child: const Icon(Icons.image, size: 30),
                         ),
                       ),
@@ -712,12 +713,12 @@ class CreateProductScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: const BoxDecoration(
-                      color: Colors.black54,
+                      color: AppColors.white,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.close,
-                      color: Colors.white,
+                      color: AppColors.white,
                       size: 14,
                     ),
                   ),
@@ -744,7 +745,7 @@ class CreateProductScreen extends StatelessWidget {
       style: const TextStyle(fontSize: 15),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey.shade500),
+        hintStyle: TextStyle(color: AppColors.premiumGold),
         filled: true,
         fillColor: AppColors.lightBackground,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
@@ -49,11 +50,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   void initState() {
     super.initState();
-    final bool isPassedUrlValid = widget.videoUrl.isNotEmpty && 
+    final bool isPassedUrlValid =
+        widget.videoUrl.isNotEmpty &&
         widget.videoUrl.toLowerCase().contains('.mp4');
-    final String playUrl = isPassedUrlValid 
-        ? widget.videoUrl 
-        : 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+    final String playUrl =
+        isPassedUrlValid
+            ? widget.videoUrl
+            : 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
 
     _controller = VideoPlayerController.network(playUrl)
       ..initialize().then((_) {
@@ -67,8 +70,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     );
   }
 
-
- /* @override
+  /* @override
   void initState() {
     super.initState();
 
@@ -90,7 +92,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     });
   }*/
 
-
   /*@override
   void didUpdateWidget(VideoPlayerScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -109,8 +110,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }
   }*/
 
-
-
   @override
   void didUpdateWidget(VideoPlayerScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -119,15 +118,19 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       _controller.dispose();
 
       // Delete old VideoController explicitly
-      if (Get.isRegistered<VideoController>(tag: oldWidget.videoId.toString())) {
+      if (Get.isRegistered<VideoController>(
+        tag: oldWidget.videoId.toString(),
+      )) {
         Get.delete<VideoController>(tag: oldWidget.videoId.toString());
       }
 
-      final bool isPassedUrlValid = widget.videoUrl.isNotEmpty && 
+      final bool isPassedUrlValid =
+          widget.videoUrl.isNotEmpty &&
           widget.videoUrl.toLowerCase().contains('.mp4');
-      final String playUrl = isPassedUrlValid 
-          ? widget.videoUrl 
-          : 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+      final String playUrl =
+          isPassedUrlValid
+              ? widget.videoUrl
+              : 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
 
       // Initialize new video controller
       _controller = VideoPlayerController.network(playUrl)
@@ -140,14 +143,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }
   }
 
-
   @override
   void dispose() {
     _controller.dispose();
     Get.delete<VideoController>(tag: widget.videoId.toString()); // ✅ Cleanup
     super.dispose();
   }
-
 
   void _togglePlayPause() {
     setState(() {
@@ -171,7 +172,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       body: Column(
         children: [
           // Video Player Section
@@ -180,7 +181,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               Container(
                 height: 250,
                 width: double.infinity,
-                color: Colors.black,
+                color: AppColors.white,
                 child: _controller.value.isInitialized
                     ? AspectRatio(
                   aspectRatio: _controller.value.aspectRatio,
@@ -204,8 +205,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black54,
-                        Colors.transparent,
+                        AppColors.white,
+                        AppColors.transparent,
                       ],
                     ),
                   ),
@@ -214,7 +215,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
-                          icon: Icon(Icons.arrow_back, color: Colors.white),
+                          icon: Icon(Icons.arrow_back, color: AppColors.white),
                           onPressed: () {},
                         ),
                         Row(
@@ -222,7 +223,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             Container(
                               padding: EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(Icons.trending_up, size: 20),
@@ -230,7 +231,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             SizedBox(width: 12),
                             Stack(
                               children: [
-                                Icon(Icons.notifications, color: Colors.white, size: 28),
+                                Icon(Icons.notifications, color: AppColors.white, size: 28),
                                 Positioned(
                                   right: 0,
                                   top: 0,
@@ -248,8 +249,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             SizedBox(width: 12),
                             PopupMenuButton(
                               tooltip: '',
-                              icon: Icon(Icons.more_vert, color: Colors.white),
-                              color: Colors.white,
+                              icon: Icon(Icons.more_vert, color: AppColors.white),
+                              color: AppColors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -317,7 +318,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.skip_previous, color: Colors.white, size: 40),
+                      icon: Icon(Icons.skip_previous, color: AppColors.white, size: 40),
                       onPressed: () {
                         _controller.seekTo(Duration.zero);
                       },
@@ -328,7 +329,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       child: Container(
                         padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -340,7 +341,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     ),
                     SizedBox(width: 24),
                     IconButton(
-                      icon: Icon(Icons.skip_next, color: Colors.white, size: 40),
+                      icon: Icon(Icons.skip_next, color: AppColors.white, size: 40),
                       onPressed: () {},
                     ),
                   ],
@@ -353,14 +354,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 right: 0,
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  color: Colors.black54,
+                  color: AppColors.white,
                   child: Row(
                     children: [
                       Text(
                         _controller.value.isInitialized
                             ? _formatDuration(_controller.value.position)
                             : '0.00',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
+                        style: TextStyle(color: AppColors.white, fontSize: 12),
                       ),
                       Expanded(
                         child: Slider(
@@ -376,17 +377,17 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             });
                           },
                           activeColor: Colors.red,
-                          inactiveColor: Colors.white30,
+                          inactiveColor: AppColors.white.withOpacity(0.3),
                         ),
                       ),
                       Text(
                         _controller.value.isInitialized
                             ? _formatDuration(_controller.value.duration)
                             : '5.00',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
+                        style: TextStyle(color: AppColors.white, fontSize: 12),
                       ),
                       SizedBox(width: 8),
-                      Icon(Icons.fullscreen, color: Colors.white, size: 20),
+                      Icon(Icons.fullscreen, color: AppColors.white, size: 20),
                     ],
                   ),
                 ),
@@ -399,23 +400,23 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 height: AppSizer.deviceHeight26,
                 child: Obx(() {
                   final video = controller.currentVideo.value;
-                  final bool isPassedUrlValid = widget.videoUrl.isNotEmpty && 
+                  final bool isPassedUrlValid =
+                      widget.videoUrl.isNotEmpty &&
                       widget.videoUrl.toLowerCase().contains('.mp4');
-                  
+
                   if (isPassedUrlValid) {
                     return WorkOutVideoPlayPage(videoUrl: widget.videoUrl);
                   }
-                  
+
                   if (video == null || video.media.isEmpty) {
                     return const Center(
                       child: CircularProgressIndicator(color: Colors.cyan),
                     );
                   }
-                  
+
                   return WorkOutVideoPlayPage(videoUrl: video.media.first.url);
                 }),
               ),
-
 
               Positioned(
                 top: 0,
@@ -428,11 +429,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
+                        color: AppColors.white.withOpacity(0.6),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: AppColors.white.withOpacity(0.2),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -440,7 +441,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       ),
                       child: const Icon(
                         Icons.arrow_back_ios_new_rounded,
-                        color: Colors.white,
+                        color: AppColors.white,
                         size: 20,
                       ),
                     ),
@@ -487,12 +488,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                               ),
                               Row(
                                 children: [
-                                  Icon(Icons.remove_red_eye, size: 14, color: Colors.grey),
+                                  Icon(Icons.remove_red_eye, size: 14, color: AppColors.premiumGold),
                                   SizedBox(width: 4),
                                   Text(
                                     '1,25,678  13 May 22',
                                     style: TextStyle(
-                                      color: Colors.grey,
+                                      color: AppColors.premiumGold,
                                       fontSize: 12,
                                     ),
                                   ),
@@ -510,7 +511,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           child: Text(
                             'Followed',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.white,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -536,7 +537,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                               Text(
                                 '2.4M',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
@@ -577,7 +578,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     child: Text(
                       'Maybe you like that',
                       style: TextStyle(
-                        color: Colors.grey,
+                        color: AppColors.premiumGold,
                         fontSize: 14,
                       ),
                     ),
@@ -609,7 +610,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                               Container(
                                 padding: EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(Icons.play_arrow, color: Colors.red, size: 24),
@@ -620,13 +621,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                 child: Container(
                                   padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: Colors.black87,
+                                    color: AppColors.white,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
                                     '05:00',
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: AppColors.white,
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -653,33 +654,30 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                 Text(
                                   'Creator, Influencer',
                                   style: TextStyle(
-                                    color: Colors.grey,
+                                    color: AppColors.premiumGold,
                                     fontSize: 12,
                                   ),
                                 ),
                                 SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    Icon(Icons.remove_red_eye, size: 14, color: Colors.grey),
+                                    Icon(Icons.remove_red_eye, size: 14, color: AppColors.premiumGold),
                                     SizedBox(width: 2),
-                                    Text('9.5M', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                                    Text('9.5M', style: TextStyle(fontSize: 11, color: AppColors.premiumGold)),
                                     SizedBox(width: 8),
-                                    Icon(Icons.thumb_up_outlined, size: 14, color: Colors.grey),
+                                    Icon(Icons.thumb_up_outlined, size: 14, color: AppColors.premiumGold),
                                     SizedBox(width: 2),
-                                    Text('2.5M', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                                    Text('2.5M', style: TextStyle(fontSize: 11, color: AppColors.premiumGold)),
                                     SizedBox(width: 8),
-                                    Icon(Icons.thumb_down_outlined, size: 14, color: Colors.grey),
+                                    Icon(Icons.thumb_down_outlined, size: 14, color: AppColors.premiumGold),
                                     SizedBox(width: 2),
-                                    Text('2.5M', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                                    Text('2.5M', style: TextStyle(fontSize: 11, color: AppColors.premiumGold)),
                                   ],
                                 ),
                               ],
                             ),
                           ),
-                          IconButton(
-                            icon: Icon(Icons.more_vert),
-                            onPressed: () {},
-                          ),
+                          
                         ],
                       ),
                     );
@@ -714,16 +712,19 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           ),
                           child: InkWell(
                             onTap: () {
-
-                              final videoUrl = item.media.isNotEmpty
-                                  ? item.media.first.url ?? ""
-                                  : "";
+                              final videoUrl =
+                                  item.media.isNotEmpty
+                                      ? item.media.first.url ?? ""
+                                      : "";
                               if (videoUrl.isEmpty) return;
 
-                              if (Get.isRegistered<VideoController>(tag: item.id.toString())) {
-                                Get.delete<VideoController>(tag: item.id.toString());
+                              if (Get.isRegistered<VideoController>(
+                                tag: item.id.toString(),
+                              )) {
+                                Get.delete<VideoController>(
+                                  tag: item.id.toString(),
+                                );
                               }
-
 
                               Get.off(
                                 () => VideoPlayerScreen(
@@ -768,7 +769,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: const BoxDecoration(
-                                        color: Colors.white,
+                                        color: AppColors.white,
                                         shape: BoxShape.circle,
                                       ),
                                       child: const Icon(
@@ -786,7 +787,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                           vertical: 2,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: Colors.black87,
+                                          color: AppColors.black.withOpacity(
+                                            0.7,
+                                          ),
                                           borderRadius: BorderRadius.circular(
                                             4,
                                           ),
@@ -794,7 +797,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                         child: Text(
                                           "item.duration " ?? "00:00",
                                           style: const TextStyle(
-                                            color: Colors.white,
+                                            color: AppColors.white,
                                             fontSize: 10,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -825,7 +828,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                       Text(
                                         item.user?.name ?? "",
                                         style: const TextStyle(
-                                          color: Colors.grey,
+                                          color: AppColors.premiumGold,
                                           fontSize: 12,
                                         ),
                                       ),
@@ -835,7 +838,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                           const Icon(
                                             Icons.remove_red_eye,
                                             size: 14,
-                                            color: Colors.grey,
+                                            color: AppColors.premiumGold,
                                           ),
                                           const SizedBox(width: 2),
                                           Text(
@@ -843,14 +846,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                 "0",
                                             style: const TextStyle(
                                               fontSize: 11,
-                                              color: Colors.grey,
+                                              color: AppColors.premiumGold,
                                             ),
                                           ),
                                           const SizedBox(width: 8),
                                           const Icon(
                                             Icons.thumb_up_outlined,
                                             size: 14,
-                                            color: Colors.grey,
+                                            color: AppColors.premiumGold,
                                           ),
                                           const SizedBox(width: 2),
                                           Text(
@@ -858,14 +861,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                 "0",
                                             style: const TextStyle(
                                               fontSize: 11,
-                                              color: Colors.grey,
+                                              color: AppColors.premiumGold,
                                             ),
                                           ),
                                           const SizedBox(width: 8),
                                           const Icon(
                                             Icons.comment,
                                             size: 14,
-                                            color: Colors.grey,
+                                            color: AppColors.premiumGold,
                                           ),
                                           const SizedBox(width: 2),
                                           Text(
@@ -874,18 +877,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                                 "0",
                                             style: const TextStyle(
                                               fontSize: 11,
-                                              color: Colors.grey,
+                                              color: AppColors.premiumGold,
                                             ),
                                           ),
                                         ],
                                       ),
                                     ],
                                   ),
-                                ),
-
-                                IconButton(
-                                  icon: const Icon(Icons.more_vert),
-                                  onPressed: () {},
                                 ),
                               ],
                             ),
@@ -921,7 +919,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               children: [
                 CircleAvatar(
                   radius: 22,
-                  backgroundColor: Colors.grey.shade200,
+                  backgroundColor: AppColors.premiumGold,
                   backgroundImage: NetworkImage(
                     video.user.avatar.isNotEmpty
                         ? video.user.avatar
@@ -938,7 +936,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: AppColors.white,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -947,13 +945,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           Icon(
                             Icons.remove_red_eye_rounded,
                             size: 13,
-                            color: Colors.grey.shade600,
+                            color: AppColors.premiumGold,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             '${video.stats.viewCount} views • ${video.createdHuman}',
                             style: TextStyle(
-                              color: Colors.grey.shade600,
+                              color: AppColors.premiumGold,
                               fontSize: 12,
                             ),
                           ),
@@ -966,10 +964,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 if (!video.is_mine) ...{
                   const SizedBox(width: 8),
                   Obx(() {
-                    final isFollowing = controller.followController
-                        .isUserFollowing(video.user.id!, initialValue: video.is_following)
-                        .value;
-                    
+                    final isFollowing =
+                        controller.followController
+                            .isUserFollowing(
+                              video.user.id!,
+                              initialValue: video.is_following,
+                            )
+                            .value;
+
                     return GestureDetector(
                       onTap: () {
                         if (isFollowing) {
@@ -984,13 +986,17 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: isFollowing ? Colors.grey.shade200 : Colors.black,
+                          color:
+                              isFollowing
+                                  ? AppColors.premiumGold
+                                  : AppColors.white,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           isFollowing ? 'Following' : 'Follow',
                           style: TextStyle(
-                            color: isFollowing ? Colors.black87 : Colors.white,
+                            color:
+                                isFollowing ? AppColors.white : AppColors.white,
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
                           ),
@@ -1011,14 +1017,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.black,
+                color: AppColors.white,
                 height: 1.4,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          
+
           const SizedBox(height: 16),
 
           // Engagement Row
@@ -1028,7 +1034,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               children: [
                 // Like Button
                 _buildActionButton(
-                  icon: video.stats.isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                  icon:
+                      video.stats.isLiked
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_border_rounded,
                   label: _formatCount(video.stats.likeCount),
                   isActive: video.stats.isLiked,
                   onTap: () {
@@ -1045,7 +1054,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
+                      backgroundColor: AppColors.transparent,
                       builder: (_) => CommentsBottomSheet(postId: video.id),
                     );
                   },
@@ -1054,15 +1063,20 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 // Share Button
                 IconButton(
                   icon: const Icon(Icons.share_rounded, size: 24),
-                  color: Colors.grey.shade700,
+                  color: AppColors.premiumGold,
                   onPressed: () {},
                 ),
                 // Bookmark Button
                 IconButton(
                   icon: Icon(
-                    video.stats.isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                    video.stats.isSaved
+                        ? Icons.bookmark_rounded
+                        : Icons.bookmark_border_rounded,
                     size: 24,
-                    color: video.stats.isSaved ? Colors.black : Colors.grey.shade700,
+                    color:
+                        video.stats.isSaved
+                            ? AppColors.white
+                            : AppColors.premiumGold,
                   ),
                   onPressed: () {
                     controller.toggleBookmark(video.id);
@@ -1073,10 +1087,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           ),
 
           const SizedBox(height: 16),
-          
+
           // Divider
-          Divider(height: 1, color: Colors.grey.shade200),
-          
+          Divider(height: 1, color: AppColors.premiumGold),
+
           const SizedBox(height: 16),
 
           // Related Videos Header
@@ -1085,7 +1099,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
             child: Text(
               'Related Videos',
               style: TextStyle(
-                color: Colors.grey.shade800,
+                color: AppColors.premiumGold,
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
               ),
@@ -1108,22 +1122,22 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isActive ? Colors.black : Colors.grey.shade100,
+          color:
+              isActive
+                  ? AppColors.premiumGold.withOpacity(0.2)
+                  : AppColors.transparent,
+          border: Border.all(color: AppColors.premiumGold),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 18,
-              color: isActive ? Colors.white : Colors.grey.shade700,
-            ),
+            Icon(icon, size: 18, color: AppColors.premiumGold),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
-                color: isActive ? Colors.white : Colors.grey.shade700,
+                color: AppColors.premiumGold,
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
               ),
@@ -1140,7 +1154,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       Container(
         padding: EdgeInsets.only(top: 20, bottom: 20 + bottomPadding),
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
@@ -1148,13 +1162,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           children: [
             CircleAvatar(
               radius: 40,
-              backgroundColor: Colors.grey.shade200,
-              backgroundImage: user.avatar != null && user.avatar!.isNotEmpty
-                  ? NetworkImage(user.avatar!)
-                  : null,
-              child: (user.avatar == null || user.avatar!.isEmpty)
-                  ? const Icon(Icons.person, size: 40)
-                  : null,
+              backgroundColor: AppColors.premiumGold,
+              backgroundImage:
+                  user.avatar != null && user.avatar!.isNotEmpty
+                      ? NetworkImage(user.avatar!)
+                      : null,
+              child:
+                  (user.avatar == null || user.avatar!.isEmpty)
+                      ? const Icon(Icons.person, size: 40)
+                      : null,
             ),
             const SizedBox(height: 16),
             Text(
@@ -1166,7 +1182,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               title: const Center(
                 child: Text(
                   "Unfollow",
-                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               onTap: () {
@@ -1255,7 +1274,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       body: Column(
         children: [
           // Video Player Section
@@ -1264,7 +1283,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               Container(
                 height: 500,
                 width: double.infinity,
-                color: Colors.black,
+                color: AppColors.white,
                 child: _isInitialized
                     ? AspectRatio(
                   aspectRatio: _controller.value.aspectRatio,
@@ -1288,8 +1307,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black54,
-                        Colors.transparent,
+                        AppColors.white,
+                        AppColors.transparent,
                       ],
                     ),
                   ),
@@ -1298,7 +1317,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
-                          icon: Icon(Icons.arrow_back, color: Colors.white),
+                          icon: Icon(Icons.arrow_back, color: AppColors.white),
                           onPressed: () => Navigator.pop(context),
                         ),
                         Row(
@@ -1306,7 +1325,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             Container(
                               padding: EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(Icons.trending_up, size: 20),
@@ -1315,7 +1334,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             Stack(
                               children: [
                                 Icon(Icons.notifications,
-                                    color: Colors.white, size: 28),
+                                    color: AppColors.white, size: 28),
                                 Positioned(
                                   right: 0,
                                   top: 0,
@@ -1333,8 +1352,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             SizedBox(width: 12),
                             PopupMenuButton(
                               tooltip: '',
-                              icon: Icon(Icons.more_vert, color: Colors.white),
-                              color: Colors.white,
+                              icon: Icon(Icons.more_vert, color: AppColors.white),
+                              color: AppColors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -1406,7 +1425,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   children: [
                     IconButton(
                       icon: Icon(Icons.skip_previous,
-                          color: Colors.white, size: 40),
+                          color: AppColors.white, size: 40),
                       onPressed: () {
                         final currentPosition = _controller.value.position;
                         final newPosition = currentPosition - Duration(seconds: 10);
@@ -1421,7 +1440,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       child: Container(
                         padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -1436,7 +1455,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     SizedBox(width: 24),
                     IconButton(
                       icon: Icon(Icons.skip_next,
-                          color: Colors.white, size: 40),
+                          color: AppColors.white, size: 40),
                       onPressed: () {
                         final currentPosition = _controller.value.position;
                         final newPosition = currentPosition + Duration(seconds: 10);
@@ -1456,14 +1475,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 right: 0,
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  color: Colors.black54,
+                  color: AppColors.white,
                   child: Row(
                     children: [
                       Text(
                         _isInitialized
                             ? _formatDuration(_controller.value.position)
                             : '0:00',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
+                        style: TextStyle(color: AppColors.white, fontSize: 12),
                       ),
                       Expanded(
                         child: Slider(
@@ -1477,14 +1496,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             _controller.seekTo(Duration(seconds: value.toInt()));
                           },
                           activeColor: Colors.red,
-                          inactiveColor: Colors.white30,
+                          inactiveColor: AppColors.white.withOpacity(0.3),
                         ),
                       ),
                       Text(
                         _isInitialized
                             ? _formatDuration(_controller.value.duration)
                             : '0:00',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
+                        style: TextStyle(color: AppColors.white, fontSize: 12),
                       ),
                       SizedBox(width: 8),
                       GestureDetector(
@@ -1492,7 +1511,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           // Fullscreen logic
                         },
                         child: Icon(Icons.fullscreen,
-                            color: Colors.white, size: 20),
+                            color: AppColors.white, size: 20),
                       ),
                     ],
                   ),
@@ -1532,12 +1551,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                               Row(
                                 children: [
                                   Icon(Icons.remove_red_eye,
-                                      size: 14, color: Colors.grey),
+                                      size: 14, color: AppColors.premiumGold),
                                   SizedBox(width: 4),
                                   Text(
                                     '1,25,678  13 May 22',
                                     style: TextStyle(
-                                      color: Colors.grey,
+                                      color: AppColors.premiumGold,
                                       fontSize: 12,
                                     ),
                                   ),
@@ -1556,7 +1575,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                           child: Text(
                             'Followed',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.white,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -1583,7 +1602,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                               Text(
                                 '2.4M',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
@@ -1624,7 +1643,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     child: Text(
                       'Maybe you like that',
                       style: TextStyle(
-                        color: Colors.grey,
+                        color: AppColors.premiumGold,
                         fontSize: 14,
                       ),
                     ),
@@ -1656,7 +1675,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                               Container(
                                 padding: EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(Icons.play_arrow,
@@ -1669,13 +1688,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: Colors.black87,
+                                    color: AppColors.white,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
                                     '05:00',
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: AppColors.white,
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -1702,7 +1721,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                 Text(
                                   'Creator, Influencer',
                                   style: TextStyle(
-                                    color: Colors.grey,
+                                    color: AppColors.premiumGold,
                                     fontSize: 12,
                                   ),
                                 ),
@@ -1710,34 +1729,31 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                 Row(
                                   children: [
                                     Icon(Icons.remove_red_eye,
-                                        size: 14, color: Colors.grey),
+                                        size: 14, color: AppColors.premiumGold),
                                     SizedBox(width: 4),
                                     Text('9.5M',
                                         style: TextStyle(
-                                            fontSize: 11, color: Colors.grey)),
+                                            fontSize: 11, color: AppColors.premiumGold)),
                                     SizedBox(width: 12),
                                     Icon(Icons.thumb_up_outlined,
-                                        size: 14, color: Colors.grey),
+                                        size: 14, color: AppColors.premiumGold),
                                     SizedBox(width: 4),
                                     Text('2.5M',
                                         style: TextStyle(
-                                            fontSize: 11, color: Colors.grey)),
+                                            fontSize: 11, color: AppColors.premiumGold)),
                                     SizedBox(width: 12),
                                     Icon(Icons.thumb_down_outlined,
-                                        size: 14, color: Colors.grey),
+                                        size: 14, color: AppColors.premiumGold),
                                     SizedBox(width: 4),
                                     Text('2.5M',
                                         style: TextStyle(
-                                            fontSize: 11, color: Colors.grey)),
+                                            fontSize: 11, color: AppColors.premiumGold)),
                                   ],
                                 ),
                               ],
                             ),
                           ),
-                          IconButton(
-                            icon: Icon(Icons.more_vert),
-                            onPressed: () {},
-                          ),
+                          
                         ],
                       ),
                     );
@@ -1751,7 +1767,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.cyan,
-        unselectedItemColor: Colors.grey,
+        unselectedItemColor: AppColors.premiumGold,
         currentIndex: 3,
         items: [
           BottomNavigationBarItem(

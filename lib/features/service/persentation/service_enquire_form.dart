@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -71,7 +72,7 @@ class _EnquiryFormState extends State<EnquiryForm> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade400,
+                    color: AppColors.premiumGold,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -93,7 +94,7 @@ class _EnquiryFormState extends State<EnquiryForm> {
                   'Fill the details to enquire about this service',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey,
+                    color: AppColors.premiumGold,
                   ),
                 ),
               ),
@@ -109,8 +110,8 @@ class _EnquiryFormState extends State<EnquiryForm> {
                 controller: _nameController,
                 decoration: InputDecoration(
                   hintText: 'Enter your full name',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.premiumGold)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.premiumGold)),
                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.primary)),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
                 ),
@@ -129,8 +130,8 @@ class _EnquiryFormState extends State<EnquiryForm> {
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   hintText: 'Enter your email',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.premiumGold)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.premiumGold)),
                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.primary)),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
                 ),
@@ -153,8 +154,8 @@ class _EnquiryFormState extends State<EnquiryForm> {
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
                   hintText: 'Enter your phone number',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.premiumGold)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.premiumGold)),
                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.primary)),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
                 ),
@@ -173,8 +174,8 @@ class _EnquiryFormState extends State<EnquiryForm> {
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                   hintText: 'Enter your subject',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.premiumGold)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.premiumGold)),
                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.primary)),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
                 ),
@@ -193,8 +194,8 @@ class _EnquiryFormState extends State<EnquiryForm> {
                 maxLines: 3,
                 decoration: InputDecoration(
                   hintText: 'Tell us more about your requirement...',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.premiumGold)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.premiumGold)),
                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.primary)),
                   contentPadding: const EdgeInsets.all(15),
                 ),
@@ -214,13 +215,13 @@ class _EnquiryFormState extends State<EnquiryForm> {
                   onPressed: _controller.isLoading.value ? null : _submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   child: _controller.isLoading.value
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const CircularProgressIndicator(color: AppColors.white)
                       : const Text(
                           'Submit Enquiry',
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -288,14 +289,14 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: AppColors.premiumGold.withOpacity(0.1),
       appBar: AppBar(
         title: const Text(
           'Service Enquiries',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.white,
         elevation: 0,
         actions: [
           Obx(() => (controller.isEnquiriesLoading.value || controller.isStatsLoading.value)
@@ -304,7 +305,7 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
                   child: SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    child: CircularProgressIndicator(color: AppColors.white, strokeWidth: 2),
                   ),
                 )
               : IconButton(
@@ -366,13 +367,13 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.inbox_outlined, size: 64, color: Colors.grey),
+                          Icon(Icons.inbox_outlined, size: 64, color: AppColors.premiumGold),
                           SizedBox(height: 16),
-                          Text('No enquiries yet', style: TextStyle(color: Colors.grey, fontSize: 16)),
+                          Text('No enquiries yet', style: TextStyle(color: AppColors.premiumGold, fontSize: 16)),
                         ],
                       ),
                     )
-                  : RefreshIndicator(color: Colors.black, 
+                  : RefreshIndicator(color: AppColors.white, 
                       onRefresh: () async {
                         await controller.fetchSellerEnquiries();
                         await controller.fetchSellerEnquiriesStats();
@@ -398,19 +399,19 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
       width: 110, // Fixed width since it's in a horizontal scroll
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: AppColors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.3)),
+        border: Border.all(color: AppColors.white.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Colors.white, size: 20),
+          Icon(icon, color: AppColors.white, size: 20),
           const SizedBox(height: 8),
           Text(
             count,
             style: const TextStyle(
-              color: Colors.white,
+              color: AppColors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -418,7 +419,7 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: AppColors.white.withOpacity(0.9),
               fontSize: 12,
             ),
           ),
@@ -441,7 +442,7 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
         statusColor = Colors.green;
         break;
       default:
-        statusColor = Colors.grey;
+        statusColor = AppColors.premiumGold;
     }
 
     final user = enquiry['user'] as Map<String, dynamic>?;
@@ -457,11 +458,11 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: AppColors.premiumGold.withOpacity(0.1),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -469,7 +470,7 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
         ],
       ),
       child: Material(
-        color: Colors.transparent,
+        color: AppColors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () => _showEnquiryDetails(context, enquiry),
@@ -487,7 +488,7 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: Colors.grey.shade600,
+                        color: AppColors.premiumGold,
                       ),
                     ),
                     Container(
@@ -542,12 +543,12 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
+                                color: AppColors.premiumGold,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 serviceTitle,
-                                style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
+                                style: TextStyle(fontSize: 11, color: AppColors.premiumGold),
                               ),
                             ),
                           ]
@@ -562,12 +563,12 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
                 // if (subject.isNotEmpty) ...[
                 //   Row(
                 //     children: [
-                //       Icon(Icons.subject, size: 14, color: Colors.grey.shade500),
+                //       Icon(Icons.subject, size: 14, color: AppColors.premiumGold),
                 //       const SizedBox(width: 4),
                 //       Expanded(
                 //         child: Text(
                 //           subject,
-                //           style: TextStyle(fontSize: 12, color: Colors.grey.shade700, fontWeight: FontWeight.w500),
+                //           style: TextStyle(fontSize: 12, color: AppColors.premiumGold, fontWeight: FontWeight.w500),
                 //           maxLines: 1,
                 //           overflow: TextOverflow.ellipsis,
                 //         ),
@@ -580,12 +581,12 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
                 // Contact info
                 Row(
                   children: [
-                    Icon(Icons.email_outlined, size: 14, color: Colors.grey.shade500),
+                    Icon(Icons.email_outlined, size: 14, color: AppColors.premiumGold),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         email,
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                        style: TextStyle(fontSize: 12, color: AppColors.premiumGold),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -594,11 +595,11 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(Icons.phone_outlined, size: 14, color: Colors.grey.shade500),
+                    Icon(Icons.phone_outlined, size: 14, color: AppColors.premiumGold),
                     const SizedBox(width: 4),
                     Text(
                       phone,
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                      style: TextStyle(fontSize: 12, color: AppColors.premiumGold),
                     ),
                   ],
                 ),
@@ -609,19 +610,19 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                      color: AppColors.premiumGold,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.message_outlined, size: 14, color: Colors.grey.shade500),
+                        Icon(Icons.message_outlined, size: 14, color: AppColors.premiumGold),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             subject,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 12, color: Colors.grey.shade700, fontStyle: FontStyle.italic),
+                            style: TextStyle(fontSize: 12, color: AppColors.premiumGold, fontStyle: FontStyle.italic),
                           ),
                         ),
                       ],
@@ -633,11 +634,11 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
                 // Footer: date
                 Row(
                   children: [
-                    Icon(Icons.access_time, size: 14, color: Colors.grey.shade400),
+                    Icon(Icons.access_time, size: 14, color: AppColors.premiumGold),
                     const SizedBox(width: 4),
                     Text(
                       dateStr,
-                      style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                      style: TextStyle(fontSize: 11, color: AppColors.premiumGold),
                     ),
                   ],
                 ),
@@ -692,7 +693,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontSize: 13,
-                    color: Colors.grey.shade600,
+                    color: AppColors.premiumGold,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -702,7 +703,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: AppColors.white,
                   ),
                 ),
               ],
@@ -739,15 +740,15 @@ class EnquiryDetailScreen extends StatelessWidget {
         statusColor = Colors.green;
         break;
       default:
-        statusColor = Colors.grey;
+        statusColor = AppColors.premiumGold;
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
         title: const Text('Enquiry Details'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: AppColors.transparent,
+        foregroundColor: AppColors.white,
         elevation: 0.5,
         centerTitle: true,
       ),
@@ -780,7 +781,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                     children: [
                       const Text(
                         'Current Status',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                        style: TextStyle(fontSize: 12, color: AppColors.premiumGold),
                       ),
                       Text(
                         status.toUpperCase(),
@@ -883,7 +884,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                 label: const Text('Delete Enquiry'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -900,10 +901,10 @@ class EnquiryDetailScreen extends StatelessWidget {
       bottomSheet: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.15),
+              color: AppColors.premiumGold.withOpacity(0.15),
               spreadRadius: 1,
               blurRadius: 10,
               offset: const Offset(0, -2),
@@ -917,7 +918,7 @@ class EnquiryDetailScreen extends StatelessWidget {
             onPressed: () => _showUpdateBottomSheet(context, enquiry),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               elevation: 0,
             ),
@@ -1011,7 +1012,7 @@ class _UpdateEnquirySheetState extends State<UpdateEnquirySheet> {
               width: 40,
               height: 4,
               margin: const EdgeInsets.only(bottom: 20),
-              decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)),
+              decoration: BoxDecoration(color: AppColors.premiumGold, borderRadius: BorderRadius.circular(2)),
             ),
           ),
           const Text(
@@ -1041,14 +1042,14 @@ class _UpdateEnquirySheetState extends State<UpdateEnquirySheet> {
             decoration: InputDecoration(
               hintText: 'Enter your reply message here...',
               filled: true,
-              fillColor: Colors.grey.shade50,
+              fillColor: AppColors.premiumGold.withOpacity(0.1),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
+                borderSide: BorderSide(color: AppColors.premiumGold),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
+                borderSide: BorderSide(color: AppColors.premiumGold),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -1075,11 +1076,11 @@ class _UpdateEnquirySheetState extends State<UpdateEnquirySheet> {
                   },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: controller.isLoading.value
-                ? const CircularProgressIndicator(color: Colors.white)
+                ? const CircularProgressIndicator(color: AppColors.white)
                 : const Text(
                     'Update Now',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -1098,9 +1099,9 @@ class _UpdateEnquirySheetState extends State<UpdateEnquirySheet> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.white,
+          color: isSelected ? color.withOpacity(0.1) : AppColors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: isSelected ? color : Colors.grey.shade300),
+          border: Border.all(color: isSelected ? color : AppColors.premiumGold),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -1110,11 +1111,11 @@ class _UpdateEnquirySheetState extends State<UpdateEnquirySheet> {
               height: 16,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: isSelected ? color : Colors.grey.shade400),
-                color: isSelected ? color : Colors.transparent,
+                border: Border.all(color: isSelected ? color : AppColors.premiumGold),
+                color: isSelected ? color : AppColors.transparent,
               ),
               child: isSelected 
-                ? const Icon(Icons.check, size: 10, color: Colors.white) 
+                ? const Icon(Icons.check, size: 10, color: AppColors.white) 
                 : null,
             ),
             const SizedBox(width: 8),
@@ -1123,7 +1124,7 @@ class _UpdateEnquirySheetState extends State<UpdateEnquirySheet> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? color : Colors.grey.shade700,
+                color: isSelected ? color : AppColors.premiumGold,
               ),
             ),
           ],

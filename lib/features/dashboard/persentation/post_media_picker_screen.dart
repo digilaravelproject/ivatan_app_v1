@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -191,23 +192,23 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
+          icon: const Icon(Icons.close, color: AppColors.white),
           onPressed: () => Get.back(),
         ),
         title: const Text(
           'New Post',
-          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+          style: TextStyle(color: AppColors.white, fontSize: 18, fontWeight: FontWeight.w600),
         ),
         actions: [
           Builder(
             builder: (context) {
               return IconButton(
-                icon: const Icon(Icons.filter_list, color: Colors.white),
+                icon: const Icon(Icons.filter_list, color: AppColors.white),
                 onPressed: () {
                   final RenderBox? button = context.findRenderObject() as RenderBox?;
                   final RenderBox? overlay = Navigator.of(context).overlay?.context.findRenderObject() as RenderBox?;
@@ -259,7 +260,7 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
           // Preview area (top) - Square format
           Container(
             height: MediaQuery.of(context).size.width, // Square height = width
-            color: Colors.grey.shade900,
+            color: AppColors.premiumGold,
             child: selectedThumbnail != null
                 ? Stack(
                     children: [
@@ -274,7 +275,7 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
                           child: Icon(
                             Icons.play_circle_outline,
                             size: 64,
-                            color: Colors.white,
+                            color: AppColors.white,
                           ),
                         ),
                       Positioned(
@@ -284,7 +285,7 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
                           onPressed: _useSelectedMedia,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
+                            foregroundColor: AppColors.white,
                             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(24),
@@ -303,12 +304,12 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
+                            color: AppColors.white.withOpacity(0.7),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: const Text(
                             'Square (1:1)',
-                            style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                            style: TextStyle(color: AppColors.white, fontSize: 12, fontWeight: FontWeight.w500),
                           ),
                         ),
                       ),
@@ -318,11 +319,11 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.photo_library_outlined, size: 64, color: Colors.grey.shade600),
+                        Icon(Icons.photo_library_outlined, size: 64, color: AppColors.premiumGold),
                         const SizedBox(height: 16),
                         Text(
                           'Select a photo or video',
-                          style: TextStyle(color: Colors.grey.shade400, fontSize: 16),
+                          style: TextStyle(color: AppColors.premiumGold, fontSize: 16),
                         ),
                       ],
                     ),
@@ -334,7 +335,7 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
           // Grid area (bottom) - Square aspect ratio
           Expanded(
             child: isLoading
-                ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                ? const Center(child: CircularProgressIndicator(color: AppColors.white))
                 : GridView.builder(
                     padding: const EdgeInsets.all(4),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -377,12 +378,12 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.camera_alt, color: Colors.white, size: 32),
+            const Icon(Icons.camera_alt, color: AppColors.white, size: 32),
             const SizedBox(height: 8),
             const Text(
               'Camera',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.white,
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
@@ -427,16 +428,16 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
                           decoration: BoxDecoration(
                             color: selectedMediaList.any((e) => e.id == asset.id)
                                 ? Colors.blue
-                                : Colors.black.withOpacity(0.3),
+                                : AppColors.white.withOpacity(0.3),
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 1.5),
+                            border: Border.all(color: AppColors.white, width: 1.5),
                           ),
                           child: selectedMediaList.any((e) => e.id == asset.id)
                               ? Center(
                                   child: Text(
                                     (selectedMediaList.indexWhere((e) => e.id == asset.id) + 1).toString(),
                                     style: const TextStyle(
-                                      color: Colors.white,
+                                      color: AppColors.white,
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -452,17 +453,17 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
+                            color: AppColors.white.withOpacity(0.7),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.videocam, color: Colors.white, size: 12),
+                              const Icon(Icons.videocam, color: AppColors.white, size: 12),
                               const SizedBox(width: 4),
                               Text(
                                 _formatDuration(asset.duration),
-                                style: const TextStyle(color: Colors.white, fontSize: 10),
+                                style: const TextStyle(color: AppColors.white, fontSize: 10),
                               ),
                             ],
                           ),
@@ -475,11 +476,11 @@ class _PostMediaPickerScreenState extends State<PostMediaPickerScreen> {
           }
           return Container(
             decoration: BoxDecoration(
-              color: Colors.grey.shade800,
+              color: AppColors.premiumGold,
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Center(
-              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+              child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
             ),
           );
         },

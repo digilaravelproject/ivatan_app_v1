@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../theme/app_colors.dart';
@@ -16,7 +17,9 @@ class CustomDialog {
   }) {
     Get.dialog(
       Dialog(
+        backgroundColor: AppColors.black,
         shape: RoundedRectangleBorder(
+          side: const BorderSide(color: AppColors.premiumGold),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(
@@ -28,13 +31,13 @@ class CustomDialog {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: (confirmColor ?? AppColors.black).withOpacity(0.1),
+                    color: (confirmColor ?? AppColors.white).withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     icon,
                     size: 40,
-                    color: confirmColor ?? AppColors.black,
+                    color: confirmColor ?? AppColors.white,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -44,7 +47,7 @@ class CustomDialog {
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.black,
+                  color: AppColors.white,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -53,7 +56,7 @@ class CustomDialog {
                 message,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey.shade700,
+                  color: AppColors.premiumGold,
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,
@@ -69,7 +72,7 @@ class CustomDialog {
                       },
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: BorderSide(color: Colors.grey.shade300),
+                        side: BorderSide(color: AppColors.premiumGold),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -77,7 +80,7 @@ class CustomDialog {
                       child: Text(
                         cancelText,
                         style: TextStyle(
-                          color: Colors.grey.shade700,
+                          color: AppColors.premiumGold,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -91,7 +94,7 @@ class CustomDialog {
                         onConfirm();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: confirmColor ?? AppColors.black,
+                        backgroundColor: confirmColor ?? AppColors.premiumGold,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -101,7 +104,7 @@ class CustomDialog {
                       child: Text(
                         confirmText,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.black,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -126,7 +129,9 @@ class CustomDialog {
   }) {
     Get.dialog(
       Dialog(
+        backgroundColor: AppColors.black,
         shape: RoundedRectangleBorder(
+          side: const BorderSide(color: AppColors.premiumGold),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(
@@ -152,7 +157,7 @@ class CustomDialog {
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.black,
+                  color: AppColors.white,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -161,7 +166,7 @@ class CustomDialog {
                 message,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey.shade700,
+                  color: AppColors.premiumGold,
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,
@@ -185,7 +190,7 @@ class CustomDialog {
                   child: Text(
                     buttonText,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -207,7 +212,9 @@ class CustomDialog {
   }) {
     Get.dialog(
       Dialog(
+        backgroundColor: AppColors.black,
         shape: RoundedRectangleBorder(
+          side: const BorderSide(color: AppColors.premiumGold),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(
@@ -233,7 +240,7 @@ class CustomDialog {
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.black,
+                  color: AppColors.white,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -242,7 +249,7 @@ class CustomDialog {
                 message,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey.shade700,
+                  color: AppColors.premiumGold,
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,
@@ -266,7 +273,7 @@ class CustomDialog {
                   child: Text(
                     buttonText,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -288,7 +295,9 @@ class CustomDialog {
   }) {
     Get.dialog(
       Dialog(
+        backgroundColor: AppColors.black,
         shape: RoundedRectangleBorder(
+          side: const BorderSide(color: AppColors.premiumGold),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(
@@ -314,7 +323,7 @@ class CustomDialog {
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.black,
+                  color: AppColors.white,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -323,7 +332,7 @@ class CustomDialog {
                 message,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey.shade700,
+                  color: AppColors.premiumGold,
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,
@@ -347,7 +356,7 @@ class CustomDialog {
                   child: Text(
                     buttonText,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -364,7 +373,9 @@ class CustomDialog {
   static void showLoading({String message = "Please wait..."}) {
     Get.dialog(
       Dialog(
+        backgroundColor: AppColors.black,
         shape: RoundedRectangleBorder(
+          side: const BorderSide(color: AppColors.premiumGold),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(
@@ -373,16 +384,13 @@ class CustomDialog {
             mainAxisSize: MainAxisSize.min,
             children: [
               const CircularProgressIndicator(
-                color: AppColors.black,
+                color: AppColors.premiumGold,
                 strokeWidth: 3,
               ),
               const SizedBox(height: 16),
               Text(
                 message,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey.shade700,
-                ),
+                style: TextStyle(fontSize: 14, color: AppColors.premiumGold),
                 textAlign: TextAlign.center,
               ),
             ],

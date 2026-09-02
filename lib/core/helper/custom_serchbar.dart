@@ -8,10 +8,12 @@ import '../theme/app_colors.dart';
 class CustomSearchBar extends StatelessWidget {
   final VoidCallback? onTap;
   final bool readOnly;
+  final ValueChanged<String>? onChanged;
 
   const CustomSearchBar({
     Key? key,
     this.onTap,
+    this.onChanged,
     this.readOnly = false,
   }) : super(key: key);
 
@@ -26,9 +28,9 @@ class CustomSearchBar extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14),
               height: 45,
               decoration: BoxDecoration(
-                color: AppColors.cardSurface,
+                color: AppColors.black.withOpacity(0.5),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.border, width: 0.5),
+                border: Border.all(color: AppColors.premiumGold, width: 1.0),
               ),
               child: Row(
                 children: [
@@ -36,23 +38,25 @@ class CustomSearchBar extends StatelessWidget {
                     child: TextField(
                       readOnly: readOnly,
                       onTap: onTap,
+                      onChanged: onChanged,
+                      cursorColor: AppColors.premiumGold,
                       decoration: const InputDecoration(
                         hintText: 'Search...',
                         hintStyle: TextStyle(
-                          color: AppColors.lightTextSecondary,
+                          color: AppColors.premiumGold,
                           fontSize: 15,
                         ),
                         border: InputBorder.none,
                       ),
                       style: const TextStyle(
                         fontSize: 15,
-                        color: AppColors.primaryText,
+                        color: AppColors.white,
                       ),
                     ),
                   ),
                   const Icon(
                     Icons.search,
-                    color: AppColors.lightTextSecondary,
+                    color: AppColors.premiumGold,
                     size: 22,
                   ),
                 ],

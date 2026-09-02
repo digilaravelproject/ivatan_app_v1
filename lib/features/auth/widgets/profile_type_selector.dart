@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
@@ -32,17 +33,21 @@ class ProfileTypeSelector extends StatelessWidget {
           validator: validator,
           decoration: InputDecoration(
             labelText: label,
-            labelStyle: TextStyle(color: Colors.grey.shade600),
+            labelStyle: TextStyle(color: AppColors.premiumGold),
             floatingLabelStyle: const TextStyle(
               color: AppColors.primary,
               fontWeight: FontWeight.w600,
             ),
-            suffixIcon: enabled
-                ? const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary)
-                : null,
+            suffixIcon:
+                enabled
+                    ? const Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: AppColors.primary,
+                    )
+                    : null,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.shade300),
+              borderSide: BorderSide(color: AppColors.premiumGold),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -56,11 +61,9 @@ class ProfileTypeSelector extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Colors.red, width: 2),
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
-            fillColor: enabled ? Colors.grey.shade50 : Colors.grey.shade200,
+            fillColor: AppColors.black,
           ),
         ),
       ),
@@ -86,14 +89,19 @@ class ProfileTypeSelector extends StatelessWidget {
 
   void _showProfileTypeBottomSheet(BuildContext context) {
     // Track which type is currently expanded (any type with subtypes)
-    String? expandedType = profileTypes
-        .firstWhereOrNull((t) => t.sellerTypes.isNotEmpty && controller.text.startsWith(t.label))
-        ?.type;
+    String? expandedType =
+        profileTypes
+            .firstWhereOrNull(
+              (t) =>
+                  t.sellerTypes.isNotEmpty &&
+                  controller.text.startsWith(t.label),
+            )
+            ?.type;
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -106,44 +114,58 @@ class ProfileTypeSelector extends StatelessWidget {
               maxChildSize: 0.85,
               expand: false,
               builder: (context, scrollController) {
-                  return Padding(
-                    padding: EdgeInsets.fromLTRB(20, 16, 20, 16 + MediaQuery.of(context).padding.bottom),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Handle Bar
-                        Center(
-                          child: Container(
-                            width: 40,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade300,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
+                return Container(
+                  decoration: const BoxDecoration(
+                    color: AppColors.black,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    16,
+                    20,
+                    16 + MediaQuery.of(context).padding.bottom,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Handle Bar
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: AppColors.premiumGold,
+                            borderRadius: BorderRadius.circular(2),
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        
-                        Text(
-                          "Select $label",
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
+                      ),
+                      const SizedBox(height: 20),
 
-                        Expanded(
-                          child: ListView.separated(
+                      Text(
+                        "Select $label",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      Expanded(
+                        child: ListView.separated(
                           controller: scrollController,
                           itemCount: profileTypes.length,
-                          separatorBuilder: (c, i) => const SizedBox(height: 12),
+                          separatorBuilder:
+                              (c, i) => const SizedBox(height: 12),
                           itemBuilder: (context, index) {
                             final pType = profileTypes[index];
                             // Any profile type that has subtypes from the API gets expanded
                             final hasSubTypes = pType.sellerTypes.isNotEmpty;
-                            final isSelected = controller.text.startsWith(pType.label);
+                            final isSelected = controller.text.startsWith(
+                              pType.label,
+                            );
                             final isExpanded = expandedType == pType.type;
 
                             if (hasSubTypes) {
@@ -153,12 +175,18 @@ class ProfileTypeSelector extends StatelessWidget {
                                 isSellerExpanded: isExpanded,
                                 onTap: () {
                                   setModalState(() {
-                                    expandedType = isExpanded ? null : pType.type;
+                                    expandedType =
+                                        isExpanded ? null : pType.type;
                                   });
                                 },
-                                child: isExpanded
-                                    ? _buildSellerSubtypes(pType, isSelected, context)
-                                    : null,
+                                child:
+                                    isExpanded
+                                        ? _buildSellerSubtypes(
+                                          pType,
+                                          isSelected,
+                                          context,
+                                        )
+                                        : null,
                               );
                             }
 
@@ -194,16 +222,19 @@ class ProfileTypeSelector extends StatelessWidget {
     required Widget? child,
   }) {
     return Material(
-      color: Colors.transparent,
+      color: AppColors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Ink(
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary.withOpacity(0.03) : Colors.grey.shade50,
+            color:
+                isSelected
+                    ? AppColors.primary.withOpacity(0.03)
+                    : AppColors.premiumGold.withOpacity(0.1),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isSelected ? AppColors.primary : Colors.grey.shade200,
+              color: isSelected ? AppColors.primary : AppColors.premiumGold,
               width: isSelected ? 1.5 : 1,
             ),
           ),
@@ -216,12 +247,18 @@ class ProfileTypeSelector extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppColors.primary.withOpacity(0.1) : Colors.grey.shade200,
+                      color:
+                          isSelected
+                              ? AppColors.primary.withOpacity(0.1)
+                              : AppColors.premiumGold,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       _getIconForType(pType.type),
-                      color: isSelected ? AppColors.primary : Colors.grey.shade700,
+                      color:
+                          isSelected
+                              ? AppColors.primary
+                              : AppColors.premiumGold,
                       size: 24,
                     ),
                   ),
@@ -235,7 +272,10 @@ class ProfileTypeSelector extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: isSelected ? AppColors.primary : Colors.black87,
+                            color:
+                                isSelected
+                                    ? AppColors.primary
+                                    : AppColors.white,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -243,7 +283,7 @@ class ProfileTypeSelector extends StatelessWidget {
                           pType.description,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey.shade600,
+                            color: AppColors.premiumGold,
                             height: 1.3,
                           ),
                         ),
@@ -253,8 +293,8 @@ class ProfileTypeSelector extends StatelessWidget {
                   // Show expand arrow for any type that has subtypes from the API
                   if (pType.sellerTypes.isNotEmpty)
                     Icon(
-                      isSellerExpanded 
-                          ? Icons.keyboard_arrow_up_rounded 
+                      isSellerExpanded
+                          ? Icons.keyboard_arrow_up_rounded
                           : Icons.keyboard_arrow_down_rounded,
                       color: AppColors.primary,
                     )
@@ -274,59 +314,87 @@ class ProfileTypeSelector extends StatelessWidget {
     );
   }
 
-  Widget _buildSellerSubtypes(ProfileType pType, bool isSelected, BuildContext context) {
+  Widget _buildSellerSubtypes(
+    ProfileType pType,
+    bool isSelected,
+    BuildContext context,
+  ) {
     return Container(
       margin: const EdgeInsets.only(top: 14),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.black,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.premiumGold),
       ),
       child: Column(
-        children: pType.sellerTypes.map((subType) {
-          final subTypeLabel = subType.capitalizeFirst ?? subType;
-          final isSubSelected = isSelected && controller.text.toLowerCase().contains(subType.toLowerCase());
+        children:
+            pType.sellerTypes.map((subType) {
+              final subTypeLabel = subType.capitalizeFirst ?? subType;
+              final isSubSelected =
+                  isSelected &&
+                  controller.text.toLowerCase().contains(subType.toLowerCase());
 
-          return Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () {
-                onSelected(pType, subType);
-                Navigator.pop(context);
-              },
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: BoxDecoration(
-                  color: isSubSelected ? AppColors.primary.withOpacity(0.08) : Colors.transparent,
+              return Material(
+                color: AppColors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    onSelected(pType, subType);
+                    Navigator.pop(context);
+                  },
                   borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      isSubSelected ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
-                      color: isSubSelected ? AppColors.primary : Colors.grey.shade400,
-                      size: 20,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
                     ),
-                    const SizedBox(width: 10),
-                    Text(
-                      subTypeLabel,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: isSubSelected ? FontWeight.bold : FontWeight.w500,
-                        color: isSubSelected ? AppColors.primary : Colors.black87,
-                      ),
+                    decoration: BoxDecoration(
+                      color:
+                          isSubSelected
+                              ? AppColors.primary.withOpacity(0.08)
+                              : AppColors.transparent,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    const Spacer(),
-                    if (isSubSelected)
-                      const Icon(Icons.check_rounded, color: AppColors.primary, size: 16),
-                  ],
+                    child: Row(
+                      children: [
+                        Icon(
+                          isSubSelected
+                              ? Icons.radio_button_checked_rounded
+                              : Icons.radio_button_off_rounded,
+                          color:
+                              isSubSelected
+                                  ? AppColors.primary
+                                  : AppColors.premiumGold,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          subTypeLabel,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight:
+                                isSubSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
+                            color:
+                                isSubSelected
+                                    ? AppColors.primary
+                                    : AppColors.white,
+                          ),
+                        ),
+                        const Spacer(),
+                        if (isSubSelected)
+                          const Icon(
+                            Icons.check_rounded,
+                            color: AppColors.primary,
+                            size: 16,
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          );
-        }).toList(),
+              );
+            }).toList(),
       ),
     );
   }

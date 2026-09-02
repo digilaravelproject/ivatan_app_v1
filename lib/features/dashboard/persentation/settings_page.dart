@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -33,30 +34,28 @@ class SettingsScreen extends StatelessWidget {
     );
 
     return Scaffold(
-     // backgroundColor: const Color(0xFFF8F9FA), // Clean, slightly off-white background
+      // backgroundColor: const Color(0xFFF8F9FA), // Clean, slightly off-white background
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         centerTitle: true,
-        leading: GestureDetector(
-            onTap: (){
-              Navigator.pop(context);
-            },
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5)
-                ]
-              ),
-              child: const Icon(CupertinoIcons.back, color: Colors.black, size: 20)
-            )
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(CupertinoIcons.back, color: AppColors.white),
         ),
-        title: const Text("Settings", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 0.5)),
+        title: const Text(
+          "Settings",
+          style: TextStyle(
+            color: AppColors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            letterSpacing: 0.5,
+          ),
+        ),
       ),
-      body: Obx((){
+      body: Obx(() {
         return SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Column(
@@ -70,21 +69,49 @@ class SettingsScreen extends StatelessWidget {
               // PRIVATE ACCOUNT TOGGLE
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.black,
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.premiumGold),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+                    BoxShadow(
+                      color: AppColors.premiumGold.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
                   ],
                 ),
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   leading: Container(
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
-                    child: const Icon(Icons.lock_outline_rounded, color: AppColors.primary),
+                    decoration: BoxDecoration(
+                      color: AppColors.premiumGold.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.lock_outline_rounded,
+                      color: AppColors.premiumGold,
+                    ),
                   ),
-                  title: const Text("Private Account", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                  subtitle: const Text("Only approved followers can see what you share", style: TextStyle(fontSize: 12, color: Colors.black54, height: 1.3)),
+                  title: const Text(
+                    "Private Account",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: AppColors.white,
+                    ),
+                  ),
+                  subtitle: const Text(
+                    "Only approved followers can see what you share",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.white,
+                      height: 1.3,
+                    ),
+                  ),
                   trailing: CupertinoSwitch(
                     value: profileController.isPrivate.value,
                     activeColor: AppColors.primary,
@@ -98,26 +125,54 @@ class SettingsScreen extends StatelessWidget {
               // SHOW EMAIL TOGGLE (STATIC UI)
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.black,
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.premiumGold),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+                    BoxShadow(
+                      color: AppColors.premiumGold.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
                   ],
                 ),
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   leading: Container(
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
                     child: const Icon(Icons.email_outlined, color: Colors.blue),
                   ),
-                  title: const Text("Show Email", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                  subtitle: const Text("Display your email address on your profile", style: TextStyle(fontSize: 12, color: Colors.black54, height: 1.3)),
-                  trailing: Obx(() => CupertinoSwitch(
-                    value: profileController.showEmail.value,
-                    activeColor: AppColors.primary,
-                    onChanged: (val) => profileController.showEmail.value = val,
-                  )),
+                  title: const Text(
+                    "Show Email",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: AppColors.white,
+                    ),
+                  ),
+                  subtitle: const Text(
+                    "Display your email address on your profile",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.white,
+                      height: 1.3,
+                    ),
+                  ),
+                  trailing: Obx(
+                    () => CupertinoSwitch(
+                      value: profileController.showEmail.value,
+                      activeColor: AppColors.primary,
+                      onChanged:
+                          (val) => profileController.showEmail.value = val,
+                    ),
+                  ),
                 ),
               ),
 
@@ -126,26 +181,57 @@ class SettingsScreen extends StatelessWidget {
               // SHOW PHONE TOGGLE (STATIC UI)
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.black,
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.premiumGold),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+                    BoxShadow(
+                      color: AppColors.premiumGold.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
                   ],
                 ),
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   leading: Container(
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), shape: BoxShape.circle),
-                    child: const Icon(Icons.phone_outlined, color: Colors.green),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.phone_outlined,
+                      color: Colors.green,
+                    ),
                   ),
-                  title: const Text("Show Phone Number", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                  subtitle: const Text("Display your phone number on your profile", style: TextStyle(fontSize: 12, color: Colors.black54, height: 1.3)),
-                  trailing: Obx(() => CupertinoSwitch(
-                    value: profileController.showPhone.value,
-                    activeColor: AppColors.primary,
-                    onChanged: (val) => profileController.showPhone.value = val,
-                  )),
+                  title: const Text(
+                    "Show Phone Number",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: AppColors.white,
+                    ),
+                  ),
+                  subtitle: const Text(
+                    "Display your phone number on your profile",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.white,
+                      height: 1.3,
+                    ),
+                  ),
+                  trailing: Obx(
+                    () => CupertinoSwitch(
+                      value: profileController.showPhone.value,
+                      activeColor: AppColors.primary,
+                      onChanged:
+                          (val) => profileController.showPhone.value = val,
+                    ),
+                  ),
                 ),
               ),
 
@@ -160,16 +246,23 @@ class SettingsScreen extends StatelessWidget {
                   profileTypes: profileController.profileTypes,
                   enabled: !profileController.hasPendingRequest,
                   onSelected: (profileType, sellerType) async {
-                    if ((profileType.type == 'seller' || profileType.type == 'ecommerce') && sellerType == 'both') {
-                      final homeController = Get.isRegistered<HomeController>()
-                          ? Get.find<HomeController>()
-                          : Get.put(HomeController());
-                      
+                    if ((profileType.type == 'seller' ||
+                            profileType.type == 'ecommerce') &&
+                        sellerType == 'both') {
+                      final homeController =
+                          Get.isRegistered<HomeController>()
+                              ? Get.find<HomeController>()
+                              : Get.put(HomeController());
+
                       Get.dialog(
-                        const Center(child: CircularProgressIndicator(color: Colors.white)),
+                        const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.white,
+                          ),
+                        ),
                         barrierDismissible: false,
                       );
-                      
+
                       try {
                         await homeController.fetchProfileConfig();
                       } catch (e) {
@@ -178,27 +271,49 @@ class SettingsScreen extends StatelessWidget {
                         Get.back();
                       }
 
-                      final ecommerceProfileId = homeController.profileConfig.value?.data?.ecommerce?.profileId;
-                      
+                      final ecommerceProfileId =
+                          homeController
+                              .profileConfig
+                              .value
+                              ?.data
+                              ?.ecommerce
+                              ?.profileId;
+
                       try {
-                        final subscriptionController = Get.isRegistered<SubscriptionController>()
-                            ? Get.find<SubscriptionController>()
-                            : Get.put(SubscriptionController());
-                        final updatedSub = await subscriptionController.fetchPlansForProfileType(
-                          profileType.type == 'ecommerce' ? 'seller' : profileType.type,
-                          profileId: ecommerceProfileId,
-                        );
+                        final subscriptionController =
+                            Get.isRegistered<SubscriptionController>()
+                                ? Get.find<SubscriptionController>()
+                                : Get.put(SubscriptionController());
+                        final updatedSub = await subscriptionController
+                            .fetchPlansForProfileType(
+                              profileType.type == 'ecommerce'
+                                  ? 'seller'
+                                  : profileType.type,
+                              profileId: ecommerceProfileId,
+                            );
                         if (updatedSub != null) {
-                          Get.to(() => ProfilePlansScreen(profileTypeSub: updatedSub));
+                          Get.to(
+                            () =>
+                                ProfilePlansScreen(profileTypeSub: updatedSub),
+                          );
                         } else {
-                          Get.snackbar("Error", "Could not load subscription plans");
+                          Get.snackbar(
+                            "Error",
+                            "Could not load subscription plans",
+                          );
                         }
                       } catch (e) {
-                        Get.snackbar("Error", "Something went wrong loading plans: $e");
+                        Get.snackbar(
+                          "Error",
+                          "Something went wrong loading plans: $e",
+                        );
                       }
                       return;
                     }
-                    profileController.switchProfileType(profileType, sellerType);
+                    profileController.switchProfileType(
+                      profileType,
+                      sellerType,
+                    );
                   },
                 ),
               ),
@@ -236,23 +351,28 @@ class SettingsScreen extends StatelessWidget {
 
               // BUTTON
               Obx(
-                () => profileController.isLoading.value
-                    ? const Center(child: CircularProgressIndicator())
-                    : MyButton(
-                  title: "Save Changes",
-                  onPressed: () {
-                    profileController.updateProfile();
-                  },
-                  gradient: const LinearGradient(
-                    colors: [AppColors.primary, AppColors.primary], // Solid Primary Color
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  height: 55,
-                  borderRadius: 28, // Pill shape
-                 // fontSize: 16,
-                 // fontWeight: FontWeight.bold,
-                ),
+                () =>
+                    profileController.isLoading.value
+                        ? const Center(child: CircularProgressIndicator())
+                        : MyButton(
+                          title: "Save Changes",
+                          onPressed: () {
+                            profileController.updateProfile();
+                          },
+                          textColor: AppColors.black,
+                          gradient: const LinearGradient(
+                            colors: [
+                              AppColors.premiumGold,
+                              AppColors.premiumGold,
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          height: 55,
+                          borderRadius: 28, // Pill shape
+                          // fontSize: 16,
+                          // fontWeight: FontWeight.bold,
+                        ),
               ),
 
               Obx(() {
@@ -260,7 +380,7 @@ class SettingsScreen extends StatelessWidget {
                   return const Padding(
                     padding: EdgeInsets.symmetric(vertical: 30.0),
                     child: Center(
-                      child: CircularProgressIndicator(color: Colors.black),
+                      child: CircularProgressIndicator(color: AppColors.white),
                     ),
                   );
                 }
@@ -279,7 +399,8 @@ class SettingsScreen extends StatelessWidget {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: profileController.switchRequests.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 12),
+                      separatorBuilder:
+                          (context, index) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final req = profileController.switchRequests[index];
                         return _buildSwitchRequestCard(req, profileController);
@@ -302,32 +423,59 @@ class SettingsScreen extends StatelessWidget {
       style: const TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.bold,
-        color: Colors.black45,
+        color: AppColors.white,
         letterSpacing: 1.2,
       ),
     );
   }
 
-  Widget _buildActionTile({required String title, required IconData icon, required Color color, required VoidCallback onTap}) {
+  Widget _buildActionTile({
+    required String title,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.black,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.premiumGold),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 2)),
+            BoxShadow(
+              color: AppColors.premiumGold.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
           ],
         ),
         child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 6,
+          ),
           leading: Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
             child: Icon(icon, color: color, size: 22),
           ),
-          title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-          trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.black38),
+          title: Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+              color: AppColors.white,
+            ),
+          ),
+          trailing: const Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: AppColors.white,
+          ),
         ),
       ),
     );
@@ -336,12 +484,18 @@ class SettingsScreen extends StatelessWidget {
   // Returns a display icon for each profile type from the API
   IconData _profileTypeIcon(String type) {
     switch (type) {
-      case 'seller': return Icons.storefront_rounded;
-      case 'employer': return Icons.business_center_rounded;
-      case 'music': return Icons.music_note_rounded;
-      case 'creator': return Icons.video_camera_back_rounded;
-      case 'personal': return Icons.person_rounded;
-      default: return Icons.verified_user_rounded;
+      case 'seller':
+        return Icons.storefront_rounded;
+      case 'employer':
+        return Icons.business_center_rounded;
+      case 'music':
+        return Icons.music_note_rounded;
+      case 'creator':
+        return Icons.video_camera_back_rounded;
+      case 'personal':
+        return Icons.person_rounded;
+      default:
+        return Icons.verified_user_rounded;
     }
   }
 
@@ -358,8 +512,14 @@ class SettingsScreen extends StatelessWidget {
     return type[0].toUpperCase() + type.substring(1);
   }
 
-  Widget _buildSwitchRequestCard(ProfileSwitchRequest req, SettingsController profileController) {
-    final profileLabel = _profileTypeLabel(req.toProfileType, req.profileSubType);
+  Widget _buildSwitchRequestCard(
+    ProfileSwitchRequest req,
+    SettingsController profileController,
+  ) {
+    final profileLabel = _profileTypeLabel(
+      req.toProfileType,
+      req.profileSubType,
+    );
     final profileIcon = _profileTypeIcon(req.toProfileType);
 
     final isApproved = req.status == 'approved' || req.status == 'active';
@@ -393,48 +553,56 @@ class SettingsScreen extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: isApproved ? null : () async {
-        final toType = req.toProfileType;
-        final subType = req.profileSubType;
-        
-        bool isFreeFlow = toType == 'employer' || 
-            (toType == 'seller' && (subType == 'product' || subType == 'service'));
-            
-        if (isFreeFlow) {
-          profileController.showAdminApprovalDialog(profileLabel);
-        } else {
-          // For all other types (including ecommerce seller-both, music, creator)
-          try {
-            final subscriptionController = Get.isRegistered<SubscriptionController>()
-                ? Get.find<SubscriptionController>()
-                : Get.put(SubscriptionController());
-            final updatedSub = await subscriptionController.fetchPlansForProfileType(toType);
-            if (updatedSub != null) {
-              Get.to(() => ProfilePlansScreen(profileTypeSub: updatedSub));
-            } else {
-              // No plans found — treat as approval-only flow
-              profileController.showAdminApprovalDialog(profileLabel);
-            }
-          } catch (e) {
-            Get.snackbar('Error', 'Could not load plans: $e', snackPosition: SnackPosition.TOP);
-          }
-        }
-      },
+      onTap:
+          isApproved
+              ? null
+              : () async {
+                final toType = req.toProfileType;
+                final subType = req.profileSubType;
+
+                bool isFreeFlow =
+                    toType == 'employer' ||
+                    (toType == 'seller' &&
+                        (subType == 'product' || subType == 'service'));
+
+                if (isFreeFlow) {
+                  profileController.showAdminApprovalDialog(profileLabel);
+                } else {
+                  // For all other types (including ecommerce seller-both, music, creator)
+                  try {
+                    final subscriptionController =
+                        Get.isRegistered<SubscriptionController>()
+                            ? Get.find<SubscriptionController>()
+                            : Get.put(SubscriptionController());
+                    final updatedSub = await subscriptionController
+                        .fetchPlansForProfileType(toType);
+                    if (updatedSub != null) {
+                      Get.to(
+                        () => ProfilePlansScreen(profileTypeSub: updatedSub),
+                      );
+                    } else {
+                      // No plans found — treat as approval-only flow
+                      profileController.showAdminApprovalDialog(profileLabel);
+                    }
+                  } catch (e) {
+                    Get.snackbar(
+                      'Error',
+                      'Could not load plans: $e',
+                      snackPosition: SnackPosition.TOP,
+                    );
+                  }
+                }
+              },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.black,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: AppColors.premiumGold),
           boxShadow: [
             BoxShadow(
               color: accentColor.withOpacity(0.08),
               blurRadius: 12,
               offset: const Offset(0, 4),
-            ),
-            BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -450,7 +618,10 @@ class SettingsScreen extends StatelessWidget {
                 // Main card content
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 14,
+                    ),
                     child: Row(
                       children: [
                         // Type icon circle
@@ -460,9 +631,16 @@ class SettingsScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: accentColor.withOpacity(0.1),
                             shape: BoxShape.circle,
-                            border: Border.all(color: accentColor.withOpacity(0.2), width: 1.5),
+                            border: Border.all(
+                              color: accentColor.withOpacity(0.2),
+                              width: 1.5,
+                            ),
                           ),
-                          child: Icon(profileIcon, color: accentColor, size: 22),
+                          child: Icon(
+                            profileIcon,
+                            color: accentColor,
+                            size: 22,
+                          ),
                         ),
                         const SizedBox(width: 14),
 
@@ -477,18 +655,19 @@ class SettingsScreen extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
+                                  color: AppColors.white,
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              if (req.userNotes != null && req.userNotes!.trim().isNotEmpty)
+                              if (req.userNotes != null &&
+                                  req.userNotes!.trim().isNotEmpty)
                                 Text(
                                   req.userNotes!,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: Colors.grey.shade600,
+                                    color: AppColors.premiumGold,
                                   ),
                                 )
                               else if (!isApproved)
@@ -496,7 +675,7 @@ class SettingsScreen extends StatelessWidget {
                                   'Tap to view details',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: Colors.grey.shade400,
+                                    color: AppColors.premiumGold,
                                     fontStyle: FontStyle.italic,
                                   ),
                                 ),
@@ -511,16 +690,26 @@ class SettingsScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: statusBgColor,
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: statusTextColor.withOpacity(0.2), width: 1),
+                                border: Border.all(
+                                  color: statusTextColor.withOpacity(0.2),
+                                  width: 1,
+                                ),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(statusIcon, color: statusTextColor, size: 12),
+                                  Icon(
+                                    statusIcon,
+                                    color: statusTextColor,
+                                    size: 12,
+                                  ),
                                   const SizedBox(width: 6),
                                   Text(
                                     statusText,
@@ -534,14 +723,14 @@ class SettingsScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-                             if (!isApproved) ...[
-                               const SizedBox(height: 8),
-                               Icon(
-                                 Icons.arrow_forward_ios_rounded,
-                                 color: Colors.grey.shade400,
-                                 size: 12,
-                               ),
-                             ],
+                            if (!isApproved) ...[
+                              const SizedBox(height: 8),
+                              Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                color: AppColors.premiumGold,
+                                size: 12,
+                              ),
+                            ],
                           ],
                         ),
                       ],
@@ -559,10 +748,15 @@ class SettingsScreen extends StatelessWidget {
   Widget _buildCleanField({required Widget child}) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.black,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.premiumGold),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 2)),
+          BoxShadow(
+            color: AppColors.premiumGold.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       padding: const EdgeInsets.all(12),

@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,7 +18,7 @@ class CustomSnackBar {
     final snackBar = SnackBar(
       content: _SnackBarContent(message: message, type: type, onTap: onTap),
       duration: duration,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       elevation: 0,
       behavior: SnackBarBehavior.floating,
       margin: const EdgeInsets.all(16),
@@ -255,8 +256,8 @@ class SnackbarDemo extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Custom Snackbar Demo'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: AppColors.transparent,
+        foregroundColor: AppColors.white,
         elevation: 0,
       ),
       body: Center(
@@ -270,7 +271,7 @@ class SnackbarDemo extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: AppColors.white,
                 ),
               ),
               const SizedBox(height: 40),
@@ -328,7 +329,7 @@ class SnackbarDemo extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

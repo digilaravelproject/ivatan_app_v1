@@ -19,22 +19,22 @@ class LiveChatList extends StatelessWidget {
     final controller = Get.put(LiveChatListController());
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.of(context).pop(),
           child: const Icon(
             Icons.menu_rounded,
-            color: Colors.black54,
+            color: AppColors.white,
             size: 24,
           ),
         ),
         title: Text(
           "Live Chat Groups",
           style: GoogleFonts.poppins(
-            color: Colors.black,
+            color: AppColors.white,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -43,7 +43,7 @@ class LiveChatList extends StatelessWidget {
           IconButton(
             icon: const Icon(
               Icons.refresh_rounded,
-              color: Colors.black87,
+              color: AppColors.white,
               size: 24,
             ),
             onPressed: () => controller.fetchGroups(),
@@ -100,15 +100,15 @@ class LiveChatList extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
           children: [
-            const Icon(Icons.search_rounded, color: Colors.grey, size: 20),
+            const Icon(Icons.search_rounded, color: AppColors.premiumGold, size: 20),
             const SizedBox(width: 8),
             Expanded(
               child: TextField(
                 controller: controller.searchController,
-                style: GoogleFonts.poppins(fontSize: 14, color: Colors.black),
+                style: GoogleFonts.poppins(fontSize: 14, color: AppColors.white),
                 decoration: InputDecoration(
                   hintText: "Search groups...",
-                  hintStyle: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[400]),
+                  hintStyle: GoogleFonts.poppins(fontSize: 14, color: AppColors.premiumGold.withOpacity(0.4)),
                   border: InputBorder.none,
                   isDense: true,
                 ),
@@ -120,7 +120,7 @@ class LiveChatList extends StatelessWidget {
                       controller.searchController.clear();
                       controller.searchQuery.value = "";
                     },
-                    child: const Icon(Icons.close_rounded, color: Colors.grey, size: 18),
+                    child: const Icon(Icons.close_rounded, color: AppColors.premiumGold, size: 18),
                   )
                 : const SizedBox.shrink()),
           ],
@@ -202,7 +202,7 @@ class LiveChatList extends StatelessWidget {
               backgroundColor: avatarColor,
               child: Icon(
                 groupType == "group" ? Icons.groups_rounded : Icons.campaign_rounded,
-                color: Colors.white,
+                color: AppColors.white,
                 size: 28,
               ),
             ),
@@ -223,7 +223,7 @@ class LiveChatList extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
+                                  color: AppColors.white,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -253,7 +253,7 @@ class LiveChatList extends StatelessWidget {
                               Icon(
                                 Icons.volume_off_rounded,
                                 size: 14,
-                                color: Colors.grey[500],
+                                color: AppColors.premiumGold.withOpacity(0.5),
                               ),
                             ],
                           ],
@@ -265,7 +265,7 @@ class LiveChatList extends StatelessWidget {
                         timeString,
                         style: GoogleFonts.poppins(
                           fontSize: 11,
-                          color: Colors.grey[400],
+                          color: AppColors.premiumGold.withOpacity(0.4),
                         ),
                       ),
                     ],
@@ -291,7 +291,7 @@ class LiveChatList extends StatelessWidget {
                                 ),
                               TextSpan(
                                 text: content,
-                                style: GoogleFonts.poppins(color: Colors.grey[600]),
+                                style: GoogleFonts.poppins(color: AppColors.premiumGold.withOpacity(0.6)),
                               ),
                             ],
                           ),
@@ -311,7 +311,7 @@ class LiveChatList extends StatelessWidget {
                             style: GoogleFonts.poppins(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: AppColors.white,
                             ),
                           ),
                         ),
@@ -333,13 +333,13 @@ class LiveChatList extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.chat_bubble_outline_rounded, size: 48, color: Colors.grey[350]),
+          Icon(Icons.chat_bubble_outline_rounded, size: 48, color: AppColors.premiumGold.withOpacity(0.35)),
           const SizedBox(height: 12),
           Text(
             "No live chat groups found",
             style: GoogleFonts.poppins(
               fontSize: 15,
-              color: Colors.grey[500],
+              color: AppColors.premiumGold.withOpacity(0.5),
               fontWeight: FontWeight.w500,
             ),
           ),

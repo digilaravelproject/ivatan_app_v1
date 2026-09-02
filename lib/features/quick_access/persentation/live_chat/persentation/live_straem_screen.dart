@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -158,7 +159,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.transparent,
       body: Stack(
         children: [
           // Video Player Background
@@ -175,10 +176,10 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
             )
           else
             Container(
-              color: Colors.black,
+              color: AppColors.white,
               child: const Center(
                 child: CircularProgressIndicator(
-                  color: Colors.white,
+                  color: AppColors.white,
                 ),
               ),
             ),
@@ -190,9 +191,9 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.transparent,
-                  Colors.black.withOpacity(0.3),
-                  Colors.black.withOpacity(0.7),
+                  AppColors.transparent,
+                  AppColors.white.withOpacity(0.3),
+                  AppColors.white.withOpacity(0.7),
                 ],
                 stops: const [0.5, 0.8, 1.0],
               ),
@@ -233,7 +234,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                             width: 8,
                             height: 8,
                             decoration: const BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.white,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -241,7 +242,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                           const Text(
                             'LIVE',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.white,
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.5,
@@ -259,24 +260,24 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: AppColors.white.withOpacity(0.7),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.2),
+                      color: AppColors.white.withOpacity(0.2),
                     ),
                   ),
                   child: Row(
                     children: [
                       Icon(
                         Icons.remove_red_eye_outlined,
-                        color: Colors.white.withOpacity(0.9),
+                        color: AppColors.white.withOpacity(0.9),
                         size: 14,
                       ),
                       const SizedBox(width: 6),
                       Text(
                         '1.2k watching',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
+                          color: AppColors.white.withOpacity(0.9),
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                         ),
@@ -297,13 +298,13 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                 // Mute/Unmute Button
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
+                    color: AppColors.white.withOpacity(0.6),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
                     icon: Icon(
                       _isMuted ? Icons.volume_off : Icons.volume_up,
-                      color: Colors.white,
+                      color: AppColors.white,
                       size: 20,
                     ),
                     onPressed: _toggleMute,
@@ -313,13 +314,13 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                 // Close Button
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
+                    color: AppColors.white.withOpacity(0.6),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
                     icon: const Icon(
                       Icons.close,
-                      color: Colors.white,
+                      color: AppColors.white,
                       size: 22,
                     ),
                     onPressed: () {
@@ -344,12 +345,12 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white,
+                      color: AppColors.white,
                       width: 2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
+                        color: AppColors.white.withOpacity(0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -357,14 +358,14 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                   ),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade800,
+                      color: AppColors.premiumGold,
                       shape: BoxShape.circle,
                     ),
                     child: const Center(
                       child: Text(
                         'JD',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
@@ -381,7 +382,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                         const Text(
                           'John Doe',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -399,7 +400,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                           child: const Text(
                             'Host',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.white,
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
                             ),
@@ -411,7 +412,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                     Text(
                       'Flutter Developer • 2h',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
+                        color: AppColors.white.withOpacity(0.8),
                         fontSize: 12,
                       ),
                     ),
@@ -465,8 +466,8 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.transparent,
-                    Colors.black.withOpacity(0.95),
+                    AppColors.transparent,
+                    AppColors.white.withOpacity(0.95),
                   ],
                   stops: const [0.0, 0.5],
                 ),
@@ -477,10 +478,10 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade900,
+                        color: AppColors.premiumGold,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: Colors.grey.shade800,
+                          color: AppColors.premiumGold,
                           width: 1,
                         ),
                       ),
@@ -491,13 +492,13 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                             child: TextField(
                               controller: _commentController,
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 fontSize: 14,
                               ),
                               decoration: InputDecoration(
                                 hintText: 'Add a comment...',
                                 hintStyle: TextStyle(
-                                  color: Colors.grey.shade500,
+                                  color: AppColors.premiumGold,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
                                 ),
@@ -512,7 +513,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                           IconButton(
                             icon: Icon(
                               Icons.emoji_emotions_outlined,
-                              color: Colors.grey.shade400,
+                              color: AppColors.premiumGold,
                               size: 22,
                             ),
                             onPressed: () {},
@@ -530,14 +531,14 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                       height: 44,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [Colors.white, Color(0xFFE0E0E0)],
+                          colors: [AppColors.white, Color(0xFFE0E0E0)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.white.withOpacity(0.3),
+                            color: AppColors.white.withOpacity(0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -545,7 +546,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                       ),
                       child: const Icon(
                         Icons.send,
-                        color: Colors.black,
+                        color: AppColors.white,
                         size: 18,
                       ),
                     ),
@@ -613,16 +614,16 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
             decoration: BoxDecoration(
               gradient: comment.isCurrentUser
                   ? const LinearGradient(
-                colors: [Colors.white, Color(0xFFE0E0E0)],
+                colors: [AppColors.white, Color(0xFFE0E0E0)],
               )
                   : LinearGradient(
-                colors: [Colors.grey.shade700, Colors.grey.shade900],
+                colors: [AppColors.premiumGold, AppColors.premiumGold],
               ),
               shape: BoxShape.circle,
               border: Border.all(
                 color: comment.isCurrentUser
-                    ? Colors.white
-                    : Colors.grey.shade600,
+                    ? AppColors.white
+                    : AppColors.premiumGold,
                 width: 1,
               ),
             ),
@@ -630,7 +631,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
               child: Text(
                 comment.username[0].toUpperCase(),
                 style: TextStyle(
-                  color: comment.isCurrentUser ? Colors.black : Colors.white,
+                  color: comment.isCurrentUser ? AppColors.white : AppColors.white,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -646,13 +647,13 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
               ),
               decoration: BoxDecoration(
                 color: comment.isCurrentUser
-                    ? Colors.white
-                    : Colors.black.withOpacity(0.7),
+                    ? AppColors.white
+                    : AppColors.white.withOpacity(0.7),
                 borderRadius: BorderRadius.circular(18),
                 border: comment.isCurrentUser
                     ? null
                     : Border.all(
-                  color: Colors.grey.shade700,
+                  color: AppColors.premiumGold,
                   width: 0.5,
                 ),
               ),
@@ -665,8 +666,8 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                         comment.username,
                         style: TextStyle(
                           color: comment.isCurrentUser
-                              ? Colors.black
-                              : Colors.white,
+                              ? AppColors.white
+                              : AppColors.white,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -676,8 +677,8 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                         comment.timeAgo,
                         style: TextStyle(
                           color: comment.isCurrentUser
-                              ? Colors.grey.shade600
-                              : Colors.grey.shade400,
+                              ? AppColors.premiumGold
+                              : AppColors.premiumGold,
                           fontSize: 10,
                         ),
                       ),
@@ -688,8 +689,8 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
                     comment.text,
                     style: TextStyle(
                       color: comment.isCurrentUser
-                          ? Colors.black
-                          : Colors.white,
+                          ? AppColors.white
+                          : AppColors.white,
                       fontSize: 13,
                     ),
                   ),
@@ -718,12 +719,12 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
             decoration: BoxDecoration(
               color: isActive
                   ? Colors.red.shade500
-                  : Colors.black.withOpacity(0.6),
+                  : AppColors.white.withOpacity(0.6),
               shape: BoxShape.circle,
               border: Border.all(
                 color: isActive
-                    ? Colors.white
-                    : Colors.grey.shade700,
+                    ? AppColors.white
+                    : AppColors.premiumGold,
                 width: isActive ? 2 : 1,
               ),
               boxShadow: isActive
@@ -738,7 +739,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
             ),
             child: Icon(
               icon,
-              color: isActive ? Colors.white : Colors.white,
+              color: isActive ? AppColors.white : AppColors.white,
               size: 22,
             ),
           ),
@@ -748,7 +749,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: AppColors.white.withOpacity(0.9),
               fontSize: 11,
               fontWeight: FontWeight.w500,
             ),

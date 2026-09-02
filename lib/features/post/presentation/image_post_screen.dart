@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +51,7 @@ class JobPostController extends GetxController {
         ),
       ),
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         appBar: AppBar(
           backgroundColor: AppColors.transparent,
         ),
@@ -85,7 +86,7 @@ class JobPostController extends GetxController {
   Widget _buildImageSection(JobPostController controller) {
     return Container(
       height: 500,
-    //  color: Colors.black,
+    //  color: AppColors.white,
       child: InteractiveViewer(
         // minScale: 0.5,
         // maxScale: 4.0,
@@ -103,7 +104,7 @@ class JobPostController extends GetxController {
 
   Widget _buildPostInfo() {
     return Container(
-      color: Colors.black,
+      color: AppColors.white,
       padding: const EdgeInsets.all(16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,11 +112,11 @@ class JobPostController extends GetxController {
           // Profile Picture
           CircleAvatar(
             radius: 24,
-            backgroundColor: Colors.grey.shade700,
+            backgroundColor: AppColors.premiumGold,
             child: const Text(
               'GS',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -132,7 +133,7 @@ class JobPostController extends GetxController {
                     Text(
                       'Gopal Singh',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
                       ),
@@ -141,7 +142,7 @@ class JobPostController extends GetxController {
                     Text(
                       '• 1st',
                       style: TextStyle(
-                        color: Colors.grey,
+                        color: AppColors.premiumGold,
                         fontSize: 13,
                       ),
                     ),
@@ -151,7 +152,7 @@ class JobPostController extends GetxController {
                 const Text(
                   '🎓 Training Head | DigiCoders Technologies Pvt Ltd...',
                   style: TextStyle(
-                    color: Colors.grey,
+                    color: AppColors.premiumGold,
                     fontSize: 12,
                   ),
                 ),
@@ -161,7 +162,7 @@ class JobPostController extends GetxController {
                     Text(
                       '📢 We Are Hiring – Flutter Developer...',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.white,
                         fontSize: 13,
                       ),
                     ),
@@ -197,7 +198,7 @@ class JobPostController extends GetxController {
                   : Icons.favorite_border,
               count: controller.likeCount.value,
               onPressed: controller.toggleLike,
-              color: controller.isLiked.value ? Colors.red : Colors.white,
+              color: controller.isLiked.value ? Colors.red : AppColors.white,
             ),
           ),
           const SizedBox(height: 20),
@@ -238,12 +239,12 @@ class JobPostController extends GetxController {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.grey.shade900.withOpacity(0.8),
+              color: AppColors.premiumGold.withOpacity(0.8),
               shape: BoxShape.circle,
             ),
             child: Icon(
               icon,
-              color: color ?? Colors.white,
+              color: color ?? AppColors.white,
               size: 24,
             ),
           ),
@@ -253,7 +254,7 @@ class JobPostController extends GetxController {
           Text(
             '$count',
             style: const TextStyle(
-              color: Colors.white,
+              color: AppColors.white,
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
@@ -275,7 +276,7 @@ class ImagePostScreen extends StatefulWidget {
 class _ImagePostScreenState extends State<ImagePostScreen> {
   // Animation State
   bool _showHeartAnimation = false;
-  Color _heartColor = Colors.white;
+  Color _heartColor = AppColors.white;
 
   void _handleDoubleTap(ImagePostController controller, int postId) {
     // 1. Toggle Like via Controller
@@ -289,7 +290,7 @@ class _ImagePostScreenState extends State<ImagePostScreen> {
       // Logic: controller.isLiked is ALREADY toggled by likePost?
       // Actually likePost is async, but we want instant feedback.
       // Ideally we assume success.
-      _heartColor = Colors.white; 
+      _heartColor = AppColors.white; 
     });
 
     // 3. Hide animation after delay
@@ -316,8 +317,8 @@ class _ImagePostScreenState extends State<ImagePostScreen> {
         ),
       ),
       child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
+        backgroundColor: AppColors.transparent,
+        appBar: AppBar(backgroundColor: AppColors.transparent, elevation: 0),
         body: Obx(() {
           if (controller.isLoading.value) {
             return Center(child: CircularProgressIndicator());
@@ -328,7 +329,7 @@ class _ImagePostScreenState extends State<ImagePostScreen> {
             return Center(
               child: Text(
                 "No Post Found",
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: AppColors.white),
               ),
             );
           }
@@ -344,7 +345,7 @@ class _ImagePostScreenState extends State<ImagePostScreen> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
-                    color: Colors.transparent,
+                    color: AppColors.transparent,
                     child: GestureDetector(
                       onDoubleTap: () => _handleDoubleTap(controller, widget.postId),
                       child: Stack(
@@ -362,7 +363,7 @@ class _ImagePostScreenState extends State<ImagePostScreen> {
                                   : Center(
                                       child: Text(
                                         "No Media",
-                                        style: TextStyle(color: Colors.white),
+                                        style: TextStyle(color: AppColors.white),
                                       ),
                                     ),
                             ),
@@ -383,7 +384,7 @@ class _ImagePostScreenState extends State<ImagePostScreen> {
                                       size: 110,
                                       shadows: [
                                         Shadow(
-                                          color: Colors.black26,
+                                          color: AppColors.white,
                                           blurRadius: 10,
                                           offset: Offset(0, 4),
                                         ),
@@ -407,7 +408,7 @@ class _ImagePostScreenState extends State<ImagePostScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.75),
+                    color: AppColors.white.withOpacity(0.75),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -425,7 +426,7 @@ class _ImagePostScreenState extends State<ImagePostScreen> {
                             Text(
                               '${post.user.name} • 1st',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
                               ),
@@ -434,7 +435,7 @@ class _ImagePostScreenState extends State<ImagePostScreen> {
                             Text(
                               post.caption ?? "",
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 fontSize: 13,
                               ),
                             ),
@@ -473,14 +474,14 @@ class _ImagePostScreenState extends State<ImagePostScreen> {
                   },
                   child: CircleAvatar(
                     radius: 22,
-                    backgroundColor: Colors.black.withOpacity(0.6),
+                    backgroundColor: AppColors.black.withOpacity(0.6),
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
                       transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
                       child: Icon(
                         isLiked ? Icons.favorite : Icons.favorite_border,
                         key: ValueKey(isLiked),
-                        color: isLiked ? Colors.red : Colors.white,
+                        color: isLiked ? Colors.red : AppColors.white,
                         size: 22,
                       ),
                     ),
@@ -489,7 +490,7 @@ class _ImagePostScreenState extends State<ImagePostScreen> {
                 const SizedBox(height: 4),
                 Text(
                   '${controller.likeCount.value}',
-                  style: const TextStyle(color: Colors.white, fontSize: 11),
+                  style: const TextStyle(color: AppColors.white, fontSize: 11),
                 ),
               ],
             );
@@ -505,7 +506,7 @@ class _ImagePostScreenState extends State<ImagePostScreen> {
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: AppColors.transparent,
                   builder:
                       (_) => CommentsBottomSheet(
                         postId: controller.post.value!.id,
@@ -533,7 +534,7 @@ class _ImagePostScreenState extends State<ImagePostScreen> {
     required IconData icon,
     required int count,
     required VoidCallback onTap,
-    Color color = Colors.white,
+    Color color = AppColors.white,
   }) {
     return Column(
       children: [
@@ -541,14 +542,14 @@ class _ImagePostScreenState extends State<ImagePostScreen> {
           onTap: onTap,
           child: CircleAvatar(
             radius: 22,
-            backgroundColor: Colors.black.withOpacity(0.6),
+            backgroundColor: AppColors.black.withOpacity(0.6),
             child: Icon(icon, color: color, size: 22),
           ),
         ),
         const SizedBox(height: 4),
         Text(
           '$count',
-          style: const TextStyle(color: Colors.white, fontSize: 11),
+          style: const TextStyle(color: AppColors.white, fontSize: 11),
         ),
       ],
     );
@@ -574,8 +575,8 @@ class ImagePostScreen extends StatelessWidget {
         ),
       ),
       child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
+        backgroundColor: AppColors.transparent,
+        appBar: AppBar(backgroundColor: AppColors.transparent, elevation: 0),
         body: Stack(
           children: [
             Positioned(
@@ -587,7 +588,7 @@ class ImagePostScreen extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
-                  color: Colors.transparent,
+                  color: AppColors.transparent,
                   child: InteractiveViewer(
                     child: SizedBox.expand(
                       child: Image.asset(
@@ -613,17 +614,17 @@ class ImagePostScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.75),
+                  color: AppColors.white.withOpacity(0.75),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CircleAvatar(
                       radius: 22,
-                      backgroundColor: Colors.grey.shade700,
+                      backgroundColor: AppColors.premiumGold,
                       child: const Text(
                         'GS',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: AppColors.white),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -636,7 +637,7 @@ class ImagePostScreen extends StatelessWidget {
                           Text(
                             'Gopal Singh • 1st',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
@@ -644,12 +645,12 @@ class ImagePostScreen extends StatelessWidget {
                           SizedBox(height: 4),
                           Text(
                             'Training Head | DigiCoders Technologies',
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                            style: TextStyle(color: AppColors.premiumGold, fontSize: 12),
                           ),
                           SizedBox(height: 6),
                           Text(
                             '📢 We Are Hiring – Flutter Developer...',
-                            style: TextStyle(color: Colors.white, fontSize: 13),
+                            style: TextStyle(color: AppColors.white, fontSize: 13),
                           ),
                         ],
                       ),
@@ -681,7 +682,7 @@ class ImagePostScreen extends StatelessWidget {
                       ? Icons.favorite
                       : Icons.favorite_border,
               count: controller.likeCount.value,
-              color: controller.isLiked.value ? Colors.red : Colors.white,
+              color: controller.isLiked.value ? Colors.red : AppColors.white,
               onTap: controller.toggleLike,
             ),
           ),
@@ -710,7 +711,7 @@ class ImagePostScreen extends StatelessWidget {
     required IconData icon,
     required int count,
     required VoidCallback onTap,
-    Color color = Colors.white,
+    Color color = AppColors.white,
   }) {
     return Column(
       children: [
@@ -718,14 +719,14 @@ class ImagePostScreen extends StatelessWidget {
           onTap: onTap,
           child: CircleAvatar(
             radius: 22,
-            backgroundColor: Colors.black.withOpacity(0.6),
+            backgroundColor: AppColors.black.withOpacity(0.6),
             child: Icon(icon, color: color, size: 22),
           ),
         ),
         const SizedBox(height: 4),
         Text(
           '$count',
-          style: const TextStyle(color: Colors.white, fontSize: 11),
+          style: const TextStyle(color: AppColors.white, fontSize: 11),
         ),
       ],
     );

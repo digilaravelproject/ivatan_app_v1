@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../repository/order_repository.dart';
@@ -48,7 +49,7 @@ class SellerOrderDetailController extends GetxController {
           response['message'] ?? 'Order status updated to $status',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green.withOpacity(0.8),
-          colorText: Colors.white,
+          colorText: AppColors.white,
         );
         // Refetch to ensure all details are up-to-date
         await fetchOrderDetails();
@@ -58,7 +59,7 @@ class SellerOrderDetailController extends GetxController {
           response?['message'] ?? 'Failed to update order status',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red.withOpacity(0.8),
-          colorText: Colors.white,
+          colorText: AppColors.white,
         );
       }
     } catch (e) {
@@ -67,7 +68,7 @@ class SellerOrderDetailController extends GetxController {
         'Failed to connect to server',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.withOpacity(0.8),
-        colorText: Colors.white,
+        colorText: AppColors.white,
       );
     }
   }

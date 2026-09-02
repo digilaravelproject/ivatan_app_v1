@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/network/app_urls.dart';
@@ -39,21 +40,21 @@ class _MyEnquiryListScreenState extends State<MyEnquiryListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: AppColors.premiumGold.withOpacity(0.1),
       appBar: AppBar(
         title: const Text(
           'My Enquiries',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
-            color: Colors.white,
+            color: AppColors.white,
           ),
         ),
         centerTitle: true,
         backgroundColor: AppColors.primary,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -67,18 +68,18 @@ class _MyEnquiryListScreenState extends State<MyEnquiryListScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.message_outlined, size: 64, color: Colors.grey.shade300),
+                Icon(Icons.message_outlined, size: 64, color: AppColors.premiumGold),
                 const SizedBox(height: 16),
                 Text(
                   'No enquiries found',
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                  style: TextStyle(color: AppColors.premiumGold, fontSize: 16),
                 ),
               ],
             ),
           );
         }
 
-        return RefreshIndicator(color: Colors.black, 
+        return RefreshIndicator(color: AppColors.white, 
           onRefresh: () => controller.fetchMyEnquiries(isRefresh: true),
           child: ListView.builder(
             controller: _scrollController,
@@ -116,7 +117,7 @@ class EnquiryCard extends StatelessWidget {
       case 'closed':
         return Colors.red;
       default:
-        return Colors.grey;
+        return AppColors.premiumGold;
     }
   }
 
@@ -125,12 +126,12 @@ class EnquiryCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        border: Border.all(color: AppColors.premiumGold, width: 1),
       ),
       child: Material(
-        color: Colors.transparent,
+        color: AppColors.transparent,
         child: InkWell(
           onTap: () {
             Navigator.push(
@@ -156,7 +157,7 @@ class EnquiryCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                          color: AppColors.white,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -189,14 +190,14 @@ class EnquiryCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.subject, size: 16, color: Colors.grey.shade600),
+                    Icon(Icons.subject, size: 16, color: AppColors.premiumGold),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         enquiry.subject.isEmpty ? 'No Subject' : enquiry.subject,
                         style: TextStyle(
                           fontSize: 15,
-                          color: Colors.grey.shade800,
+                          color: AppColors.premiumGold,
                           fontWeight: FontWeight.w500,
                         ),
                         maxLines: 1,
@@ -211,14 +212,14 @@ class EnquiryCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.message_outlined, size: 16, color: Colors.grey.shade600),
+                    Icon(Icons.message_outlined, size: 16, color: AppColors.premiumGold),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         enquiry.message.isEmpty ? 'No message' : enquiry.message,
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey.shade700,
+                          color: AppColors.premiumGold,
                           height: 1.3,
                         ),
                         maxLines: 2,
@@ -238,10 +239,10 @@ class EnquiryCard extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
+                            color: AppColors.premiumGold,
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(Icons.person_outline, size: 14, color: Colors.grey.shade700),
+                          child: Icon(Icons.person_outline, size: 14, color: AppColors.premiumGold),
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -249,20 +250,20 @@ class EnquiryCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: Colors.grey.shade700,
+                            color: AppColors.premiumGold,
                           ),
                         ),
                       ],
                     ),
                     Row(
                       children: [
-                        Icon(Icons.access_time, size: 14, color: Colors.grey.shade500),
+                        Icon(Icons.access_time, size: 14, color: AppColors.premiumGold),
                         const SizedBox(width: 4),
                         Text(
                           _formatDate(enquiry.createdAt),
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey.shade500,
+                            color: AppColors.premiumGold,
                           ),
                         ),
                       ],
@@ -324,22 +325,22 @@ class EnquiryDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
         title: Text(
           enquiry.service?.title ?? 'Enquiry Details',
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: AppColors.white,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0.5,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: AppColors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -378,7 +379,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: AppColors.white,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -386,7 +387,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                         enquiry.service?.description ?? 'No description',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey.shade600,
+                          color: AppColors.premiumGold,
                         ),
                       ),
                     ],
@@ -395,7 +396,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: AppColors.white,
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: Text(
@@ -403,7 +404,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppColors.white,
                     ),
                   ),
                 ),
@@ -416,9 +417,9 @@ class EnquiryDetailScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: AppColors.premiumGold.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: AppColors.premiumGold),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -428,10 +429,10 @@ class EnquiryDetailScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.store, size: 20, color: Colors.black),
+                        child: Icon(Icons.store, size: 20, color: AppColors.white),
                       ),
                       const SizedBox(width: 12),
                       Column(
@@ -441,7 +442,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                             'Seller',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey,
+                              color: AppColors.premiumGold,
                             ),
                           ),
                           Text(
@@ -449,7 +450,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black,
+                              color: AppColors.white,
                             ),
                           ),
                         ],
@@ -468,7 +469,7 @@ class EnquiryDetailScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: Colors.black,
+                color: AppColors.white,
               ),
             ),
             const SizedBox(height: 12),
@@ -477,9 +478,9 @@ class EnquiryDetailScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: AppColors.premiumGold.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: AppColors.premiumGold),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -489,7 +490,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: AppColors.white,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -497,20 +498,20 @@ class EnquiryDetailScreen extends StatelessWidget {
                     enquiry.message.isEmpty ? 'No message' : enquiry.message,
                     style: TextStyle(
                       fontSize: 15,
-                      color: Colors.grey.shade800,
+                      color: AppColors.premiumGold,
                       height: 1.5,
                     ),
                   ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today, size: 14, color: Colors.grey.shade500),
+                      Icon(Icons.calendar_today, size: 14, color: AppColors.premiumGold),
                       const SizedBox(width: 6),
                       Text(
                         'Sent on ${_formatDate(enquiry.createdAt)}',
                         style: TextStyle(
                           fontSize: 13,
-                          color: Colors.grey.shade500,
+                          color: AppColors.premiumGold,
                         ),
                       ),
                     ],
@@ -531,7 +532,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: AppColors.white,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -546,7 +547,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                     ),
                   ),
@@ -583,7 +584,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                       enquiry.replyMessage!,
                       style: TextStyle(
                         fontSize: 15,
-                        color: Colors.grey.shade800,
+                        color: AppColors.premiumGold,
                         height: 1.5,
                       ),
                     ),

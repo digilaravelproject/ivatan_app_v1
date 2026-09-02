@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/subscription_controller.dart';
@@ -69,18 +70,18 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
     final isAnyStatus = isSubscribed || isPending;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: BackButton(
-          color: Colors.black,
+          color: AppColors.white,
           onPressed: () => Get.back(),
         ),
         title: Text(
           _plan.name,
           style: const TextStyle(
-            color: Colors.black,
+            color: AppColors.white,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -93,7 +94,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
                 child: SizedBox(
                   width: 16,
                   height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black54),
+                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
                 ),
               ),
             ),
@@ -119,7 +120,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
                   const SizedBox(height: 16),
                   const Text(
                     "Plan Features",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.white),
                   ),
                   const SizedBox(height: 16),
                   // Skeleton loaders
@@ -143,12 +144,12 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
               const SizedBox(height: 12),
               const Text("Failed to load plan details", style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 6),
-              Text(_errorMsg!, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+              Text(_errorMsg!, style: TextStyle(fontSize: 12, color: AppColors.premiumGold)),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _fetchDetails,
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-                child: const Text("Retry", style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.transparent),
+                child: const Text("Retry", style: TextStyle(color: AppColors.white)),
               ),
             ],
           ),
@@ -172,7 +173,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: AppColors.white,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -214,18 +215,18 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
                           );
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: AppColors.transparent,
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                   child: loading
                       ? const SizedBox(
                           height: 20, width: 20,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          child: CircularProgressIndicator(color: AppColors.white, strokeWidth: 2),
                         )
                       : const Text(
                           "Subscribe Now",
-                          style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: AppColors.white, fontSize: 15, fontWeight: FontWeight.bold),
                         ),
                 ),
               ),
@@ -246,16 +247,16 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
         children: [
           Container(
             width: 20, height: 20,
-            decoration: BoxDecoration(color: Colors.grey.shade200, shape: BoxShape.circle),
+            decoration: BoxDecoration(color: AppColors.premiumGold, shape: BoxShape.circle),
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(height: 12, width: 140, color: Colors.grey.shade200),
+                Container(height: 12, width: 140, color: AppColors.premiumGold),
                 const SizedBox(height: 6),
-                Container(height: 10, width: 220, color: Colors.grey.shade100),
+                Container(height: 10, width: 220, color: AppColors.premiumGold),
               ],
             ),
           ),
@@ -277,7 +278,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: AppColors.white.withOpacity(0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -337,7 +338,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.06),
+                          color: AppColors.white.withOpacity(0.06),
                           shape: BoxShape.circle,
                           border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.5), width: 1),
                         ),
@@ -348,9 +349,9 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
+                          color: AppColors.white.withOpacity(0.05),
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: Colors.white.withOpacity(0.08)),
+                          border: Border.all(color: AppColors.white.withOpacity(0.08)),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -361,7 +362,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
                                 shape: BoxShape.circle,
                                 color: isSubscribed
                                     ? const Color(0xFF10B981)
-                                    : (isPending ? const Color(0xFFF59E0B) : Colors.white24),
+                                    : (isPending ? const Color(0xFFF59E0B) : AppColors.white),
                               ),
                             ),
                             const SizedBox(width: 6),
@@ -370,7 +371,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
                               style: TextStyle(
                                 color: isSubscribed
                                     ? const Color(0xFF10B981)
-                                    : (isPending ? const Color(0xFFF59E0B) : Colors.white70),
+                                    : (isPending ? const Color(0xFFF59E0B) : AppColors.white),
                                 fontSize: 9,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -391,7 +392,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
                         ).createShader(bounds),
                         child: Text(
                           plan.name,
-                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900),
+                          style: const TextStyle(color: AppColors.white, fontSize: 18, fontWeight: FontWeight.w900),
                         ),
                       ),
                       if (plan.isPopular) ...[
@@ -406,7 +407,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
                           ),
                           child: const Text(
                             "MOST POPULAR",
-                            style: TextStyle(color: Colors.black, fontSize: 7, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                            style: TextStyle(color: AppColors.white, fontSize: 7, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                           ),
                         ),
                       ],
@@ -427,13 +428,13 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
                         ).createShader(bounds),
                         child: Text(
                           plan.price,
-                          style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900),
+                          style: const TextStyle(color: AppColors.white, fontSize: 26, fontWeight: FontWeight.w900),
                         ),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         "/ ${plan.period}",
-                        style: const TextStyle(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.w500),
+                        style: const TextStyle(fontSize: 12, color: AppColors.white, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -441,7 +442,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
 
                   Text(
                     plan.description,
-                    style: const TextStyle(color: Colors.white70, fontSize: 11, height: 1.4),
+                    style: const TextStyle(color: AppColors.white, fontSize: 11, height: 1.4),
                   ),
                 ],
               ),
@@ -461,8 +462,8 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(3),
-          decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-          child: const Icon(Icons.check, color: Colors.white, size: 11),
+          decoration: const BoxDecoration(color: AppColors.white, shape: BoxShape.circle),
+          child: const Icon(Icons.check, color: AppColors.white, size: 11),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -471,13 +472,13 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
             children: [
               Text(
                 feature.title,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87),
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.white),
               ),
               if (feature.description.isNotEmpty) ...[
                 const SizedBox(height: 2),
                 Text(
                   feature.description,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600, height: 1.4),
+                  style: TextStyle(fontSize: 12, color: AppColors.premiumGold, height: 1.4),
                 ),
               ],
             ],
@@ -495,9 +496,9 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.premiumGold.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: AppColors.premiumGold),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -517,7 +518,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey.shade800,
+                    color: AppColors.premiumGold,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -525,7 +526,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
                   isPending
                       ? "This plan is subscribed but pending approval from admin."
                       : "This plan is active and approved by admin. You can manage your subscription from the store details.",
-                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600, height: 1.4),
+                  style: TextStyle(fontSize: 13, color: AppColors.premiumGold, height: 1.4),
                 ),
               ],
             ),

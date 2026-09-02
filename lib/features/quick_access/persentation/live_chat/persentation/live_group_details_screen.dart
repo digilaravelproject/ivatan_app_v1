@@ -135,11 +135,11 @@ class LiveGroupDetailsController extends GetxController {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (ctx) {
         return Container(
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: AppColors.black,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Padding(
@@ -169,12 +169,12 @@ class LiveGroupDetailsController extends GetxController {
                       children: [
                         Text(
                           participant.user?.name ?? "User",
-                          style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                          style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.white),
                         ),
                         if (participant.user?.username != null)
                           Text(
                             "@${participant.user!.username}",
-                            style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey[600]),
+                            style: GoogleFonts.poppins(fontSize: 13, color: AppColors.premiumGold.withOpacity(0.6)),
                           ),
                       ],
                     ),
@@ -185,7 +185,7 @@ class LiveGroupDetailsController extends GetxController {
               const Divider(height: 1),
               
               ListTile(
-                leading: const Icon(Icons.message_outlined, color: Colors.black87),
+                leading: const Icon(Icons.message_outlined, color: AppColors.white),
                 title: Text("Message ${participant.user?.name ?? 'User'}", style: GoogleFonts.poppins()),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -195,7 +195,7 @@ class LiveGroupDetailsController extends GetxController {
               ),
               
               ListTile(
-                leading: const Icon(Icons.person_outline_rounded, color: Colors.black87),
+                leading: const Icon(Icons.person_outline_rounded, color: AppColors.white),
                 title: Text("View Profile", style: GoogleFonts.poppins()),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -234,8 +234,8 @@ class LiveGroupDetailsController extends GetxController {
               ],
               
               ListTile(
-                leading: const Icon(Icons.close_rounded, color: Colors.grey),
-                title: Text("Cancel", style: GoogleFonts.poppins(color: Colors.grey)),
+                leading: const Icon(Icons.close_rounded, color: AppColors.premiumGold),
+                title: Text("Cancel", style: GoogleFonts.poppins(color: AppColors.premiumGold)),
                 onTap: () => Navigator.pop(ctx),
               ),
             ],
@@ -280,12 +280,12 @@ class LiveGroupDetailsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF2F4F7), // Soft WhatsApp background grey
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0.5,
         title: Text(
           "Group Info",
           style: GoogleFonts.poppins(
-            color: Colors.black87,
+            color: AppColors.black,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -294,7 +294,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
           onTap: () => Navigator.of(context).pop(),
           child: const Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: Colors.black54,
+            color: AppColors.black,
             size: 20,
           ),
         ),
@@ -340,7 +340,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
                 left: 0,
                 right: 0,
                 child: LinearProgressIndicator(
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: AppColors.transparent,
                   valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
                   minHeight: 3,
                 ),
@@ -354,7 +354,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
   // 1. Top Header Block
   Widget _buildHeaderBlock(BuildContext context, LiveGroupDetailsController controller) {
     return Container(
-      color: Colors.white,
+      color: AppColors.black,
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
       width: double.infinity,
       child: Column(
@@ -384,7 +384,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 21,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: AppColors.black,
             ),
           ),
           const SizedBox(height: 4),
@@ -393,7 +393,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
             "Group · ${controller.participantsCount} participants",
             style: GoogleFonts.poppins(
               fontSize: 13.5,
-              color: Colors.grey[500],
+              color: AppColors.premiumGold.withOpacity(0.5),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -475,7 +475,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
   // 2. Description Block
   Widget _buildDescriptionBlock(LiveGroupDetailsController controller) {
     return Container(
-      color: Colors.white,
+      color: AppColors.black,
       padding: const EdgeInsets.all(16),
       width: double.infinity,
       child: Column(
@@ -494,7 +494,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
             controller.groupDescription,
             style: GoogleFonts.poppins(
               fontSize: 13.5,
-              color: Colors.grey[800],
+              color: AppColors.premiumGold.withOpacity(0.8),
               height: 1.45,
             ),
           ),
@@ -503,7 +503,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
             "Created by ${controller.createdByName}, on ${controller.formattedCreatedAt}",
             style: GoogleFonts.poppins(
               fontSize: 12,
-              color: Colors.grey[500],
+              color: AppColors.premiumGold.withOpacity(0.5),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -515,7 +515,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
   // 3. Details Parameters Block
   Widget _buildDetailsBlock(LiveGroupDetailsController controller) {
     return Container(
-      color: Colors.white,
+      color: AppColors.black,
       width: double.infinity,
       child: Column(
         children: [
@@ -552,14 +552,14 @@ class LiveGroupDetailsScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
-          Icon(icon, color: Colors.black45, size: 20),
+          Icon(icon, color: AppColors.black, size: 20),
           const SizedBox(width: 12),
           Text(
             label,
             style: GoogleFonts.poppins(
               fontSize: 13.5,
               fontWeight: FontWeight.w500,
-              color: Colors.grey[650],
+              color: AppColors.premiumGold.withOpacity(0.65),
             ),
           ),
           const Spacer(),
@@ -568,7 +568,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 13.5,
               fontWeight: FontWeight.w600,
-              color: valueColor ?? Colors.black87,
+              color: valueColor ?? AppColors.white,
             ),
           ),
         ],
@@ -586,7 +586,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
   // 4. Switches List Block
   Widget _buildSwitchesBlock(LiveGroupDetailsController controller) {
     return Container(
-      color: Colors.white,
+      color: AppColors.black,
       width: double.infinity,
       child: Column(
         children: [
@@ -618,14 +618,14 @@ class LiveGroupDetailsScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          Icon(icon, color: Colors.black45, size: 20),
+          Icon(icon, color: AppColors.black, size: 20),
           const SizedBox(width: 12),
           Text(
             label,
             style: GoogleFonts.poppins(
               fontSize: 13.5,
               fontWeight: FontWeight.w500,
-              color: Colors.grey[700],
+              color: AppColors.premiumGold.withOpacity(0.7),
             ),
           ),
           const Spacer(),
@@ -642,7 +642,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
   // 5. Participants List Block
   Widget _buildParticipantsBlock(BuildContext context, LiveGroupDetailsController controller) {
     return Material(
-      color: Colors.white,
+      color: AppColors.black,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -659,7 +659,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey[800],
+                      color: AppColors.premiumGold.withOpacity(0.8),
                     ),
                   ),
                 ),
@@ -668,7 +668,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
                   constraints: const BoxConstraints(),
                   icon: Icon(
                     controller.isSearchExpanded.value ? Icons.close_rounded : Icons.search_rounded,
-                    color: Colors.grey[600],
+                    color: AppColors.premiumGold.withOpacity(0.6),
                     size: 22,
                   ),
                   onPressed: () {
@@ -699,7 +699,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
                   onChanged: (val) => controller.searchQuery.value = val,
                   decoration: InputDecoration(
                     hintText: "Search participants...",
-                    hintStyle: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 13.5),
+                    hintStyle: GoogleFonts.poppins(color: AppColors.premiumGold.withOpacity(0.4), fontSize: 13.5),
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: const EdgeInsets.symmetric(vertical: 10),
@@ -715,7 +715,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
               child: Center(
                 child: Text(
                   "No participants found",
-                  style: GoogleFonts.poppins(color: Colors.grey[500], fontSize: 13.5),
+                  style: GoogleFonts.poppins(color: AppColors.premiumGold.withOpacity(0.5), fontSize: 13.5),
                 ),
               ),
             )
@@ -752,7 +752,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: AppColors.black,
                     ),
                   ),
                   subtitle: participant.user?.username != null
@@ -760,7 +760,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
                           "@${participant.user!.username}",
                           style: GoogleFonts.poppins(
                             fontSize: 12.5,
-                            color: Colors.grey[600],
+                            color: AppColors.premiumGold.withOpacity(0.6),
                           ),
                         )
                       : null,
@@ -794,7 +794,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
   // 6. Exit / View Messages Buttons Block
   Widget _buildActionButtonsBlock(BuildContext context, LiveGroupDetailsController controller) {
     return Material(
-      color: Colors.white,
+      color: AppColors.black,
       child: Container(
         width: double.infinity,
         child: Column(
@@ -827,10 +827,10 @@ class LiveGroupDetailsScreen extends StatelessWidget {
             //       middleText: "Are you sure you want to exit this group?",
             //       middleTextStyle: GoogleFonts.poppins(fontSize: 14),
             //       textConfirm: "Exit",
-            //       confirmTextColor: Colors.white,
+            //       confirmTextColor: AppColors.white,
             //       buttonColor: Colors.red,
             //       textCancel: "Cancel",
-            //       cancelTextColor: Colors.grey,
+            //       cancelTextColor: AppColors.premiumGold,
             //       onConfirm: () {
             //         Get.back(); // Close dialog
             //         Get.back(); // Exit details screen

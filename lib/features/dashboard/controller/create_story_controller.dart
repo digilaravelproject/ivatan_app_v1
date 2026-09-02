@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_connect/http/src/multipart/multipart_file.dart' hide MultipartFile;
+import 'package:get/get_connect/http/src/multipart/multipart_file.dart'
+    hide MultipartFile;
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -30,7 +31,6 @@ import 'package:dio/dio.dart';
 import 'package:image_cropper/image_cropper.dart';
 import '../model/story_model.dart';
 
-
 class StoryController extends GetxController {
   final ImagePicker _picker = ImagePicker();
 
@@ -40,26 +40,25 @@ class StoryController extends GetxController {
   RxBool isVideoInitialized = false.obs;
   RxString videoUrl = "".obs;
 
-  ProfileController controller = Get.put(ProfileController(SharedPrefManager().user!.username));
+  ProfileController controller = Get.put(
+    ProfileController(SharedPrefManager().user!.username),
+  );
   final HomeController homeController = Get.put(HomeController());
-
 
   //RxList<HighlightStoryModel> highlights = <HighlightStoryModel>[].obs;
 
   @override
   void onInit() {
     super.onInit();
-   // fetchHighlightes(userName);
+    // fetchHighlightes(userName);
   }
-
 
   VideoPlayerController? videoController;
   final ApiServices api = ApiServices();
 
-
   // ------------------ FORM FIELDS ---------------------
   RxString selectedType = "post".obs;
-  
+
   void refreshProfileHighlights() {
     final username = SharedPrefManager().user!.username;
     if (Get.isRegistered<ProfileController>(tag: username)) {
@@ -68,6 +67,7 @@ class StoryController extends GetxController {
       controller.fetchHighlightes(username);
     }
   }
+
   RxString selectedVisibility = "public".obs;
   TextEditingController captionCtrl = TextEditingController();
   int? currentHighlightId;
@@ -91,11 +91,11 @@ class StoryController extends GetxController {
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Edit Photo',
-            toolbarColor: Colors.black,
-            toolbarWidgetColor: Colors.white,
+            toolbarColor: AppColors.white,
+            toolbarWidgetColor: AppColors.white,
             initAspectRatio: CropAspectRatioPreset.original,
             lockAspectRatio: false,
-            backgroundColor: Colors.black,
+            backgroundColor: AppColors.transparent,
             activeControlsWidgetColor: AppColors.primary,
           ),
           IOSUiSettings(
@@ -146,20 +146,16 @@ class StoryController extends GetxController {
     }
   }
 
-
   Future<bool> requestPermissions() async {
     if (await Permission.videos.isDenied || await Permission.photos.isDenied) {
-      Map<Permission, PermissionStatus> statuses = await [
-        Permission.videos,
-        Permission.photos,
-      ].request();
+      Map<Permission, PermissionStatus> statuses =
+          await [Permission.videos, Permission.photos].request();
 
       return statuses[Permission.videos]!.isGranted ||
           statuses[Permission.photos]!.isGranted;
     }
     return true;
   }
-
 
   Future<void> pickVideo(ImageSource source) async {
     try {
@@ -173,7 +169,7 @@ class StoryController extends GetxController {
       // Compress video for older devices
       final info = await VideoCompress.compressVideo(
         picked.path,
-        quality: VideoQuality.HighestQuality, 
+        quality: VideoQuality.HighestQuality,
         deleteOrigin: false,
       );
 
@@ -196,7 +192,6 @@ class StoryController extends GetxController {
       isVideoInitialized.value = true;
 
       Get.to(() => StoryScreen());
-
     } catch (e) {
       isVideoInitialized.value = false;
       print("Pick video error: $e");
@@ -208,12 +203,10 @@ class StoryController extends GetxController {
     }
   }
 
-
   void showPickerOptions() async {
     // Navigate to Instagram-style media picker screen
     Get.to(() => StoryMediaPickerScreen());
   }
-
 
   Future<File> _compressImage(File file) async {
     final filePath = file.absolute.path;
@@ -249,7 +242,9 @@ class StoryController extends GetxController {
 
         if (compressedXFile2 != null) {
           File compressedAgain = File(compressedXFile2.path);
-          print("📉 Secondary compressed image size: ${(compressedAgain.lengthSync() / 1024).toStringAsFixed(2)} KB");
+          print(
+            "📉 Secondary compressed image size: ${(compressedAgain.lengthSync() / 1024).toStringAsFixed(2)} KB",
+          );
           return compressedAgain;
         }
       }
@@ -272,25 +267,25 @@ class StoryController extends GetxController {
         mediaFiles.add(compressedFile);
       } else if (videoFile.value != null) {
         File videoToUpload = videoFile.value!;
-        
+
         CustomSnackBar.showInfo(message: "Compressing video, please wait...");
-        
+
         final info = await VideoCompress.compressVideo(
           videoToUpload.path,
           quality: VideoQuality.MediumQuality,
           deleteOrigin: false,
         );
-        
+
         if (info != null && info.path != null) {
           videoToUpload = File(info.path!);
-          print("Compressed story video size: ${(videoToUpload.lengthSync() / 1024).toStringAsFixed(2)} KB");
+          print(
+            "Compressed story video size: ${(videoToUpload.lengthSync() / 1024).toStringAsFixed(2)} KB",
+          );
         }
         mediaFiles.add(videoToUpload);
       }
 
-      Map<String, dynamic> body = {
-        "caption": captionCtrl.text,
-      };
+      Map<String, dynamic> body = {"caption": captionCtrl.text};
 
       // Backend usually expects: media[] instead of media[0]
       for (int i = 0; i < mediaFiles.length; i++) {
@@ -312,7 +307,6 @@ class StoryController extends GetxController {
         CustomSnackBar.showSuccess(message: '${response["message"]}');
         Get.back();
       }
-
     } catch (e) {
       print("POST ERROR: $e");
       Get.snackbar("Error", "Failed to create story");
@@ -365,7 +359,6 @@ class StoryController extends GetxController {
     }
   }*/
 
-
   Future<void> createHighlight() async {
     try {
       if (captionCtrl.text.trim().isEmpty) {
@@ -377,9 +370,7 @@ class StoryController extends GetxController {
       // Ye list ek bhi id ho sakti hai ya multiple
       List<int> storyIds = [currentStoryId]; // e.g. [123] OR [123, 456]
 
-      Map<String, dynamic> body = {
-        "title": captionCtrl.text.trim(),
-      };
+      Map<String, dynamic> body = {"title": captionCtrl.text.trim()};
 
       // 👉 OPTIONAL cover_media (image/video)
       if (imageFile.value != null) {
@@ -415,13 +406,12 @@ class StoryController extends GetxController {
 
       if (response != null) {
         CustomSnackBar.showSuccess(message: response["message"]);
-        
+
         refreshProfileHighlights();
-        
+
         captionCtrl.clear();
         Get.back();
       }
-
     } catch (e) {
       print("Create highlight error: $e");
       Get.snackbar("Error", "Failed to create highlight");
@@ -435,9 +425,10 @@ class StoryController extends GetxController {
     await Get.bottomSheet(
       Container(
         padding: EdgeInsets.only(top: 20, bottom: 20 + bottomPad),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(
+        decoration: BoxDecoration(
+          color: AppColors.black,
+          border: Border.all(color: AppColors.premiumGold),
+          borderRadius: const BorderRadius.vertical(
             top: Radius.circular(30), // 👈 beautiful curved top
           ),
         ),
@@ -449,7 +440,7 @@ class StoryController extends GetxController {
               width: 30,
               height: 2,
               decoration: BoxDecoration(
-                color: Colors.grey.shade600,
+                color: AppColors.premiumGold,
                 borderRadius: BorderRadius.circular(50),
               ),
             ),
@@ -458,10 +449,13 @@ class StoryController extends GetxController {
 
             // Delete
             ListTile(
-            //  leading: const Icon(Icons.delete, color: Colors.red),
+              //  leading: const Icon(Icons.delete, color: Colors.red),
               title: Text(
                 "Delete",
-                style: TextStyle(color: AppColors.error,fontWeight:FontWeight.bold ),
+                style: TextStyle(
+                  color: AppColors.error,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               onTap: () {
                 Get.back(closeOverlays: true);
@@ -471,10 +465,13 @@ class StoryController extends GetxController {
 
             // Highlight
             ListTile(
-         //     leading: const Icon(Icons.star, color: Colors.black),
+              //     leading: const Icon(Icons.star, color: AppColors.white),
               title: const Text(
                 "Highlight",
-                style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: AppColors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               onTap: () {
                 Get.back(closeOverlays: true);
@@ -486,7 +483,7 @@ class StoryController extends GetxController {
         ),
       ),
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
     );
   }
 
@@ -496,7 +493,7 @@ class StoryController extends GetxController {
       Container(
         padding: EdgeInsets.only(top: 20, bottom: 20 + bottomPad),
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(30), // 👈 beautiful curved top
           ),
@@ -509,13 +506,20 @@ class StoryController extends GetxController {
               width: 30,
               height: 2,
               decoration: BoxDecoration(
-                color: Colors.grey.shade600,
+                color: AppColors.premiumGold,
                 borderRadius: BorderRadius.circular(50),
               ),
             ),
 
             const SizedBox(height: 20),
-            Text("Add to highlights",style: TextStyle(color: AppColors.black,fontWeight: FontWeight.bold,fontSize: 20),),
+            Text(
+              "Add to highlights",
+              style: TextStyle(
+                color: AppColors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
 
             const SizedBox(height: 20),
 
@@ -523,9 +527,7 @@ class StoryController extends GetxController {
               if (controller.isLoading.value) {
                 return SizedBox(
                   height: 80,
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  child: Center(child: CircularProgressIndicator()),
                 );
               }
 
@@ -533,11 +535,8 @@ class StoryController extends GetxController {
                 height: 90,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                  ),
-                  itemCount:
-                  controller.highlights.length + 1,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: controller.highlights.length + 1,
                   itemBuilder: (context, index) {
                     // Add Story Button
                     if (index == 0) {
@@ -560,10 +559,12 @@ class StoryController extends GetxController {
 
                     // Dynamic cover logic for sheet
                     String? imageUrl = story.cover_media_url;
-                    if ((imageUrl == null || imageUrl.isEmpty) && story.stories.isNotEmpty) {
-                      imageUrl = story.stories.first.thumbnailUrl.isNotEmpty 
-                          ? story.stories.first.thumbnailUrl 
-                          : story.stories.first.mediaUrl;
+                    if ((imageUrl == null || imageUrl.isEmpty) &&
+                        story.stories.isNotEmpty) {
+                      imageUrl =
+                          story.stories.first.thumbnailUrl.isNotEmpty
+                              ? story.stories.first.thumbnailUrl
+                              : story.stories.first.mediaUrl;
                     }
 
                     return GestureDetector(
@@ -584,12 +585,11 @@ class StoryController extends GetxController {
                 ),
               );
             }),
-
           ],
         ),
       ),
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
     );
   }
 
@@ -604,11 +604,7 @@ class StoryController extends GetxController {
 
       print("Calling addStoryToHighlight: $apiUrl");
 
-      final response = await api.callPost(
-        apiUrl,
-        data: {},
-        isFormData: false,
-      );
+      final response = await api.callPost(apiUrl, data: {}, isFormData: false);
 
       print("API RESULT  addStoryToHighlight: $response");
 
@@ -619,12 +615,10 @@ class StoryController extends GetxController {
       } else {
         CustomSnackBar.showError(message: "Could not add story");
       }
-
     } catch (e) {
       print("AddToHighlight ERROR: $e");
 
       CustomSnackBar.showError(message: "Something went wrong");
-
     } finally {
       isLoading.value = false;
     }
@@ -643,17 +637,12 @@ class StoryController extends GetxController {
       final status = response["success"] == true;
 
       if (status) {
-
         homeController.removeStory(storyId);
 
-        CustomSnackBar.showSuccess(message: "Story removed successfully" );
-        return true;   // API success
+        CustomSnackBar.showSuccess(message: "Story removed successfully");
+        return true; // API success
       } else {
-        Get.snackbar(
-          "Error",
-          msg,
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        Get.snackbar("Error", msg, snackPosition: SnackPosition.BOTTOM);
         return false;
       }
     } catch (e) {
@@ -666,10 +655,11 @@ class StoryController extends GetxController {
     }
   }
 
-
   Future<bool> deleteHighlight(int storyId) async {
     try {
-      final response = await api.callDelete("api/v1/stories/highlights/$currentHighlightId/$currentStoryId");
+      final response = await api.callDelete(
+        "api/v1/stories/highlights/$currentHighlightId/$currentStoryId",
+      );
 
       print("Delete Comment Response: $response");
 
@@ -680,18 +670,13 @@ class StoryController extends GetxController {
       final status = response["success"] == true;
 
       if (status) {
-
         homeController.removeStory(storyId);
         controller.fetchHighlightes(SharedPrefManager().user!.username);
 
-        CustomSnackBar.showSuccess(message: "Story removed successfully" );
-        return true;   // API success
+        CustomSnackBar.showSuccess(message: "Story removed successfully");
+        return true; // API success
       } else {
-        Get.snackbar(
-          "Error",
-          msg,
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        Get.snackbar("Error", msg, snackPosition: SnackPosition.BOTTOM);
         return false;
       }
     } catch (e) {
@@ -709,19 +694,26 @@ class StoryController extends GetxController {
     final currentUserId = SharedPrefManager().user?.id;
     final userStoryGroup = homeController.storyData.firstWhere(
       (group) => group.user.id == currentUserId,
-      orElse: () => UserStoryGroup(
-          user: StoryUser(id: 0, username: "", name: "", avatar: "", isVerified: false),
-          stories: [],
-          hasUnseen: false
-      ),
+      orElse:
+          () => UserStoryGroup(
+            user: StoryUser(
+              id: 0,
+              username: "",
+              name: "",
+              avatar: "",
+              isVerified: false,
+            ),
+            stories: [],
+            hasUnseen: false,
+          ),
     );
 
     // 2. Set the currentStoryId to the first available story (if any)
     if (userStoryGroup.stories.isNotEmpty) {
       currentStoryId = userStoryGroup.stories.first.id;
     } else {
-      currentStoryId = 0; 
-      // Note: User can still create highlight from profile without stories 
+      currentStoryId = 0;
+      // Note: User can still create highlight from profile without stories
       // by picking a cover image (StoryWidgets.addStory() in the sheet).
     }
 
@@ -736,10 +728,8 @@ class StoryController extends GetxController {
       Container(
         padding: EdgeInsets.only(top: 20, bottom: bottomPad),
         decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(30),
-          ),
+          color: AppColors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -750,33 +740,37 @@ class StoryController extends GetxController {
               width: 30,
               height: 2,
               decoration: BoxDecoration(
-                color: Colors.grey.shade600,
+                color: AppColors.premiumGold,
                 borderRadius: BorderRadius.circular(50),
               ),
             ),
 
             const SizedBox(height: 20),
-            Text("Add to highlights",style: TextStyle(color: AppColors.black,fontWeight: FontWeight.bold,fontSize: 20),),
+            Text(
+              "Add to highlights",
+              style: TextStyle(
+                color: AppColors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
 
             const SizedBox(height: 20),
             StoryWidgets.addStory(),
 
             TextField(
-                  controller: captionCtrl,
-                textAlign: TextAlign.center,
-                  decoration: const InputDecoration(
-                    alignLabelWithHint: true,
-                    hintText: "Enter highlight name",
-                    hintStyle: TextStyle(
-                      color: AppColors.lightTextSecondary,
-                    ),
-                    border: InputBorder.none,
-                  ),
-                ),
-
+              controller: captionCtrl,
+              textAlign: TextAlign.center,
+              decoration: const InputDecoration(
+                alignLabelWithHint: true,
+                hintText: "Enter highlight name",
+                hintStyle: TextStyle(color: AppColors.lightTextSecondary),
+                border: InputBorder.none,
+              ),
+            ),
 
             InkWell(
-              onTap: (){
+              onTap: () {
                 createHighlight();
               },
               child: Container(
@@ -802,15 +796,13 @@ class StoryController extends GetxController {
             // MyButton(title: "Add",onPressed: (){
             //   createHighlight();
             // },)
-
           ],
         ),
       ),
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
     );
   }
-
 
   @override
   void onClose() {
@@ -818,26 +810,25 @@ class StoryController extends GetxController {
     super.onClose();
   }
 
-
-  Future<void> createComment({required int storyId, required String body}) async {
+  Future<void> createComment({
+    required int storyId,
+    required String body,
+  }) async {
     try {
       isLoading.value = true;
 
       final response = await api.callPost(
         "api/v1/comments/story/$storyId",
-        data: {
-          "body": body,
-        },
+        data: {"body": body},
       );
 
       print("Create Comment Response: $response");
 
       if (response != null && response["data"] != null) {
         // Optionally add the newly created comment to the list
-      //  commentsList.insert(0, CommentModel.fromJson(response["data"]));
+        //  commentsList.insert(0, CommentModel.fromJson(response["data"]));
 
-      //  homeController.updateCommentCount(postId, true);
-
+        //  homeController.updateCommentCount(postId, true);
       }
     } catch (e) {
       print("Create Comment Error: $e");
@@ -845,7 +836,4 @@ class StoryController extends GetxController {
       isLoading.value = false;
     }
   }
-
-
-
 }

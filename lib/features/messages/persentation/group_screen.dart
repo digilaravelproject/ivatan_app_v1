@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -10,6 +11,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../db/shared_pref_manager.dart';
 import '../../../route/app_pages.dart';
 import '../../profile/screen/profile_screen.dart';
+import '../../../core/helper/custom_serchbar.dart';
 import '../controller/chatt_controller.dart';
 import 'package:intl/intl.dart';
 
@@ -21,9 +23,9 @@ class GroupScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ChattController controller = Get.put(ChattController());
     return Container(
-      color: Colors.white, // Clean White Background
+      color: AppColors.transparent, // Clean Transparent Background
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(70),
           child: AppBar(
@@ -39,7 +41,7 @@ class GroupScreen extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
+                    border: Border.all(color: AppColors.white, width: 2),
                   ),
                   child: CircleAvatar(
                     backgroundImage: NetworkImage(SharedPrefManager().user!.profilePhotoPath.toString()),
@@ -50,7 +52,7 @@ class GroupScreen extends StatelessWidget {
             title: const Text(
               'Groups', // Changed from i-group for consistency
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
                 letterSpacing: 0.5,
@@ -60,7 +62,7 @@ class GroupScreen extends StatelessWidget {
             //    IconButton(
             //       icon: const Icon(
             //         Icons.search,
-            //         color: Colors.white,
+            //         color: AppColors.white,
             //         size: 26,
             //       ),
             //       onPressed: () {},
@@ -70,7 +72,7 @@ class GroupScreen extends StatelessWidget {
             //     child: IconButton(
             //       icon: const Icon(
             //         Icons.more_vert,
-            //         color: Colors.white,
+            //         color: AppColors.white,
             //         size: 26,
             //       ),
             //       onPressed: () {},
@@ -86,42 +88,8 @@ class GroupScreen extends StatelessWidget {
             // Search Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                height: 48,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      CupertinoIcons.search,
-                      color: Colors.grey.shade500,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextField(
-                        onChanged: controller.searchedGroup,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 15,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Search groups...',
-                          hintStyle: TextStyle(
-                            color: Colors.grey.shade500,
-                            fontSize: 14,
-                          ),
-                          isDense: true,
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              child: CustomSearchBar(
+                onChanged: controller.searchedGroup,
               ),
             ),
 
@@ -137,9 +105,9 @@ class GroupScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.group_outlined, size: 48, color: Colors.grey.shade300),
+                        Icon(Icons.group_outlined, size: 48, color: AppColors.premiumGold),
                         const SizedBox(height: 12),
-                        Text("No groups found", style: TextStyle(color: Colors.grey.shade400)),
+                        Text("No groups found", style: TextStyle(color: AppColors.premiumGold)),
                       ],
                     ),
                   ),
@@ -154,7 +122,7 @@ class GroupScreen extends StatelessWidget {
                   child: ListView.separated(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: controller.filteredGroupList.length,
-                    separatorBuilder: (ctx, i) => Divider(height: 1, indent: 80, color: Colors.grey.shade100),
+                    separatorBuilder: (ctx, i) => Divider(height: 1, indent: 80, color: AppColors.premiumGold),
                     itemBuilder: (context, index) {
                       final message = controller.filteredGroupList[index];
                       return InkWell(
@@ -176,7 +144,7 @@ class GroupScreen extends StatelessWidget {
                               height: 50,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.grey.shade200,
+                                color: AppColors.premiumGold,
                               ),
                               child: ClipOval(
                                 child: message.type == "group" &&
@@ -187,7 +155,7 @@ class GroupScreen extends StatelessWidget {
                                   fit: BoxFit.cover,
                                 )
                                     : message.type == "group"
-                                    ? const Icon(Icons.group, color: Colors.grey)
+                                    ? const Center(child: Icon(Icons.group, color: AppColors.black, size: 26))
                                     : Center(
                                   child: Text(
                                     message.name.isNotEmpty
@@ -196,18 +164,18 @@ class GroupScreen extends StatelessWidget {
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
-                                      color: Colors.black87,
+                                      color: AppColors.black,
                                     ),
                                   ),
                                 ),
                               ),
                               /*child: ClipOval(
                                 child: message.type == "group"
-                                    ? const Icon(Icons.group, color: Colors.grey)
+                                    ? const Icon(Icons.group, color: AppColors.premiumGold)
                                     : Center(
                                         child: Text(
                                           message.name.isNotEmpty ? message.name[0].toUpperCase() : "?",
-                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.white),
                                         ),
                                       ),
                               ),*/
@@ -228,7 +196,7 @@ class GroupScreen extends StatelessWidget {
                                           style: const TextStyle(
                                             fontWeight: FontWeight.w600, // Slightly less bold than unread message
                                             fontSize: 16,
-                                            color: Colors.black,
+                                            color: AppColors.white,
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -237,7 +205,7 @@ class GroupScreen extends StatelessWidget {
                                        Text(
                                         formatChatDate(message.updatedAt.toString()),
                                         style: TextStyle(
-                                          color: Colors.grey.shade500,
+                                          color: AppColors.premiumGold,
                                           fontSize: 11,
                                         ),
                                       ),
@@ -250,7 +218,7 @@ class GroupScreen extends StatelessWidget {
                                         child: Text(
                                           message.lastMessage?.content ?? "No messages",
                                           style: TextStyle(
-                                            color: Colors.black87, // Stronger color for readability
+                                            color: AppColors.white, // Stronger color for readability
                                             fontSize: 14,
                                           ),
                                           maxLines: 1,
@@ -268,7 +236,7 @@ class GroupScreen extends StatelessWidget {
                                           child: Text(
                                             message.unreadCount.toString(),
                                             style: const TextStyle(
-                                              color: Colors.white,
+                                              color: AppColors.white,
                                               fontSize: 10,
                                               fontWeight: FontWeight.bold,
                                             ),

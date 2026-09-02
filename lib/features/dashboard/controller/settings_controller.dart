@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -467,7 +468,7 @@ class SettingsController extends GetxController {
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -491,7 +492,7 @@ class SettingsController extends GetxController {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: AppColors.white,
                 ),
               ),
               const SizedBox(height: 8),
@@ -500,7 +501,7 @@ class SettingsController extends GetxController {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 13,
-                  color: Colors.black54,
+                  color: AppColors.white,
                   height: 1.4,
                 ),
               ),
@@ -511,7 +512,7 @@ class SettingsController extends GetxController {
                 child: ElevatedButton(
                   onPressed: () => Get.back(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: AppColors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -519,7 +520,7 @@ class SettingsController extends GetxController {
                   ),
                   child: const Text(
                     "Okay",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -688,7 +689,7 @@ class SettingsController extends GetxController {
           response["message"] ?? "Switch request submitted successfully.",
           snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.green,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           duration: const Duration(seconds: 3),
         );
 
@@ -723,7 +724,7 @@ class SettingsController extends GetxController {
           response != null ? (response["message"] ?? "Switch failed") : "Switch failed",
           snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.red,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           duration: const Duration(seconds: 3),
         );
       }
@@ -734,7 +735,7 @@ class SettingsController extends GetxController {
         "Something went wrong: ${e.toString()}",
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.red,
-        colorText: Colors.white,
+        colorText: AppColors.white,
         duration: const Duration(seconds: 3),
       );
     } finally {
@@ -883,7 +884,7 @@ class SettingsController extends GetxController {
           responseData["message"] ?? "Profile Updated Successfully",
           snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.green,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           duration: Duration(seconds: 2),
         );
 
@@ -897,7 +898,7 @@ class SettingsController extends GetxController {
           responseData["message"] ?? "Update Failed",
           snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.red,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           duration: Duration(seconds: 3),
         );
       }
@@ -910,7 +911,7 @@ class SettingsController extends GetxController {
         "Something went wrong: ${e.toString()}",
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.red,
-        colorText: Colors.white,
+        colorText: AppColors.white,
         duration: Duration(seconds: 3),
       );
     }
@@ -1058,8 +1059,9 @@ class SettingsController extends GetxController {
     Get.bottomSheet(
       Container(
         padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + bottomPad),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: AppColors.black,
+          border: Border.all(color: AppColors.premiumGold),
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
@@ -1071,13 +1073,13 @@ class SettingsController extends GetxController {
               height: 4,
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: AppColors.premiumGold,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
             const Text(
               "Select Profile Photo",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.white),
             ),
             const SizedBox(height: 25),
             Row(
@@ -1157,7 +1159,7 @@ class SettingsController extends GetxController {
           const SizedBox(height: 8),
           Text(
             label,
-            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13, color: AppColors.white),
           ),
         ],
       ),

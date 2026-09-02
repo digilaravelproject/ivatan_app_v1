@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,19 +14,19 @@ class SubscriptionHistoryScreen extends StatelessWidget {
     final controller = Get.put(SubscriptionHistoryController());
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         centerTitle: true,
         leading: GestureDetector(
           onTap: () => Get.back(),
-          child: const Icon(CupertinoIcons.back, color: Colors.black),
+          child: const Icon(CupertinoIcons.back, color: AppColors.white),
         ),
         title: const Text(
           "Subscription History",
           style: TextStyle(
-            color: Colors.black,
+            color: AppColors.white,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -34,7 +35,7 @@ class SubscriptionHistoryScreen extends StatelessWidget {
       body: Obx(() {
         if (controller.isLoading.value && controller.historyList.isEmpty) {
           return const Center(
-            child: CircularProgressIndicator(color: Colors.black),
+            child: CircularProgressIndicator(color: AppColors.white),
           );
         }
 
@@ -45,7 +46,11 @@ class SubscriptionHistoryScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 48),
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    color: Colors.redAccent,
+                    size: 48,
+                  ),
                   const SizedBox(height: 12),
                   const Text(
                     "Failed to load subscription history",
@@ -55,16 +60,24 @@ class SubscriptionHistoryScreen extends StatelessWidget {
                   Text(
                     controller.errorMessage.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppColors.premiumGold,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => controller.fetchSubscriptionHistory(),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      backgroundColor: AppColors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
-                    child: const Text("Retry", style: TextStyle(color: Colors.white)),
+                    child: const Text(
+                      "Retry",
+                      style: TextStyle(color: AppColors.white),
+                    ),
                   ),
                 ],
               ),
@@ -75,7 +88,7 @@ class SubscriptionHistoryScreen extends StatelessWidget {
         if (controller.historyList.isEmpty) {
           return RefreshIndicator(
             onRefresh: () => controller.fetchSubscriptionHistory(),
-            color: Colors.black,
+            color: AppColors.white,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
@@ -84,13 +97,17 @@ class SubscriptionHistoryScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.history_rounded, size: 64, color: Colors.grey.shade300),
+                      Icon(
+                        Icons.history_rounded,
+                        size: 64,
+                        color: AppColors.premiumGold,
+                      ),
                       const SizedBox(height: 16),
                       const Text(
                         "No Subscription History",
                         style: TextStyle(
                           fontSize: 18,
-                          color: Colors.black87,
+                          color: AppColors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -102,7 +119,7 @@ class SubscriptionHistoryScreen extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey.shade500,
+                            color: AppColors.premiumGold,
                           ),
                         ),
                       ),
@@ -116,7 +133,7 @@ class SubscriptionHistoryScreen extends StatelessWidget {
 
         return RefreshIndicator(
           onRefresh: () => controller.fetchSubscriptionHistory(),
-          color: Colors.black,
+          color: AppColors.white,
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             itemCount: controller.historyList.length,
@@ -134,14 +151,14 @@ class SubscriptionHistoryScreen extends StatelessWidget {
   Widget _buildHistoryCard(BuildContext context, SubscriptionHistoryItem item) {
     final plan = item.plan;
     final profile = item.profile;
-    
+
     final isActive = item.status.toLowerCase() == 'active';
     final isPending = item.status.toLowerCase() == 'pending';
-    
+
     Color accentColor;
     Color statusBgColor;
     Color statusTextColor;
-    
+
     if (isActive) {
       accentColor = const Color(0xFF10B981); // Green
       statusBgColor = const Color(0xFFD1FAE5);
@@ -151,14 +168,14 @@ class SubscriptionHistoryScreen extends StatelessWidget {
       statusBgColor = const Color(0xFFFEF3C7);
       statusTextColor = const Color(0xFFD97706);
     } else {
-      accentColor = Colors.grey.shade400; // Grey / Cancelled
-      statusBgColor = Colors.grey.shade200;
-      statusTextColor = Colors.grey.shade700;
+      accentColor = AppColors.premiumGold; // Grey / Cancelled
+      statusBgColor = AppColors.premiumGold;
+      statusTextColor = AppColors.premiumGold;
     }
 
     String startsDateStr = "";
     String endsDateStr = "";
-    
+
     try {
       if (item.startsAt.isNotEmpty) {
         final startDt = DateTime.parse(item.startsAt);
@@ -174,18 +191,21 @@ class SubscriptionHistoryScreen extends StatelessWidget {
     }
 
     final String planName = plan?.name ?? "Unknown Plan";
-    final String priceStr = plan != null
-        ? (plan.currency == 'INR' ? "₹${double.tryParse(plan.price)?.toStringAsFixed(0) ?? plan.price}" : "${plan.currency} ${plan.price}")
-        : "Free";
+    final String priceStr =
+        plan != null
+            ? (plan.currency == 'INR'
+                ? "₹${double.tryParse(plan.price)?.toStringAsFixed(0) ?? plan.price}"
+                : "${plan.currency} ${plan.price}")
+            : "Free";
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.black,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.premiumGold),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: AppColors.premiumGold.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -204,174 +224,209 @@ class SubscriptionHistoryScreen extends StatelessWidget {
                   children: [
                     // Header Bar
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      color: Colors.grey.shade50,
-              child: Row(
-                children: [
-                  Icon(_getProfileIcon(profile?.type ?? plan?.profileType ?? ''), size: 20, color: Colors.black87),
-                  const SizedBox(width: 8),
-                  Text(
-                    _getProfileLabel(profile?.type ?? plan?.profileType ?? ''),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: statusBgColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      item.status.toUpperCase(),
-                      style: TextStyle(
-                        color: statusTextColor,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.3,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
                       ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Plan Title and Price
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          planName,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 18,
-                            color: Colors.black,
+                      color: AppColors.premiumGold.withOpacity(0.1),
+                      child: Row(
+                        children: [
+                          Icon(
+                            _getProfileIcon(
+                              profile?.type ?? plan?.profileType ?? '',
+                            ),
+                            size: 20,
+                            color: AppColors.white,
                           ),
-                        ),
-                      ),
-                      Text(
-                        priceStr,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 18,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  
-                  if (plan?.description != null && plan!.description.isNotEmpty) ...[
-                    Text(
-                      plan.description,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                        height: 1.3,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-
-                  const Divider(height: 1),
-                  const SizedBox(height: 12),
-
-                  // Dates and auto-renew details
-                  _buildDetailRow(
-                    Icons.calendar_today_outlined, 
-                    "Started At", 
-                    startsDateStr,
-                  ),
-                  const SizedBox(height: 8),
-                  _buildDetailRow(
-                    Icons.event_busy_outlined, 
-                    "Ends At", 
-                    endsDateStr.isNotEmpty ? endsDateStr : "Lifetime (Auto-Renew)",
-                  ),
-                  const SizedBox(height: 8),
-                  _buildDetailRow(
-                    Icons.autorenew_rounded, 
-                    "Auto Renew", 
-                    item.autoRenew ? "Enabled" : "Disabled",
-                  ),
-                  
-                  if (item.gatewayOrderId != null && item.gatewayOrderId!.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    _buildDetailRow(
-                      Icons.receipt_long_outlined, 
-                      "Order ID", 
-                      item.gatewayOrderId!,
-                    ),
-                  ],
-
-                  if (item.gatewaySubscriptionId != null && item.gatewaySubscriptionId!.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    _buildDetailRow(
-                      Icons.vpn_key_outlined, 
-                      "Subscription ID", 
-                      item.gatewaySubscriptionId!,
-                    ),
-                  ],
-
-                  if (plan != null && plan.features.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    const Divider(height: 1),
-                    const SizedBox(height: 12),
-                    const Text(
-                      "Plan Features",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                        color: Colors.black54,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 6,
-                      children: plan.features.map((feat) => Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.grey.shade200),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.check_circle, size: 10, color: Colors.black54),
-                            const SizedBox(width: 4),
-                            Text(
-                              feat,
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black87,
+                          const SizedBox(width: 8),
+                          Text(
+                            _getProfileLabel(
+                              profile?.type ?? plan?.profileType ?? '',
+                            ),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: AppColors.white,
+                            ),
+                          ),
+                          const Spacer(),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: statusBgColor,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              item.status.toUpperCase(),
+                              style: TextStyle(
+                                color: statusTextColor,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.3,
                               ),
                             ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Plan Title and Price
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  planName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 18,
+                                    color: AppColors.white,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                priceStr,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 18,
+                                  color: AppColors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+
+                          if (plan?.description != null &&
+                              plan!.description.isNotEmpty) ...[
+                            Text(
+                              plan.description,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.premiumGold,
+                                height: 1.3,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
                           ],
-                        ),
-                      )).toList(),
-                    )
+
+                          const Divider(height: 1),
+                          const SizedBox(height: 12),
+
+                          // Dates and auto-renew details
+                          _buildDetailRow(
+                            Icons.calendar_today_outlined,
+                            "Started At",
+                            startsDateStr,
+                          ),
+                          const SizedBox(height: 8),
+                          _buildDetailRow(
+                            Icons.event_busy_outlined,
+                            "Ends At",
+                            endsDateStr.isNotEmpty
+                                ? endsDateStr
+                                : "Lifetime (Auto-Renew)",
+                          ),
+                          const SizedBox(height: 8),
+                          _buildDetailRow(
+                            Icons.autorenew_rounded,
+                            "Auto Renew",
+                            item.autoRenew ? "Enabled" : "Disabled",
+                          ),
+
+                          if (item.gatewayOrderId != null &&
+                              item.gatewayOrderId!.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            _buildDetailRow(
+                              Icons.receipt_long_outlined,
+                              "Order ID",
+                              item.gatewayOrderId!,
+                            ),
+                          ],
+
+                          if (item.gatewaySubscriptionId != null &&
+                              item.gatewaySubscriptionId!.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            _buildDetailRow(
+                              Icons.vpn_key_outlined,
+                              "Subscription ID",
+                              item.gatewaySubscriptionId!,
+                            ),
+                          ],
+
+                          if (plan != null && plan.features.isNotEmpty) ...[
+                            const SizedBox(height: 12),
+                            const Divider(height: 1),
+                            const SizedBox(height: 12),
+                            const Text(
+                              "Plan Features",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: AppColors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 6,
+                              children:
+                                  plan.features
+                                      .map(
+                                        (feat) => Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.premiumGold,
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                            border: Border.all(
+                                              color: AppColors.premiumGold,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(
+                                                Icons.check_circle,
+                                                size: 10,
+                                                color: AppColors.white,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                feat,
+                                                style: const TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: AppColors.white,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
                   ],
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    ],
-  ),
-),
       ),
     );
   }
@@ -379,13 +434,13 @@ class SubscriptionHistoryScreen extends StatelessWidget {
   Widget _buildDetailRow(IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: Colors.grey.shade500),
+        Icon(icon, size: 14, color: AppColors.premiumGold),
         const SizedBox(width: 8),
         Text(
           label,
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey.shade500,
+            color: AppColors.premiumGold,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -394,7 +449,7 @@ class SubscriptionHistoryScreen extends StatelessWidget {
           value,
           style: const TextStyle(
             fontSize: 12,
-            color: Colors.black87,
+            color: AppColors.white,
             fontWeight: FontWeight.w600,
           ),
         ),

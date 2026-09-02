@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -86,13 +87,13 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
             margin: const EdgeInsets.only(right: 12, top: 2),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isHighlighted ? Colors.black : const Color(0xFFE5E7EB),
+              color: isHighlighted ? AppColors.white : const Color(0xFFE5E7EB),
             ),
             alignment: Alignment.center,
             child: Text(
               "$number",
               style: TextStyle(
-                color: isHighlighted ? Colors.white : Colors.black87,
+                color: isHighlighted ? AppColors.white : AppColors.white,
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
               ),
@@ -103,7 +104,7 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
               text,
               style: const TextStyle(
                 fontSize: 14,
-                color: Colors.black87,
+                color: AppColors.white,
                 height: 1.4,
                 fontWeight: FontWeight.w500,
               ),
@@ -125,7 +126,7 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
         borderRadius: BorderRadius.circular(24.0),
       ),
       elevation: 10,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 32.0),
       child: ConstrainedBox(
         constraints: BoxConstraints(
@@ -144,7 +145,7 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 12.0, right: 12.0),
                     child: IconButton(
-                      icon: const Icon(Icons.close, color: Colors.black, size: 24),
+                      icon: const Icon(Icons.close, color: AppColors.white, size: 24),
                       onPressed: widget.onCancel,
                     ),
                   ),
@@ -158,7 +159,7 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
                       height: 52,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.black, width: 1.5),
+                        border: Border.all(color: AppColors.white, width: 1.5),
                       ),
                       alignment: Alignment.center,
                       child: Stack(
@@ -166,14 +167,14 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
                         children: const [
                           Icon(
                             Icons.shield_outlined,
-                            color: Colors.black,
+                            color: AppColors.white,
                             size: 26,
                           ),
                           Positioned(
                             top: 15,
                             child: Icon(
                               Icons.check,
-                              color: Colors.black,
+                              color: AppColors.white,
                               size: 13,
                               weight: 800,
                             ),
@@ -192,7 +193,7 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
               "Terms & Conditions Summary",
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.black,
+                color: AppColors.white,
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 letterSpacing: -0.5,
@@ -203,7 +204,7 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
               "Please review the key points below",
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.grey.shade500,
+                color: AppColors.premiumGold,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -254,7 +255,7 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.white,
                               border: Border.all(color: const Color(0xFFE5E7EB)),
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -264,7 +265,7 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
                                 Text(
                                   _isExpanded ? "Read less" : "Read more",
                                   style: const TextStyle(
-                                    color: Colors.black87,
+                                    color: AppColors.white,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -275,7 +276,7 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
                                       ? Icons.keyboard_arrow_up
                                       : Icons.keyboard_arrow_down,
                                   size: 16,
-                                  color: Colors.black87,
+                                  color: AppColors.white,
                                 ),
                               ],
                             ),
@@ -340,16 +341,16 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(
-                                  color: _isChecked ? Colors.black : const Color(0xFFD1D5DB),
+                                  color: _isChecked ? AppColors.white : const Color(0xFFD1D5DB),
                                   width: 1.5,
                                 ),
-                                color: _isChecked ? Colors.black : Colors.white,
+                                color: _isChecked ? AppColors.white : AppColors.white,
                               ),
                               alignment: Alignment.center,
                               child: _isChecked
                                   ? const Icon(
                                       Icons.check,
-                                      color: Colors.white,
+                                      color: AppColors.white,
                                       size: 16,
                                     )
                                   : null,
@@ -358,7 +359,7 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
                               child: RichText(
                                 text: TextSpan(
                                   style: const TextStyle(
-                                    color: Colors.black87,
+                                    color: AppColors.white,
                                     fontSize: 13,
                                     height: 1.5,
                                     fontFamily: 'DMSans', // Use project fontFamily standard
@@ -372,7 +373,7 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
                                       style: const TextStyle(
                                         decoration: TextDecoration.underline,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.black,
+                                        color: AppColors.white,
                                       ),
                                       recognizer: TapGestureRecognizer()
                                         ..onTap = () {
@@ -385,7 +386,7 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
                                       style: const TextStyle(
                                         decoration: TextDecoration.underline,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.black,
+                                        color: AppColors.white,
                                       ),
                                       recognizer: TapGestureRecognizer()
                                         ..onTap = () {
@@ -412,10 +413,10 @@ class _TermsConditionsDialogState extends State<TermsConditionsDialog> {
               padding: const EdgeInsets.all(20.0),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _isChecked ? Colors.black : const Color(0xFFE5E7EB),
-                  foregroundColor: _isChecked ? Colors.white : Colors.grey.shade500,
+                  backgroundColor: _isChecked ? AppColors.white : const Color(0xFFE5E7EB),
+                  foregroundColor: _isChecked ? AppColors.white : AppColors.premiumGold,
                   elevation: 0,
-                  shadowColor: Colors.transparent,
+                  shadowColor: AppColors.transparent,
                   minimumSize: const Size(double.infinity, 52),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0),

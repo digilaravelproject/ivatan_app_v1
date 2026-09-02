@@ -19,35 +19,35 @@ class LiveChatInboxScreen extends StatelessWidget {
     final controller = Get.put(LiveChatInboxController());
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.of(context).pop(),
           child: const Icon(
             Icons.menu_rounded,
-            color: Colors.black54,
+            color: AppColors.white,
             size: 24,
           ),
         ),
         title: Text(
           "Chats",
           style: GoogleFonts.poppins(
-            color: Colors.black,
+            color: AppColors.white,
             fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list_rounded, color: Colors.black87, size: 24),
+            icon: const Icon(Icons.filter_list_rounded, color: AppColors.white, size: 24),
             onPressed: () {
               controller.fetchChats();
             },
           ),
           IconButton(
-            icon: const Icon(Icons.edit_outlined, color: Colors.black87, size: 22),
+            icon: const Icon(Icons.edit_outlined, color: AppColors.white, size: 22),
             onPressed: () {
               // Action for editing
             },
@@ -106,15 +106,15 @@ class LiveChatInboxScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
           children: [
-            const Icon(Icons.search_rounded, color: Colors.grey, size: 20),
+            const Icon(Icons.search_rounded, color: AppColors.premiumGold, size: 20),
             const SizedBox(width: 8),
             Expanded(
               child: TextField(
                 controller: controller.searchController,
-                style: GoogleFonts.poppins(fontSize: 14, color: Colors.black),
+                style: GoogleFonts.poppins(fontSize: 14, color: AppColors.white),
                 decoration: InputDecoration(
                   hintText: "Search chats...",
-                  hintStyle: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[400]),
+                  hintStyle: GoogleFonts.poppins(fontSize: 14, color: AppColors.premiumGold.withOpacity(0.4)),
                   border: InputBorder.none,
                   isDense: true,
                 ),
@@ -126,7 +126,7 @@ class LiveChatInboxScreen extends StatelessWidget {
                       controller.searchController.clear();
                       controller.searchQuery.value = "";
                     },
-                    child: const Icon(Icons.close_rounded, color: Colors.grey, size: 18),
+                    child: const Icon(Icons.close_rounded, color: AppColors.premiumGold, size: 18),
                   )
                 : const SizedBox.shrink()),
           ],
@@ -206,7 +206,7 @@ class LiveChatInboxScreen extends StatelessWidget {
               backgroundColor: avatarColor,
               child: Icon(
                 chatType == "group" ? Icons.groups_rounded : Icons.campaign_rounded,
-                color: Colors.white,
+                color: AppColors.white,
                 size: 26,
               ),
             ),
@@ -224,7 +224,7 @@ class LiveChatInboxScreen extends StatelessWidget {
                           style: GoogleFonts.poppins(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: AppColors.white,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -235,7 +235,7 @@ class LiveChatInboxScreen extends StatelessWidget {
                         timeString,
                         style: GoogleFonts.poppins(
                           fontSize: 11,
-                          color: Colors.grey[400],
+                          color: AppColors.premiumGold.withOpacity(0.4),
                         ),
                       ),
                     ],
@@ -261,7 +261,7 @@ class LiveChatInboxScreen extends StatelessWidget {
                                 ),
                               TextSpan(
                                 text: content,
-                                style: GoogleFonts.poppins(color: Colors.grey[600]),
+                                style: GoogleFonts.poppins(color: AppColors.premiumGold.withOpacity(0.6)),
                               ),
                             ],
                           ),
@@ -283,7 +283,7 @@ class LiveChatInboxScreen extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontSize: 10.5,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                 ),
                               ),
                             ),
@@ -306,13 +306,13 @@ class LiveChatInboxScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.mark_chat_read_rounded, size: 48, color: Colors.grey[350]),
+          Icon(Icons.mark_chat_read_rounded, size: 48, color: AppColors.premiumGold.withOpacity(0.35)),
           const SizedBox(height: 12),
           Text(
             "No chats under this category",
             style: GoogleFonts.poppins(
               fontSize: 15,
-              color: Colors.grey[500],
+              color: AppColors.premiumGold.withOpacity(0.5),
               fontWeight: FontWeight.w500,
             ),
           ),

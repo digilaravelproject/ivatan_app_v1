@@ -11,6 +11,8 @@ import 'package:intl/intl.dart';
 import '../controller/chatt_controller.dart';
 import 'dashboard.dart';
 
+import '../../../core/helper/custom_serchbar.dart';
+
 class MessageListScreen extends StatefulWidget {
   const MessageListScreen({Key? key}) : super(key: key);
 
@@ -62,7 +64,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
         ),
       ),
       child: Scaffold(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.transparent,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(70),
           child: AppBar(
@@ -83,7 +85,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2), // White border
+                    border: Border.all(color: AppColors.white, width: 2), // White border
                   ),
                   child: ClipOval(
                     child: Image.network(
@@ -103,7 +105,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
             title: const Text(
               'Messages',
               style: TextStyle(
-                color: Colors.white, // White text
+                color: AppColors.white, // White text
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
                 letterSpacing: 0.5,
@@ -114,7 +116,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
               IconButton(
                 icon: const Icon(
                   Icons.group_add_rounded,
-                  color: Colors.white,
+                  color: AppColors.white,
                   size: 26,
                 ),
                 onPressed: () {
@@ -139,48 +141,9 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                   parent: _animationController,
                   curve: Curves.easeOut,
                 )),
-                  child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Container(
-                    height: 48,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100, // Flat grey background
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          CupertinoIcons.search,
-                          color: Colors.grey.shade500,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: TextField(
-                            onChanged: controller.searchedPerson,
-                            style: TextStyle(
-                              color: AppColors.black,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
-                            ),
-                            cursorColor: AppColors.black,
-                            decoration: InputDecoration(
-                              hintText: 'Search messages...',
-                              hintStyle: TextStyle(
-                                color: Colors.grey.shade500,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              isDense: true,
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  child: CustomSearchBar(
+                    onChanged: controller.searchedPerson,
                   ),
-                ),
               ),
             ),
             
@@ -209,10 +172,10 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6), // Reduced padding
                         decoration: BoxDecoration(
-                          color: isSelected ? AppColors.black : Colors.transparent,
+                          color: isSelected ? AppColors.black : AppColors.transparent,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: isSelected ? AppColors.black : Colors.grey.shade300,
+                            color: isSelected ? AppColors.black : AppColors.premiumGold,
                             width: 1,
                           ),
                         ),
@@ -220,7 +183,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                           child: Text(
                             _filters[index],
                             style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.black87,
+                              color: isSelected ? AppColors.white : AppColors.white,
                               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                               fontSize: 12, // Reduced from 13
                             ),
@@ -253,9 +216,9 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.chat_bubble_outline_rounded, size: 48, color: Colors.grey.shade300),
+                        Icon(Icons.chat_bubble_outline_rounded, size: 48, color: AppColors.premiumGold),
                         SizedBox(height: 12),
-                        Text("No messages yet", style: TextStyle(color: Colors.grey.shade400)),
+                        Text("No messages yet", style: TextStyle(color: AppColors.premiumGold)),
                       ],
                     ),
                   ),
@@ -268,7 +231,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                   child: ListView.separated(
                     padding: const EdgeInsets.only(top: 8, bottom: 20),
                     itemCount: controller.filteredChatList.length,
-                    separatorBuilder: (ctx, i) => Divider(height: 1, indent: 80, color: Colors.grey.shade100),
+                    separatorBuilder: (ctx, i) => Divider(height: 1, indent: 80, color: AppColors.premiumGold),
                     itemBuilder: (context, index) {
                     final message = controller.filteredChatList[index];
                     final hasUnread = message.unreadCount > 0;
@@ -290,7 +253,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                                   height: 50,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Colors.grey.shade200,
+                                    color: AppColors.premiumGold,
                                   ),
                                   child: ClipOval(
                                     child: (message.avatar != null && message.avatar.toString().isNotEmpty && !message.avatar.toString().contains("ui-avatars.com"))
@@ -299,13 +262,13 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                                             fit: BoxFit.cover,
                                             errorBuilder: (context, error, stackTrace) {
                                               return message.type == "group"
-                                                  ? const Center(child: Icon(Icons.group, color: Colors.grey, size: 26))
-                                                  : const Center(child: Icon(CupertinoIcons.person, color: Colors.grey, size: 26));
+                                                  ? const Center(child: Icon(Icons.group, color: AppColors.black, size: 26))
+                                                  : const Center(child: Icon(CupertinoIcons.person, color: AppColors.black, size: 26));
                                             },
                                           )
                                         : (message.type == "group"
-                                            ? const Center(child: Icon(Icons.group, color: Colors.grey, size: 26))
-                                            : const Center(child: Icon(CupertinoIcons.person, color: Colors.grey, size: 26))),
+                                            ? const Center(child: Icon(Icons.group, color: AppColors.black, size: 26))
+                                            : const Center(child: Icon(CupertinoIcons.person, color: AppColors.black, size: 26))),
                                   ),
                                 ),
                                 if (message.type != "group" && message.isOnline)
@@ -318,7 +281,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                                       decoration: BoxDecoration(
                                         color: Colors.green,
                                         shape: BoxShape.circle,
-                                        border: Border.all(color: Colors.white, width: 2.5),
+                                        border: Border.all(color: AppColors.white, width: 2.5),
                                       ),
                                     ),
                                   ),
@@ -341,7 +304,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                                           style: TextStyle(
                                             fontWeight: hasUnread ? FontWeight.w700 : FontWeight.w600,
                                             fontSize: 16,
-                                            color: Colors.black,
+                                            color: AppColors.white,
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -350,7 +313,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                                       Text(
                                         formatChatDate(message.updatedAt.toString()),
                                         style: TextStyle(
-                                          color: hasUnread ? AppColors.black : Colors.grey.shade500,
+                                          color: hasUnread ? AppColors.black : AppColors.premiumGold,
                                           fontSize: 11,
                                           fontWeight: hasUnread ? FontWeight.w600 : FontWeight.w400,
                                         ),
@@ -375,7 +338,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                                                               ? message.lastMessage!.content
                                                               : "No messages")))),
                                           style: TextStyle(
-                                            color: hasUnread ? Colors.black87 : Colors.grey.shade500,
+                                            color: hasUnread ? AppColors.white : AppColors.premiumGold,
                                             fontSize: 14,
                                             fontWeight: hasUnread ? FontWeight.w500 : FontWeight.w400,
                                           ),
@@ -393,7 +356,7 @@ class _MessageListScreenState extends State<MessageListScreen> with SingleTicker
                                           ),
                                           child: Text(
                                             message.unreadCount.toString(),
-                                            style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                            style: TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.bold),
                                           ),
                                         ),
                                     ],

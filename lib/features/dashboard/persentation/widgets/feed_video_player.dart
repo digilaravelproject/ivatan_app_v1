@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -92,10 +93,10 @@ class _FeedVideoPlayerState extends State<FeedVideoPlayer> {
   Widget build(BuildContext context) {
     if (!_initialized) {
       return Container(
-        color: Colors.black12,
+        color: AppColors.white,
         height: 300, // Default height to avoid layout shift
         child: const Center(
-          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.grey),
+          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.premiumGold),
         ),
       );
     }
@@ -150,12 +151,12 @@ class _FeedVideoPlayerState extends State<FeedVideoPlayer> {
               child: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
+                  color: AppColors.white.withOpacity(0.6),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   _isMuted ? Icons.volume_off : Icons.volume_up,
-                  color: Colors.white,
+                  color: AppColors.white,
                   size: 20,
                 ),
               ),

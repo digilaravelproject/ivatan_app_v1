@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -115,15 +116,15 @@ class _CreateExclusivePostScreenState extends State<CreateExclusivePostScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: AppColors.white),
         title: const Text(
           "New Exclusive Post",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 16),
+          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w600, fontSize: 16),
         ),
       ),
       body: SingleChildScrollView(
@@ -138,17 +139,17 @@ class _CreateExclusivePostScreenState extends State<CreateExclusivePostScreen> {
                 aspectRatio: 4 / 3,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                    color: AppColors.premiumGold,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey.shade300, width: 1),
+                    border: Border.all(color: AppColors.premiumGold, width: 1),
                   ),
                   child: _selectedMedia == null
                       ? Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
-                            Icon(Icons.add_photo_alternate_outlined, color: Colors.grey, size: 48),
+                            Icon(Icons.add_photo_alternate_outlined, color: AppColors.premiumGold, size: 48),
                             SizedBox(height: 8),
-                            Text("Tap to select media", style: TextStyle(color: Colors.grey, fontSize: 14)),
+                            Text("Tap to select media", style: TextStyle(color: AppColors.premiumGold, fontSize: 14)),
                           ],
                         )
                       : ClipRRect(
@@ -167,9 +168,9 @@ class _CreateExclusivePostScreenState extends State<CreateExclusivePostScreen> {
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: AppColors.premiumGold.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: AppColors.premiumGold),
               ),
               child: TextField(
                 controller: _captionController,
@@ -178,7 +179,7 @@ class _CreateExclusivePostScreenState extends State<CreateExclusivePostScreen> {
                 maxLength: 2200, // Insta style limit
                 decoration: const InputDecoration(
                   hintText: "Write a captivating description...",
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                  hintStyle: TextStyle(color: AppColors.premiumGold, fontSize: 14),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.all(16),
                   counterText: "",
@@ -214,7 +215,7 @@ class _CreateExclusivePostScreenState extends State<CreateExclusivePostScreen> {
                       children: const [
                         Text("Unlock Price", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                         SizedBox(height: 2),
-                        Text("Amount followers pay to view", style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        Text("Amount followers pay to view", style: TextStyle(fontSize: 12, color: AppColors.premiumGold)),
                       ],
                     ),
                   ),
@@ -234,7 +235,7 @@ class _CreateExclusivePostScreenState extends State<CreateExclusivePostScreen> {
                         hintStyle: TextStyle(color: Colors.blue.withValues(alpha: 0.4)),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: AppColors.white,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(color: Colors.blue.withValues(alpha: 0.3)),
@@ -260,13 +261,13 @@ class _CreateExclusivePostScreenState extends State<CreateExclusivePostScreen> {
               onPressed: _isLoading ? null : _uploadPost,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 elevation: 0,
               ),
               child: _isLoading 
-                ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: AppColors.white, strokeWidth: 2))
                 : const Text("Share Exclusive Post", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
             const SizedBox(height: 20),
@@ -279,11 +280,11 @@ class _CreateExclusivePostScreenState extends State<CreateExclusivePostScreen> {
   void _showMediaPickerOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (context) {
         return Container(
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: SafeArea(
@@ -295,7 +296,7 @@ class _CreateExclusivePostScreenState extends State<CreateExclusivePostScreen> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: AppColors.premiumGold,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),

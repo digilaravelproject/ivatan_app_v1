@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'dart:async';
 
 import 'package:better_player_plus/better_player_plus.dart';
@@ -168,7 +169,7 @@ class _HighlightScreenStoryViewerState extends State<HighlightScreenStoryViewer>
     HomeController homeController = Get.put(HomeController());
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.transparent,
       body: Stack(
         children: [
           /// STORY PAGES
@@ -228,14 +229,14 @@ class _HighlightScreenStoryViewerState extends State<HighlightScreenStoryViewer>
                       height: 3,
                       decoration: BoxDecoration(
                         color: index == currentIndex
-                            ? Colors.white
-                            : Colors.white38,
+                            ? AppColors.white
+                            : AppColors.white,
                       ),
                       child: index == currentIndex
                           ? FractionallySizedBox(
                         widthFactor: progress,
                         alignment: Alignment.centerLeft,
-                        child: Container(color: Colors.white),
+                        child: Container(color: AppColors.white),
                       )
                           : null,
                     ),
@@ -306,9 +307,9 @@ class _HighlightScreenStoryViewerState extends State<HighlightScreenStoryViewer>
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: const [
-                            Icon(Icons.more_vert, color: Colors.white, size: 24),
+                            Icon(Icons.more_vert, color: AppColors.white, size: 24),
                             SizedBox(height: 4),
-                            Text("More", style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 14)),
+                            Text("More", style: TextStyle(color: AppColors.white,fontWeight: FontWeight.bold,fontSize: 14)),
                           ],
                         ),
                       ),
@@ -325,12 +326,12 @@ class _HighlightScreenStoryViewerState extends State<HighlightScreenStoryViewer>
                               showSend = value.trim().isNotEmpty; // 👈 text likhte ही send show
                             });
                           },
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: AppColors.white),
                           decoration: InputDecoration(
                             hintText: "Send a message",
-                            hintStyle: const TextStyle(color: Colors.white70),
+                            hintStyle: const TextStyle(color: AppColors.white),
                             filled: true,
-                            fillColor: Colors.transparent,
+                            fillColor: AppColors.transparent,
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 12,
@@ -349,7 +350,7 @@ class _HighlightScreenStoryViewerState extends State<HighlightScreenStoryViewer>
                               },
                               child: const Padding(
                                 padding: EdgeInsets.only(right: 10),
-                                child: Icon(Icons.send, color: Colors.white, size: 26),
+                                child: Icon(Icons.send, color: AppColors.white, size: 26),
                               ),
                             )
                                 : const Padding(
@@ -359,14 +360,14 @@ class _HighlightScreenStoryViewerState extends State<HighlightScreenStoryViewer>
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(30),
                               borderSide: const BorderSide(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 width: 1.5,
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(30),
                               borderSide: const BorderSide(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 width: 1.5,
                               ),
                             ),
@@ -384,12 +385,12 @@ class _HighlightScreenStoryViewerState extends State<HighlightScreenStoryViewer>
                           widget.stories[currentIndex].isLiked
                               ? Icons.favorite
                               : Icons.favorite_border,
-                          color: widget.stories[currentIndex].isLiked ? Colors.red : Colors.white,
+                          color: widget.stories[currentIndex].isLiked ? Colors.red : AppColors.white,
                           size: 26,
                         ),
                       ),
 
-                      //  Icon(Icons.favorite_border, color: Colors.white, size: 24),
+                      //  Icon(Icons.favorite_border, color: AppColors.white, size: 24),
 
                     ],)
               ),

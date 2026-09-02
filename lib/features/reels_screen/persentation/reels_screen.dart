@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:better_player_plus/better_player_plus.dart';
 import 'package:flutter/material.dart';
 
@@ -60,7 +61,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.transparent,
       body: GestureDetector(
         onTap: _nextVideo,
         child: Stack(
@@ -154,9 +155,9 @@ class _ReelsScreenState extends State<ReelsScreen> {
   Widget _iconWithText(IconData icon, String text) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white, size: 30),
+        Icon(icon, color: AppColors.white, size: 30),
         const SizedBox(height: 4),
-        Text(text, style: const TextStyle(color: Colors.white)),
+        Text(text, style: const TextStyle(color: AppColors.white)),
       ],
     );
   }
@@ -247,11 +248,11 @@ class _ReelsScreenState extends State<ReelsScreen> {
       }
 
       if (reelsController.reels.isEmpty) {
-        return const Center(child: Text("No reels available", style: TextStyle(color: Colors.white)));
+        return const Center(child: Text("No reels available", style: TextStyle(color: AppColors.white)));
       }
 
       return Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.transparent,
         body: PageView.builder(
           controller: _pageController,
           scrollDirection: Axis.vertical,
@@ -290,14 +291,14 @@ class _ReelsScreenState extends State<ReelsScreen> {
                       Text(
                         reel.user.name,
                         style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 5),
                       Text(
                         reel.caption,
-                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                        style: const TextStyle(color: AppColors.white, fontSize: 14),
                       ),
                     ],
                   ),
@@ -313,9 +314,9 @@ class _ReelsScreenState extends State<ReelsScreen> {
   Widget _iconWithText(IconData icon, String text) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white, size: 30),
+        Icon(icon, color: AppColors.white, size: 30),
         const SizedBox(height: 4),
-        Text(text, style: const TextStyle(color: Colors.white)),
+        Text(text, style: const TextStyle(color: AppColors.white)),
       ],
     );
   }
@@ -399,7 +400,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.transparent,
       body: PageView.builder(
         controller: _pageController,
         scrollDirection: Axis.vertical,
@@ -469,20 +470,20 @@ class _ReelsScreenState extends State<ReelsScreen> {
                             ),
                           ),
                         ),
-                        const Icon(Icons.music_note,color: Colors.white,),
+                        const Icon(Icons.music_note,color: AppColors.white,),
                       ],
                     ),
                     const SizedBox(height: 8),
                     const Text(
                       "@rushikesh123 it is a long established fact that a reader distracted by....",
-                      style: TextStyle(fontSize: 14,color: Colors.white),
+                      style: TextStyle(fontSize: 14,color: AppColors.white),
                     ),
                     const SizedBox(height: 8),
                     Row(
                       children: const [
-                        Icon(Icons.music_note, size: 16,color: Colors.white,),
+                        Icon(Icons.music_note, size: 16,color: AppColors.white,),
                         SizedBox(width: 5),
-                        Text("Audio.Original",style: TextStyle(fontSize: 14,color: Colors.white),),
+                        Text("Audio.Original",style: TextStyle(fontSize: 14,color: AppColors.white),),
                       ],
                     ),
                   ],
@@ -498,9 +499,9 @@ class _ReelsScreenState extends State<ReelsScreen> {
   Widget _iconWithText(IconData icon, String text) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white, size: 30),
+        Icon(icon, color: AppColors.white, size: 30),
         const SizedBox(height: 4),
-        Text(text, style: const TextStyle(color: Colors.white)),
+        Text(text, style: const TextStyle(color: AppColors.white)),
       ],
     );
   }

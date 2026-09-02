@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -64,9 +65,9 @@ class FeedPostWidget extends StatelessWidget {
                           ? Image.network(
                               post.user.avatar!, 
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => const Icon(CupertinoIcons.person, color: Colors.grey),
+                              errorBuilder: (context, error, stackTrace) => const Icon(CupertinoIcons.person, color: AppColors.premiumGold),
                             )
-                          : const Icon(CupertinoIcons.person, color: Colors.grey),
+                          : const Icon(CupertinoIcons.person, color: AppColors.premiumGold),
                     ),
                   ),
                 ),
@@ -155,7 +156,7 @@ class FeedPostWidget extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                         decoration: BoxDecoration(
-                          color: following ? AppColors.secondaryBackground : Colors.transparent,
+                          color: following ? AppColors.secondaryBackground : AppColors.transparent,
                           border: Border.all(
                               color: following ? AppColors.border : AppColors.premiumGold,
                               width: 1
@@ -310,7 +311,7 @@ class FeedPostWidget extends StatelessWidget {
                         showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
+                          backgroundColor: AppColors.transparent,
                           builder: (_) => CommentsBottomSheet(postId: post.id),
                         );
                       },
@@ -365,7 +366,7 @@ class FeedPostWidget extends StatelessWidget {
             ),
           ),
           
-          Divider(height: 1, thickness: 0.5, color: Colors.grey.shade200),
+          Divider(height: 1, thickness: 0.5, color: AppColors.premiumGold),
         ],
       ),
     );
@@ -374,11 +375,12 @@ class FeedPostWidget extends StatelessWidget {
   void _showSideMenu(BuildContext context, int postId, String username, int userId) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: AppColors.black,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          border: Border.all(color: AppColors.premiumGold),
         ),
         child: Padding(
           padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
@@ -392,7 +394,7 @@ class FeedPostWidget extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: AppColors.premiumGold,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -407,12 +409,12 @@ class FeedPostWidget extends StatelessWidget {
                 controller.openReportBottomSheet(postId: postId);
               },
             ),
-             Divider(height: 1, thickness: 0.5, color: Colors.grey.shade100, indent: 16, endIndent: 16),
+             Divider(height: 1, thickness: 0.5, color: AppColors.premiumGold, indent: 16, endIndent: 16),
 
 
             // 2. About this profile
             ListTile(
-              leading: const Icon(Icons.info_outline_rounded, color: Colors.black87),
+              leading: const Icon(Icons.info_outline_rounded, color: AppColors.white),
               title: const Text("About this profile", style: TextStyle(fontWeight: FontWeight.w500)),
               onTap: () {
                 Navigator.pop(context);
@@ -430,22 +432,22 @@ class FeedPostWidget extends StatelessWidget {
                 controller.blockUser(userId);
               },
             ),
-            Divider(height: 1, thickness: 0.5, color: Colors.grey.shade100, indent: 16, endIndent: 16),
+            Divider(height: 1, thickness: 0.5, color: AppColors.premiumGold, indent: 16, endIndent: 16),
             
             // 4. Interested
             ListTile(
-              leading: const Icon(Icons.star_border_rounded, color: Colors.black87),
+              leading: const Icon(Icons.star_border_rounded, color: AppColors.white),
               title: const Text("Interested", style: TextStyle(fontWeight: FontWeight.w500)),
               onTap: () {
                 Navigator.pop(context);
                 controller.markInterested(postId);
               },
             ),
-            Divider(height: 1, thickness: 0.5, color: Colors.grey.shade100, indent: 16, endIndent: 16),
+            Divider(height: 1, thickness: 0.5, color: AppColors.premiumGold, indent: 16, endIndent: 16),
 
             // 5. Not Interested
             ListTile(
-              leading: const Icon(Icons.visibility_off_outlined, color: Colors.black87),
+              leading: const Icon(Icons.visibility_off_outlined, color: AppColors.white),
               title: const Text("Not interested", style: TextStyle(fontWeight: FontWeight.w500)),
               onTap: () {
                 Navigator.pop(context);

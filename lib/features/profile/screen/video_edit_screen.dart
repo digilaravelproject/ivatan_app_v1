@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,13 +31,13 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
   final RxList<TextOverlay> textOverlays = <TextOverlay>[].obs;
   final RxBool showTextInput = false.obs;
   final TextEditingController textInputCtrl = TextEditingController();
-  Color selectedTextColor = Colors.white;
+  Color selectedTextColor = AppColors.white;
 
   final RxBool showTrash = false.obs;
   final RxBool isOverTrash = false.obs;
 
   final List<Map<String, dynamic>> filters = [
-    {'name': 'Origin', 'matrix': null, 'color': Colors.grey},
+    {'name': 'Origin', 'matrix': null, 'color': AppColors.premiumGold},
     {'name': 'Clarend', 'matrix': PresetFilters.clarendon, 'color': Colors.orange},
     {'name': 'Gingham', 'matrix': PresetFilters.gingham, 'color': Colors.blue},
     {'name': 'Moon', 'matrix': PresetFilters.moon, 'color': Colors.brown},
@@ -84,7 +85,7 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.transparent,
       body: _controller.value.isInitialized
         ? Stack(
             children: [
@@ -92,7 +93,7 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
               Positioned.fill(
                 child: Center(
                   child: Obx(() => ColorFiltered(
-                    colorFilter: currentFilter.value ?? const ColorFilter.mode(Colors.transparent, BlendMode.multiply),
+                    colorFilter: currentFilter.value ?? const ColorFilter.mode(AppColors.transparent, BlendMode.multiply),
                     child: AspectRatio(
                       aspectRatio: _controller.value.aspectRatio,
                       child: VideoPlayer(_controller),
@@ -109,7 +110,7 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
                 top: 50,
                 left: 10,
                 child: IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                  icon: const Icon(Icons.close, color: AppColors.white, size: 30),
                   onPressed: () => Get.back(),
                 ),
               ),
@@ -135,7 +136,7 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
                   onPressed: _onDone,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                     elevation: 8,
@@ -163,12 +164,12 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: isOverTrash.value ? Colors.red.withOpacity(0.8) : Colors.black54,
+                        color: isOverTrash.value ? Colors.red.withOpacity(0.8) : AppColors.white,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.delete_outline, 
-                        color: Colors.white, 
+                        color: AppColors.white, 
                         size: isOverTrash.value ? 40 : 30,
                       ),
                     ),
@@ -177,7 +178,7 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
               ),
             ],
           )
-        : const Center(child: CircularProgressIndicator(color: Colors.white)),
+        : const Center(child: CircularProgressIndicator(color: AppColors.white)),
     );
   }
 
@@ -232,13 +233,13 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
                 scale: t.scale,
                 child: Container(
                   padding: const EdgeInsets.all(15),
-                  color: Colors.transparent,
+                  color: AppColors.transparent,
                   child: Text(t.text, 
                     style: TextStyle(
                       color: t.color, 
                       fontSize: 30, 
                       fontWeight: FontWeight.bold,
-                      shadows: [Shadow(color: Colors.black.withOpacity(0.5), blurRadius: 4, offset: const Offset(2, 2))]
+                      shadows: [Shadow(color: AppColors.white.withOpacity(0.5), blurRadius: 4, offset: const Offset(2, 2))]
                     )
                   ),
                 ),
@@ -256,11 +257,11 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.black26,
+          color: AppColors.white,
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white24),
+          border: Border.all(color: AppColors.white),
         ),
-        child: Icon(icon, color: Colors.white, size: 24),
+        child: Icon(icon, color: AppColors.white, size: 24),
       ),
     );
   }
@@ -297,7 +298,7 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
-                  colors: [Colors.black.withOpacity(0.9), Colors.transparent],
+                  colors: [AppColors.white.withOpacity(0.9), AppColors.transparent],
                 ),
               ),
               child: Column(
@@ -308,7 +309,7 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
                     children: [
                       Text(
                         activeTool.value.toUpperCase(), 
-                        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.2)
+                        style: const TextStyle(color: AppColors.white, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.2)
                       ),
                       IconButton(
                         icon: const Icon(Icons.check, color: Colors.blue),
@@ -336,8 +337,8 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
           data: SliderThemeData(
             trackHeight: 4,
             activeTrackColor: Colors.blue,
-            inactiveTrackColor: Colors.white24,
-            thumbColor: Colors.white,
+            inactiveTrackColor: AppColors.white,
+            thumbColor: AppColors.white,
             overlayColor: Colors.blue.withOpacity(0.2),
             rangeThumbShape: const RoundRangeSliderThumbShape(enabledThumbRadius: 8),
           ),
@@ -397,17 +398,17 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("0:00", style: TextStyle(color: Colors.white54, fontSize: 10)),
+            Text("0:00", style: TextStyle(color: AppColors.white, fontSize: 10)),
             Flexible(
               child: Obx(() => Text(
                 "Selected: ${(duration.value / 1000).toStringAsFixed(1)}s ${widget.isReel ? '(Max 90s)' : ''}", 
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)
+                style: const TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.bold)
               )),
             ),
             Obx(() => Text(
                _formatDuration((maxDuration / 1000).toInt()), 
-               style: const TextStyle(color: Colors.white54, fontSize: 10)
+               style: const TextStyle(color: AppColors.white, fontSize: 10)
             )),
           ],
         ),
@@ -450,15 +451,15 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
                     decoration: BoxDecoration(
                       color: f['color'],
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(color: AppColors.white, width: 2),
                       boxShadow: [
                         if (isSelected) BoxShadow(color: Colors.blue.withOpacity(0.5), blurRadius: 8)
                       ]
                     ),
-                    child: const Icon(Icons.filter_hdr, color: Colors.white, size: 20),
+                    child: const Icon(Icons.filter_hdr, color: AppColors.white, size: 20),
                   ),
                   const SizedBox(height: 5),
-                  Text(f['name'], style: TextStyle(color: isSelected ? Colors.blue : Colors.white, fontSize: 10)),
+                  Text(f['name'], style: TextStyle(color: isSelected ? Colors.blue : AppColors.white, fontSize: 10)),
                 ],
               ),
             ),
@@ -477,12 +478,12 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
             child: TextField(
               controller: textInputCtrl,
               autofocus: true,
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: AppColors.white),
               decoration: InputDecoration(
                 hintText: "Enter text...",
-                hintStyle: const TextStyle(color: Colors.white54),
+                hintStyle: const TextStyle(color: AppColors.white),
                 filled: true,
-                fillColor: Colors.white10,
+                fillColor: AppColors.white,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(25), borderSide: BorderSide.none),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
               ),
@@ -493,7 +494,7 @@ class _VideoEditScreenState extends State<VideoEditScreen> {
             icon: const Icon(Icons.send, color: Colors.blue),
             onPressed: () {
               if (textInputCtrl.text.isNotEmpty) {
-                textOverlays.add(TextOverlay(text: textInputCtrl.text, color: Colors.white, position: const Offset(100, 200)));
+                textOverlays.add(TextOverlay(text: textInputCtrl.text, color: AppColors.white, position: const Offset(100, 200)));
                 textInputCtrl.clear();
                 activeTool.value = 'none';
               }

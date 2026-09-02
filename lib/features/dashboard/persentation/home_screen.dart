@@ -37,309 +37,332 @@ class HomePage extends StatelessWidget {
     final imageUrl = user?.profilePhotoPath ?? "";
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       key: controller.scaffoldKey,
       endDrawer: DrawerScreen(),
       endDrawerEnableOpenDragGesture: false,
 
       body: NotificationListener<ScrollNotification>(
-          onNotification: (notification) {
-            if (notification is UserScrollNotification) {
-              if (notification.direction == ScrollDirection.reverse) {
-                if (controller.showStories.value) {
-                  controller.showStories.value = false;
-                }
-              } else if (notification.direction == ScrollDirection.forward) {
-                if (!controller.showStories.value) {
-                  controller.showStories.value = true;
-                }
+        onNotification: (notification) {
+          if (notification is UserScrollNotification) {
+            if (notification.direction == ScrollDirection.reverse) {
+              if (controller.showStories.value) {
+                controller.showStories.value = false;
+              }
+            } else if (notification.direction == ScrollDirection.forward) {
+              if (!controller.showStories.value) {
+                controller.showStories.value = true;
               }
             }
+          }
 
-            // Pagination Logic only
-            if (notification is ScrollEndNotification &&
-                !controller.isLoading.value &&
-                controller.isMoreDataAvailable.value &&
-                notification.metrics.pixels >=
-                    notification.metrics.maxScrollExtent * 0.8) {
-              controller.fetchPosts(loadMore: true);
-            }
-            return false;
-          },
-          child: Obx(() {
-            final isStoriesShown = controller.showStories.value;
-            return RefreshIndicator(color: AppColors.premiumGold, 
-              notificationPredicate: (notification) {
-                return isStoriesShown;
-              },
-              onRefresh: () async {
-                await controller.fetchPosts();
-                await controller.fetchStories();
-                await controller.fetchUnreadNotificationCount();
-              },
-              child: Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(AppAssets.imgBackgroundApp),
-                    fit: BoxFit.cover,
-                  ),
+          // Pagination Logic only
+          if (notification is ScrollEndNotification &&
+              !controller.isLoading.value &&
+              controller.isMoreDataAvailable.value &&
+              notification.metrics.pixels >=
+                  notification.metrics.maxScrollExtent * 0.8) {
+            controller.fetchPosts(loadMore: true);
+          }
+          return false;
+        },
+        child: Obx(() {
+          final isStoriesShown = controller.showStories.value;
+          return RefreshIndicator(
+            color: AppColors.premiumGold,
+            notificationPredicate: (notification) {
+              return isStoriesShown;
+            },
+            onRefresh: () async {
+              await controller.fetchPosts();
+              await controller.fetchStories();
+              await controller.fetchUnreadNotificationCount();
+            },
+            child: Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(AppAssets.imgBackgroundApp),
+                  fit: BoxFit.cover,
                 ),
-                child: Stack(
-                  children: [
-                    CustomScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                slivers: [
-                  Obx(() => SliverAppBar(
-                    floating: true,
-                    snap: true,
-                    pinned: controller.showStories.value,
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    automaticallyImplyLeading: false,
-                    toolbarHeight: 60,
-                    titleSpacing: 0,
-                    title: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.asset(
-                          AppAssets.HomeAppLogo,
-                          width: 120,
-                          height: 120,
-                        ),
-                      ],
-                    ),
-                    actions: [
-                      Obx(() {
-                        final count = controller.unreadNotificationCount.value;
-                        return Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            IconButton(
-                              icon: const Icon(
-                                CupertinoIcons.bell,
-                                color: AppColors.premiumGold,
-                                size: 26,
+              ),
+              child: Stack(
+                children: [
+                  CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      Obx(
+                        () => SliverAppBar(
+                          floating: true,
+                          snap: true,
+                          pinned: controller.showStories.value,
+                          backgroundColor: AppColors.transparent,
+                          elevation: 0,
+                          automaticallyImplyLeading: false,
+                          toolbarHeight: 60,
+                          titleSpacing: 0,
+                          title: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(
+                                AppAssets.HomeAppLogo,
+                                width: 120,
+                                height: 120,
                               ),
-                              onPressed: () async {
-                                await Get.toNamed(AppRoutes.notifications);
-                                controller.fetchUnreadNotificationCount();
-                              },
-                            ),
-                            if (count > 0)
-                              Positioned(
-                                top: 10,
-                                right: 10,
-                                child: Container(
-                                  padding: const EdgeInsets.all(3),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white, width: 1.5),
+                            ],
+                          ),
+                          actions: [
+                            Obx(() {
+                              final count =
+                                  controller.unreadNotificationCount.value;
+                              return Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(
+                                      CupertinoIcons.bell,
+                                      color: AppColors.premiumGold,
+                                      size: 26,
+                                    ),
+                                    onPressed: () async {
+                                      await Get.toNamed(
+                                        AppRoutes.notifications,
+                                      );
+                                      controller.fetchUnreadNotificationCount();
+                                    },
                                   ),
-                                  constraints: const BoxConstraints(
-                                    minWidth: 16,
-                                    minHeight: 16,
+                                  if (count > 0)
+                                    Positioned(
+                                      top: 10,
+                                      right: 10,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(3),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: AppColors.white,
+                                            width: 1.5,
+                                          ),
+                                        ),
+                                        constraints: const BoxConstraints(
+                                          minWidth: 16,
+                                          minHeight: 16,
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            count > 99 ? '99+' : '$count',
+                                            style: const TextStyle(
+                                              color: AppColors.white,
+                                              fontSize: 8,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              );
+                            }),
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.wechat_outlined,
+                                    color: AppColors.premiumGold,
+                                    size: 26,
                                   ),
-                                  child: Center(
-                                    child: Text(
-                                      count > 99 ? '99+' : '$count',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 8,
-                                        fontWeight: FontWeight.bold,
+                                  onPressed: () => Get.to(dashboard()),
+                                ),
+                                Positioned(
+                                  top: 10,
+                                  right: 10,
+                                  child: Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: AppColors.white,
+                                        width: 1.5,
                                       ),
                                     ),
                                   ),
                                 ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 12.0),
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.menu_rounded,
+                                  color: AppColors.premiumGold,
+                                  size: 28,
+                                ),
+                                onPressed: () => controller.openDrawer(),
                               ),
+                            ),
                           ],
-                        );
-                      }),
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-
-                          IconButton(
-                            icon: const Icon(
-                              Icons.wechat_outlined,
-                              color: AppColors.premiumGold,
-                              size: 26,
-                            ),
-                            onPressed: () => Get.to(dashboard()),
-                          ),
-                          Positioned(
-                            top: 10,
-                            right: 10,
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 1.5),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 12.0),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.menu_rounded,
-                            color: AppColors.premiumGold,
-                            size: 28,
-                          ),
-                          onPressed: () => controller.openDrawer(),
                         ),
                       ),
-                    ],
-                  )),
 
-                  // ============= STORIES SECTION (Always Visible) =============
-                  SliverToBoxAdapter(
-                    child: Obx(() {
-                      if (controller.isStoryLoading.value) {
-                        return _buildStoriesShimmer();
-                      }
-
-                      // Identify My Story vs Others
-                      final currentUserId = controller.currentUser.value?.id;
-                      UserStoryGroup? myStoryGroup;
-                      List<UserStoryGroup> otherStories = [];
-
-                      if (currentUserId != null) {
-                        // Split existing stories
-                        for (var group in controller.storyData) {
-                          if (group.user.id == currentUserId ||
-                              (group.stories.isNotEmpty &&
-                                  group.stories.first.is_mine)) {
-                            myStoryGroup = group;
-                          } else {
-                            otherStories.add(group);
+                      // ============= STORIES SECTION (Always Visible) =============
+                      SliverToBoxAdapter(
+                        child: Obx(() {
+                          if (controller.isStoryLoading.value) {
+                            return _buildStoriesShimmer();
                           }
-                        }
-                      } else {
-                        otherStories = List.from(controller.storyData);
-                      }
 
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 500),
-                        height: controller.showStories.value ? 130 : 0,
-                        curve: Curves.easeInOut,
-                        child: AnimatedOpacity(
-                          duration: const Duration(milliseconds: 500),
-                          opacity: controller.showStories.value ? 1.0 : 0.0,
-                          child: Container(
-                            height: 130,
-                            color: Colors.transparent,
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              padding: EdgeInsets.symmetric(horizontal: 16),
-                              itemCount:
-                              otherStories.length + 1, // +1 for "Your Story"
-                              itemBuilder: (context, index) {
-                                if (index == 0) {
-                                  return _buildMyStoryItem(imageUrl, myStoryGroup);
-                                }
+                          // Identify My Story vs Others
+                          final currentUserId =
+                              controller.currentUser.value?.id;
+                          UserStoryGroup? myStoryGroup;
+                          List<UserStoryGroup> otherStories = [];
 
-                                final story = otherStories[index - 1];
+                          if (currentUserId != null) {
+                            // Split existing stories
+                            for (var group in controller.storyData) {
+                              if (group.user.id == currentUserId ||
+                                  (group.stories.isNotEmpty &&
+                                      group.stories.first.is_mine)) {
+                                myStoryGroup = group;
+                              } else {
+                                otherStories.add(group);
+                              }
+                            }
+                          } else {
+                            otherStories = List.from(controller.storyData);
+                          }
 
-                                // Double-check: Skip if this is somehow the current user's story
-                                if (story.user.id == currentUserId ||
-                                    (story.stories.isNotEmpty &&
-                                        story.stories.first.is_mine)) {
-                                  return SizedBox.shrink(); // Don't show duplicate
-                                }
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 500),
+                            height: controller.showStories.value ? 130 : 0,
+                            curve: Curves.easeInOut,
+                            child: AnimatedOpacity(
+                              duration: const Duration(milliseconds: 500),
+                              opacity: controller.showStories.value ? 1.0 : 0.0,
+                              child: Container(
+                                height: 130,
+                                color: AppColors.transparent,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  padding: EdgeInsets.symmetric(horizontal: 16),
+                                  itemCount:
+                                      otherStories.length +
+                                      1, // +1 for "Your Story"
+                                  itemBuilder: (context, index) {
+                                    if (index == 0) {
+                                      return _buildMyStoryItem(
+                                        imageUrl,
+                                        myStoryGroup,
+                                      );
+                                    }
 
-                                return GestureDetector(
-                                  onTap: () {
-                                    Get.to(
+                                    final story = otherStories[index - 1];
+
+                                    // Double-check: Skip if this is somehow the current user's story
+                                    if (story.user.id == currentUserId ||
+                                        (story.stories.isNotEmpty &&
+                                            story.stories.first.is_mine)) {
+                                      return SizedBox.shrink(); // Don't show duplicate
+                                    }
+
+                                    return GestureDetector(
+                                      onTap: () {
+                                        Get.to(
                                           () => FullScreenStoryViewer(
-                                        stories: story.stories,
-                                        initialIndex: 0,
+                                            stories: story.stories,
+                                            initialIndex: 0,
+                                          ),
+                                        );
+                                      },
+                                      child: _buildStoryCard(
+                                        story, // Pass full story object
                                       ),
                                     );
                                   },
-                                  child: _buildStoryCard(
-                                    story, // Pass full story object
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-
-                  // ============= POSTS SECTION =============
-                  Obx(() {
-                    if (controller.isLoading.value && controller.posts.isEmpty) {
-                      return _buildPostsShimmer();
-                    }
-
-                    if (controller.posts.isEmpty) {
-                      return SliverFillRemaining(
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.image_outlined,
-                                size: 80,
-                                color: Colors.grey.shade300,
-                              ),
-                              SizedBox(height: 16),
-                              Text(
-                                "No Posts Available",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey.shade600,
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-
-                    return SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        final post = controller.posts[index];
-                        return _buildModernPostCard(post, index, context);
-                      }, childCount: controller.posts.length),
-                    );
-                  }),
-
-                  // ============= LOADING MORE =============
-                  Obx(() {
-                    return controller.isMoreDataAvailable.value
-                        ? SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Center(child: CircularProgressIndicator()),
+                            ),
+                          );
+                        }),
                       ),
-                    )
-                        : SliverToBoxAdapter(child: SizedBox.shrink());
-                  }),
+
+                      // ============= POSTS SECTION =============
+                      Obx(() {
+                        if (controller.isLoading.value &&
+                            controller.posts.isEmpty) {
+                          return _buildPostsShimmer();
+                        }
+
+                        if (controller.posts.isEmpty) {
+                          return SliverFillRemaining(
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.image_outlined,
+                                    size: 80,
+                                    color: AppColors.premiumGold,
+                                  ),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    "No Posts Available",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: AppColors.premiumGold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+
+                        return SliverList(
+                          delegate: SliverChildBuilderDelegate((
+                            context,
+                            index,
+                          ) {
+                            final post = controller.posts[index];
+                            return _buildModernPostCard(post, index, context);
+                          }, childCount: controller.posts.length),
+                        );
+                      }),
+
+                      // ============= LOADING MORE =============
+                      Obx(() {
+                        return controller.isMoreDataAvailable.value
+                            ? SliverToBoxAdapter(
+                              child: Padding(
+                                padding: EdgeInsets.all(20),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ),
+                            )
+                            : SliverToBoxAdapter(child: SizedBox.shrink());
+                      }),
+                    ],
+                  ),
                 ],
               ),
-                  ]
-              ),
-            )
-
-            );
-
-          })),
+            ),
+          );
+        }),
+      ),
     );
   }
 
   Widget _buildStoriesShimmer() {
     return Container(
       height: 130,
-      color: Colors.transparent,
+      color: AppColors.transparent,
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -349,8 +372,8 @@ class HomePage extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.only(right: 10),
             child: Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: AppColors.premiumGold.withOpacity(0.3),
+              highlightColor: AppColors.premiumGold.withOpacity(0.1),
               child: Container(
                 width: 80,
                 height: 114,
@@ -368,113 +391,110 @@ class HomePage extends StatelessWidget {
 
   Widget _buildPostsShimmer() {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-            (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header (Avatar + Name)
-                Row(
-                  children: [
-                    Shimmer.fromColors(
-                      baseColor: Colors.grey[300]!,
-                      highlightColor: Colors.grey[100]!,
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header (Avatar + Name)
+              Row(
+                children: [
+                  Shimmer.fromColors(
+                    baseColor: AppColors.premiumGold.withOpacity(0.3),
+                    highlightColor: AppColors.premiumGold.withOpacity(0.1),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(
+                        color: AppColors.white,
+                        shape: BoxShape.circle,
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Shimmer.fromColors(
-                          baseColor: Colors.grey[300]!,
-                          highlightColor: Colors.grey[100]!,
-                          child: Container(
-                            width: 120,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Shimmer.fromColors(
-                          baseColor: Colors.grey[300]!,
-                          highlightColor: Colors.grey[100]!,
-                          child: Container(
-                            width: 80,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                // Media Area (Large rectangle)
-                Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
-                  child: Container(
-                    height: 250,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                // Actions (Like, Comment, Share icons placeholder)
-                Row(
-                  children: [
-                    Shimmer.fromColors(
-                      baseColor: Colors.grey[300]!,
-                      highlightColor: Colors.grey[100]!,
-                      child: Container(
-                        width: 24,
-                        height: 24,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Shimmer.fromColors(
+                        baseColor: AppColors.premiumGold.withOpacity(0.3),
+                        highlightColor: AppColors.premiumGold.withOpacity(0.1),
+                        child: Container(
+                          width: 120,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: AppColors.white,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Shimmer.fromColors(
-                      baseColor: Colors.grey[300]!,
-                      highlightColor: Colors.grey[100]!,
-                      child: Container(
-                        width: 24,
-                        height: 24,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
+                      const SizedBox(height: 6),
+                      Shimmer.fromColors(
+                        baseColor: AppColors.premiumGold.withOpacity(0.3),
+                        highlightColor: AppColors.premiumGold.withOpacity(0.1),
+                        child: Container(
+                          width: 80,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: AppColors.white,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Media Area (Large rectangle)
+              Shimmer.fromColors(
+                baseColor: AppColors.premiumGold.withOpacity(0.3),
+                highlightColor: AppColors.premiumGold.withOpacity(0.1),
+                child: Container(
+                  height: 250,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
-                const SizedBox(height: 20),
-              ],
-            ),
-          );
-        },
-        childCount: 3,
-      ),
+              ),
+              const SizedBox(height: 12),
+              // Actions (Like, Comment, Share icons placeholder)
+              Row(
+                children: [
+                  Shimmer.fromColors(
+                    baseColor: AppColors.premiumGold.withOpacity(0.3),
+                    highlightColor: AppColors.premiumGold.withOpacity(0.1),
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration: const BoxDecoration(
+                        color: AppColors.white,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Shimmer.fromColors(
+                    baseColor: AppColors.premiumGold.withOpacity(0.3),
+                    highlightColor: AppColors.premiumGold.withOpacity(0.1),
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration: const BoxDecoration(
+                        color: AppColors.white,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      }, childCount: 3),
     );
   }
 
@@ -490,7 +510,7 @@ class HomePage extends StatelessWidget {
         if (myStoryGroup != null && myStoryGroup.stories.isNotEmpty) {
           // View own story
           Get.to(
-                () => FullScreenStoryViewer(
+            () => FullScreenStoryViewer(
               stories: myStoryGroup.stories,
               initialIndex: 0,
             ),
@@ -506,13 +526,18 @@ class HomePage extends StatelessWidget {
         margin: const EdgeInsets.only(right: 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
-          gradient: hasStory
-              ? const LinearGradient(
-                  colors: [AppColors.premiumGold, AppColors.goldHighlight, AppColors.goldGlow],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
+          gradient:
+              hasStory
+                  ? const LinearGradient(
+                    colors: [
+                      AppColors.premiumGold,
+                      AppColors.goldHighlight,
+                      AppColors.goldGlow,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                  : null,
           color: !hasStory ? AppColors.secondaryBackground : null,
         ),
         padding: hasStory ? const EdgeInsets.all(2.0) : EdgeInsets.zero,
@@ -525,119 +550,148 @@ class HomePage extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             child: Stack(
               fit: StackFit.expand,
-            children: [
-              // Background Media
-              if (hasStory)
-                _buildStoryMedia(myStoryGroup.stories.last)
-              else
-                BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              children: [
+                // Background Media
+                if (hasStory)
+                  _buildStoryMedia(myStoryGroup.stories.last)
+                else
+                  BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.premiumGold.withOpacity(0.05),
+                        border: Border.all(
+                          color: AppColors.white.withOpacity(0.15),
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+
+                // Dark Gradient for Text
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 45,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
-                      border: Border.all(color: Colors.white.withOpacity(0.15)),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-
-              // Dark Gradient for Text
-              Positioned(
-                bottom: 0, left: 0, right: 0,
-                height: 45,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [AppColors.mainBackground.withOpacity(0.75), Colors.transparent],
-                    ),
-                  ),
-                ),
-              ),
-
-              // Text
-              Positioned(
-                bottom: 8, left: 6, right: 6,
-                child: Text(
-                  hasStory ? "Your Story" : "Add Story",
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.2,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-
-              // Badge
-              Positioned(
-                top: 6, left: 6,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.premiumGold, AppColors.goldHighlight, AppColors.goldGlow],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (!hasStory) const Icon(Icons.add, color: Colors.white, size: 10),
-                      if (!hasStory) const SizedBox(width: 2),
-                      Text(
-                        hasStory ? "Story" : "Add",
-                        style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Floating Plus Button to add more stories when they already have active stories
-              if (hasStory)
-                Positioned(
-                  top: 6,
-                  right: 6,
-                  child: GestureDetector(
-                    onTap: () {
-                      final storyController = Get.put(StoryController());
-                      storyController.showPickerOptions();
-                    },
-                    child: Container(
-                      width: 22,
-                      height: 22,
-                      decoration: BoxDecoration(
-                        color: AppColors.mainBackground,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 1.5),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.25),
-                            blurRadius: 3,
-                            offset: const Offset(0, 1),
-                          ),
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          AppColors.mainBackground.withOpacity(0.75),
+                          AppColors.transparent,
                         ],
                       ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.white,
-                          size: 13,
+                    ),
+                  ),
+                ),
+
+                // Text
+                Positioned(
+                  bottom: 8,
+                  left: 6,
+                  right: 6,
+                  child: Text(
+                    hasStory ? "Your Story" : "Add Story",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.2,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+
+                // Badge
+                Positioned(
+                  top: 6,
+                  left: 6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          AppColors.premiumGold,
+                          AppColors.goldHighlight,
+                          AppColors.goldGlow,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (!hasStory)
+                          const Icon(
+                            Icons.add,
+                            color: AppColors.white,
+                            size: 10,
+                          ),
+                        if (!hasStory) const SizedBox(width: 2),
+                        Text(
+                          hasStory ? "Story" : "Add",
+                          style: const TextStyle(
+                            color: AppColors.white,
+                            fontSize: 8,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Floating Plus Button to add more stories when they already have active stories
+                if (hasStory)
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: GestureDetector(
+                      onTap: () {
+                        final storyController = Get.put(StoryController());
+                        storyController.showPickerOptions();
+                      },
+                      child: Container(
+                        width: 22,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          color: AppColors.mainBackground,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.white,
+                            width: 1.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.white.withOpacity(0.25),
+                              blurRadius: 3,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.add,
+                            color: AppColors.white,
+                            size: 13,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-            ],
-          ),
-         ), // Close inner Container
+              ],
+            ),
+          ), // Close inner Container
         ),
       ),
     );
@@ -657,20 +711,25 @@ class HomePage extends StatelessWidget {
       onTap:
           () => Get.to(
             () =>
-            FullScreenStoryViewer(stories: story.stories, initialIndex: 0),
-      ),
+                FullScreenStoryViewer(stories: story.stories, initialIndex: 0),
+          ),
       child: Container(
         width: 80,
         margin: const EdgeInsets.only(right: 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
-          gradient: hasUnseen
-              ? const LinearGradient(
-                  colors: [AppColors.premiumGold, AppColors.goldHighlight, AppColors.goldGlow],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
+          gradient:
+              hasUnseen
+                  ? const LinearGradient(
+                    colors: [
+                      AppColors.premiumGold,
+                      AppColors.goldHighlight,
+                      AppColors.goldGlow,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                  : null,
           color: !hasUnseen ? AppColors.secondaryBackground : null,
         ),
         padding: hasUnseen ? const EdgeInsets.all(2.0) : EdgeInsets.zero,
@@ -683,67 +742,86 @@ class HomePage extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             child: Stack(
               fit: StackFit.expand,
-            children: [
-              // Background Media
-              story.stories.isNotEmpty
-                  ? _buildStoryMedia(story.stories.last)
-                  : _buildUserAvatar(story.user.avatar),
+              children: [
+                // Background Media
+                story.stories.isNotEmpty
+                    ? _buildStoryMedia(story.stories.last)
+                    : _buildUserAvatar(story.user.avatar),
 
-              // Dark Gradient for Text
-              Positioned(
-                bottom: 0, left: 0, right: 0,
-                height: 45,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [AppColors.mainBackground.withOpacity(0.75), Colors.transparent],
-                    ),
-                  ),
-                ),
-              ),
-
-              // Text
-              Positioned(
-                bottom: 8, left: 6, right: 6,
-                child: Text(
-                  name,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.2,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-
-              // Badge
-              if (hasUnseen)
+                // Dark Gradient for Text
                 Positioned(
-                  top: 6, left: 6,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 45,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.premiumGold, AppColors.goldHighlight, AppColors.goldGlow],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          AppColors.mainBackground.withOpacity(0.75),
+                          AppColors.transparent,
+                        ],
                       ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Text(
-                      "New",
-                      style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
-            ],
-          ),
-         ), // Close inner Container
+
+                // Text
+                Positioned(
+                  bottom: 8,
+                  left: 6,
+                  right: 6,
+                  child: Text(
+                    name,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.2,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+
+                // Badge
+                if (hasUnseen)
+                  Positioned(
+                    top: 6,
+                    left: 6,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            AppColors.premiumGold,
+                            AppColors.goldHighlight,
+                            AppColors.goldGlow,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text(
+                        "New",
+                        style: TextStyle(
+                          color: AppColors.white,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ), // Close inner Container
         ),
       ),
     );
@@ -780,24 +858,24 @@ class HomePage extends StatelessWidget {
         fit: BoxFit.cover,
         errorBuilder:
             (ctx, err, stack) => Container(
-          color: Colors.grey.shade200,
-          child: Icon(Icons.person, color: Colors.grey),
-        ),
+              color: AppColors.premiumGold,
+              child: Icon(Icons.person, color: AppColors.premiumGold),
+            ),
       );
     }
     return Container(
-      color: Colors.grey.shade200,
-      child: Icon(Icons.person, color: Colors.grey),
+      color: AppColors.premiumGold,
+      child: Icon(Icons.person, color: AppColors.premiumGold),
     );
   }
 
   Widget _buildErrorFallback(String type) {
     return Container(
-      color: Colors.grey.shade900,
+      color: AppColors.premiumGold,
       child: Center(
         child: Icon(
           type == 'video' ? Icons.videocam : Icons.broken_image,
-          color: Colors.white54,
+          color: AppColors.white,
           size: 24,
         ),
       ),
@@ -817,475 +895,503 @@ class HomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          // ========== POST HEADER ==========
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            child: Row(
-              children: [
-                // Avatar
-                GestureDetector(
-                  onTap:
-                      () => Get.to(
-                    ProfileScreen(viewUserName: post.user.username),
-                  ),
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.grey.shade200,
-                    ),
-                    child: ClipOval(
-                      child: (post.user.avatar != null &&
-                          post.user.avatar!.isNotEmpty &&
-                          post.user.avatar != "null")
-                          ? Image.network(
-                        AppUrls.getFullImageUrl(post.user.avatar!),
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            Icon(Icons.person, color: Colors.grey.shade600, size: 24),
-                      )
-                          : Icon(Icons.person, color: Colors.grey.shade600, size: 24),
-                    ),
-                  ),
-                ),
-
-                SizedBox(width: 10),
-
-                // Name, Occupation & Song
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Flexible(
-                            child: GestureDetector(
-                              onTap:
-                                  () => Get.to(
-                                ProfileScreen(
-                                  viewUserName: post.user.username,
-                                ),
-                              ),
-                              child: Text(
-                                post.user.username.isNotEmpty
-                                    ? post.user.username
-                                    : post.user.name,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14,
-                                  color: AppColors.primaryText,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ),
-                          if (post.user.isVerified) ...[
-                            SizedBox(width: 4),
-                            Image.asset(AppAssets.imgverified,height: 16,width: 16, color: AppColors.successSoftGold),
-                            //Icon(Icons.verified, color: Colors.blue, size: 14),
-                          ],
-
-                          // Date / Time
-                          Text(
-                            " • ${DateHelper.formatPostDate(post.createdAt)}",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.secondaryText,
-                            ),
-                          ),
-                        ],
+            // ========== POST HEADER ==========
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
+                children: [
+                  // Avatar
+                  GestureDetector(
+                    onTap:
+                        () => Get.to(
+                          ProfileScreen(viewUserName: post.user.username),
+                        ),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.premiumGold,
                       ),
+                      child: ClipOval(
+                        child:
+                            (post.user.avatar != null &&
+                                    post.user.avatar!.isNotEmpty &&
+                                    post.user.avatar != "null")
+                                ? Image.network(
+                                  AppUrls.getFullImageUrl(post.user.avatar!),
+                                  fit: BoxFit.cover,
+                                  errorBuilder:
+                                      (context, error, stackTrace) => Icon(
+                                        Icons.person,
+                                        color: AppColors.premiumGold,
+                                        size: 24,
+                                      ),
+                                )
+                                : Icon(
+                                  Icons.person,
+                                  color: AppColors.premiumGold,
+                                  size: 24,
+                                ),
+                      ),
+                    ),
+                  ),
 
-                      // Song Info / Location / Occupation
-                      Padding(
-                        padding: const EdgeInsets.only(top: 1),
-                        child: Row(
+                  SizedBox(width: 10),
+
+                  // Name, Occupation & Song
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           children: [
-                            if (post.type == 'video') ...[
-                              Icon(
-                                Icons.music_note,
-                                size: 12,
-                                color: AppColors.premiumGold,
+                            Flexible(
+                              child: GestureDetector(
+                                onTap:
+                                    () => Get.to(
+                                      ProfileScreen(
+                                        viewUserName: post.user.username,
+                                      ),
+                                    ),
+                                child: Text(
+                                  post.user.username.isNotEmpty
+                                      ? post.user.username
+                                      : post.user.name,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                    color: AppColors.primaryText,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
+                            ),
+                            if (post.user.isVerified) ...[
                               SizedBox(width: 4),
+                              Image.asset(
+                                AppAssets.imgverified,
+                                height: 16,
+                                width: 16,
+                                color: AppColors.successSoftGold,
+                              ),
+                              //Icon(Icons.verified, color: Colors.blue, size: 14),
                             ],
 
-                            Flexible(
-                              child: Text(
-                                post.type == 'video'
-                                    ? "Original Audio"
-                                    : post.user.occupation,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: AppColors.premiumGold,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                            // Date / Time
+                            Text(
+                              " • ${DateHelper.formatPostDate(post.createdAt)}",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.secondaryText,
                               ),
                             ),
                           ],
+                        ),
+
+                        // Song Info / Location / Occupation
+                        Padding(
+                          padding: const EdgeInsets.only(top: 1),
+                          child: Row(
+                            children: [
+                              if (post.type == 'video') ...[
+                                Icon(
+                                  Icons.music_note,
+                                  size: 12,
+                                  color: AppColors.premiumGold,
+                                ),
+                                SizedBox(width: 4),
+                              ],
+
+                              Flexible(
+                                child: Text(
+                                  post.type == 'video'
+                                      ? "Original Audio"
+                                      : post.user.occupation,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: AppColors.premiumGold,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Follow Button
+                  if (!post.is_mine) ...[
+                    SizedBox(width: 8),
+                    Obx(() {
+                      final isFollowing =
+                          controller.followController
+                              .isUserFollowing(
+                                post.user.id,
+                                initialValue: post.is_following,
+                              )
+                              .value;
+
+                      // If following, you can choose to hide it or show "Following"
+                      // User said "update nhi ho rhi", implying they want to see the change.
+                      // Let's show "Following" in a subtle way or allow hiding if intended.
+                      // Given previous logic was hiding it (line 445), let's keep it visible
+                      // but reactive so it can vanish/change smoothly.
+
+                      final bool following = isFollowing;
+
+                      return GestureDetector(
+                        onTap: () {
+                          if (post.user.id != null) {
+                            controller.toggleFollowForPostUser(post.user.id!);
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color:
+                                following
+                                    ? AppColors.secondaryBackground
+                                    : AppColors.transparent,
+                            border: Border.all(
+                              color: AppColors.premiumGold,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            following ? "Following" : "Follow",
+                            style: TextStyle(
+                              color: AppColors.premiumGold,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+
+                  // More Menu
+                  IconButton(
+                    icon: Icon(Icons.more_horiz, color: AppColors.primaryText),
+                    onPressed:
+                        () => _showSideMenu(
+                          context,
+                          post.id,
+                          post.user.username,
+                          post.user.id,
+                        ),
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(),
+                    splashRadius: 20,
+                  ),
+                ],
+              ),
+            ),
+
+            // ========== POST MEDIA (CAROUSEL / VIDEO) ==========
+            if (post.media.isNotEmpty)
+              FeedMediaWidget(
+                media: post.media,
+                type: post.type,
+                isLiked: post.stats.isLiked ?? false,
+                onDoubleTap: () => controller.likePost(post.id, index),
+              ),
+
+            // ========== POST ACTIONS ==========
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      // Like
+                      GestureDetector(
+                        onTap: () => controller.likePost(post.id, index),
+                        child: Icon(
+                          post.stats.isLiked == true
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color:
+                              post.stats.isLiked == true
+                                  ? Colors.red
+                                  : AppColors.premiumGold,
+                          size: 28,
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      if ((post.stats.likeCount ?? 0) > 0)
+                        Text(
+                          "${post.stats.likeCount}",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                            color: AppColors.premiumGold,
+                          ),
+                        ),
+
+                      SizedBox(width: 16),
+
+                      // Comment
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: AppColors.transparent,
+                            builder:
+                                (_) => CommentsBottomSheet(postId: post.id),
+                          );
+                        },
+                        child: Icon(
+                          Icons.chat_bubble_outline,
+                          color: AppColors.premiumGold,
+                          size: 24,
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      if ((post.stats.commentCount ?? 0) > 0)
+                        Text(
+                          "${post.stats.commentCount}",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                            color: AppColors.premiumGold,
+                          ),
+                        ),
+
+                      SizedBox(width: 16),
+
+                      // Share
+                      GestureDetector(
+                        onTap: () {
+                          final link =
+                              "https://ivatan.in/post/${post.id}?type=${post.media.first.type}";
+                          Share.share("Check this post 👇\n$link");
+                        },
+                        child: Icon(
+                          Icons.share,
+                          color: AppColors.premiumGold,
+                          size: 24,
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      if ((post.stats.shareCount ?? 0) > 0)
+                        Text(
+                          "${post.stats.shareCount}",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                            color: AppColors.premiumGold,
+                          ),
+                        ),
+
+                      Spacer(),
+
+                      GestureDetector(
+                        onTap: () => controller.toggleBookmark(post.id),
+                        child: Icon(
+                          post.stats.isSaved
+                              ? Icons.bookmark
+                              : Icons.bookmark_border,
+                          color: AppColors.premiumGold,
+                          size: 26,
                         ),
                       ),
                     ],
                   ),
-                ),
 
-                // Follow Button
-                if (!post.is_mine) ...[
-                  SizedBox(width: 8),
-                  Obx(() {
-                    final isFollowing =
-                        controller.followController
-                            .isUserFollowing(
-                          post.user.id,
-                          initialValue: post.is_following,
-                        )
-                            .value;
+                  // Like Count
+                  // if ((post.stats.likeCount ?? 0) > 0)
+                  //   Padding(
+                  //     padding: const EdgeInsets.only(top: 8),
+                  //     child: Text(
+                  //       "${post.stats.likeCount} likes",
+                  //       style: TextStyle(
+                  //         fontWeight: FontWeight.w600,
+                  //         fontSize: 13,
+                  //         color: AppColors.white,
+                  //       ),
+                  //     ),
+                  //   ),
 
-                    // If following, you can choose to hide it or show "Following"
-                    // User said "update nhi ho rhi", implying they want to see the change.
-                    // Let's show "Following" in a subtle way or allow hiding if intended.
-                    // Given previous logic was hiding it (line 445), let's keep it visible
-                    // but reactive so it can vanish/change smoothly.
-
-                    final bool following = isFollowing;
-
-                    return GestureDetector(
-                      onTap: () {
-                        if (post.user.id != null) {
-                          controller.toggleFollowForPostUser(post.user.id!);
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color:
-                          following
-                              ? AppColors.secondaryBackground
-                              : Colors.transparent,
-                          border: Border.all(
-                            color: AppColors.premiumGold,
-                            width: 1,
+                  // Caption with Username + Rich Text
+                  if (post.caption != null && post.caption!.isNotEmpty) ...[
+                    SizedBox(height: 6),
+                    ExpandableCaption(
+                      text: post.caption!,
+                      textColor: AppColors.primaryText,
+                      username:
+                          post.user.username.isNotEmpty
+                              ? post.user.username
+                              : post.user.name,
+                      onUsernameTap:
+                          () => Get.to(
+                            ProfileScreen(viewUserName: post.user.username),
                           ),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          following ? "Following" : "Follow",
-                          style: TextStyle(
-                            color: AppColors.premiumGold,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-                ],
-
-                // More Menu
-                IconButton(
-                  icon: Icon(Icons.more_horiz, color: AppColors.primaryText),
-                  onPressed:
-                      () => _showSideMenu(context, post.id, post.user.username, post.user.id),
-                  padding: EdgeInsets.zero,
-                  constraints: BoxConstraints(),
-                  splashRadius: 20,
-                ),
-              ],
-            ),
-          ),
-
-          // ========== POST MEDIA (CAROUSEL / VIDEO) ==========
-          if (post.media.isNotEmpty)
-            FeedMediaWidget(
-              media: post.media,
-              type: post.type,
-              isLiked: post.stats.isLiked ?? false,
-              onDoubleTap: () => controller.likePost(post.id, index),
-            ),
-
-          // ========== POST ACTIONS ==========
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    // Like
-                    GestureDetector(
-                      onTap: () => controller.likePost(post.id, index),
-                      child: Icon(
-                        post.stats.isLiked == true
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: post.stats.isLiked == true
-                            ? Colors.red
-                            : AppColors.premiumGold,
-                        size: 28,
-                      ),
-                    ),
-                    SizedBox(width: 4),
-                    if ((post.stats.likeCount ?? 0) > 0)
-                      Text(
-                        "${post.stats.likeCount}",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                          color: AppColors.premiumGold,
-                        ),
-                      ),
-
-                    SizedBox(width: 16),
-
-                    // Comment
-                    GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (_) => CommentsBottomSheet(postId: post.id),
-                        );
-                      },
-                      child: Icon(
-                        Icons.chat_bubble_outline,
-                        color: AppColors.premiumGold,
-                        size: 24,
-                      ),
-                    ),
-                    SizedBox(width: 4),
-                    if ((post.stats.commentCount ?? 0) > 0)
-                      Text(
-                        "${post.stats.commentCount}",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                          color: AppColors.premiumGold,
-                        ),
-                      ),
-
-                    SizedBox(width: 16),
-
-                    // Share
-                    GestureDetector(
-                      onTap: () {
-                        final link =
-                            "https://ivatan.in/post/${post.id}?type=${post.media.first.type}";
-                        Share.share("Check this post 👇\n$link");
-                      },
-                      child: Icon(
-                        Icons.share,
-                        color: AppColors.premiumGold,
-                        size: 24,
-                      ),
-                    ),
-                    SizedBox(width: 4),
-                    if ((post.stats.shareCount ?? 0) > 0)
-                      Text(
-                        "${post.stats.shareCount}",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                          color: AppColors.premiumGold,
-                        ),
-                      ),
-
-                    Spacer(),
-
-                    GestureDetector(
-                      onTap: () => controller.toggleBookmark(post.id),
-                      child: Icon(
-                        post.stats.isSaved ? Icons.bookmark : Icons.bookmark_border,
-                        color: AppColors.premiumGold,
-                        size: 26,
-                      ),
                     ),
                   ],
-                ),
-
-                // Like Count
-                // if ((post.stats.likeCount ?? 0) > 0)
-                //   Padding(
-                //     padding: const EdgeInsets.only(top: 8),
-                //     child: Text(
-                //       "${post.stats.likeCount} likes",
-                //       style: TextStyle(
-                //         fontWeight: FontWeight.w600,
-                //         fontSize: 13,
-                //         color: Colors.white,
-                //       ),
-                //     ),
-                //   ),
-
-                // Caption with Username + Rich Text
-                if (post.caption != null && post.caption!.isNotEmpty) ...[
-                  SizedBox(height: 6),
-                  ExpandableCaption(
-                    text: post.caption!,
-                    textColor: AppColors.primaryText,
-                    username:
-                    post.user.username.isNotEmpty
-                        ? post.user.username
-                        : post.user.name,
-                    onUsernameTap:
-                        () => Get.to(
-                      ProfileScreen(viewUserName: post.user.username),
-                    ),
-                  ),
                 ],
-              ],
+              ),
             ),
-          ),
-
-        ],
-       ),
+          ],
+        ),
       ), // Close ClipRRect
     ); // Close Container
   }
 
-  void _showSideMenu(BuildContext context, int postId, String username, int userId) {
+  void _showSideMenu(
+    BuildContext context,
+    int postId,
+    String username,
+    int userId,
+  ) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder:
           (context) => Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Handle
-              Center(
-                child: Container(
-                  margin: EdgeInsets.only(top: 10, bottom: 6),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(2),
+            decoration: BoxDecoration(
+              color: AppColors.black,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              border: Border.all(color: AppColors.premiumGold),
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).padding.bottom,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Handle
+                  Center(
+                    child: Container(
+                      margin: EdgeInsets.only(top: 10, bottom: 6),
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.premiumGold,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
                   ),
-                ),
-              ),
 
-              // 1. Report
-              ListTile(
-                leading: Icon(
-                  Icons.report_gmailerrorred_outlined,
-                  color: Colors.redAccent,
-                ),
-                title: Text(
-                  "Report",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: Colors.redAccent,
+                  // 1. Report
+                  ListTile(
+                    leading: Icon(
+                      Icons.report_gmailerrorred_outlined,
+                      color: Colors.redAccent,
+                    ),
+                    title: Text(
+                      "Report",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.redAccent,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.openReportBottomSheet(postId: postId);
+                    },
                   ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  controller.openReportBottomSheet(postId: postId);
-                },
-              ),
-              Divider(
-                height: 1,
-                thickness: 0.5,
-                color: Colors.grey.shade100,
-                indent: 16,
-                endIndent: 16,
-              ),
-
-              // 2. About this profile
-              ListTile(
-                leading: Icon(
-                  Icons.info_outline_rounded,
-                  color: Colors.black87,
-                ),
-                title: Text(
-                  "About this profile",
-                  style: TextStyle(fontWeight: FontWeight.w500),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  if (username.isNotEmpty) {
-                    Get.to(ProfileScreen(viewUserName: username));
-                  }
-                },
-              ),
-
-              // 3. Block
-              ListTile(
-                leading: Icon(Icons.block, color: Colors.redAccent),
-                title: Text(
-                  "Block",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: Colors.redAccent,
+                  Divider(
+                    height: 1,
+                    thickness: 0.5,
+                    color: AppColors.premiumGold,
+                    indent: 16,
+                    endIndent: 16,
                   ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  controller.blockUser(userId);
-                },
-              ),
-              Divider(
-                height: 1,
-                thickness: 0.5,
-                color: Colors.grey.shade100,
-                indent: 16,
-                endIndent: 16,
-              ),
 
-              // 4. Interested
-              ListTile(
-                leading: Icon(
-                  Icons.star_border_rounded,
-                  color: Colors.black87,
-                ),
-                title: Text(
-                  "Interested",
-                  style: TextStyle(fontWeight: FontWeight.w500),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  controller.markInterested(postId);
-                },
-              ),
+                  // 2. About this profile
+                  ListTile(
+                    leading: Icon(
+                      Icons.info_outline_rounded,
+                      color: AppColors.white,
+                    ),
+                    title: Text(
+                      "About this profile",
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      if (username.isNotEmpty) {
+                        Get.to(ProfileScreen(viewUserName: username));
+                      }
+                    },
+                  ),
 
-              // 5. Not Interested
-              ListTile(
-                leading: Icon(
-                  Icons.visibility_off_outlined,
-                  color: Colors.black87,
-                ),
-                title: Text(
-                  "Not interested",
-                  style: TextStyle(fontWeight: FontWeight.w500),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  controller.markNotInterested(postId);
-                },
-              ),
+                  // 3. Block
+                  ListTile(
+                    leading: Icon(Icons.block, color: Colors.redAccent),
+                    title: Text(
+                      "Block",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.redAccent,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.blockUser(userId);
+                    },
+                  ),
+                  Divider(
+                    height: 1,
+                    thickness: 0.5,
+                    color: AppColors.premiumGold,
+                    indent: 16,
+                    endIndent: 16,
+                  ),
 
-              SizedBox(height: 20),
-            ],
+                  // 4. Interested
+                  ListTile(
+                    leading: Icon(
+                      Icons.star_border_rounded,
+                      color: AppColors.white,
+                    ),
+                    title: Text(
+                      "Interested",
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.markInterested(postId);
+                    },
+                  ),
+
+                  // 5. Not Interested
+                  ListTile(
+                    leading: Icon(
+                      Icons.visibility_off_outlined,
+                      color: AppColors.white,
+                    ),
+                    title: Text(
+                      "Not interested",
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.markNotInterested(postId);
+                    },
+                  ),
+
+                  SizedBox(height: 20),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
     );
   }
 }
-
-
 
 class CommentsBottomSheet extends StatefulWidget {
   final int postId;
@@ -1320,7 +1426,9 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom + MediaQuery.of(context).padding.bottom,
+        bottom:
+            MediaQuery.of(context).viewInsets.bottom +
+            MediaQuery.of(context).padding.bottom,
       ),
       child: DraggableScrollableSheet(
         initialChildSize: 0.75,
@@ -1335,7 +1443,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             ),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.black,
+                border: Border.all(color: AppColors.premiumGold),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(24),
                   topRight: Radius.circular(24),
@@ -1347,7 +1456,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                   /// --- HEADER ----
                   _buildHeader(),
 
-                  Divider(height: 1, color: Colors.grey.shade100),
+                  Divider(height: 1, color: AppColors.premiumGold),
 
                   /// --- COMMENT LIST ----
                   Expanded(
@@ -1396,7 +1505,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             height: 4,
             width: 40,
             decoration: BoxDecoration(
-              color: Colors.grey.shade600,
+              color: AppColors.premiumGold,
               borderRadius: BorderRadius.circular(20),
             ),
           ),
@@ -1425,15 +1534,15 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: AppColors.white,
                       ),
                     ),
                     Obx(
-                          () => Text(
+                      () => Text(
                         "${commentController.commentsList.length} ${commentController.commentsList.length == 1 ? 'comment' : 'comments'}",
                         style: TextStyle(
                           fontSize: 13,
-                          color: Colors.grey.shade600,
+                          color: AppColors.premiumGold,
                         ),
                       ),
                     ),
@@ -1455,13 +1564,13 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: AppColors.premiumGold,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.chat_bubble_outline_rounded,
               size: 50,
-              color: Colors.grey.shade400,
+              color: AppColors.premiumGold,
             ),
           ),
           const SizedBox(height: 16),
@@ -1470,13 +1579,13 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.grey.shade800,
+              color: AppColors.premiumGold,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             "Be the first to share your thoughts!",
-            style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+            style: TextStyle(fontSize: 14, color: AppColors.premiumGold),
           ),
         ],
       ),
@@ -1503,7 +1612,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: Colors.transparent,
+              color: AppColors.transparent,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1515,19 +1624,30 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                         height: 40,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.grey.shade200,
+                          color: AppColors.premiumGold,
                         ),
                         child: ClipOval(
-                          child: (comment.user?.avtar != null &&
-                              comment.user!.avtar!.isNotEmpty &&
-                              comment.user!.avtar != "null")
-                              ? Image.network(
-                            AppUrls.getFullImageUrl(comment.user!.avtar!),
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Icon(Icons.person, color: Colors.grey.shade600, size: 24),
-                          )
-                              : Icon(Icons.person, color: Colors.grey.shade600, size: 24),
+                          child:
+                              (comment.user?.avtar != null &&
+                                      comment.user!.avtar!.isNotEmpty &&
+                                      comment.user!.avtar != "null")
+                                  ? Image.network(
+                                    AppUrls.getFullImageUrl(
+                                      comment.user!.avtar!,
+                                    ),
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) => Icon(
+                                          Icons.person,
+                                          color: AppColors.black,
+                                          size: 24,
+                                        ),
+                                  )
+                                  : Icon(
+                                    Icons.person,
+                                    color: AppColors.black,
+                                    size: 24,
+                                  ),
                         ),
                       ),
                     ],
@@ -1547,7 +1667,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
-                                color: Colors.black87,
+                                color: AppColors.white,
                               ),
                             ),
                           ],
@@ -1559,7 +1679,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                           comment.body ?? "",
                           style: const TextStyle(
                             fontSize: 14,
-                            color: Colors.black87,
+                            color: AppColors.white,
                             height: 1.4,
                           ),
                         ),
@@ -1569,19 +1689,15 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                         Row(
                           children: [
                             _buildActionButton(
-                              customIcon: Image.asset(
-                                comment.hasLiked == true
-                                    ? 'assets/images/likeexclamation.png'
-                                    : 'assets/images/likeexclamation2.png',
-                                key: ValueKey(comment.hasLiked),
-                                width: 18,
-                                height: 18,
-                              ),
+                              icon:
+                                  comment.hasLiked == true
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
                               label: "${comment.likesCount}",
                               color:
-                              comment.hasLiked
-                                  ? Colors.red
-                                  : Colors.grey.shade700,
+                                  comment.hasLiked
+                                      ? Colors.red
+                                      : AppColors.premiumGold,
                               onTap: () {
                                 commentController.likeComment(
                                   comment.id,
@@ -1593,7 +1709,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                             _buildActionButton(
                               icon: Icons.reply_rounded,
                               label: "Reply",
-                              color: Colors.grey.shade700,
+                              color: AppColors.premiumGold,
                               onTap: () {
                                 setState(() {
                                   replyingToCommentId = comment.id;
@@ -1610,7 +1726,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                                 "${comment.replies.length} ${comment.replies.length == 1 ? 'reply' : 'replies'}",
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.grey.shade600,
+                                  color: AppColors.premiumGold,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -1631,16 +1747,16 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               margin: const EdgeInsets.only(left: 48),
               child: Column(
                 children:
-                comment.replies.asMap().entries.map<Widget>((entry) {
-                  int replyIndex = entry.key;
-                  var reply = entry.value;
-                  return _buildReply(
-                    reply,
-                    index,
-                    replyIndex,
-                    widget.postId,
-                  );
-                }).toList(),
+                    comment.replies.asMap().entries.map<Widget>((entry) {
+                      int replyIndex = entry.key;
+                      var reply = entry.value;
+                      return _buildReply(
+                        reply,
+                        index,
+                        replyIndex,
+                        widget.postId,
+                      );
+                    }).toList(),
               ),
             ),
         ],
@@ -1678,19 +1794,24 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               height: 32,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.grey.shade200,
+                color: AppColors.premiumGold,
               ),
               child: ClipOval(
-                child: (reply.user?.avtar != null &&
-                    reply.user!.avtar!.isNotEmpty &&
-                    reply.user!.avtar != "null")
-                    ? Image.network(
-                  AppUrls.getFullImageUrl(reply.user!.avtar!),
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      Icon(Icons.person, color: Colors.grey.shade600, size: 20),
-                )
-                    : Icon(Icons.person, color: Colors.grey.shade600, size: 20),
+                child:
+                    (reply.user?.avtar != null &&
+                            reply.user!.avtar!.isNotEmpty &&
+                            reply.user!.avtar != "null")
+                        ? Image.network(
+                          AppUrls.getFullImageUrl(reply.user!.avtar!),
+                          fit: BoxFit.cover,
+                          errorBuilder:
+                              (context, error, stackTrace) => Icon(
+                                Icons.person,
+                                color: AppColors.black,
+                                size: 20,
+                              ),
+                        )
+                        : Icon(Icons.person, color: AppColors.black, size: 20),
               ),
             ),
             const SizedBox(width: 12),
@@ -1714,7 +1835,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     reply.body ?? "",
                     style: const TextStyle(
                       fontSize: 13,
-                      color: Colors.black87,
+                      color: AppColors.white,
                       height: 1.4,
                     ),
                   ),
@@ -1738,7 +1859,10 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       onTap: onTap,
       child: Row(
         children: [
-          if (customIcon != null) customIcon else if (icon != null) Icon(icon, size: 18, color: color),
+          if (customIcon != null)
+            customIcon
+          else if (icon != null)
+            Icon(icon, size: 18, color: color),
           const SizedBox(width: 4),
           Text(
             label,
@@ -1769,11 +1893,11 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     return Container(
       padding: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
-        border: Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
+        color: AppColors.black.withOpacity(1.0),
+        border: Border(top: BorderSide(color: AppColors.premiumGold, width: 1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.premiumGold.withOpacity(0.05),
             offset: const Offset(0, -2),
             blurRadius: 8,
           ),
@@ -1805,7 +1929,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                      color: AppColors.premiumGold,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     alignment: Alignment.center,
@@ -1819,7 +1943,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             ),
           ),
 
-          Divider(height: 1, color: Colors.grey.shade100),
+          Divider(height: 1, color: AppColors.premiumGold),
 
           // Replying indicator
           if (replyingToCommentId != null)
@@ -1879,21 +2003,27 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                      color: AppColors.transparent,
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.grey.shade300, width: 1),
+                      border: Border.all(
+                        color: AppColors.premiumGold,
+                        width: 1,
+                      ),
                     ),
                     child: TextField(
                       controller: textController,
                       maxLines: null,
-                      style: const TextStyle(fontSize: 14),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.white,
+                      ),
                       decoration: InputDecoration(
                         hintText:
-                        replyingToCommentId != null
-                            ? "Write a reply..."
-                            : "Share your thoughts...",
+                            replyingToCommentId != null
+                                ? "Write a reply..."
+                                : "Share your thoughts...",
                         hintStyle: TextStyle(
-                          color: Colors.grey.shade500,
+                          color: AppColors.white,
                           fontSize: 14,
                         ),
                         contentPadding: const EdgeInsets.symmetric(
@@ -1949,7 +2079,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     ),
                     child: const Icon(
                       Icons.send_rounded,
-                      color: Colors.white,
+                      color: AppColors.white,
                       size: 20,
                     ),
                   ),
@@ -1963,14 +2093,14 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   }
 
   void _showDeletePopupBlur(
-      BuildContext context,
-      Offset position,
-      int commentId,
-      int commentIndex,
-      int postId, {
-        required bool isReply,
-        int? replyIndex,
-      }) {
+    BuildContext context,
+    Offset position,
+    int commentId,
+    int commentIndex,
+    int postId, {
+    required bool isReply,
+    int? replyIndex,
+  }) {
     OverlayState overlayState = Overlay.of(context);
     late OverlayEntry blurEntry;
     late OverlayEntry popupEntry;
@@ -1978,15 +2108,15 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     blurEntry = OverlayEntry(
       builder:
           (_) => GestureDetector(
-        onTap: () {
-          blurEntry.remove();
-          popupEntry.remove();
-        },
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(color: Colors.black.withOpacity(0.4)),
-        ),
-      ),
+            onTap: () {
+              blurEntry.remove();
+              popupEntry.remove();
+            },
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(color: AppColors.white.withOpacity(0.4)),
+            ),
+          ),
     );
 
     popupEntry = OverlayEntry(
@@ -1995,7 +2125,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
           left: position.dx - 80,
           top: position.dy - 10,
           child: Material(
-            color: Colors.transparent,
+            color: AppColors.transparent,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               decoration: BoxDecoration(
@@ -2035,12 +2165,16 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: const [
-                    Icon(Icons.delete_rounded, color: Colors.white, size: 20),
+                    Icon(
+                      Icons.delete_rounded,
+                      color: AppColors.white,
+                      size: 20,
+                    ),
                     SizedBox(width: 8),
                     Text(
                       "Delete",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
                       ),
@@ -2130,7 +2264,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //         endDrawer: DrawerScreen(), // your drawer file
 //         endDrawerEnableOpenDragGesture: false,
 //         appBar: AppBar(
-//           backgroundColor: Colors.transparent,
+//           backgroundColor: AppColors.transparent,
 //           elevation: 0,
 //         //  titleSpacing: 12,
 //           leadingWidth: 60,
@@ -2184,7 +2318,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                 ),*//*
 //                 CircleAvatar(
 //                   radius: 20,
-//                   backgroundColor: Colors.grey.shade300,
+//                   backgroundColor: AppColors.premiumGold,
 //                   child: ClipOval(
 //                     child: SizedBox(
 //                       width: 40,
@@ -2211,7 +2345,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //            // name.toString(),
 //           "  i-app",
 //             style: const TextStyle(
-//               color: Colors.white,
+//               color: AppColors.white,
 //               fontSize: 20,
 //               fontWeight: FontWeight.w600,
 //             ),
@@ -2223,7 +2357,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //               child: Row(
 //                 children: [
 //                   IconButton(
-//                     icon: const Icon(Icons.message, color: Colors.white),
+//                     icon: const Icon(Icons.message, color: AppColors.white),
 //                     onPressed: () {
 //                       Get.to(dashboard());
 //                     },
@@ -2231,7 +2365,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                   IconButton(
 //                     icon: const Icon(
 //                       Icons.menu_open_outlined,
-//                       color: Colors.white,
+//                       color: AppColors.white,
 //                     ),
 //                     onPressed: () {
 //                       controller.openDrawer();
@@ -2255,7 +2389,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //
 //             return true;
 //           },
-//           child: RefreshIndicator(color: Colors.black, 
+//           child: RefreshIndicator(color: AppColors.white,
 //             onRefresh: () async {
 //               await controller.fetchPosts();
 //               await controller.fetchStories();
@@ -2360,7 +2494,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                                       ),
 //                                       child:  CircleAvatar(
 //                                         radius: 20,
-//                                         backgroundColor: Colors.grey.shade300,
+//                                         backgroundColor: AppColors.premiumGold,
 //                                         backgroundImage: post.user.avatar != null &&
 //                                             post.user.avatar!.isNotEmpty
 //                                             ? NetworkImage(post.user.avatar!)
@@ -2411,7 +2545,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                                           post.user.occupation ,
 //                                           style: const TextStyle(
 //                                             fontSize: 11,
-//                                             color: Colors.white,
+//                                             color: AppColors.white,
 //                                           ),
 //                                          // maxLines: 1,
 //                                          // overflow: TextOverflow.ellipsis,
@@ -2439,7 +2573,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                                         child: Text(
 //                                           post.is_following ? "Following" : "Follow",
 //                                           style: const TextStyle(
-//                                             color: Colors.white,
+//                                             color: AppColors.white,
 //                                             fontWeight: FontWeight.bold,
 //                                             fontSize: 12,
 //                                           ),
@@ -2508,7 +2642,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                                           right: 10,
 //                                           child: Icon(
 //                                             Icons.videocam_rounded,
-//                                             color: Colors.white,
+//                                             color: AppColors.white,
 //                                             size: 28,
 //                                           ),
 //                                         ),
@@ -2531,7 +2665,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                                           : Icons.favorite_border,
 //                                       color: post.stats.isLiked == true
 //                                           ? Colors.red
-//                                           : Colors.grey,
+//                                           : AppColors.premiumGold,
 //                                     ),
 //                                   ),
 //
@@ -2545,7 +2679,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                                       showModalBottomSheet(
 //                                         context: context,
 //                                         isScrollControlled: true,
-//                                         backgroundColor: Colors.transparent,
+//                                         backgroundColor: AppColors.transparent,
 //                                         builder: (_) => CommentsBottomSheet(
 //                                           postId: post.id,
 //                                         ),
@@ -2654,12 +2788,12 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                                 vertical: 2,
 //                               ),
 //                               decoration: BoxDecoration(
-//                                 color: Colors.black,
+//                                 color: AppColors.white,
 //                                 borderRadius: BorderRadius.circular(4),
 //                               ),
 //                               child: const Text(
 //                                 'Follow',
-//                                 style: TextStyle(color: Colors.white),
+//                                 style: TextStyle(color: AppColors.white),
 //                               ),
 //                             ),
 //                           ],
@@ -2668,7 +2802,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                         Text(
 //                           time,
 //                           style: const TextStyle(
-//                             color: Colors.grey,
+//                             color: AppColors.premiumGold,
 //                             fontSize: 12,
 //                           ),
 //                         ),
@@ -2744,7 +2878,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                   padding: const EdgeInsets.all(3), // border thickness
 //                   child: Container(
 //                     decoration: const BoxDecoration(
-//                       color: Colors.white,
+//                       color: AppColors.white,
 //                       shape: BoxShape.circle,
 //                     ),
 //                     child: ClipOval(
@@ -2776,11 +2910,11 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                     decoration: BoxDecoration(
 //                       color: Colors.blue,
 //                       shape: BoxShape.circle,
-//                       border: Border.all(color: Colors.white, width: 2),
+//                       border: Border.all(color: AppColors.white, width: 2),
 //                     ),
 //                     child: const Icon(
 //                       Icons.add,
-//                       color: Colors.white,
+//                       color: AppColors.white,
 //                       size: 12,
 //                     ),
 //                   ),
@@ -2804,11 +2938,11 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //             width: 60,
 //             height: 60,
 //             decoration: BoxDecoration(
-//               color: Colors.black,
+//               color: AppColors.white,
 //               shape: BoxShape.circle,
-//               //    border: Border.all(color: Colors.grey.shade300, width: 2),
+//               //    border: Border.all(color: AppColors.premiumGold, width: 2),
 //             ),
-//             child: const Icon(Icons.add, color: Colors.white),
+//             child: const Icon(Icons.add, color: AppColors.white),
 //           ),
 //           const SizedBox(height: 4),
 //           const Text(
@@ -2846,7 +2980,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                   padding: const EdgeInsets.all(3), // border thickness
 //                   child: Container(
 //                     decoration: const BoxDecoration(
-//                       color: Colors.white,
+//                       color: AppColors.white,
 //                       shape: BoxShape.circle,
 //                     ),
 //                     child: ClipOval(
@@ -2899,7 +3033,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //           const SizedBox(height: 4),
 //           Text(
 //             name,
-//             style: const TextStyle(fontSize: 11, color: Colors.black87),
+//             style: const TextStyle(fontSize: 11, color: AppColors.white),
 //           ),
 //         ],
 //       ),
@@ -2909,7 +3043,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //   void _showBottomSheet(BuildContext context) {
 //     showModalBottomSheet(
 //       context: context,
-//       backgroundColor: Colors.white,
+//       backgroundColor: AppColors.transparent,
 //       shape: const RoundedRectangleBorder(
 //         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
 //       ),
@@ -2981,7 +3115,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //   @override
 //   Widget build(BuildContext context) {
 //     return  Scaffold(
-//       backgroundColor: Colors.white,
+//       backgroundColor: AppColors.transparent,
 //       body: Stack(
 //         children: [
 //           SafeArea(
@@ -3034,7 +3168,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //             style: TextStyle(
 //               fontSize: 32,
 //               fontWeight: FontWeight.bold,
-//               color: Colors.white
+//               color: AppColors.white
 //               ,
 //             ),
 //           ),
@@ -3057,7 +3191,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                       child: const Text(
 //                         '3',
 //                         style: TextStyle(
-//                           color: Colors.white,
+//                           color: AppColors.white,
 //                           fontSize: 10,
 //                           fontWeight: FontWeight.bold,
 //                         ),
@@ -3112,19 +3246,19 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                         padding: const EdgeInsets.all(2),
 //                         child: Container(
 //                           decoration: const BoxDecoration(
-//                             color: Colors.white,
+//                             color: AppColors.white,
 //                             shape: BoxShape.circle,
 //                           ),
 //                           // child: Padding(
 //                           //   padding: const EdgeInsets.all(2),
 //                           //   child: Container(
 //                           //     decoration: const BoxDecoration(
-//                           //       color: Colors.grey,
+//                           //       color: AppColors.premiumGold,
 //                           //       shape: BoxShape.circle,
 //                           //     ),
 //                               child: CircleAvatar(
 //                                 radius: 30,
-//                                 backgroundColor: Colors.white,
+//                                 backgroundColor: AppColors.transparent,
 //                                 backgroundImage: NetworkImage(
 //                                   'https://images.pexels.com/photos/39317/baby-child-happy-joy-39317.jpeg',
 //                                 ),
@@ -3150,7 +3284,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                         padding: const EdgeInsets.all(3), // border thickness
 //                         child: Container(
 //                           decoration: const BoxDecoration(
-//                             color: Colors.white,
+//                             color: AppColors.white,
 //                             shape: BoxShape.circle,
 //                           ),
 //                           child: ClipOval(
@@ -3180,11 +3314,11 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                           decoration: BoxDecoration(
 //                             color: Colors.blue,
 //                             shape: BoxShape.circle,
-//                             border: Border.all(color: Colors.white, width: 2),
+//                             border: Border.all(color: AppColors.white, width: 2),
 //                           ),
 //                           child: const Icon(
 //                             Icons.add,
-//                             color: Colors.white,
+//                             color: AppColors.white,
 //                             size: 12,
 //                           ),
 //                         ),
@@ -3257,7 +3391,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                     ),
 //                     const Text(
 //                       '🎵 Imam Malboo • Neha Nair, Kinanu Kondu',
-//                       style: TextStyle(fontSize: 11, color: Colors.grey),
+//                       style: TextStyle(fontSize: 11, color: AppColors.premiumGold),
 //                     ),
 //                   ],
 //                 ),
@@ -3318,13 +3452,13 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                     Text(
 //                       '$likes Liked',
 //                       style: const TextStyle(
-//                         color: Colors.white,
+//                         color: AppColors.white,
 //                         fontWeight: FontWeight.bold,
 //                         shadows: [
 //                           Shadow(
 //                             offset: Offset(0, 1),
 //                             blurRadius: 4,
-//                             color: Colors.black45,
+//                             color: AppColors.white,
 //                           ),
 //                         ],
 //                       ),
@@ -3360,12 +3494,12 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //             children: [
 //               Text(
 //                 time,
-//                 style: const TextStyle(fontSize: 12, color: Colors.grey),
+//                 style: const TextStyle(fontSize: 12, color: AppColors.premiumGold),
 //               ),
 //               const SizedBox(height: 4),
 //               const Text(
 //                 '@vibeteller, @mooddreamlms and others liked this post!',
-//                 style: TextStyle(fontSize: 12, color: Colors.grey),
+//                 style: TextStyle(fontSize: 12, color: AppColors.premiumGold),
 //               ),
 //               const SizedBox(height: 4),
 //               const Text(
@@ -3387,7 +3521,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //       decoration: BoxDecoration(
 //         color: color,
 //         shape: BoxShape.circle,
-//         border: Border.all(color: Colors.white, width: 2),
+//         border: Border.all(color: AppColors.white, width: 2),
 //       ),
 //     );
 //   }
@@ -3397,8 +3531,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //     return Container(
 //       height: 70,
 //       decoration: BoxDecoration(
-//         color: Colors.white,
-//         border: Border(top: BorderSide(color: Colors.grey.shade200)),
+//         color: AppColors.white,
+//         border: Border(top: BorderSide(color: AppColors.premiumGold)),
 //       ),
 //       child: Stack(
 //         clipBehavior: Clip.none,
@@ -3424,7 +3558,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                 shape: BoxShape.circle,
 //                 boxShadow: [
 //                   BoxShadow(
-//                     color: Colors.black26,
+//                     color: AppColors.white,
 //                     blurRadius: 8,
 //                     offset: Offset(0, 4),
 //                   ),
@@ -3432,7 +3566,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //               ),
 //               child: const Icon(
 //                 Icons.add_circle,
-//                 color: Colors.white,
+//                 color: AppColors.white,
 //                 size: 32,
 //               ),
 //             ),
@@ -3449,7 +3583,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //       children: [
 //         Icon(
 //           icon,
-//           color: isActive ? Colors.blue : Colors.grey,
+//           color: isActive ? Colors.blue : AppColors.premiumGold,
 //           size: 24,
 //         ),
 //         const SizedBox(height: 4),
@@ -3457,7 +3591,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //           label,
 //           style: TextStyle(
 //             fontSize: 12,
-//             color: isActive ? Colors.blue : Colors.grey,
+//             color: isActive ? Colors.blue : AppColors.premiumGold,
 //             fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
 //           ),
 //         ),
@@ -3527,13 +3661,13 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                                 vertical: 2,
 //                               ),
 //                               decoration: BoxDecoration(
-//                                 color: Colors.black,
+//                                 color: AppColors.white,
 //                                 borderRadius: BorderRadius.circular(4),
 //                               ),
 //                               child: const Text(
 //                                 'Follow',
 //                                 style: TextStyle(
-//                                   color: Colors.white,
+//                                   color: AppColors.white,
 //                                   fontSize: 14,
 //                                   fontWeight: FontWeight.w500,
 //                                 ),
@@ -3547,7 +3681,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                         Text(
 //                           timeAgo,
 //                           style: const TextStyle(
-//                             color: Colors.grey,
+//                             color: AppColors.premiumGold,
 //                             fontSize: 12,
 //                           ),
 //                         ),
@@ -3603,7 +3737,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                     child: Text(
 //                       tagName,
 //                       style: const TextStyle(
-//                         color: Colors.white,
+//                         color: AppColors.white,
 //                         fontSize: 12,
 //                         fontWeight: FontWeight.w500,
 //                       ),
@@ -3617,7 +3751,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                     caption,
 //                     style: const TextStyle(
 //                       fontSize: 13,
-//                       color: Colors.black87,
+//                       color: AppColors.white,
 //                       height: 1.4,
 //                     ),
 //                   ),
@@ -3685,8 +3819,8 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                     begin: Alignment.topCenter,
 //                     end: Alignment.bottomCenter,
 //                     colors: [
-//                       Colors.white.withOpacity(0.85),
-//                       Colors.white.withOpacity(0.55),
+//                       AppColors.white.withOpacity(0.85),
+//                       AppColors.white.withOpacity(0.55),
 //                     ],
 //                   ),
 //                   borderRadius: const BorderRadius.only(
@@ -3694,7 +3828,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                     topRight: Radius.circular(40),
 //                   ),
 //                   border: Border.all(
-//                     color: Colors.white.withOpacity(0.3),
+//                     color: AppColors.white.withOpacity(0.3),
 //                     width: 1.5,
 //                   ),
 //                 ),
@@ -3703,7 +3837,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                     /// --- HEADER ----
 //                     _buildHeader(),
 //
-//                     Divider(height: 1, color: Colors.grey.shade100),
+//                     Divider(height: 1, color: AppColors.premiumGold),
 //
 //                     /// --- COMMENT LIST ----
 //                     Expanded(
@@ -3749,7 +3883,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //             height: 4,
 //             width: 40,
 //             decoration: BoxDecoration(
-//               color: Colors.grey.shade600,
+//               color: AppColors.premiumGold,
 //               borderRadius: BorderRadius.circular(20),
 //             ),
 //           ),
@@ -3778,14 +3912,14 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                       style: TextStyle(
 //                         fontSize: 20,
 //                         fontWeight: FontWeight.bold,
-//                         color: Colors.black87,
+//                         color: AppColors.white,
 //                       ),
 //                     ),
 //                     Obx(() => Text(
 //                       "${commentController.commentsList.length} ${commentController.commentsList.length == 1 ? 'comment' : 'comments'}",
 //                       style: TextStyle(
 //                         fontSize: 13,
-//                         color: Colors.grey.shade600,
+//                         color: AppColors.premiumGold,
 //                       ),
 //                     )),
 //                   ],
@@ -3806,13 +3940,13 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //           Container(
 //             padding: const EdgeInsets.all(20),
 //             decoration: BoxDecoration(
-//               color: Colors.grey.shade100,
+//               color: AppColors.premiumGold,
 //               shape: BoxShape.circle,
 //             ),
 //             child: Icon(
 //               Icons.chat_bubble_outline_rounded,
 //               size: 50,
-//               color: Colors.grey.shade400,
+//               color: AppColors.premiumGold,
 //             ),
 //           ),
 //           const SizedBox(height: 16),
@@ -3821,7 +3955,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //             style: TextStyle(
 //               fontSize: 18,
 //               fontWeight: FontWeight.w600,
-//               color: Colors.grey.shade800,
+//               color: AppColors.premiumGold,
 //             ),
 //           ),
 //           const SizedBox(height: 8),
@@ -3829,7 +3963,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //             "Be the first to share your thoughts!",
 //             style: TextStyle(
 //               fontSize: 14,
-//               color: Colors.grey.shade600,
+//               color: AppColors.premiumGold,
 //             ),
 //           ),
 //         ],
@@ -3857,7 +3991,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //             },
 //             child: Container(
 //               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-//               color: Colors.transparent,
+//               color: AppColors.transparent,
 //               child: Row(
 //                 crossAxisAlignment: CrossAxisAlignment.start,
 //                 children: [
@@ -3866,7 +4000,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                     children: [
 //                       CircleAvatar(
 //                         radius: 20,
-//                         backgroundColor: Colors.grey.shade100,
+//                         backgroundColor: AppColors.premiumGold,
 //                         backgroundImage: (comment.user?.avtar != null &&
 //                             comment.user?.avtar != "")
 //                             ? NetworkImage(comment.user!.avtar!)
@@ -3875,7 +4009,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                             comment.user?.avtar == "")
 //                             ? Icon(
 //                           Icons.person,
-//                           color: Colors.grey.shade700,
+//                           color: AppColors.premiumGold,
 //                           size: 24,
 //                         )
 //                             : null,
@@ -3890,7 +4024,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                             decoration: BoxDecoration(
 //                               color: Colors.green,
 //                               shape: BoxShape.circle,
-//                               border: Border.all(color: Colors.white, width: 2),
+//                               border: Border.all(color: AppColors.white, width: 2),
 //                             ),
 //                           ),
 //                         ),
@@ -3911,7 +4045,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                               style: const TextStyle(
 //                                 fontWeight: FontWeight.bold,
 //                                 fontSize: 15,
-//                                 color: Colors.black87,
+//                                 color: AppColors.white,
 //                               ),
 //                             ),
 //                           ],
@@ -3923,7 +4057,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                           comment.body ?? "",
 //                           style: const TextStyle(
 //                             fontSize: 14,
-//                             color: Colors.black87,
+//                             color: AppColors.white,
 //                             height: 1.4,
 //                           ),
 //                         ),
@@ -3937,7 +4071,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                                   ? Icons.favorite
 //                                   : Icons.favorite_border,
 //                               label: "${comment.likesCount}",
-//                               color: comment.hasLiked ? Colors.red : Colors.grey.shade700,
+//                               color: comment.hasLiked ? Colors.red : AppColors.premiumGold,
 //                               onTap: () {
 //                                 commentController.likeComment(comment.id, index);
 //                               },
@@ -3946,7 +4080,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                             _buildActionButton(
 //                               icon: Icons.reply_rounded,
 //                               label: "Reply",
-//                               color: Colors.grey.shade700,
+//                               color: AppColors.premiumGold,
 //                               onTap: () {
 //                                 setState(() {
 //                                   replyingToCommentId = comment.id;
@@ -3961,7 +4095,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                                 "${comment.replies.length} ${comment.replies.length == 1 ? 'reply' : 'replies'}",
 //                                 style: TextStyle(
 //                                   fontSize: 12,
-//                                   color: Colors.grey.shade600,
+//                                   color: AppColors.premiumGold,
 //                                   fontWeight: FontWeight.w500,
 //                                 ),
 //                               ),
@@ -4015,7 +4149,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //           children: [
 //             CircleAvatar(
 //               radius: 16,
-//               backgroundColor: Colors.grey.shade100,
+//               backgroundColor: AppColors.premiumGold,
 //               backgroundImage: (reply.user?.avtar != null &&
 //                   reply.user?.avtar != "")
 //                   ? NetworkImage(reply.user!.avtar!)
@@ -4024,7 +4158,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                   reply.user?.avtar == "")
 //                   ? Icon(
 //                 Icons.person,
-//                 color: Colors.grey.shade700,
+//                 color: AppColors.premiumGold,
 //                 size: 20,
 //               )
 //                   : null,
@@ -4050,7 +4184,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                     reply.body ?? "",
 //                     style: const TextStyle(
 //                       fontSize: 13,
-//                       color: Colors.black87,
+//                       color: AppColors.white,
 //                       height: 1.4,
 //                     ),
 //                   ),
@@ -4092,13 +4226,13 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //     return Container(
 //       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
 //       decoration: BoxDecoration(
-//         color: Colors.white.withOpacity(0.9),
+//         color: AppColors.black.withOpacity(1.0),
 //         border: Border(
-//           top: BorderSide(color: Colors.grey.shade200, width: 1),
+//           top: BorderSide(color: AppColors.premiumGold, width: 1),
 //         ),
 //         boxShadow: [
 //           BoxShadow(
-//             color: Colors.black.withOpacity(0.05),
+//             color: AppColors.premiumGold.withOpacity(0.05),
 //             offset: const Offset(0, -2),
 //             blurRadius: 8,
 //           ),
@@ -4162,20 +4296,20 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //               Expanded(
 //                 child: Container(
 //                   decoration: BoxDecoration(
-//                     color: Colors.grey.shade100,
+//                     color: AppColors.premiumGold,
 //                     borderRadius: BorderRadius.circular(24),
-//                     border: Border.all(color: Colors.grey.shade300, width: 1),
+//                     border: Border.all(color: AppColors.premiumGold, width: 1),
 //                   ),
 //                   child: TextField(
 //                     controller: textController,
 //                     maxLines: null,
-//                     style: const TextStyle(fontSize: 14),
+//                     style: const TextStyle(fontSize: 14, color: AppColors.white),
 //                     decoration: InputDecoration(
 //                       hintText: replyingToCommentId != null
 //                           ? "Write a reply..."
 //                           : "Share your thoughts...",
 //                       hintStyle: TextStyle(
-//                         color: Colors.grey.shade500,
+//                         color: AppColors.premiumGold,
 //                         fontSize: 14,
 //                       ),
 //                       contentPadding: const EdgeInsets.symmetric(
@@ -4230,7 +4364,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                   ),
 //                   child: const Icon(
 //                     Icons.send_rounded,
-//                     color: Colors.white,
+//                     color: AppColors.white,
 //                     size: 20,
 //                   ),
 //                 ),
@@ -4263,7 +4397,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //         },
 //         child: BackdropFilter(
 //           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-//           child: Container(color: Colors.black.withOpacity(0.4)),
+//           child: Container(color: AppColors.white.withOpacity(0.4)),
 //         ),
 //       ),
 //     );
@@ -4274,7 +4408,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //           left: position.dx - 80,
 //           top: position.dy - 10,
 //           child: Material(
-//             color: Colors.transparent,
+//             color: AppColors.transparent,
 //             child: Container(
 //               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
 //               decoration: BoxDecoration(
@@ -4314,12 +4448,12 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //                 child: Row(
 //                   mainAxisSize: MainAxisSize.min,
 //                   children: const [
-//                     Icon(Icons.delete_rounded, color: Colors.white, size: 20),
+//                     Icon(Icons.delete_rounded, color: AppColors.white, size: 20),
 //                     SizedBox(width: 8),
 //                     Text(
 //                       "Delete",
 //                       style: TextStyle(
-//                         color: Colors.white,
+//                         color: AppColors.white,
 //                         fontWeight: FontWeight.bold,
 //                         fontSize: 15,
 //                       ),
@@ -4440,7 +4574,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //               right: 10,
 //               child: Icon(
 //                 Icons.videocam_rounded,
-//                 color: Colors.white,
+//                 color: AppColors.white,
 //                 size: 28,
 //               ),
 //             ),
@@ -4451,7 +4585,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
 //               scale: _scaleAnimation,
 //               child: Icon(
 //                 Icons.favorite,
-//                 color: Colors.white.withOpacity(0.9),
+//                 color: AppColors.black.withOpacity(1.0),
 //                 size: 100,
 //               ),
 //             ),
@@ -4487,13 +4621,15 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
 
-    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.04).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.95,
+      end: 1.04,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    _glowAnimation = Tween<double>(begin: 4.0, end: 12.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _glowAnimation = Tween<double>(
+      begin: 4.0,
+      end: 12.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -4529,7 +4665,9 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
               if (config == null) {
                 // Show loading spinner
                 Get.dialog(
-                  const Center(child: CircularProgressIndicator(color: Colors.black)),
+                  const Center(
+                    child: CircularProgressIndicator(color: AppColors.white),
+                  ),
                   barrierDismissible: false,
                 );
 
@@ -4548,19 +4686,20 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
                   "Error",
                   "Failed to retrieve profile configuration. Please check your internet connection.",
                   backgroundColor: Colors.red,
-                  colorText: Colors.white,
+                  colorText: AppColors.white,
                 );
                 return;
               }
 
               // Resolve current active profile from config
-              final currentProfileName = config.data?.userProfile?.currentProfileName;
+              final currentProfileName =
+                  config.data?.userProfile?.currentProfileName;
               if (currentProfileName == null || currentProfileName.isEmpty) {
                 Get.snackbar(
                   "Error",
                   "Current active profile name is not set.",
                   backgroundColor: Colors.red,
-                  colorText: Colors.white,
+                  colorText: AppColors.white,
                 );
                 return;
               }
@@ -4571,36 +4710,45 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
               bool isSubscribedActive = false;
               dynamic profileObj;
 
-              if (currentProfileName == 'personal' || currentProfileName == 'personal_profile') {
+              if (currentProfileName == 'personal' ||
+                  currentProfileName == 'personal_profile') {
                 mappedProfileType = 'personal';
                 profileObj = config.data?.personalProfile;
                 profileId = profileObj?.profileId;
                 activePlanSlug = profileObj?.subscription?.planSlug;
-                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
+                isSubscribedActive =
+                    profileObj?.subscription?.isActive ?? false;
               } else if (currentProfileName == 'employer') {
                 mappedProfileType = 'employer';
                 profileObj = config.data?.employer;
                 profileId = profileObj?.profileId;
                 activePlanSlug = profileObj?.subscription?.planSlug;
-                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
-              } else if (currentProfileName == 'ecommerce' || currentProfileName == 'seller') {
+                isSubscribedActive =
+                    profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'ecommerce' ||
+                  currentProfileName == 'seller') {
                 mappedProfileType = 'seller';
                 profileObj = config.data?.ecommerce;
                 profileId = profileObj?.profileId;
                 activePlanSlug = profileObj?.subscription?.planSlug;
-                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
-              } else if (currentProfileName == 'music_play' || currentProfileName == 'music') {
+                isSubscribedActive =
+                    profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'music_play' ||
+                  currentProfileName == 'music') {
                 mappedProfileType = 'music';
                 profileObj = config.data?.musicPlay;
                 profileId = profileObj?.profileId;
                 activePlanSlug = profileObj?.subscription?.planSlug;
-                isSubscribedActive = profileObj?.subscription?.isActive ?? false;
-              } else if (currentProfileName == 'content_creation' || currentProfileName == 'creator') {
+                isSubscribedActive =
+                    profileObj?.subscription?.isActive ?? false;
+              } else if (currentProfileName == 'content_creation' ||
+                  currentProfileName == 'creator') {
                 mappedProfileType = 'creator';
                 profileObj = config.data?.contentCreation;
                 profileId = profileObj?.profileId;
                 activePlanSlug = profileObj?.subscriptionDetails?.planSlug;
-                isSubscribedActive = profileObj?.subscriptionDetails?.isActive ?? false;
+                isSubscribedActive =
+                    profileObj?.subscriptionDetails?.isActive ?? false;
               }
 
               if (profileObj == null) {
@@ -4608,27 +4756,31 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
                   "Error",
                   "Profile configuration details are missing for: $currentProfileName",
                   backgroundColor: Colors.red,
-                  colorText: Colors.white,
+                  colorText: AppColors.white,
                 );
                 return;
               }
 
               try {
-                final subscriptionController = Get.isRegistered<SubscriptionController>()
-                    ? Get.find<SubscriptionController>()
-                    : Get.put(SubscriptionController());
+                final subscriptionController =
+                    Get.isRegistered<SubscriptionController>()
+                        ? Get.find<SubscriptionController>()
+                        : Get.put(SubscriptionController());
 
                 Get.dialog(
-                  const Center(child: CircularProgressIndicator(color: Colors.black)),
+                  const Center(
+                    child: CircularProgressIndicator(color: AppColors.white),
+                  ),
                   barrierDismissible: false,
                 );
 
-                final resolvedSub = await subscriptionController.fetchPlansForProfileType(
-                  mappedProfileType,
-                  activePlanSlug: activePlanSlug,
-                  isSubscribedActive: isSubscribedActive,
-                  profileId: profileId,
-                );
+                final resolvedSub = await subscriptionController
+                    .fetchPlansForProfileType(
+                      mappedProfileType,
+                      activePlanSlug: activePlanSlug,
+                      isSubscribedActive: isSubscribedActive,
+                      profileId: profileId,
+                    );
 
                 Get.back(); // Close loading dialog
 
@@ -4639,7 +4791,7 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
                     "Error",
                     "Failed to load plans for profile type: $mappedProfileType",
                     backgroundColor: Colors.red,
-                    colorText: Colors.white,
+                    colorText: AppColors.white,
                   );
                 }
               } catch (e) {
@@ -4648,7 +4800,7 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
                   "Error",
                   "Something went wrong while loading plans: $e",
                   backgroundColor: Colors.red,
-                  colorText: Colors.white,
+                  colorText: AppColors.white,
                 );
               }
             },
@@ -4657,7 +4809,11 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [AppColors.premiumGold, AppColors.goldHighlight, AppColors.goldGlow],
+                  colors: [
+                    AppColors.premiumGold,
+                    AppColors.goldHighlight,
+                    AppColors.goldGlow,
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -4669,30 +4825,27 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
                     spreadRadius: 1,
                   ),
                 ],
-                border: Border.all(
-                  color: const Color(0xFFFFF7C2),
-                  width: 1.2,
-                ),
+                border: Border.all(color: const Color(0xFFFFF7C2), width: 1.2),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(
                     Icons.workspace_premium_rounded,
-                    color: Colors.white,
+                    color: AppColors.white,
                     size: 13,
                   ),
                   const SizedBox(width: 3),
                   const Text(
                     "PRO",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 9.5,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 0.6,
                       shadows: [
                         Shadow(
-                          color: Colors.black26,
+                          color: AppColors.white,
                           blurRadius: 2,
                           offset: Offset(0, 1),
                         ),
@@ -4712,7 +4865,7 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (context) {
         return Container(
           decoration: const BoxDecoration(
@@ -4720,7 +4873,10 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: EdgeInsets.fromLTRB(
-            24, 20, 24, 20 + MediaQuery.of(context).padding.bottom,
+            24,
+            20,
+            24,
+            20 + MediaQuery.of(context).padding.bottom,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -4730,7 +4886,7 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade800,
+                    color: AppColors.premiumGold,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -4752,7 +4908,7 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
               const Text(
                 "Upgrade to IVatan PRO",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.white,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
@@ -4761,16 +4917,25 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
               Text(
                 "Unlock all premium features, badges, and services.",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.grey.shade400,
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: AppColors.premiumGold, fontSize: 14),
               ),
               const SizedBox(height: 24),
-              _buildFeatureRow(Icons.check_circle_rounded, "Golden Verified Profile Badge"),
-              _buildFeatureRow(Icons.check_circle_rounded, "Priority Support & Approval"),
-              _buildFeatureRow(Icons.check_circle_rounded, "Unlimited Product & Service Listings"),
-              _buildFeatureRow(Icons.check_circle_rounded, "Access to Exclusive Music Playlists"),
+              _buildFeatureRow(
+                Icons.check_circle_rounded,
+                "Golden Verified Profile Badge",
+              ),
+              _buildFeatureRow(
+                Icons.check_circle_rounded,
+                "Priority Support & Approval",
+              ),
+              _buildFeatureRow(
+                Icons.check_circle_rounded,
+                "Unlimited Product & Service Listings",
+              ),
+              _buildFeatureRow(
+                Icons.check_circle_rounded,
+                "Access to Exclusive Music Playlists",
+              ),
               const SizedBox(height: 32),
               Container(
                 width: double.infinity,
@@ -4792,13 +4957,13 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
                       "Premium",
                       "Subscription processing is coming soon!",
                       snackPosition: SnackPosition.TOP,
-                      backgroundColor: Colors.black87,
-                      colorText: Colors.white,
+                      backgroundColor: AppColors.transparent,
+                      colorText: AppColors.white,
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
+                    backgroundColor: AppColors.transparent,
+                    shadowColor: AppColors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(26),
                     ),
@@ -4806,7 +4971,7 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
                   child: const Text(
                     "Subscribe Now - 9.99/mo",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -4831,7 +4996,7 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
           Text(
             text,
             style: const TextStyle(
-              color: Colors.white,
+              color: AppColors.white,
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),

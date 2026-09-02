@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,7 +16,6 @@ import 'package:i_vatan_app/features/post/presentation/image_post_screen.dart';
 import 'package:i_vatan_app/core/network/api_services.dart';
 import 'package:i_vatan_app/features/reels_screen/controller/short_play_controller.dart';
 
-
 /*
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
@@ -23,9 +23,9 @@ class HistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: AppColors.white,
       child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.transparent,
           appBar: AppBar(
             leadingWidth: 40, // 👈 default padding kam karega
             titleSpacing: 0,
@@ -70,7 +70,7 @@ class HistoryScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     height: 45,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                      color: AppColors.premiumGold,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -93,7 +93,7 @@ class HistoryScreen extends StatelessWidget {
                             ),
                             style: const TextStyle(
                               fontSize: 18,
-                              color: Colors.black87,
+                              color: AppColors.white,
                             ),
                           ),
                         ),
@@ -118,7 +118,7 @@ class HistoryScreen extends StatelessWidget {
                           Text(
                             "Watch history",
                             style: TextStyle(
-                              color: Colors.grey.shade600,
+                              color: AppColors.premiumGold,
                               fontSize: 14,
                             ),
                           ),
@@ -166,13 +166,13 @@ class HistoryScreen extends StatelessWidget {
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                           decoration: BoxDecoration(
-                                            color: Colors.black.withOpacity(0.7),
+                                            color: AppColors.white.withOpacity(0.7),
                                             borderRadius: BorderRadius.circular(4),
                                           ),
                                           child: const Text(
                                             "10:45",
                                             style: TextStyle(
-                                              color: Colors.white,
+                                              color: AppColors.white,
                                               fontSize: 10,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -190,7 +190,7 @@ class HistoryScreen extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
+                                    color: AppColors.white,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -198,7 +198,7 @@ class HistoryScreen extends StatelessWidget {
                                   "12.3K views • 2 days ago",
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: Colors.grey.shade600,
+                                    color: AppColors.premiumGold,
                                   ),
                                 ),
                               ],
@@ -220,7 +220,7 @@ class HistoryScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Icon(Icons.tune_rounded, color: Colors.grey.shade400, size: 20),
+                        Icon(Icons.tune_rounded, color: AppColors.premiumGold, size: 20),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -263,14 +263,14 @@ class HistoryScreen extends StatelessWidget {
                                       "Travel Guide • 45K views",
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: Colors.grey.shade500,
+                                        color: AppColors.premiumGold,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
                               IconButton(
-                                icon: Icon(Icons.more_vert, color: Colors.grey.shade400, size: 18),
+                                icon: Icon(Icons.more_vert, color: AppColors.premiumGold, size: 18),
                                 onPressed: () {},
                               ),
                             ],
@@ -288,33 +288,29 @@ class HistoryScreen extends StatelessWidget {
 }
 */
 
-
-
-
-
 /*class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
         leadingWidth: 40,
         titleSpacing: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: const Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: Colors.black,
+            color: AppColors.white,
           ),
         ),
         title: const Text(
           "History",
           style: TextStyle(
-            color: Colors.black,
+            color: AppColors.white,
             fontWeight: FontWeight.bold,
             fontSize: 24,
           ),
@@ -349,13 +345,13 @@ class HistoryScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     height: 45,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                      color: AppColors.premiumGold,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: const [
                         Icon(CupertinoIcons.search,
-                            color: Colors.grey),
+                            color: AppColors.premiumGold),
                         SizedBox(width: 10),
                         Expanded(
                           child: TextField(
@@ -405,13 +401,13 @@ class HistoryScreen extends StatelessWidget {
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.7),
+                                        color: AppColors.white.withOpacity(0.7),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: const Text(
                                         "10:45",
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: AppColors.white,
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -429,7 +425,7 @@ class HistoryScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black87,
+                                color: AppColors.white,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -437,7 +433,7 @@ class HistoryScreen extends StatelessWidget {
                               "12.3K views • 2 days ago",
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey.shade600,
+                                color: AppColors.premiumGold,
                               ),
                             ),
                           ],
@@ -452,12 +448,12 @@ class HistoryScreen extends StatelessWidget {
               SliverAppBar(
                 pinned: true,
                 automaticallyImplyLeading: false,
-                backgroundColor: Colors.white,
+                backgroundColor: AppColors.transparent,
                 elevation: 0,
                 bottom: const TabBar(
                   indicatorColor: AppColors.primary,
                   labelColor: AppColors.primary,
-                  unselectedLabelColor: Colors.grey,
+                  unselectedLabelColor: AppColors.premiumGold,
                   labelStyle: TextStyle(fontWeight: FontWeight.w600),
                   tabs: [
                     Tab(text: "Likes"),
@@ -500,11 +496,11 @@ class VideoGridSection extends StatelessWidget {
       itemBuilder: (context, index) {
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.shade200,
+                color: AppColors.premiumGold,
                 blurRadius: 8,
                 spreadRadius: 2,
               )
@@ -536,13 +532,13 @@ class VideoGridSection extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.6),
+                          color: AppColors.white.withOpacity(0.6),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Icons.play_arrow,
                           size: 18,
-                          color: Colors.white,
+                          color: AppColors.white,
                         ),
                       ),
                     ),
@@ -587,24 +583,19 @@ class VideoGridSection extends StatelessWidget {
   Widget _iconWithText(IconData icon, String count) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: Colors.grey.shade600),
+        Icon(icon, size: 16, color: AppColors.premiumGold),
         const SizedBox(width: 4),
         Text(
           count,
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey.shade600,
+            color: AppColors.premiumGold,
           ),
         ),
       ],
     );
   }
 }*/
-
-
-
-
-
 
 /// Enum for Video type
 enum VideoType { like, comment, product, service }
@@ -632,16 +623,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: AppColors.white),
         title: Text(
           'History',
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: AppColors.white,
           ),
         ),
       ),
@@ -650,25 +641,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
       body: DefaultTabController(
         length: 4,
         child: NestedScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
-
               /// SEARCH BAR
-             /* SliverToBoxAdapter(
+              /* SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     height: 45,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                      color: AppColors.premiumGold,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: const [
                         Icon(CupertinoIcons.search,
-                            color: Colors.grey),
+                            color: AppColors.premiumGold),
                         SizedBox(width: 10),
                         Expanded(
                           child: TextField(
@@ -684,7 +674,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),
               ),*/
 
-             /* SliverToBoxAdapter(
+              /* SliverToBoxAdapter(
                 child: Row(
                   children: [
                     Padding(
@@ -695,24 +685,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),),*/
 
               /// HORIZONTAL VIDEO LIST
-
-
               SliverToBoxAdapter(
                 child: SizedBox(
                   height: 220, // Slider height adjust karo
                   child: Obx(() {
-                    if (controller.isLoadingVideoViews.value && controller.videoViews.isEmpty) {
+                    if (controller.isLoadingVideoViews.value &&
+                        controller.videoViews.isEmpty) {
                       return _buildShimmerSlider();
                     }
                     if (controller.videoViews.isEmpty) {
                       return _buildEmptyState("No video history available");
                     }
-                    
+
                     return NotificationListener<ScrollNotification>(
                       onNotification: (ScrollNotification scrollInfo) {
                         if (!controller.isLoadingVideoViews.value &&
                             controller.hasMoreVideoViews &&
-                            scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+                            scrollInfo.metrics.pixels ==
+                                scrollInfo.metrics.maxScrollExtent) {
                           controller.fetchVideoViews(loadMore: true);
                         }
                         return false;
@@ -730,7 +720,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   }),
                 ),
               ),
-
 
               /*SliverToBoxAdapter(
                 child: SizedBox(
@@ -764,13 +753,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.7),
+                                        color: AppColors.white.withOpacity(0.7),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: const Text(
                                         "10:45",
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: AppColors.white,
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -788,7 +777,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black87,
+                                color: AppColors.white,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -796,7 +785,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               "12.3K views • 2 days ago",
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey.shade600,
+                                color: AppColors.premiumGold,
                               ),
                             ),
                           ],
@@ -806,26 +795,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                 ),
               ),*/
-
-              SliverToBoxAdapter(
-                child: SizedBox(height: 10,),
-              ),
+              SliverToBoxAdapter(child: SizedBox(height: 10)),
 
               /// STICKY TAB BAR
               SliverPersistentHeader(
                 pinned: true,
                 delegate: _SliverTabBarDelegate(
-                  const TabBar(
-                   // indicatorColor: AppColors.primary,
-                    labelColor: AppColors.primary,
-                    indicator: const UnderlineTabIndicator(
+                   TabBar(
+                    // indicatorColor: AppColors.primary,
+                    labelColor: AppColors.premiumGold,
+                    indicator:  UnderlineTabIndicator(
                       borderSide: BorderSide(
                         width: 2,
-                        color: Colors.black,
+                        color: AppColors.premiumGold,
                       ),
                       borderRadius: BorderRadius.zero,
-                    ),                    unselectedLabelColor: Colors.grey,
-                    labelStyle: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    unselectedLabelColor: AppColors.white.withOpacity(0.5),
+                    labelStyle: const TextStyle(fontWeight: FontWeight.w600),
                     tabs: [
                       Tab(text: "Like"),
                       Tab(text: "Comment"),
@@ -835,7 +822,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                 ),
               ),
-
             ];
           },
 
@@ -852,6 +838,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ),
     );
   }
+
   Widget _buildShimmerSlider() {
     return PageView.builder(
       itemCount: 3,
@@ -861,12 +848,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 8),
           child: Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
+            baseColor: AppColors.premiumGold.withOpacity(0.3),
+            highlightColor: AppColors.premiumGold.withOpacity(0.1),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.black,
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: AppColors.premiumGold.withOpacity(0.5),
+                ),
               ),
             ),
           ),
@@ -880,13 +870,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.history_toggle_off, size: 64, color: Colors.grey.shade400),
+          Icon(
+            Icons.history_toggle_off,
+            size: 64,
+            color: AppColors.premiumGold,
+          ),
           const SizedBox(height: 16),
           Text(
             title,
             style: TextStyle(
               fontSize: 16,
-              color: Colors.grey.shade600,
+              color: AppColors.premiumGold,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -909,11 +903,12 @@ class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => tabBar.preferredSize.height;
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: Colors.white,
-      child: tabBar,
-    );
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(color: AppColors.black, child: tabBar);
   }
 
   @override
@@ -943,11 +938,11 @@ class VideoGridSection extends StatelessWidget {
       itemBuilder: (context, index) {
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.shade200,
+                color: AppColors.premiumGold,
                 blurRadius: 8,
               )
             ],
@@ -977,13 +972,13 @@ class VideoGridSection extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.6),
+                          color: AppColors.white.withOpacity(0.6),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Icons.play_arrow,
                           size: 18,
-                          color: Colors.white,
+                          color: AppColors.white,
                         ),
                       ),
                     ),
@@ -1028,7 +1023,7 @@ class VideoGridSection extends StatelessWidget {
     }
   }
 
-  Widget _iconWithText(IconData icon, String count, {Color color = Colors.black}) {
+  Widget _iconWithText(IconData icon, String count, {Color color = AppColors.white}) {
     return Row(
       children: [
         Icon(icon, size: 18, color: color),
@@ -1046,8 +1041,6 @@ class VideoGridSection extends StatelessWidget {
   }
 }
 */
-
-
 
 class VideoGridSection extends StatelessWidget {
   final VideoType type;
@@ -1092,57 +1085,70 @@ class VideoGridSection extends StatelessWidget {
       }
 
       if (isLoading && items.isEmpty) {
-        return (type == VideoType.product || type == VideoType.service) 
-            ? _buildShimmerList() 
+        return (type == VideoType.product || type == VideoType.service)
+            ? _buildShimmerList()
             : _buildShimmerGrid();
       }
-      
-      final Widget content = items.isEmpty
-          ? _buildEmptyState("No history found.")
-          : NotificationListener<ScrollNotification>(
-              onNotification: (ScrollNotification scrollInfo) {
-                if (!isLoading && hasMore && scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-                  loadMore();
-                }
-                return false;
-              },
-              child: (type == VideoType.product || type == VideoType.service)
-                  ? ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(16),
-                      itemCount: items.length + (hasMore ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index == items.length) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-                        final item = items[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: _buildOrderCard(item as PurchaseHistoryItem),
-                        );
-                      },
-                    )
-                  : GridView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(16),
-                      itemCount: items.length + (hasMore ? 1 : 0),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 1.0,
-                      ),
-                      itemBuilder: (context, index) {
-                        if (index == items.length) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-                        final item = items[index];
-                        return _buildVideoCard(context, item, type);
-                      },
-                    ),
-            );
 
-      return RefreshIndicator(color: Colors.black, 
+      final Widget content =
+          items.isEmpty
+              ? _buildEmptyState("No history found.")
+              : NotificationListener<ScrollNotification>(
+                onNotification: (ScrollNotification scrollInfo) {
+                  if (!isLoading &&
+                      hasMore &&
+                      scrollInfo.metrics.pixels ==
+                          scrollInfo.metrics.maxScrollExtent) {
+                    loadMore();
+                  }
+                  return false;
+                },
+                child:
+                    (type == VideoType.product || type == VideoType.service)
+                        ? ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(16),
+                          itemCount: items.length + (hasMore ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            if (index == items.length) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            final item = items[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: _buildOrderCard(
+                                item as PurchaseHistoryItem,
+                              ),
+                            );
+                          },
+                        )
+                        : GridView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(16),
+                          itemCount: items.length + (hasMore ? 1 : 0),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 16,
+                                mainAxisSpacing: 16,
+                                childAspectRatio: 1.0,
+                              ),
+                          itemBuilder: (context, index) {
+                            if (index == items.length) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            final item = items[index];
+                            return _buildVideoCard(context, item, type);
+                          },
+                        ),
+              );
+
+      return RefreshIndicator(
+        color: AppColors.white,
         onRefresh: () async {
           await Future.wait([
             controller.fetchVideoViews(),
@@ -1169,12 +1175,13 @@ class VideoGridSection extends StatelessWidget {
       ),
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
+          baseColor: AppColors.premiumGold!,
+          highlightColor: AppColors.premiumGold!,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.black,
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.premiumGold.withOpacity(0.5)),
             ),
           ),
         );
@@ -1190,13 +1197,16 @@ class VideoGridSection extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
           child: Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
+            baseColor: AppColors.premiumGold.withOpacity(0.3),
+            highlightColor: AppColors.premiumGold.withOpacity(0.1),
             child: Container(
               height: 100,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.black,
                 borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppColors.premiumGold.withOpacity(0.5),
+                ),
               ),
             ),
           ),
@@ -1215,13 +1225,17 @@ class VideoGridSection extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.history_toggle_off, size: 64, color: Colors.grey.shade400),
+                Icon(
+                  Icons.history_toggle_off,
+                  size: 64,
+                  color: AppColors.premiumGold,
+                ),
                 const SizedBox(height: 16),
                 Text(
                   title,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey.shade600,
+                    color: AppColors.premiumGold,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -1236,37 +1250,54 @@ class VideoGridSection extends StatelessWidget {
   Widget _buildOrderCard(PurchaseHistoryItem order) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.black,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.premiumGold),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade300,
+            color: AppColors.premiumGold.withOpacity(0.2),
             blurRadius: 6,
             spreadRadius: 1,
-          )
+          ),
         ],
       ),
       padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Order #${order.orderId}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+          Text(
+            "Order #${order.orderId}",
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: AppColors.white,
+            ),
+          ),
           const SizedBox(height: 4),
-          Text(order.createdAt, style: TextStyle(color: Colors.grey.shade600, fontSize: 10)),
+          Text(
+            order.createdAt,
+            style: TextStyle(color: AppColors.premiumGold, fontSize: 10),
+          ),
           const SizedBox(height: 8),
           Expanded(
             child: Text(
               order.items.isNotEmpty ? order.items.first.title : "No items",
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 12),
+              style: const TextStyle(fontSize: 12, color: AppColors.white),
             ),
           ),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("\$${order.totalAmount}", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+              Text(
+                "\$${order.totalAmount}",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.premiumGold,
+                ),
+              ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -1275,11 +1306,15 @@ class VideoGridSection extends StatelessWidget {
                 ),
                 child: Text(
                   order.status,
-                  style: TextStyle(fontSize: 10, color: Colors.blue.shade700, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.blue.shade700,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -1310,13 +1345,7 @@ class VideoGridSection extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
       ),
-      child: Center(
-        child: Icon(
-          iconData,
-          size: 40,
-          color: Colors.white24,
-        ),
-      ),
+      child: Center(child: Icon(iconData, size: 40, color: AppColors.white)),
     );
   }
 
@@ -1348,10 +1377,16 @@ class VideoGridSection extends StatelessWidget {
         final String typeLower = entityType.toLowerCase();
         if (typeLower == 'post' || typeLower == 'image') {
           Get.to(() => ImagePostScreen(postId: entityId));
-        } else if (typeLower == 'reel' || (imageUrl != null && imageUrl.toLowerCase().contains('reel') && imageUrl.toLowerCase().contains('.mp4'))) {
+        } else if (typeLower == 'reel' ||
+            (imageUrl != null &&
+                imageUrl.toLowerCase().contains('reel') &&
+                imageUrl.toLowerCase().contains('.mp4'))) {
           _openReel(context, entityId, title, sub, imageUrl ?? "");
         } else {
-          Get.to(() => VideoPlayerScreen(videoUrl: imageUrl ?? "", videoId: entityId));
+          Get.to(
+            () =>
+                VideoPlayerScreen(videoUrl: imageUrl ?? "", videoId: entityId),
+          );
         }
       },
       child: ClipRRect(
@@ -1359,95 +1394,118 @@ class VideoGridSection extends StatelessWidget {
         child: Stack(
           children: [
             Positioned.fill(
-              child: hasImage
-                  ? (imageUrl.toLowerCase().contains('.mp4')
-                      ? FeedVideoPlayer(
-                          videoUrl: imageUrl,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.network(
-                          imageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (ctx, err, stack) => _buildPlaceholderWidget(type),
-                        ))
-                  : _buildPlaceholderWidget(type),
+              child:
+                  hasImage
+                      ? (imageUrl.toLowerCase().contains('.mp4')
+                          ? FeedVideoPlayer(
+                            videoUrl: imageUrl,
+                            fit: BoxFit.cover,
+                          )
+                          : Image.network(
+                            imageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (ctx, err, stack) =>
+                                    _buildPlaceholderWidget(type),
+                          ))
+                      : _buildPlaceholderWidget(type),
             ),
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withOpacity(0.6),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          if (hasImage && imageUrl.toLowerCase().contains('.mp4'))
-            Positioned(
-              top: 8,
-              right: 8,
+            Positioned.fill(
               child: Container(
-                padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.play_arrow,
-                  size: 18,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          Positioned(
-            bottom: 8,
-            left: 8,
-            right: 8,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(color: Colors.black54, offset: Offset(0, 1), blurRadius: 2)
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      AppColors.transparent,
+                      AppColors.white.withOpacity(0.6),
                     ],
                   ),
                 ),
-                const SizedBox(height: 6),
-                _buildBottomIcon(type),
-              ],
+              ),
             ),
-          ),
-        ],
+            if (hasImage && imageUrl.toLowerCase().contains('.mp4'))
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: AppColors.white.withOpacity(0.6),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.play_arrow,
+                    size: 18,
+                    color: AppColors.white,
+                  ),
+                ),
+              ),
+            Positioned(
+              bottom: 8,
+              left: 8,
+              right: 8,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      color: AppColors.white,
+                      shadows: [
+                        Shadow(
+                          color: AppColors.white,
+                          offset: Offset(0, 1),
+                          blurRadius: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  _buildBottomIcon(type),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildBottomIcon(VideoType type) {
     switch (type) {
       case VideoType.like:
         return _iconWithText(Icons.favorite, "Liked", color: Colors.red);
       case VideoType.comment:
-        return _iconWithText(Icons.comment, "Commented", color: Colors.white);
+        return _iconWithText(
+          Icons.comment,
+          "Commented",
+          color: AppColors.white,
+        );
       case VideoType.product:
-        return _iconWithText(Icons.shopping_bag, "Product", color: Colors.white);
+        return _iconWithText(
+          Icons.shopping_bag,
+          "Product",
+          color: AppColors.white,
+        );
       case VideoType.service:
-        return _iconWithText(Icons.design_services, "Service", color: Colors.white);
+        return _iconWithText(
+          Icons.design_services,
+          "Service",
+          color: AppColors.white,
+        );
     }
   }
 
-  Widget _iconWithText(IconData icon, String text, {Color color = Colors.white}) {
+  Widget _iconWithText(
+    IconData icon,
+    String text, {
+    Color color = AppColors.white,
+  }) {
     return Row(
       children: [
         Icon(icon, size: 16, color: color),
@@ -1468,7 +1526,8 @@ class VideoGridSection extends StatelessWidget {
 class HistoryVideoSliderItem extends StatefulWidget {
   final VideoViewHistoryItem item;
 
-  const HistoryVideoSliderItem({Key? key, required this.item}) : super(key: key);
+  const HistoryVideoSliderItem({Key? key, required this.item})
+    : super(key: key);
 
   @override
   State<HistoryVideoSliderItem> createState() => _HistoryVideoSliderItemState();
@@ -1482,8 +1541,8 @@ class _HistoryVideoSliderItemState extends State<HistoryVideoSliderItem> {
     super.initState();
     final imageUrl = widget.item.preview?.thumbnail ?? "";
     _aspectRatio = 16 / 9;
-    if (widget.item.postType.toLowerCase().contains('reel') || 
-        widget.item.postType.toLowerCase().contains('clip') || 
+    if (widget.item.postType.toLowerCase().contains('reel') ||
+        widget.item.postType.toLowerCase().contains('clip') ||
         widget.item.postType.toLowerCase().contains('short') ||
         imageUrl.toLowerCase().contains('reel')) {
       _aspectRatio = 9 / 16;
@@ -1501,9 +1560,20 @@ class _HistoryVideoSliderItemState extends State<HistoryVideoSliderItem> {
         if (typeLower == 'post' || typeLower == 'image') {
           Get.to(() => ImagePostScreen(postId: widget.item.entityId));
         } else if (typeLower == 'reel') {
-          _openReel(context, widget.item.entityId, widget.item.preview?.caption ?? "", widget.item.createdHuman, imageUrl);
+          _openReel(
+            context,
+            widget.item.entityId,
+            widget.item.preview?.caption ?? "",
+            widget.item.createdHuman,
+            imageUrl,
+          );
         } else {
-          Get.to(() => VideoPlayerScreen(videoUrl: imageUrl, videoId: widget.item.entityId));
+          Get.to(
+            () => VideoPlayerScreen(
+              videoUrl: imageUrl,
+              videoId: widget.item.entityId,
+            ),
+          );
         }
       },
       child: Padding(
@@ -1515,10 +1585,10 @@ class _HistoryVideoSliderItemState extends State<HistoryVideoSliderItem> {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.shade300,
+                  color: AppColors.premiumGold,
                   blurRadius: 8,
                   spreadRadius: 2,
-                )
+                ),
               ],
             ),
             child: Stack(
@@ -1527,114 +1597,128 @@ class _HistoryVideoSliderItemState extends State<HistoryVideoSliderItem> {
                 Positioned.fill(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: imageUrl.toLowerCase().contains('.mp4')
-                        ? FeedVideoPlayer(
-                            videoUrl: imageUrl,
-                            fit: BoxFit.cover,
-                            onRatioLoaded: (ratio) {
-                              if (mounted && ratio != _aspectRatio) {
-                                setState(() {
-                                  _aspectRatio = ratio;
-                                });
-                              }
-                            },
-                          )
-                      : (imageUrl.isNotEmpty
-                          ? Image.network(
-                              imageUrl,
+                    child:
+                        imageUrl.toLowerCase().contains('.mp4')
+                            ? FeedVideoPlayer(
+                              videoUrl: imageUrl,
                               fit: BoxFit.cover,
-                              errorBuilder: (ctx, err, stack) => Container(color: Colors.grey),
+                              onRatioLoaded: (ratio) {
+                                if (mounted && ratio != _aspectRatio) {
+                                  setState(() {
+                                    _aspectRatio = ratio;
+                                  });
+                                }
+                              },
                             )
-                          : Container(
-                              decoration: const BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [Color(0xFF2E2E2E), Color(0xFF1A1A1A)],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                              ),
-                              child: const Center(
-                                child: Icon(Icons.play_circle_outline, size: 40, color: Colors.white24),
-                              ),
-                            )),
-                ),
-              ),
-
-              /// 🌑 GRADIENT OVERLAY
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.black.withOpacity(0.3),
-                      Colors.black.withOpacity(0.0),
-                    ],
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
+                            : (imageUrl.isNotEmpty
+                                ? Image.network(
+                                  imageUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder:
+                                      (ctx, err, stack) => Container(
+                                        color: AppColors.premiumGold,
+                                      ),
+                                )
+                                : Container(
+                                  decoration: const BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Color(0xFF2E2E2E),
+                                        Color(0xFF1A1A1A),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                  ),
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.play_circle_outline,
+                                      size: 40,
+                                      color: AppColors.white,
+                                    ),
+                                  ),
+                                )),
                   ),
                 ),
-              ),
 
-              /// 🕒 TIME LABEL
-              Positioned(
-                top: 12,
-                right: 12,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                /// 🌑 GRADIENT OVERLAY
+                Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: const Text(
-                    "Video",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.white.withOpacity(0.3),
+                        AppColors.white.withOpacity(0.0),
+                      ],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
                     ),
                   ),
                 ),
-              ),
 
-              /// 📝 TITLE & VIEWS
-              Positioned(
-                bottom: 12,
-                left: 12,
-                right: 12,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      preview?.caption ?? "Nature Video",
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black54,
-                            offset: Offset(0, 1),
-                            blurRadius: 2,
-                          )
-                        ],
-                      ),
+                /// 🕒 TIME LABEL
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      widget.item.createdHuman,
+                    decoration: BoxDecoration(
+                      color: AppColors.white.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text(
+                      "Video",
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: AppColors.white,
                         fontSize: 10,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
-          ),
+
+                /// 📝 TITLE & VIEWS
+                Positioned(
+                  bottom: 12,
+                  left: 12,
+                  right: 12,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        preview?.caption ?? "Nature Video",
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          shadows: [
+                            Shadow(
+                              color: AppColors.white,
+                              offset: Offset(0, 1),
+                              blurRadius: 2,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.item.createdHuman,
+                        style: TextStyle(
+                          color: AppColors.white.withOpacity(0.9),
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1642,29 +1726,36 @@ class _HistoryVideoSliderItemState extends State<HistoryVideoSliderItem> {
   }
 }
 
-void _openReel(BuildContext context, int entityId, String fallbackTitle, String fallbackSub, String fallbackUrl) async {
+void _openReel(
+  BuildContext context,
+  int entityId,
+  String fallbackTitle,
+  String fallbackSub,
+  String fallbackUrl,
+) async {
   showDialog(
     context: context,
     barrierDismissible: false,
     builder: (BuildContext context) {
-      return const Center(
-        child: CircularProgressIndicator(color: Colors.cyan),
-      );
+      return const Center(child: CircularProgressIndicator(color: Colors.cyan));
     },
   );
 
   try {
     final api = Get.find<ApiServices>();
     final response = await api.callGet("api/v1/posts/$entityId");
-    
+
     // Dismiss loading dialog
     if (Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
     }
 
     if (response != null) {
-      final map = response["data"] is Map<String, dynamic> ? response["data"] : response;
-      
+      final map =
+          response["data"] is Map<String, dynamic>
+              ? response["data"]
+              : response;
+
       // Parse media url
       String videoUrl = fallbackUrl;
       String thumbUrl = fallbackUrl;
@@ -1672,7 +1763,7 @@ void _openReel(BuildContext context, int entityId, String fallbackTitle, String 
         videoUrl = map["media"][0]["url"] ?? fallbackUrl;
         thumbUrl = map["media"][0]["thumbnail"] ?? fallbackUrl;
       }
-      
+
       final singleReel = ReelModel(
         id: entityId,
         uuid: entityId.toString(),
@@ -1694,7 +1785,7 @@ void _openReel(BuildContext context, int entityId, String fallbackTitle, String 
             url: videoUrl,
             thumbnail: thumbUrl,
             mimeType: "video/mp4",
-          )
+          ),
         ],
         stats: ReelStats(
           likeCount: map["stats"]?["like_count"] ?? 0,
@@ -1713,7 +1804,9 @@ void _openReel(BuildContext context, int entityId, String fallbackTitle, String 
 
       if (Get.isRegistered<ShortPlayController>()) {
         final shortPlayController = Get.find<ShortPlayController>();
-        final index = shortPlayController.reelsList.indexWhere((r) => r.id == entityId);
+        final index = shortPlayController.reelsList.indexWhere(
+          (r) => r.id == entityId,
+        );
         if (index != -1) {
           finalReels = List<ReelModel>.from(shortPlayController.reelsList);
           initialIndex = index;
@@ -1726,10 +1819,7 @@ void _openReel(BuildContext context, int entityId, String fallbackTitle, String 
         initialIndex = 0;
       }
 
-      Get.to(() => ReelsView(
-        reels: finalReels,
-        initialIndex: initialIndex,
-      ));
+      Get.to(() => ReelsView(reels: finalReels, initialIndex: initialIndex));
     } else {
       _openReelFallback(entityId, fallbackTitle, fallbackSub, fallbackUrl);
     }
@@ -1764,7 +1854,7 @@ void _openReelFallback(int entityId, String title, String sub, String url) {
         url: url,
         thumbnail: url,
         mimeType: "video/mp4",
-      )
+      ),
     ],
     stats: ReelStats(
       likeCount: 0,
@@ -1783,7 +1873,9 @@ void _openReelFallback(int entityId, String title, String sub, String url) {
 
   if (Get.isRegistered<ShortPlayController>()) {
     final shortPlayController = Get.find<ShortPlayController>();
-    final index = shortPlayController.reelsList.indexWhere((r) => r.id == entityId);
+    final index = shortPlayController.reelsList.indexWhere(
+      (r) => r.id == entityId,
+    );
     if (index != -1) {
       finalReels = List<ReelModel>.from(shortPlayController.reelsList);
       initialIndex = index;
@@ -1796,11 +1888,5 @@ void _openReelFallback(int entityId, String title, String sub, String url) {
     initialIndex = 0;
   }
 
-  Get.to(() => ReelsView(
-    reels: finalReels,
-    initialIndex: initialIndex,
-  ));
+  Get.to(() => ReelsView(reels: finalReels, initialIndex: initialIndex));
 }
-
-
-

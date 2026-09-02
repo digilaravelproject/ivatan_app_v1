@@ -88,7 +88,7 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -212,7 +212,7 @@ class _SplashPageState extends State<SplashPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       body: SafeArea(
         child: Column(
           children: [
@@ -250,7 +250,7 @@ class _SplashPageState extends State<SplashPage>
                       : "From OCTROID",
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey.shade600,
+                    color: AppColors.premiumGold,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -342,7 +342,7 @@ class _SplashPageState extends State<SplashPage>
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
-//       backgroundColor: Colors.white,
+//       backgroundColor: AppColors.transparent,
 //       body: SafeArea(
 //         child: Column(
 //           children: [
@@ -377,7 +377,7 @@ class _SplashPageState extends State<SplashPage>
 //                     "from octraide",
 //                     style: TextStyle(
 //                       fontSize: 14,
-//                       color: Colors.grey.shade600,
+//                       color: AppColors.premiumGold,
 //                     ),
 //                   ),
 //                 ],

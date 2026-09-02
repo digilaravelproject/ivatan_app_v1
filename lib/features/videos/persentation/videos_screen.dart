@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -33,7 +34,7 @@ import '../controller/video_controller.dart';
         ),
       ),
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         body: NotificationListener<ScrollNotification>(
           onNotification: (scroll) {
 
@@ -118,7 +119,7 @@ import '../controller/video_controller.dart';
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: AppColors.white.withOpacity(0.2),
               blurRadius: 10,
               offset: Offset(0, 4),
             ),
@@ -161,7 +162,7 @@ import '../controller/video_controller.dart';
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                  colors: [AppColors.transparent, AppColors.white.withOpacity(0.7)],
                 ),
               ),
             ),
@@ -173,18 +174,18 @@ import '../controller/video_controller.dart';
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 // decoration: BoxDecoration(
-                //   color: Colors.black.withOpacity(0.5),
+                //   color: AppColors.white.withOpacity(0.5),
                 //   borderRadius: BorderRadius.circular(20),
                 // ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.remove_red_eye, color: Colors.white, size: 16),
+                    Icon(Icons.remove_red_eye, color: AppColors.white, size: 16),
                     SizedBox(width: 6),
                     Text(
                       views,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
@@ -201,7 +202,7 @@ import '../controller/video_controller.dart';
               child: Container(
                 padding: EdgeInsets.all(8),
                 // decoration: BoxDecoration(
-                //   color: Colors.white,
+                //   color: AppColors.white,
                 //   borderRadius: BorderRadius.circular(10),
                 // ),
                 child: Icon(
@@ -236,7 +237,7 @@ import '../controller/video_controller.dart';
                           Text(
                             title,
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
@@ -247,7 +248,7 @@ import '../controller/video_controller.dart';
                           Text(
                             name,
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.white,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
@@ -258,7 +259,7 @@ import '../controller/video_controller.dart';
                           Text(
                             '$username. $role',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
+                              color: AppColors.white.withOpacity(0.8),
                               fontSize: 12,
                             ),
                             maxLines: 1,
@@ -273,11 +274,11 @@ import '../controller/video_controller.dart';
                      // padding: EdgeInsets.all(12),
                       // decoration: BoxDecoration(
                       //   shape: BoxShape.circle,
-                      //   border: Border.all(color: Colors.white, width: 2),
+                      //   border: Border.all(color: AppColors.white, width: 2),
                       // ),
                       child: Icon(
                         Icons.play_circle_outline_rounded,
-                        color: Colors.white,
+                        color: AppColors.white,
                         size: 34,
                       ),
                     ),
@@ -292,14 +293,13 @@ import '../controller/video_controller.dart';
   }
 }*/
 
-
-
 class VideosScreen extends StatefulWidget {
   const VideosScreen({super.key});
 
   @override
   State<VideosScreen> createState() => _VideosScreenState();
 }
+
 class _VideosScreenState extends State<VideosScreen> {
   final VideoController controller = Get.put(VideoController(videoId: 0));
   final ScrollController scrollController = ScrollController();
@@ -310,7 +310,7 @@ class _VideosScreenState extends State<VideosScreen> {
 
     scrollController.addListener(() {
       if (scrollController.position.pixels >=
-          scrollController.position.maxScrollExtent - 200 &&
+              scrollController.position.maxScrollExtent - 200 &&
           controller.isMoreDataAvailable.value &&
           !controller.isMoreLoading.value) {
         controller.fetchVideo(loadMore: true);
@@ -335,7 +335,7 @@ class _VideosScreenState extends State<VideosScreen> {
       ),
       child: Scaffold(
         extendBody: true,
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         body: SafeArea(
           bottom: false,
           child: Column(
@@ -343,7 +343,7 @@ class _VideosScreenState extends State<VideosScreen> {
               // Custom Header
               Container(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
-                color: Colors.transparent,
+                color: AppColors.transparent,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -358,7 +358,7 @@ class _VideosScreenState extends State<VideosScreen> {
                               style: TextStyle(
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: AppColors.white,
                                 letterSpacing: -0.5,
                               ),
                             ),
@@ -367,7 +367,7 @@ class _VideosScreenState extends State<VideosScreen> {
                               'Trending videos for you',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey.shade400,
+                                color: AppColors.premiumGold,
                               ),
                             ),
                           ],
@@ -380,7 +380,10 @@ class _VideosScreenState extends State<VideosScreen> {
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: AppColors.secondaryBackground,
-                              border: Border.all(color: AppColors.premiumGold, width: 1),
+                              border: Border.all(
+                                color: AppColors.premiumGold,
+                                width: 1,
+                              ),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
@@ -404,7 +407,11 @@ class _VideosScreenState extends State<VideosScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.search, color: AppColors.premiumGold, size: 22),
+                          const Icon(
+                            Icons.search,
+                            color: AppColors.premiumGold,
+                            size: 22,
+                          ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: TextField(
@@ -414,14 +421,14 @@ class _VideosScreenState extends State<VideosScreen> {
                               decoration: InputDecoration(
                                 hintText: 'Search videos...',
                                 hintStyle: TextStyle(
-                                  color: Colors.grey.shade500,
+                                  color: AppColors.premiumGold,
                                   fontSize: 15,
                                 ),
                                 border: InputBorder.none,
                               ),
                               style: const TextStyle(
                                 fontSize: 15,
-                                color: Colors.white,
+                                color: AppColors.white,
                               ),
                             ),
                           ),
@@ -431,14 +438,16 @@ class _VideosScreenState extends State<VideosScreen> {
                   ],
                 ),
               ),
-              
+
               Expanded(
-                child: RefreshIndicator(color: Colors.black, 
+                child: RefreshIndicator(
+                  color: AppColors.white,
                   onRefresh: () async {
                     await controller.fetchVideo();
                   },
                   child: Obx(() {
-                    if (controller.isLoading.value && controller.posts.isEmpty) {
+                    if (controller.isLoading.value &&
+                        controller.posts.isEmpty) {
                       return const Center(child: CircularProgressIndicator());
                     }
                     if (controller.posts.isEmpty) {
@@ -450,7 +459,8 @@ class _VideosScreenState extends State<VideosScreen> {
                             child: Center(
                               child: CustomEmptyState(
                                 title: "No Videos Yet",
-                                subTitle: "Check back later for amazing content!",
+                                subTitle:
+                                    "Check back later for amazing content!",
                                 icon: Icons.video_library_rounded,
                               ),
                             ),
@@ -461,13 +471,19 @@ class _VideosScreenState extends State<VideosScreen> {
                     return GridView.builder(
                       controller: scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 90),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.7,
-                        crossAxisSpacing: 14,
-                        mainAxisSpacing: 14,
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 16,
+                        bottom: 90,
                       ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.7,
+                            crossAxisSpacing: 14,
+                            mainAxisSpacing: 14,
+                          ),
                       itemCount: controller.filteredList.length + 1,
                       itemBuilder: (context, index) {
                         if (index < controller.filteredList.length) {
@@ -502,80 +518,88 @@ class _VideosScreenState extends State<VideosScreen> {
   void _showFilterBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + MediaQuery.of(context).padding.bottom),
-          child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Sort By',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+      backgroundColor: AppColors.transparent,
+      builder:
+          (context) => Container(
+            decoration: BoxDecoration(
+              color: AppColors.black,
+              border: Border.all(color: AppColors.premiumGold),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                20,
+                20,
+                20 + MediaQuery.of(context).padding.bottom,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Sort By',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.white,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close, color: AppColors.white),
+                      ),
+                    ],
                   ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  _buildFilterOption(
+                    context,
+                    'Most Viewed',
+                    Icons.visibility_rounded,
+                    () {
+                      controller.sortByViews();
+                      Navigator.pop(context);
+                    },
+                    'views',
+                  ),
+                  _buildFilterOption(
+                    context,
+                    'Most Recent',
+                    Icons.access_time_rounded,
+                    () {
+                      controller.sortByRecent();
+                      Navigator.pop(context);
+                    },
+                    'recent',
+                  ),
+                  _buildFilterOption(
+                    context,
+                    'Most Liked',
+                    Icons.favorite_rounded,
+                    () {
+                      controller.sortByLikes();
+                      Navigator.pop(context);
+                    },
+                    'likes',
+                  ),
+                  _buildFilterOption(
+                    context,
+                    'Reset Filter',
+                    Icons.refresh_rounded,
+                    () {
+                      controller.resetSort();
+                      Navigator.pop(context);
+                    },
+                    'none',
+                  ),
+                  const SizedBox(height: 10),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-            _buildFilterOption(
-              context,
-              'Most Viewed',
-              Icons.visibility_rounded,
-              () {
-                controller.sortByViews();
-                Navigator.pop(context);
-              },
-              'views',
-            ),
-            _buildFilterOption(
-              context,
-              'Most Recent',
-              Icons.access_time_rounded,
-              () {
-                controller.sortByRecent();
-                Navigator.pop(context);
-              },
-              'recent',
-            ),
-            _buildFilterOption(
-              context,
-              'Most Liked',
-              Icons.favorite_rounded,
-              () {
-                controller.sortByLikes();
-                Navigator.pop(context);
-              },
-              'likes',
-            ),
-            _buildFilterOption(
-              context,
-              'Reset Filter',
-              Icons.refresh_rounded,
-              () {
-                controller.resetSort();
-                Navigator.pop(context);
-              },
-              'none',
-            ),
-            const SizedBox(height: 10),
-          ],
           ),
-        ),
-      ),
     );
   }
 
@@ -588,21 +612,25 @@ class _VideosScreenState extends State<VideosScreen> {
   ) {
     return Obx(() {
       final isSelected = controller.selectedFilter.value == filterKey;
-      
+
       return InkWell(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
           margin: const EdgeInsets.only(bottom: 8),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.black : Colors.grey.shade50,
+            color:
+                isSelected
+                    ? AppColors.premiumGold.withOpacity(0.2)
+                    : AppColors.transparent,
+            border: Border.all(color: AppColors.premiumGold),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             children: [
               Icon(
-                icon, 
-                color: isSelected ? Colors.white : Colors.grey.shade700, 
+                icon,
+                color: isSelected ? AppColors.white : AppColors.premiumGold,
                 size: 22,
               ),
               const SizedBox(width: 12),
@@ -611,20 +639,20 @@ class _VideosScreenState extends State<VideosScreen> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected ? Colors.white : Colors.black,
+                  color: isSelected ? AppColors.white : AppColors.premiumGold,
                 ),
               ),
               const Spacer(),
               if (isSelected)
                 const Icon(
                   Icons.check_circle_rounded,
-                  color: Colors.white,
+                  color: AppColors.white,
                   size: 20,
                 )
               else
                 Icon(
-                  Icons.arrow_forward_ios_rounded, 
-                  color: Colors.grey.shade400, 
+                  Icons.arrow_forward_ios_rounded,
+                  color: AppColors.premiumGold,
                   size: 16,
                 ),
             ],
@@ -634,29 +662,31 @@ class _VideosScreenState extends State<VideosScreen> {
     });
   }
 
-
   Widget _buildGridVideoCard(
-      String imageUrl,
-      String title,
-      String name,
-      String username,
-      String videoUrl,
-      int videoid,
-      String profileImage,
-      String views,
-      ) {
+    String imageUrl,
+    String title,
+    String name,
+    String username,
+    String videoUrl,
+    int videoid,
+    String profileImage,
+    String views,
+  ) {
     return InkWell(
       onTap: () {
-        Get.to(() => VideoPlayerScreen(videoUrl: videoUrl, videoId: videoid,), 
-          fullscreenDialog: false, preventDuplicates: false);
+        Get.to(
+          () => VideoPlayerScreen(videoUrl: videoUrl, videoId: videoid),
+          fullscreenDialog: false,
+          preventDuplicates: false,
+        );
       },
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
-          color: Colors.white,
+          color: AppColors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: AppColors.white.withOpacity(0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -670,7 +700,9 @@ class _VideosScreenState extends State<VideosScreen> {
               child: Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(14),
+                    ),
                     child: Image.network(
                       imageUrl ?? "",
                       width: double.infinity,
@@ -678,12 +710,12 @@ class _VideosScreenState extends State<VideosScreen> {
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          color: Colors.grey.shade200,
+                          color: AppColors.premiumGold,
                           child: Center(
                             child: Icon(
                               Icons.video_library_rounded,
                               size: 40,
-                              color: Colors.grey.shade400,
+                              color: AppColors.premiumGold,
                             ),
                           ),
                         );
@@ -694,14 +726,16 @@ class _VideosScreenState extends State<VideosScreen> {
                   // Gradient overlay
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(14),
+                      ),
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.2),
-                          Colors.black.withOpacity(0.5),
+                          AppColors.transparent,
+                          AppColors.white.withOpacity(0.2),
+                          AppColors.white.withOpacity(0.5),
                         ],
                       ),
                     ),
@@ -711,11 +745,11 @@ class _VideosScreenState extends State<VideosScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.white,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: AppColors.white.withOpacity(0.2),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -723,7 +757,7 @@ class _VideosScreenState extends State<VideosScreen> {
                       ),
                       child: const Icon(
                         Icons.play_arrow_rounded,
-                        color: Colors.black,
+                        color: AppColors.white,
                         size: 26,
                       ),
                     ),
@@ -735,20 +769,27 @@ class _VideosScreenState extends State<VideosScreen> {
                     top: 8,
                     right: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.7),
+                        color: AppColors.white.withOpacity(0.7),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.remove_red_eye, color: Colors.white, size: 12),
+                          const Icon(
+                            Icons.remove_red_eye,
+                            color: AppColors.white,
+                            size: 12,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             views,
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: AppColors.white,
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
                             ),
@@ -771,7 +812,7 @@ class _VideosScreenState extends State<VideosScreen> {
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: AppColors.white,
                       height: 1.3,
                     ),
                     maxLines: 2,
@@ -783,7 +824,7 @@ class _VideosScreenState extends State<VideosScreen> {
                       CircleAvatar(
                         radius: 12,
                         backgroundImage: NetworkImage(profileImage),
-                        backgroundColor: Colors.grey.shade300,
+                        backgroundColor: AppColors.premiumGold,
                       ),
                       const SizedBox(width: 6),
                       Expanded(
@@ -791,7 +832,7 @@ class _VideosScreenState extends State<VideosScreen> {
                           name ?? '',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey.shade600,
+                            color: AppColors.premiumGold,
                             fontWeight: FontWeight.w500,
                           ),
                           maxLines: 1,
@@ -808,30 +849,35 @@ class _VideosScreenState extends State<VideosScreen> {
       ),
     );
   }
+
   Widget _buildVideoCard(
-      String imageUrl,
-      String title,
-      String name,
-      String username,
-      String videoUrl,
-      int videoid,
-      String role,
-      String profileImage,
-      String views,
-      ) {
+    String imageUrl,
+    String title,
+    String name,
+    String username,
+    String videoUrl,
+    int videoid,
+    String role,
+    String profileImage,
+    String views,
+  ) {
     return InkWell(
-      onTap: (){
-        Get.to(() => VideoPlayerScreen(videoUrl: videoUrl, videoId: videoid,), fullscreenDialog: false,preventDuplicates: false);
+      onTap: () {
+        Get.to(
+          () => VideoPlayerScreen(videoUrl: videoUrl, videoId: videoid),
+          fullscreenDialog: false,
+          preventDuplicates: false,
+        );
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         height: 200,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: Colors.white,
+          color: AppColors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: AppColors.white.withOpacity(0.06),
               blurRadius: 12,
               offset: const Offset(0, 2),
             ),
@@ -858,12 +904,12 @@ class _VideosScreenState extends State<VideosScreen> {
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
-                    color: Colors.grey.shade200,
+                    color: AppColors.premiumGold,
                     child: Center(
                       child: Icon(
                         Icons.video_library_rounded,
                         size: 48,
-                        color: Colors.grey.shade400,
+                        color: AppColors.premiumGold,
                       ),
                     ),
                   );
@@ -878,9 +924,9 @@ class _VideosScreenState extends State<VideosScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.transparent,
-                    Colors.black.withOpacity(0.3),
-                    Colors.black.withOpacity(0.8),
+                    AppColors.transparent,
+                    AppColors.white.withOpacity(0.3),
+                    AppColors.white.withOpacity(0.8),
                   ],
                 ),
               ),
@@ -891,12 +937,12 @@ class _VideosScreenState extends State<VideosScreen> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.5),
+                  color: AppColors.white.withOpacity(0.5),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.play_arrow_rounded,
-                  color: Colors.white,
+                  color: AppColors.white,
                   size: 32,
                 ),
               ),
@@ -908,18 +954,22 @@ class _VideosScreenState extends State<VideosScreen> {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 // decoration: BoxDecoration(
-                //   color: Colors.black.withOpacity(0.5),
+                //   color: AppColors.white.withOpacity(0.5),
                 //   borderRadius: BorderRadius.circular(20),
                 // ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.remove_red_eye, color: Colors.white, size: 16),
+                    Icon(
+                      Icons.remove_red_eye,
+                      color: AppColors.white,
+                      size: 16,
+                    ),
                     SizedBox(width: 6),
                     Text(
                       views,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
@@ -936,7 +986,7 @@ class _VideosScreenState extends State<VideosScreen> {
               child: Container(
                 padding: EdgeInsets.all(8),
                 // decoration: BoxDecoration(
-                //   color: Colors.white,
+                //   color: AppColors.white,
                 //   borderRadius: BorderRadius.circular(10),
                 // ),
                 child: Icon(
@@ -959,7 +1009,7 @@ class _VideosScreenState extends State<VideosScreen> {
                     CircleAvatar(
                       radius: 20,
                       backgroundImage: NetworkImage(profileImage),
-                      backgroundColor: Colors.grey.shade300,
+                      backgroundColor: AppColors.premiumGold,
                     ),
                     const SizedBox(width: 10),
 
@@ -972,7 +1022,7 @@ class _VideosScreenState extends State<VideosScreen> {
                           Text(
                             title ?? '',
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: AppColors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                             ),
@@ -983,7 +1033,7 @@ class _VideosScreenState extends State<VideosScreen> {
                           Text(
                             name ?? '',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
+                              color: AppColors.white.withOpacity(0.9),
                               fontSize: 13,
                               fontWeight: FontWeight.w400,
                             ),
@@ -1002,10 +1052,7 @@ class _VideosScreenState extends State<VideosScreen> {
       ),
     );
   }
-
 }
-
-
 
 class CustomSearchBar extends StatelessWidget {
   CustomSearchBar({Key? key}) : super(key: key);
@@ -1027,7 +1074,7 @@ class CustomSearchBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: AppColors.white.withOpacity(0.05),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -1038,7 +1085,7 @@ class CustomSearchBar extends StatelessWidget {
                   Expanded(
                     child: TextField(
                       onChanged: (value) {
-                        print("onchange value = "+value);
+                        print("onchange value = " + value);
                         controller.filterSearch(value);
                       },
                       decoration: InputDecoration(

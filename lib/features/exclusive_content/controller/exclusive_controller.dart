@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../data/exclusive_api_service.dart';
@@ -70,21 +71,21 @@ class ExclusiveController extends GetxController {
               "Success", 
               "Payment successful! Enablement requested.",
               backgroundColor: Colors.green,
-              colorText: Colors.white,
+              colorText: AppColors.white,
             );
           } else if (result == false) {
             Get.snackbar(
               "Payment Failed", 
               "Payment failed on PhonePe. Please try again.",
               backgroundColor: Colors.red,
-              colorText: Colors.white,
+              colorText: AppColors.white,
             );
           } else {
             Get.snackbar(
               "Payment Cancelled", 
               "Payment was cancelled or interrupted.",
               backgroundColor: Colors.orange,
-              colorText: Colors.white,
+              colorText: AppColors.white,
             );
           }
           // Fetch the latest status from the backend to sync UI
@@ -95,7 +96,7 @@ class ExclusiveController extends GetxController {
           await checkEnablementStatus();
         }
       } else {
-         Get.snackbar("Error", response?['message'] ?? "Failed to request enablement.", backgroundColor: Colors.red, colorText: Colors.white);
+         Get.snackbar("Error", response?['message'] ?? "Failed to request enablement.", backgroundColor: Colors.red, colorText: AppColors.white);
       }
     } catch (e) {
       debugPrint("Error requesting enablement: $e");
@@ -176,17 +177,17 @@ class ExclusiveController extends GetxController {
             // Success in UI, verify it
             final verifyResp = await _apiService.verifyPurchase(purchaseId, "PAYMENT_SUCCESS_REF", "PAYMENT_SUCCESS");
             if (verifyResp != null && verifyResp['success'] == true) {
-               Get.snackbar("Success", "Purchase successful! Content unlocked.", backgroundColor: Colors.green, colorText: Colors.white);
+               Get.snackbar("Success", "Purchase successful! Content unlocked.", backgroundColor: Colors.green, colorText: AppColors.white);
                isSuccess = true;
             } else {
                // Fallback optimistic
-               Get.snackbar("Success", "Payment successful! It may take a moment to unlock.", backgroundColor: Colors.green, colorText: Colors.white);
+               Get.snackbar("Success", "Payment successful! It may take a moment to unlock.", backgroundColor: Colors.green, colorText: AppColors.white);
                isSuccess = true;
             }
           } else if (result == false) {
-             Get.snackbar("Payment Failed", "Purchase failed on PhonePe. Please try again.", backgroundColor: Colors.red, colorText: Colors.white);
+             Get.snackbar("Payment Failed", "Purchase failed on PhonePe. Please try again.", backgroundColor: Colors.red, colorText: AppColors.white);
           } else {
-             Get.snackbar("Payment Cancelled", "Payment was cancelled or interrupted.", backgroundColor: Colors.orange, colorText: Colors.white);
+             Get.snackbar("Payment Cancelled", "Payment was cancelled or interrupted.", backgroundColor: Colors.orange, colorText: AppColors.white);
           }
         } else {
           // No redirect URL means it could be a free post or fully paid by wallet?

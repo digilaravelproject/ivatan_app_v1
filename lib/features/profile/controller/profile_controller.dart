@@ -253,11 +253,11 @@ class ProfileController extends GetxController {
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Edit Photo',
-            toolbarColor: Colors.black,
-            toolbarWidgetColor: Colors.white,
+            toolbarColor: AppColors.white,
+            toolbarWidgetColor: AppColors.white,
             initAspectRatio: CropAspectRatioPreset.original,
             lockAspectRatio: false,
-            backgroundColor: Colors.black,
+            backgroundColor: AppColors.transparent,
             activeControlsWidgetColor: Colors.blue,
           ),
           IOSUiSettings(
@@ -390,7 +390,7 @@ class ProfileController extends GetxController {
     Get.bottomSheet(
       Container(
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Padding(
@@ -405,7 +405,7 @@ class ProfileController extends GetxController {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: AppColors.premiumGold,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),

@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
@@ -36,7 +37,7 @@ class ContactScreen extends StatelessWidget {
         ),
       ),
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         appBar: AppBar(
           backgroundColor: AppColors.transparent,
           leading: GestureDetector(
@@ -85,7 +86,7 @@ class ContactScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: AppColors.white.withOpacity(0.05),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -114,7 +115,7 @@ class ContactScreen extends StatelessWidget {
                             border: InputBorder.none,
                           ),
                           style: const TextStyle(
-                            color: Colors.black87,
+                            color: AppColors.white,
                           ),
                         ),
                       ),
@@ -176,7 +177,7 @@ class ContactScreen extends StatelessWidget {
                               child: Container(
                                 height: 50,
                                 width: 50,
-                                color: Colors.grey.shade300,
+                                color: AppColors.premiumGold,
                                 child: contact.avatar != null && contact.avatar!.isNotEmpty
                                     ? Image.network(
                                   contact.avatar!,
@@ -207,7 +208,7 @@ class ContactScreen extends StatelessWidget {
                                       contact.username!,
                                       style: const TextStyle(
                                         fontSize: 14,
-                                        color: Colors.grey,
+                                        color: AppColors.premiumGold,
                                       ),
                                     ),
                                 ],
@@ -251,7 +252,7 @@ class ContactScreen extends StatelessWidget {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(5),
               border: Border.all(color: Colors.blue),
             ),
@@ -269,14 +270,14 @@ class ContactScreen extends StatelessWidget {
       // Determine button text and color
       String buttonText;
       Color backgroundColor;
-      Color textColor = Colors.white;
+      Color textColor = AppColors.white;
 
       VoidCallback? onTapAction;
 
       if (contact.isFollowing.value) {
         buttonText = "Message";
-        backgroundColor = Colors.grey;
-        textColor = Colors.white;
+        backgroundColor = AppColors.premiumGold;
+        textColor = AppColors.white;
 
         // Action for Message button
        // onTapAction = () {
@@ -305,7 +306,7 @@ class ContactScreen extends StatelessWidget {
       } else if (contact.isFollower.value) {
         buttonText = "Following";
         backgroundColor = Colors.blue;
-        textColor = Colors.white;
+        textColor = AppColors.white;
 
         // Optional: onTap can do nothing or open message screen
         onTapAction = () {
@@ -314,7 +315,7 @@ class ContactScreen extends StatelessWidget {
       } else {
         buttonText = "Follow";
         backgroundColor = Colors.blue;
-        textColor = Colors.white;
+        textColor = AppColors.white;
 
         // Toggle follow/unfollow
         onTapAction = () {

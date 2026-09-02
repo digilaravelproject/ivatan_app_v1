@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -31,8 +32,8 @@ class LoginPage extends GetWidget<LoginController> {
           gradient: LinearGradient(
             colors: [
               AppColors.primary.withOpacity(0.1),
-              Colors.white,
-              Colors.white,
+              AppColors.white,
+              AppColors.white,
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -100,7 +101,7 @@ class LoginPage extends GetWidget<LoginController> {
                             child: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 shape: BoxShape.circle,
                               ),
                               child: ClipOval(
@@ -124,12 +125,12 @@ class LoginPage extends GetWidget<LoginController> {
                                 Shadow(
                                   offset: Offset(0, 1),
                                   blurRadius: 2,
-                                  color: Colors.white24, // top highlight
+                                  color: AppColors.white, // top highlight
                                 ),
                                 Shadow(
                                   offset: Offset(2, 2),
                                   blurRadius: 4,
-                                  color: Colors.black45, // bottom shadow
+                                  color: AppColors.white, // bottom shadow
                                 ),
                               ],
                             ),
@@ -138,18 +139,18 @@ class LoginPage extends GetWidget<LoginController> {
                           Text(
                             "Welcome Back!",
                             style: context.textTheme.titleMedium?.copyWith(
-                              color: Colors.grey.shade400,
+                              color: AppColors.premiumGold,
                               fontWeight: FontWeight.w500,
                               shadows: const [
                                 Shadow(
                                   offset: Offset(0, 1),
                                   blurRadius: 1,
-                                  color: Colors.white24,
+                                  color: AppColors.white,
                                 ),
                                 Shadow(
                                   offset: Offset(1.5, 1.5),
                                   blurRadius: 3,
-                                  color: Colors.black38,
+                                  color: AppColors.white,
                                 ),
                               ],
                             ),
@@ -167,14 +168,14 @@ class LoginPage extends GetWidget<LoginController> {
                       child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(35),
                             topRight: Radius.circular(35),
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
+                              color: AppColors.white.withOpacity(0.08),
                               blurRadius: 25,
                               offset: const Offset(0, -8),
                             ),
@@ -191,7 +192,7 @@ class LoginPage extends GetWidget<LoginController> {
                                   width: 50,
                                   height: 5,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.shade300,
+                                    color: AppColors.premiumGold,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
@@ -203,7 +204,7 @@ class LoginPage extends GetWidget<LoginController> {
                                 "Welcome Back! 👋",
                                 style: context.textTheme.headlineSmall?.copyWith(
                                   fontWeight: FontWeight.w800,
-                                  color: Colors.black87,
+                                  color: AppColors.white,
                                   fontSize: 26,
                                 ),
                               ),
@@ -211,7 +212,7 @@ class LoginPage extends GetWidget<LoginController> {
                               Text(
                                 "Sign in to continue your journey",
                                 style: context.textTheme.bodyLarge?.copyWith(
-                                  color: Colors.grey.shade600,
+                                  color: AppColors.premiumGold,
                                   height: 1.5,
                                   fontSize: 15,
                                 ),
@@ -266,11 +267,11 @@ class LoginPage extends GetWidget<LoginController> {
                                         decoration: BoxDecoration(
                                           color: controller.isLoginPass.value
                                               ? AppColors.primary
-                                              : Colors.transparent,
+                                              : AppColors.transparent,
                                           border: Border.all(
                                             color: controller.isLoginPass.value
                                                 ? AppColors.primary
-                                                : Colors.grey.shade400,
+                                                : AppColors.premiumGold,
                                             width: 2,
                                           ),
                                           borderRadius: BorderRadius.circular(4),
@@ -279,7 +280,7 @@ class LoginPage extends GetWidget<LoginController> {
                                             ? const Icon(
                                           Icons.check,
                                           size: 14,
-                                          color: Colors.white,
+                                          color: AppColors.white,
                                         )
                                             : null,
                                       ),
@@ -288,7 +289,7 @@ class LoginPage extends GetWidget<LoginController> {
                                         "Login with OTP",
                                         style: context.textTheme.bodyMedium?.copyWith(
                                           fontWeight: FontWeight.w500,
-                                          color: Colors.grey.shade700,
+                                          color: AppColors.premiumGold,
                                         ),
                                       ),
                                     ],
@@ -368,7 +369,7 @@ class LoginPage extends GetWidget<LoginController> {
                                 children: [
                                   Expanded(
                                     child: Divider(
-                                      color: Colors.grey.shade300,
+                                      color: AppColors.premiumGold,
                                       thickness: 1,
                                     ),
                                   ),
@@ -377,7 +378,7 @@ class LoginPage extends GetWidget<LoginController> {
                                     child: Text(
                                       "OR",
                                       style: TextStyle(
-                                        color: Colors.grey.shade500,
+                                        color: AppColors.premiumGold,
                                         fontWeight: FontWeight.w500,
                                         fontSize: 12,
                                       ),
@@ -385,7 +386,7 @@ class LoginPage extends GetWidget<LoginController> {
                                   ),
                                   Expanded(
                                     child: Divider(
-                                      color: Colors.grey.shade300,
+                                      color: AppColors.premiumGold,
                                       thickness: 1,
                                     ),
                                   ),
@@ -400,7 +401,7 @@ class LoginPage extends GetWidget<LoginController> {
                                   text: TextSpan(
                                     text: "Don't have an account? ",
                                     style: context.textTheme.bodyMedium?.copyWith(
-                                      color: Colors.grey.shade600,
+                                      color: AppColors.premiumGold,
                                     ),
                                     children: [
                                       TextSpan(
@@ -499,7 +500,7 @@ class LoginPage extends GetWidget<LoginController> {
 //                               width: 50,
 //                               height: 4,
 //                               decoration: BoxDecoration(
-//                                 color: Colors.grey.shade300,
+//                                 color: AppColors.premiumGold,
 //                                 borderRadius: BorderRadius.circular(2),
 //                               ),
 //                             ),
@@ -517,7 +518,7 @@ class LoginPage extends GetWidget<LoginController> {
 //                           Text(
 //                             "Enter your mobile number and start connecting with i_app!",
 //                             style: context.textTheme.bodyMedium?.copyWith(
-//                               color: Colors.grey.shade600,
+//                               color: AppColors.premiumGold,
 //                             ),
 //                           ),
 //

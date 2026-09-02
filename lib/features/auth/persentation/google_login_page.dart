@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -175,7 +176,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
             const SizedBox(height: 10),
             const Text(
               'Aapko ek OTP verification code milega',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(fontSize: 14, color: AppColors.premiumGold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 40),
@@ -210,7 +211,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: AppColors.white,
                         ),
                       )
                       : const Text(
@@ -310,7 +311,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
             const SizedBox(height: 10),
             Text(
               '${widget.phoneNumber} pe bheja gaya code enter karein',
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              style: const TextStyle(fontSize: 14, color: AppColors.premiumGold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 40),
@@ -349,7 +350,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: AppColors.white,
                         ),
                       )
                       : const Text(

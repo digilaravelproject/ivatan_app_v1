@@ -19,16 +19,16 @@ class JobCreateScreen extends GetView<JobController> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.transparent,
           elevation: 0,
-          iconTheme: const IconThemeData(color: Colors.black),
+          iconTheme: const IconThemeData(color: AppColors.white),
           title: Obx(() => Text(
             controller.isEditing.value ? 'Update Job Posting' : 'Create Job Posting',
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: AppColors.white,
             ),
           )),
         ),
@@ -55,11 +55,11 @@ class JobCreateScreen extends GetView<JobController> {
                         height: 150,
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: hasAnyLogo ? Colors.black : Colors.grey[300]!,
+                            color: hasAnyLogo ? AppColors.white : AppColors.premiumGold.withOpacity(0.3),
                             width: 2,
                           ),
                           borderRadius: BorderRadius.circular(8),
-                          color: Colors.grey[50],
+                          color: AppColors.premiumGold.withOpacity(0.1),
                         ),
                         child: hasLocalFile
                             ? ClipRRect(
@@ -87,15 +87,15 @@ class JobCreateScreen extends GetView<JobController> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.6),
+                              color: AppColors.white.withOpacity(0.6),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.edit, size: 12, color: Colors.white),
+                                Icon(Icons.edit, size: 12, color: AppColors.white),
                                 SizedBox(width: 4),
-                                Text('Change', style: TextStyle(color: Colors.white, fontSize: 11)),
+                                Text('Change', style: TextStyle(color: AppColors.white, fontSize: 11)),
                               ],
                             ),
                           ),
@@ -314,8 +314,8 @@ class JobCreateScreen extends GetView<JobController> {
                       ? null
                       : () => controller.createJob(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    disabledBackgroundColor: Colors.grey[400],
+                    backgroundColor: AppColors.transparent,
+                    disabledBackgroundColor: AppColors.premiumGold.withOpacity(0.4),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -325,14 +325,14 @@ class JobCreateScreen extends GetView<JobController> {
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          child: CircularProgressIndicator(color: AppColors.white, strokeWidth: 2),
                         )
                       : Text(
                           controller.isEditing.value ? 'Update Job' : 'Create Job',
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: AppColors.white,
                           ),
                         ),
                 )),
@@ -372,9 +372,9 @@ class JobCreateScreen extends GetView<JobController> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: Colors.grey[500]),
+      hintStyle: TextStyle(color: AppColors.premiumGold.withOpacity(0.5)),
       filled: true,
-      fillColor: Colors.grey[100],
+      fillColor: AppColors.premiumGold.withOpacity(0.1),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide.none,
@@ -387,7 +387,7 @@ class JobCreateScreen extends GetView<JobController> {
     return GoogleFonts.poppins(
       fontSize: 14,
       fontWeight: FontWeight.w600,
-      color: Colors.black87,
+      color: AppColors.white,
     );
   }
 
@@ -395,12 +395,12 @@ class JobCreateScreen extends GetView<JobController> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.business, size: 40, color: Colors.grey[400]),
+        Icon(Icons.business, size: 40, color: AppColors.premiumGold.withOpacity(0.4)),
         const SizedBox(height: 8),
         Text(
           'Tap to upload logo',
           style: TextStyle(
-            color: Colors.grey[600],
+            color: AppColors.premiumGold.withOpacity(0.6),
             fontSize: 14,
           ),
         ),
@@ -421,10 +421,10 @@ class JobCreateScreen extends GetView<JobController> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
           decoration: BoxDecoration(
-            color: isActive ? activeColor.withOpacity(0.08) : Colors.grey[100],
+            color: isActive ? activeColor.withOpacity(0.08) : AppColors.premiumGold.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isActive ? activeColor : Colors.grey[300]!,
+              color: isActive ? activeColor : AppColors.premiumGold.withOpacity(0.3),
               width: isActive ? 2 : 1,
             ),
           ),
@@ -438,7 +438,7 @@ class JobCreateScreen extends GetView<JobController> {
                   style: GoogleFonts.poppins(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: isActive ? activeColor : Colors.grey[700],
+                    color: isActive ? activeColor : AppColors.premiumGold.withOpacity(0.7),
                   ),
                 ),
               ),
@@ -448,14 +448,14 @@ class JobCreateScreen extends GetView<JobController> {
                 height: 20,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isActive ? activeColor : Colors.transparent,
+                  color: isActive ? activeColor : AppColors.transparent,
                   border: Border.all(
-                    color: isActive ? activeColor : Colors.grey[400]!,
+                    color: isActive ? activeColor : AppColors.premiumGold.withOpacity(0.4),
                     width: 2,
                   ),
                 ),
                 child: isActive
-                    ? const Icon(Icons.check, size: 13, color: Colors.white)
+                    ? const Icon(Icons.check, size: 13, color: AppColors.white)
                     : null,
               ),
             ],

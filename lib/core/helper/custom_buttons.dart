@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -90,8 +91,8 @@ class MyButton extends StatelessWidget {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             elevation: elevation,
-            backgroundColor: Colors.transparent, // 🪄 transparent to show gradient
-            shadowColor: Colors.transparent,
+            backgroundColor: AppColors.transparent, // 🪄 transparent to show gradient
+            shadowColor: AppColors.transparent,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
@@ -128,9 +129,6 @@ class MyButton extends StatelessWidget {
   }
 }*/
 
-
-
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -148,8 +146,9 @@ class MyButton extends StatelessWidget {
   final Color? color;
   final IconData? icon;
   final Gradient? gradient;
-  final double? height; // ✅ dynamic height
-  final double? borderRadius; // ✅ dynamic radius
+  final double? height;
+  final double? borderRadius;
+  final Color? textColor;
 
   const MyButton({
     super.key,
@@ -162,8 +161,9 @@ class MyButton extends StatelessWidget {
     this.color,
     this.icon,
     this.gradient,
-    this.height, // ✅ added
-    this.borderRadius, // ✅ added
+    this.height,
+    this.borderRadius,
+    this.textColor,
   });
 
   @override
@@ -172,45 +172,50 @@ class MyButton extends StatelessWidget {
     final double radius = borderRadius ?? 16; // ✅ fallback radius
     final double btnHeight = height ?? 48; // ✅ fallback height
 
-    final buttonContent = isLoading
-        ? SizedBox.square(
-      dimension: 18,
-      child: CircularProgressIndicator(
-        color: type == ButtonType.outlined
-            ? context.theme.primaryColor
-            : context.theme.colorScheme.onPrimary,
-        strokeWidth: 2,
-      ),
-    )
-        : Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (icon != null) ...[
-          Icon(
-            icon,
-            size: 20,
-            color: type == ButtonType.outlined
-                ? context.theme.primaryColor
-                : context.theme.colorScheme.onPrimary,
-          ),
-          const SizedBox(width: 8),
-        ],
-        Flexible(
-          child: Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: context.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: type == ButtonType.outlined
-                  ? context.theme.primaryColor
-                  : context.theme.colorScheme.onPrimary,
-            ),
-          ),
-        ),
-      ],
-    );
+    final buttonContent =
+        isLoading
+            ? SizedBox.square(
+              dimension: 18,
+              child: CircularProgressIndicator(
+                color:
+                    type == ButtonType.outlined
+                        ? context.theme.primaryColor
+                        : context.theme.colorScheme.onPrimary,
+                strokeWidth: 2,
+              ),
+            )
+            : Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (icon != null) ...[
+                  Icon(
+                    icon,
+                    size: 20,
+                    color:
+                        type == ButtonType.outlined
+                            ? context.theme.primaryColor
+                            : context.theme.colorScheme.onPrimary,
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                Flexible(
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color:
+                          textColor ??
+                          (type == ButtonType.outlined
+                              ? context.theme.primaryColor
+                              : context.theme.colorScheme.onPrimary),
+                    ),
+                  ),
+                ),
+              ],
+            );
 
     Widget buttonWidget;
 
@@ -219,9 +224,13 @@ class MyButton extends StatelessWidget {
       buttonWidget = Container(
         height: btnHeight,
         decoration: BoxDecoration(
-          gradient: gradient ??
+          gradient:
+              gradient ??
               LinearGradient(
-                colors: [AppColors.primaryDark, AppColors.primaryLight.withOpacity(0.8)],
+                colors: [
+                  AppColors.primaryDark,
+                  AppColors.primaryLight.withOpacity(0.8),
+                ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -230,8 +239,8 @@ class MyButton extends StatelessWidget {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             elevation: elevation,
-            backgroundColor: Colors.transparent,
-            shadowColor: Colors.transparent,
+            backgroundColor: AppColors.transparent,
+            shadowColor: AppColors.transparent,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(radius),
             ),
@@ -258,12 +267,7 @@ class MyButton extends StatelessWidget {
 
     return SizedBox(
       width: double.infinity,
-      child: Padding(
-        padding: padding ?? EdgeInsets.zero,
-        child: buttonWidget,
-      ),
+      child: Padding(padding: padding ?? EdgeInsets.zero, child: buttonWidget),
     );
   }
 }
-
-

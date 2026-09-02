@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/exclusive_controller.dart';
@@ -28,10 +29,10 @@ class _ExclusiveDashboardScreenState extends State<ExclusiveDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Exclusive Content", style: TextStyle(color: Colors.black)),
+        title: const Text("Exclusive Content", style: TextStyle(color: AppColors.white)),
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.black),
-        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: AppColors.white),
+        backgroundColor: AppColors.transparent,
         elevation: 0,
       ),
       body: Obx(() {
@@ -67,7 +68,7 @@ class _ExclusiveDashboardScreenState extends State<ExclusiveDashboardScreen> {
             const SizedBox(height: 10),
             const Text(
               "Monetize your premium content by locking posts and reels. Followers will need to purchase access to view them.",
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              style: TextStyle(fontSize: 16, color: AppColors.premiumGold),
               textAlign: TextAlign.center,
             ),
             const Text(
@@ -83,7 +84,7 @@ class _ExclusiveDashboardScreenState extends State<ExclusiveDashboardScreen> {
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -92,7 +93,7 @@ class _ExclusiveDashboardScreenState extends State<ExclusiveDashboardScreen> {
                   ? const SizedBox(
                       width: 20, 
                       height: 20, 
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                      child: CircularProgressIndicator(color: AppColors.white, strokeWidth: 2)
                     )
                   : const Text("Pay & Request Enablement", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             )),
@@ -125,7 +126,7 @@ class _ExclusiveDashboardScreenState extends State<ExclusiveDashboardScreen> {
               isPaymentFailed 
                   ? "Your payment was not successful. Please try again to enable exclusive content."
                   : "Your request is being reviewed by the admin. Please check back later.",
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
+              style: const TextStyle(fontSize: 16, color: AppColors.premiumGold),
               textAlign: TextAlign.center,
             ),
             if (isPaymentFailed) ...[
@@ -137,7 +138,7 @@ class _ExclusiveDashboardScreenState extends State<ExclusiveDashboardScreen> {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -146,7 +147,7 @@ class _ExclusiveDashboardScreenState extends State<ExclusiveDashboardScreen> {
                     ? const SizedBox(
                         width: 20, 
                         height: 20, 
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                        child: CircularProgressIndicator(color: AppColors.white, strokeWidth: 2)
                       )
                     : const Text("Retry Payment & Request", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),

@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -17,13 +18,13 @@ class AvatarCustomizerScreen extends StatelessWidget {
     Get.put(FluttermojiController());
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        title: const Text("Customize Avatar", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
+        title: const Text("Customize Avatar", style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black),
+          icon: const Icon(Icons.close, color: AppColors.white),
           onPressed: () => Get.back(),
         ),
         actions: [
@@ -48,12 +49,12 @@ class AvatarCustomizerScreen extends StatelessWidget {
                       Get.back(result: rasterFile);
                     } else {
                       print("❌ Avatar conversion failed");
-                      Get.snackbar("Error", "Could not generate avatar image", backgroundColor: Colors.red, colorText: Colors.white);
+                      Get.snackbar("Error", "Could not generate avatar image", backgroundColor: Colors.red, colorText: AppColors.white);
                     }
                   }
                 } catch (e) {
                   print("❌ Error exporting Fluttermoji: $e");
-                  Get.snackbar("Error", "Failed to save avatar", backgroundColor: Colors.red, colorText: Colors.white);
+                  Get.snackbar("Error", "Failed to save avatar", backgroundColor: Colors.red, colorText: AppColors.white);
                 }
               },
               child: Container(
@@ -65,7 +66,7 @@ class AvatarCustomizerScreen extends StatelessWidget {
                 child: const Center(
                   child: Text(
                     "Save",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -79,7 +80,7 @@ class AvatarCustomizerScreen extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Colors.white, Colors.grey.shade50],
+              colors: [AppColors.white, AppColors.premiumGold.withOpacity(0.1)],
             ),
           ),
           child: Column(
@@ -90,11 +91,11 @@ class AvatarCustomizerScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: AppColors.white.withOpacity(0.05),
                           blurRadius: 20,
                           spreadRadius: 5,
                         ),
@@ -102,7 +103,7 @@ class AvatarCustomizerScreen extends StatelessWidget {
                     ),
                     child: FluttermojiCircleAvatar(
                       radius: 100,
-                      backgroundColor: Colors.grey[200],
+                      backgroundColor: AppColors.premiumGold.withOpacity(0.2),
                     ),
                   ),
                 ),
@@ -111,11 +112,11 @@ class AvatarCustomizerScreen extends StatelessWidget {
                 flex: 3,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.white,
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: AppColors.white.withOpacity(0.05),
                         blurRadius: 10,
                         offset: const Offset(0, -5),
                       ),

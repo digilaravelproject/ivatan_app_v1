@@ -28,7 +28,9 @@ class LiveGroupChatScreen extends StatelessWidget {
     final int participantsCount = args['participants_count'] ?? 142;
     final String chatMode = args['chat_mode'] ?? "everyone";
     final bool isAdmin = args['is_admin'] ?? true;
-    final String description = args['description'] ?? "General chat for all users. Feel free to share your thoughts.";
+    final String description =
+        args['description'] ??
+        "General chat for all users. Feel free to share your thoughts.";
 
     final controller = Get.put(
       LiveGroupChatController(
@@ -55,29 +57,32 @@ class LiveGroupChatScreen extends StatelessWidget {
         return true;
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFFAFAFA),
+        backgroundColor: AppColors.transparent,
         appBar: _buildAppBar(context, controller),
         body: Stack(
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.01),
+                color: AppColors.white.withOpacity(0.01),
               ),
             ),
-            
+
             Column(
               children: [
                 // 💬 Messages Feed
                 Expanded(
                   child: Obx(() {
-                    if (controller.isLoading.value && controller.messages.isEmpty) {
+                    if (controller.isLoading.value &&
+                        controller.messages.isEmpty) {
                       return const Center(
                         child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.primary,
+                          ),
                         ),
                       );
                     }
-  
+
                     if (controller.messages.isEmpty) {
                       return _buildEmptyState();
                     }
@@ -86,63 +91,92 @@ class LiveGroupChatScreen extends StatelessWidget {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       _scrollToBottom(listScrollController);
                     });
-  
-                    return RefreshIndicator(color: AppColors.primary,
+
+                    return RefreshIndicator(
+                      color: AppColors.primary,
                       onRefresh: () async {
                         await controller.fetchMessages();
                         // Auto-scroll to bottom after refresh
                         _scrollToBottom(listScrollController);
                       },
                       child: ListView.builder(
-                        controller: listScrollController, // Use our custom scroll controller
-                        reverse: false, // Changed from true to false - no more bottom alignment
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        controller:
+                            listScrollController, // Use our custom scroll controller
+                        reverse:
+                            false, // Changed from true to false - no more bottom alignment
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
                         itemCount: controller.messages.length,
                         itemBuilder: (context, index) {
                           // Reverse the index to show latest messages at bottom
-                          final reversedIndex = controller.messages.length - 1 - index;
+                          final reversedIndex =
+                              controller.messages.length - 1 - index;
                           final message = controller.messages[reversedIndex];
                           final isMe = message.isMine;
-                          
+
                           bool showDate = false;
                           if (reversedIndex == controller.messages.length - 1) {
                             showDate = true;
                           } else {
-                            final nextMessage = controller.messages[reversedIndex + 1];
-                            if (controller.formatMessageDate(nextMessage.createdAt) != controller.formatMessageDate(message.createdAt)) {
+                            final nextMessage =
+                                controller.messages[reversedIndex + 1];
+                            if (controller.formatMessageDate(
+                                  nextMessage.createdAt,
+                                ) !=
+                                controller.formatMessageDate(
+                                  message.createdAt,
+                                )) {
                               showDate = true;
                             }
                           }
-  
-                        // System messages styling
-                        if (message.messageType == 'system' || message.sender?.name == 'System') {
+
+                          // System messages styling
+                          if (message.messageType == 'system' ||
+                              message.sender?.name == 'System') {
+                            return Column(
+                              children: [
+                                if (showDate)
+                                  _buildDateBubble(
+                                    controller.formatMessageDate(
+                                      message.createdAt,
+                                    ),
+                                  ),
+                                _buildSystemBubble(message.content),
+                              ],
+                            );
+                          }
+
                           return Column(
-                             children: [
-                              if (showDate) _buildDateBubble(controller.formatMessageDate(message.createdAt)),
-                              _buildSystemBubble(message.content),
+                            children: [
+                              if (showDate)
+                                _buildDateBubble(
+                                  controller.formatMessageDate(
+                                    message.createdAt,
+                                  ),
+                                ),
+                              _SwipeToReplyWrapper(
+                                key: ValueKey(message.id),
+                                onReply: () {
+                                  controller.replyingToMessage.value = message;
+                                  controller.focusNode.requestFocus();
+                                },
+                                child: _buildChatBubble(
+                                  context,
+                                  controller,
+                                  message,
+                                  isMe,
+                                ),
+                              ),
                             ],
                           );
-                        }
-  
-                        return Column(
-                          children: [
-                            if (showDate) _buildDateBubble(controller.formatMessageDate(message.createdAt)),
-                            _SwipeToReplyWrapper(
-                              key: ValueKey(message.id),
-                              onReply: () {
-                                controller.replyingToMessage.value = message;
-                                controller.focusNode.requestFocus();
-                              },
-                              child: _buildChatBubble(context, controller, message, isMe),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                        },
+                      ),
                     );
                   }),
                 ),
-  
+
                 // 📝 Reply Preview Bar
                 Obx(() {
                   if (controller.replyingToMessage.value != null) {
@@ -150,7 +184,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                   }
                   return const SizedBox.shrink();
                 }),
-  
+
                 // 📷 Pending Attachment Preview Bar
                 Obx(() {
                   if (controller.selectedAttachment.value != null) {
@@ -158,33 +192,39 @@ class LiveGroupChatScreen extends StatelessWidget {
                   }
                   return const SizedBox.shrink();
                 }),
-  
-  
+
                 // ✍️ Input message bar
                 _buildInputBar(context, controller),
-  
+
                 // Emoji Picker
-                Obx(() => Offstage(
-                  offstage: !controller.isEmojiVisible.value,
-                  child: SizedBox(
-                    height: 250,
-                    child: EmojiPicker(
-                      textEditingController: controller.messageController,
-                      onEmojiSelected: (category, emoji) {
-                         // Controller updates automatically
-                      },
-                      config: Config(
-                        height: 250,
-                        checkPlatformCompatibility: true,
-                        emojiViewConfig: EmojiViewConfig(
-                          columns: 7,
-                          emojiSizeMax: 32 * (foundation.defaultTargetPlatform == TargetPlatform.iOS ? 1.30 : 1.0),
-                          backgroundColor: const Color(0xFFF2F2F2),
+                Obx(
+                  () => Offstage(
+                    offstage: !controller.isEmojiVisible.value,
+                    child: SizedBox(
+                      height: 250,
+                      child: EmojiPicker(
+                        textEditingController: controller.messageController,
+                        onEmojiSelected: (category, emoji) {
+                          // Controller updates automatically
+                        },
+                        config: Config(
+                          height: 250,
+                          checkPlatformCompatibility: true,
+                          emojiViewConfig: EmojiViewConfig(
+                            columns: 7,
+                            emojiSizeMax:
+                                32 *
+                                (foundation.defaultTargetPlatform ==
+                                        TargetPlatform.iOS
+                                    ? 1.30
+                                    : 1.0),
+                            backgroundColor: const Color(0xFFF2F2F2),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                )),
+                ),
               ],
             ),
           ],
@@ -193,23 +233,30 @@ class LiveGroupChatScreen extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context, LiveGroupChatController controller) {
+  PreferredSizeWidget _buildAppBar(
+    BuildContext context,
+    LiveGroupChatController controller,
+  ) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       elevation: 0.5,
-      iconTheme: const IconThemeData(color: Colors.black54),
+      iconTheme: const IconThemeData(color: AppColors.white),
       leadingWidth: 40,
       leading: GestureDetector(
         onTap: () => Navigator.of(context).pop(),
         child: const Padding(
           padding: EdgeInsets.only(left: 10),
-          child: Icon(Icons.arrow_back_rounded, color: Colors.black54, size: 24),
+          child: Icon(
+            Icons.arrow_back_rounded,
+            color: AppColors.white,
+            size: 24,
+          ),
         ),
       ),
       title: GestureDetector(
         onTap: () {
           Get.to(
-                () => const LiveGroupDetailsScreen(),
+            () => const LiveGroupDetailsScreen(),
             arguments: {
               'chat_id': controller.chatId,
               'name': controller.groupName,
@@ -226,7 +273,11 @@ class LiveGroupChatScreen extends StatelessWidget {
             CircleAvatar(
               radius: 20,
               backgroundColor: controller.avatarColor,
-              child: const Icon(Icons.groups_rounded, color: Colors.white, size: 22),
+              child: const Icon(
+                Icons.groups_rounded,
+                color: AppColors.white,
+                size: 22,
+              ),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -238,14 +289,14 @@ class LiveGroupChatScreen extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: AppColors.white,
                     ),
                   ),
                   Text(
                     "${controller.participantsCount} participants",
                     style: GoogleFonts.poppins(
                       fontSize: 11,
-                      color: Colors.grey[500],
+                      color: AppColors.premiumGold.withOpacity(0.5),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -255,9 +306,9 @@ class LiveGroupChatScreen extends StatelessWidget {
           ],
         ),
       ),
-    /*  actions: [
+      /*  actions: [
         IconButton(
-          icon: const Icon(Icons.more_vert_rounded, color: Colors.black54),
+          icon: const Icon(Icons.more_vert_rounded, color: AppColors.white),
           onPressed: () {
             Get.to(
               () => const LiveGroupDetailsScreen(),
@@ -282,11 +333,11 @@ class LiveGroupChatScreen extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 14),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: AppColors.black.withOpacity(0.5),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: AppColors.black.withOpacity(0.04),
             blurRadius: 1,
             offset: const Offset(0, 1),
           ),
@@ -296,7 +347,7 @@ class LiveGroupChatScreen extends StatelessWidget {
         date,
         style: GoogleFonts.poppins(
           fontSize: 11.5,
-          color: Colors.grey[600],
+          color: AppColors.white.withOpacity(0.8),
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -309,7 +360,7 @@ class LiveGroupChatScreen extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: const Color(0xFFF3F4F6),
+          color: AppColors.black.withOpacity(0.5),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
@@ -317,7 +368,7 @@ class LiveGroupChatScreen extends StatelessWidget {
           textAlign: TextAlign.center,
           style: GoogleFonts.poppins(
             fontSize: 12,
-            color: Colors.grey[600],
+            color: AppColors.white.withOpacity(0.8),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -341,7 +392,8 @@ class LiveGroupChatScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Row(
-            mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+            mainAxisAlignment:
+                isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (!isMe) ...[
@@ -353,52 +405,71 @@ class LiveGroupChatScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: ClipOval(
-                    child: message.sender?.avatar != null && message.sender!.avatar!.trim().isNotEmpty
-                        ? Image.network(
-                            message.sender!.avatar!,
-                            width: 30,
-                            height: 30,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Center(
-                                child: Text(
-                                  senderName[0].toUpperCase(),
-                                  style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
-                                ),
-                              );
-                            },
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const Center(
-                                child: SizedBox(
-                                  width: 12,
-                                  height: 12,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 1.5,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                    child:
+                        message.sender?.avatar != null &&
+                                message.sender!.avatar!.trim().isNotEmpty
+                            ? Image.network(
+                              message.sender!.avatar!,
+                              width: 30,
+                              height: 30,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Center(
+                                  child: Text(
+                                    senderName[0].toUpperCase(),
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.white,
+                                    ),
                                   ),
+                                );
+                              },
+                              loadingBuilder: (
+                                context,
+                                child,
+                                loadingProgress,
+                              ) {
+                                if (loadingProgress == null) return child;
+                                return const Center(
+                                  child: SizedBox(
+                                    width: 12,
+                                    height: 12,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1.5,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        AppColors.premiumGold,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                            : Center(
+                              child: Text(
+                                senderName[0].toUpperCase(),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.white,
                                 ),
-                              );
-                            },
-                          )
-                        : Center(
-                            child: Text(
-                              senderName[0].toUpperCase(),
-                              style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+                              ),
                             ),
-                          ),
                   ),
                 ),
                 const SizedBox(width: 8),
               ],
 
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width * 0.72,
                 ),
                 decoration: BoxDecoration(
-                  color: isMe ? AppColors.black : Colors.white,
+                  color: isMe ? AppColors.black : AppColors.premiumGold,
                   borderRadius: BorderRadius.only(
                     topLeft: const Radius.circular(12),
                     topRight: const Radius.circular(12),
@@ -407,7 +478,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.03),
+                      color: AppColors.white.withOpacity(0.03),
                       blurRadius: 1,
                       offset: const Offset(0, 1),
                     ),
@@ -416,7 +487,10 @@ class LiveGroupChatScreen extends StatelessWidget {
                 child: Stack(
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(bottom: 4, right: isMe ? 68 : 45), // Reserve space for the timestamp (more space for 'isMe' due to checkmark)
+                      padding: EdgeInsets.only(
+                        bottom: 4,
+                        right: isMe ? 68 : 45,
+                      ), // Reserve space for the timestamp (more space for 'isMe' due to checkmark)
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -433,320 +507,445 @@ class LiveGroupChatScreen extends StatelessWidget {
                               ),
                             ),
 
-                           // 💬 WhatsApp-style Quoted Reply Block
-                    if (message.repliedMessage != null) ...[ 
-                      GestureDetector(
-                        onTap: () {}, // future: scroll to original message
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 6),
-                          decoration: BoxDecoration(
-                            color: isMe
-                                ? Colors.white.withValues(alpha: 0.14)
-                                : Colors.black.withValues(alpha: 0.06),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          clipBehavior: Clip.hardEdge,
-                          child: IntrinsicHeight(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                // ── Thick Accent Left Bar ──────────────────
-                                Container(
-                                  width: 4,
-                                  decoration: BoxDecoration(
-                                    color: isMe
-                                        ? AppColors.secondary
-                                        : avatarColor,
-                                    borderRadius: const BorderRadius.only(
-                                      topLeft: Radius.circular(8),
-                                      bottomLeft: Radius.circular(8),
-                                    ),
-                                  ),
+                          // 💬 WhatsApp-style Quoted Reply Block
+                          if (message.repliedMessage != null) ...[
+                            GestureDetector(
+                              onTap:
+                                  () {}, // future: scroll to original message
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 6),
+                                decoration: BoxDecoration(
+                                  color:
+                                      isMe
+                                          ? AppColors.white.withValues(
+                                            alpha: 0.14,
+                                          )
+                                          : AppColors.white.withValues(
+                                            alpha: 0.06,
+                                          ),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                // ── Quoted Content ─────────────────────────
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 6),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        // Sender name
-                                        Text(
-                                          message.repliedMessage!.sender
-                                                  ?.name ??
-                                              "Unknown",
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w700,
-                                            color: isMe
-                                                ? AppColors.secondary
-                                                : avatarColor,
+                                clipBehavior: Clip.hardEdge,
+                                child: IntrinsicHeight(
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      // ── Thick Accent Left Bar ──────────────────
+                                      Container(
+                                        width: 4,
+                                        decoration: BoxDecoration(
+                                          color:
+                                              isMe
+                                                  ? AppColors.secondary
+                                                  : avatarColor,
+                                          borderRadius: const BorderRadius.only(
+                                            topLeft: Radius.circular(8),
+                                            bottomLeft: Radius.circular(8),
                                           ),
                                         ),
-                                        const SizedBox(height: 2),
-                                        // Content / media hint
-                                        Row(
-                                          children: [
-                                            if (message.repliedMessage!
-                                                    .messageType ==
-                                                'image') ...[
-                                              Icon(Icons.image_rounded,
-                                                  size: 13,
-                                                  color: isMe
-                                                      ? Colors.white54
-                                                      : Colors.black45),
-                                              const SizedBox(width: 4),
-                                            ] else if (message.repliedMessage!
-                                                    .messageType ==
-                                                'file') ...[
-                                              Icon(
-                                                  Icons
-                                                      .insert_drive_file_rounded,
-                                                  size: 13,
-                                                  color: isMe
-                                                      ? Colors.white54
-                                                      : Colors.black45),
-                                              const SizedBox(width: 4),
-                                            ],
-                                            Expanded(
-                                              child: Text(
-                                                message.repliedMessage!
-                                                            .messageType ==
-                                                        'image'
-                                                    ? "Photo"
-                                                    : (message.repliedMessage!
-                                                                .messageType ==
-                                                            'file'
-                                                        ? "Document"
-                                                        : (message
-                                                                .repliedMessage!
-                                                                .content
-                                                                .isEmpty
-                                                            ? "Message"
-                                                            : message
-                                                                .repliedMessage!
-                                                                .content)),
-                                                maxLines: 2,
-                                                overflow:
-                                                    TextOverflow.ellipsis,
+                                      ),
+                                      // ── Quoted Content ─────────────────────────
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 6,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                message
+                                                        .repliedMessage!
+                                                        .sender
+                                                        ?.name ??
+                                                    "Unknown",
                                                 style: GoogleFonts.poppins(
                                                   fontSize: 12,
-                                                  color: isMe
-                                                      ? Colors.white60
-                                                      : Colors.black54,
-                                                  height: 1.3,
+                                                  fontWeight: FontWeight.w700,
+                                                  color:
+                                                      isMe
+                                                          ? AppColors.white
+                                                          : AppColors.black,
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                              const SizedBox(height: 2),
+                                              // Content / media hint
+                                              Row(
+                                                children: [
+                                                  if (message
+                                                          .repliedMessage!
+                                                          .messageType ==
+                                                      'image') ...[
+                                                    Icon(
+                                                      Icons.image_rounded,
+                                                      size: 13,
+                                                      color:
+                                                          isMe
+                                                              ? AppColors.white
+                                                              : AppColors.white,
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                  ] else if (message
+                                                          .repliedMessage!
+                                                          .messageType ==
+                                                      'file') ...[
+                                                    Icon(
+                                                      Icons
+                                                          .insert_drive_file_rounded,
+                                                      size: 13,
+                                                      color:
+                                                          isMe
+                                                              ? AppColors.white
+                                                              : AppColors.white,
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                  ],
+                                                  Expanded(
+                                                    child: Text(
+                                                      message
+                                                                  .repliedMessage!
+                                                                  .messageType ==
+                                                              'image'
+                                                          ? "Photo"
+                                                          : (message
+                                                                      .repliedMessage!
+                                                                      .messageType ==
+                                                                  'file'
+                                                              ? "Document"
+                                                              : (message
+                                                                      .repliedMessage!
+                                                                      .content
+                                                                      .isEmpty
+                                                                  ? "Message"
+                                                                  : message
+                                                                      .repliedMessage!
+                                                                      .content)),
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                            fontSize: 12,
+                                                            color:
+                                                                isMe
+                                                                    ? AppColors
+                                                                        .white
+                                                                    : AppColors
+                                                                        .white,
+                                                            height: 1.3,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                      // ── Image thumbnail (if original was image) ─
+                                      if (message.repliedMessage!.messageType ==
+                                              'image' &&
+                                          message
+                                                  .repliedMessage!
+                                                  .attachmentUrl !=
+                                              null)
+                                        ClipRRect(
+                                          borderRadius: const BorderRadius.only(
+                                            topRight: Radius.circular(8),
+                                            bottomRight: Radius.circular(8),
+                                          ),
+                                          child: Image.network(
+                                            message
+                                                .repliedMessage!
+                                                .attachmentUrl!,
+                                            width: 48,
+                                            height: 48,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) =>
+                                                    const SizedBox.shrink(),
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                 ),
-                                // ── Image thumbnail (if original was image) ─
-                                if (message.repliedMessage!.messageType ==
-                                        'image' &&
-                                    message.repliedMessage!.attachmentUrl !=
-                                        null)
-                                  ClipRRect(
-                                    borderRadius: const BorderRadius.only(
-                                      topRight: Radius.circular(8),
-                                      bottomRight: Radius.circular(8),
-                                    ),
-                                    child: Image.network(
-                                      message.repliedMessage!.attachmentUrl!,
-                                      width: 48,
-                                      height: 48,
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) =>
-                                              const SizedBox.shrink(),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-
-                    // 💬 Body rendering based on message type
-                    if (message.messageType == 'image') ...[
-                      const SizedBox(height: 4),
-                      GestureDetector(
-                        onTap: () {
-                          final bool isLocal = message.attachmentUrl != null && !message.attachmentUrl!.startsWith('http');
-                          if (message.attachmentUrl != null && message.attachmentUrl!.isNotEmpty) {
-                            Get.to(() => FullScreenImageViewer(
-                                  imageUrl: message.attachmentUrl!,
-                                  isLocal: isLocal,
-                                ));
-                          }
-                        },
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: (message.attachmentUrl != null && !message.attachmentUrl!.startsWith('http'))
-                              ? Image.file(
-                                  File(message.attachmentUrl!),
-                                  width: 220,
-                                  height: 160,
-                                  fit: BoxFit.cover,
-                                )
-                              : (message.attachmentUrl != null && message.attachmentUrl!.isNotEmpty)
-                                  ? Image.network(
-                                      message.attachmentUrl!,
-                                      width: 220,
-                                      height: 160,
-                                      fit: BoxFit.cover,
-                                      loadingBuilder: (context, child, loadingProgress) {
-                                        if (loadingProgress == null) return child;
-                                        return Container(
-                                          width: 220,
-                                          height: 160,
-                                          color: Colors.grey[100],
-                                          child: const Center(
-                                            child: CircularProgressIndicator(strokeWidth: 2),
-                                          ),
-                                        );
-                                      },
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Container(
-                                          width: 220,
-                                          height: 160,
-                                          color: Colors.grey[200],
-                                          child: const Center(
-                                            child: Icon(Icons.broken_image_rounded, color: Colors.grey, size: 36),
-                                          ),
-                                        );
-                                      },
-                                    )
-                                  : Container(
-                                      width: 220,
-                                      height: 160,
-                                      color: Colors.grey[200],
-                                      child: const Center(
-                                        child: CircularProgressIndicator(strokeWidth: 2),
-                                      ),
-                                    ),
-                        ),
-                      ),
-                      if (message.content.isNotEmpty && !message.content.startsWith("Sending Image...")) ...[
-                        const SizedBox(height: 6),
-                        Text(
-                          message.content,
-                          style: GoogleFonts.poppins(
-                            fontSize: 13.5,
-                            color: isMe ? Colors.white : Colors.black87,
-                            height: 1.35,
-                          ),
-                        ),
-                      ],
-                    ] else if (message.messageType == 'file') ...[
-                      const SizedBox(height: 4),
-                      GestureDetector(
-                        onTap: () async {
-                          if (message.attachmentUrl != null && message.attachmentUrl!.isNotEmpty) {
-                            try {
-                              final Uri uri = message.attachmentUrl!.startsWith('http')
-                                  ? Uri.parse(message.attachmentUrl!)
-                                  : Uri.file(message.attachmentUrl!);
-
-                              bool launched = false;
-                              if (await canLaunchUrl(uri)) {
-                                launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-                              }
-                              if (!launched) {
-                                launched = await launchUrl(uri, mode: LaunchMode.platformDefault);
-                              }
-                              if (!launched) {
-                                Clipboard.setData(ClipboardData(text: message.attachmentUrl!));
-                                CustomSnackBar.showSuccess(message: "Opening file... Link copied to clipboard!");
-                              }
-                            } catch (e) {
-                              try {
-                                bool launched = await launchUrl(Uri.parse(message.attachmentUrl!), mode: LaunchMode.platformDefault);
-                                if (!launched) {
-                                  Clipboard.setData(ClipboardData(text: message.attachmentUrl!));
-                                  CustomSnackBar.showSuccess(message: "File link copied to clipboard!");
-                                }
-                              } catch (e2) {
-                                Clipboard.setData(ClipboardData(text: message.attachmentUrl!));
-                                CustomSnackBar.showSuccess(message: "File link copied to clipboard!");
-                              }
-                            }
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isMe ? Colors.white.withOpacity(0.12) : Colors.grey[100],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.insert_drive_file_rounded,
-                                color: isMe ? AppColors.secondary : Colors.blue,
-                                size: 28,
                               ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                            ),
+                          ],
+
+                          // 💬 Body rendering based on message type
+                          if (message.messageType == 'image') ...[
+                            const SizedBox(height: 4),
+                            GestureDetector(
+                              onTap: () {
+                                final bool isLocal =
+                                    message.attachmentUrl != null &&
+                                    !message.attachmentUrl!.startsWith('http');
+                                if (message.attachmentUrl != null &&
+                                    message.attachmentUrl!.isNotEmpty) {
+                                  Get.to(
+                                    () => FullScreenImageViewer(
+                                      imageUrl: message.attachmentUrl!,
+                                      isLocal: isLocal,
+                                    ),
+                                  );
+                                }
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child:
+                                    (message.attachmentUrl != null &&
+                                            !message.attachmentUrl!.startsWith(
+                                              'http',
+                                            ))
+                                        ? Image.file(
+                                          File(message.attachmentUrl!),
+                                          width: 220,
+                                          height: 160,
+                                          fit: BoxFit.cover,
+                                        )
+                                        : (message.attachmentUrl != null &&
+                                            message.attachmentUrl!.isNotEmpty)
+                                        ? Image.network(
+                                          message.attachmentUrl!,
+                                          width: 220,
+                                          height: 160,
+                                          fit: BoxFit.cover,
+                                          loadingBuilder: (
+                                            context,
+                                            child,
+                                            loadingProgress,
+                                          ) {
+                                            if (loadingProgress == null)
+                                              return child;
+                                            return Container(
+                                              width: 220,
+                                              height: 160,
+                                              color: AppColors.premiumGold
+                                                  .withOpacity(0.1),
+                                              child: const Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                    ),
+                                              ),
+                                            );
+                                          },
+                                          errorBuilder: (
+                                            context,
+                                            error,
+                                            stackTrace,
+                                          ) {
+                                            return Container(
+                                              width: 220,
+                                              height: 160,
+                                              color: AppColors.premiumGold
+                                                  .withOpacity(0.2),
+                                              child: const Center(
+                                                child: Icon(
+                                                  Icons.broken_image_rounded,
+                                                  color: AppColors.premiumGold,
+                                                  size: 36,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        )
+                                        : Container(
+                                          width: 220,
+                                          height: 160,
+                                          color: AppColors.premiumGold
+                                              .withOpacity(0.2),
+                                          child: const Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
+                                          ),
+                                        ),
+                              ),
+                            ),
+                            if (message.content.isNotEmpty &&
+                                !message.content.startsWith(
+                                  "Sending Image...",
+                                )) ...[
+                              const SizedBox(height: 6),
+                              Text(
+                                message.content,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13.5,
+                                  color:
+                                      isMe ? AppColors.white : AppColors.black,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ],
+                          ] else if (message.messageType == 'file') ...[
+                            const SizedBox(height: 4),
+                            GestureDetector(
+                              onTap: () async {
+                                if (message.attachmentUrl != null &&
+                                    message.attachmentUrl!.isNotEmpty) {
+                                  try {
+                                    final Uri uri =
+                                        message.attachmentUrl!.startsWith(
+                                              'http',
+                                            )
+                                            ? Uri.parse(message.attachmentUrl!)
+                                            : Uri.file(message.attachmentUrl!);
+
+                                    bool launched = false;
+                                    if (await canLaunchUrl(uri)) {
+                                      launched = await launchUrl(
+                                        uri,
+                                        mode: LaunchMode.externalApplication,
+                                      );
+                                    }
+                                    if (!launched) {
+                                      launched = await launchUrl(
+                                        uri,
+                                        mode: LaunchMode.platformDefault,
+                                      );
+                                    }
+                                    if (!launched) {
+                                      Clipboard.setData(
+                                        ClipboardData(
+                                          text: message.attachmentUrl!,
+                                        ),
+                                      );
+                                      CustomSnackBar.showSuccess(
+                                        message:
+                                            "Opening file... Link copied to clipboard!",
+                                      );
+                                    }
+                                  } catch (e) {
+                                    try {
+                                      bool launched = await launchUrl(
+                                        Uri.parse(message.attachmentUrl!),
+                                        mode: LaunchMode.platformDefault,
+                                      );
+                                      if (!launched) {
+                                        Clipboard.setData(
+                                          ClipboardData(
+                                            text: message.attachmentUrl!,
+                                          ),
+                                        );
+                                        CustomSnackBar.showSuccess(
+                                          message:
+                                              "File link copied to clipboard!",
+                                        );
+                                      }
+                                    } catch (e2) {
+                                      Clipboard.setData(
+                                        ClipboardData(
+                                          text: message.attachmentUrl!,
+                                        ),
+                                      );
+                                      CustomSnackBar.showSuccess(
+                                        message:
+                                            "File link copied to clipboard!",
+                                      );
+                                    }
+                                  }
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color:
+                                      isMe
+                                          ? AppColors.white.withOpacity(0.12)
+                                          : AppColors.premiumGold.withOpacity(
+                                            0.1,
+                                          ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(
-                                      message.attachmentUrl != null
-                                          ? message.attachmentUrl!.split('/').last
-                                          : "Document",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 12.5,
-                                        fontWeight: FontWeight.w600,
-                                        color: isMe ? Colors.white : Colors.black87,
-                                      ),
+                                    Icon(
+                                      Icons.insert_drive_file_rounded,
+                                      color:
+                                          isMe
+                                              ? AppColors.secondary
+                                              : Colors.blue,
+                                      size: 28,
                                     ),
-                                    Text(
-                                      message.status == "sending" ? "Uploading..." : "Tap to copy URL",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 10,
-                                        color: isMe ? Colors.white60 : Colors.grey[600],
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            message.attachmentUrl != null
+                                                ? message.attachmentUrl!
+                                                    .split('/')
+                                                    .last
+                                                : "Document",
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 12.5,
+                                              fontWeight: FontWeight.w600,
+                                              color:
+                                                  isMe
+                                                      ? AppColors.white
+                                                      : AppColors.white,
+                                            ),
+                                          ),
+                                          Text(
+                                            message.status == "sending"
+                                                ? "Uploading..."
+                                                : "Tap to copy URL",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 10,
+                                              color:
+                                                  isMe
+                                                      ? AppColors.white
+                                                      : AppColors.premiumGold
+                                                          .withOpacity(0.6),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
+                            ),
+                            if (message.content.isNotEmpty &&
+                                !message.content.startsWith(
+                                  "Sending File...",
+                                )) ...[
+                              const SizedBox(height: 6),
+                              Text(
+                                message.content,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13.5,
+                                  color:
+                                      isMe ? AppColors.white : AppColors.black,
+                                  height: 1.35,
+                                ),
+                              ),
                             ],
-                          ),
-                        ),
-                      ),
-                      if (message.content.isNotEmpty && !message.content.startsWith("Sending File...")) ...[
-                        const SizedBox(height: 6),
-                        Text(
-                          message.content,
-                          style: GoogleFonts.poppins(
-                            fontSize: 13.5,
-                            color: isMe ? Colors.white : Colors.black87,
-                            height: 1.35,
-                          ),
-                        ),
-                      ],
-                    ] else ...[
-                      Text(
-                        message.content,
-                        style: GoogleFonts.poppins(
-                          fontSize: 13.5,
-                          color: isMe ? Colors.white : Colors.black87,
-                          height: 1.35,
-                        ),
-                      ),
-                    ],
+                          ] else ...[
+                            Text(
+                              message.content,
+                              style: GoogleFonts.poppins(
+                                fontSize: 13.5,
+                                color: isMe ? AppColors.white : AppColors.black,
+                                height: 1.35,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -763,7 +962,10 @@ class LiveGroupChatScreen extends StatelessWidget {
                               controller.formatMessageTime(message.createdAt),
                               style: GoogleFonts.poppins(
                                 fontSize: 10,
-                                color: isMe ? Colors.white70 : Colors.grey[500],
+                                color:
+                                    isMe
+                                        ? AppColors.white
+                                        : AppColors.black.withOpacity(0.7),
                               ),
                             ),
                             if (isMe) ...[
@@ -772,7 +974,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                                 message.status == "sending"
                                     ? Icons.access_time_rounded
                                     : Icons.done_all_rounded,
-                                color: message.status == "sending" ? Colors.white70 : Colors.white70,
+                                color: AppColors.white,
                                 size: 14,
                               ),
                             ],
@@ -790,21 +992,25 @@ class LiveGroupChatScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInputBar(BuildContext context, LiveGroupChatController controller) {
+  Widget _buildInputBar(
+    BuildContext context,
+    LiveGroupChatController controller,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      color: Colors.transparent,
+      color: AppColors.transparent,
       child: SafeArea(
         child: Row(
           children: [
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.black,
                   borderRadius: BorderRadius.circular(25),
+                  border: Border.all(color: AppColors.premiumGold, width: 1.5),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: AppColors.premiumGold.withOpacity(0.1),
                       blurRadius: 2,
                       offset: const Offset(0, 1),
                     ),
@@ -813,8 +1019,13 @@ class LiveGroupChatScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.attach_file_rounded, color: Colors.black54, size: 22),
-                      onPressed: () => _showAttachmentSheet(context, controller),
+                      icon: const Icon(
+                        Icons.attach_file_rounded,
+                        color: AppColors.premiumGold,
+                        size: 22,
+                      ),
+                      onPressed:
+                          () => _showAttachmentSheet(context, controller),
                     ),
 
                     Expanded(
@@ -823,12 +1034,20 @@ class LiveGroupChatScreen extends StatelessWidget {
                         focusNode: controller.focusNode,
                         maxLines: 4,
                         minLines: 1,
-                        style: GoogleFonts.poppins(fontSize: 14.5, color: Colors.black87),
+                        style: GoogleFonts.poppins(
+                          fontSize: 14.5,
+                          color: AppColors.white,
+                        ),
                         decoration: InputDecoration(
                           hintText: "Type a message...",
-                          hintStyle: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 14.5),
+                          hintStyle: GoogleFonts.poppins(
+                            color: AppColors.premiumGold.withOpacity(0.4),
+                            fontSize: 14.5,
+                          ),
                           border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 8,
+                          ),
                         ),
                         onTap: () {
                           if (controller.isEmojiVisible.value) {
@@ -839,13 +1058,15 @@ class LiveGroupChatScreen extends StatelessWidget {
                     ),
 
                     IconButton(
-                      icon: Obx(() => Icon(
-                        controller.isEmojiVisible.value
-                            ? Icons.keyboard_rounded
-                            : Icons.sentiment_satisfied_alt_rounded,
-                        color: Colors.black54,
-                        size: 24,
-                      )),
+                      icon: Obx(
+                        () => Icon(
+                          controller.isEmojiVisible.value
+                              ? Icons.keyboard_rounded
+                              : Icons.sentiment_satisfied_alt_rounded,
+                          color: AppColors.premiumGold,
+                          size: 24,
+                        ),
+                      ),
                       onPressed: () {
                         if (controller.isEmojiVisible.value) {
                           controller.focusNode.requestFocus();
@@ -872,7 +1093,11 @@ class LiveGroupChatScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: const Center(
-                  child: Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                  child: Icon(
+                    Icons.send_rounded,
+                    color: AppColors.white,
+                    size: 20,
+                  ),
                 ),
               ),
             ),
@@ -888,15 +1113,21 @@ class LiveGroupChatScreen extends StatelessWidget {
   ) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withValues(alpha: 0.45),
+      backgroundColor: AppColors.transparent,
+      barrierColor: AppColors.white.withValues(alpha: 0.45),
       builder: (ctx) {
         return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: AppColors.black,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            border: Border.all(color: AppColors.premiumGold),
           ),
-          padding: EdgeInsets.fromLTRB(24, 16, 24, 32 + MediaQuery.of(ctx).padding.bottom),
+          padding: EdgeInsets.fromLTRB(
+            24,
+            16,
+            24,
+            32 + MediaQuery.of(ctx).padding.bottom,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -907,7 +1138,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: AppColors.premiumGold.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -918,7 +1149,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black87,
+                  color: AppColors.white,
                 ),
               ),
               const SizedBox(height: 20),
@@ -999,7 +1230,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                 ),
               ],
             ),
-            child: Icon(icon, color: Colors.white, size: 28),
+            child: Icon(icon, color: AppColors.white, size: 28),
           ),
           const SizedBox(height: 10),
           Text(
@@ -1007,14 +1238,13 @@ class LiveGroupChatScreen extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: AppColors.white,
             ),
           ),
         ],
       ),
     );
   }
-
 
   void _showMessageOptions(
     BuildContext context,
@@ -1023,100 +1253,115 @@ class LiveGroupChatScreen extends StatelessWidget {
   ) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        margin: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 8),
-            Container(
-              width: 38,
-              height: 4.5,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(3),
-              ),
+      backgroundColor: AppColors.transparent,
+      builder:
+          (ctx) => Container(
+            margin: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.black,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.premiumGold),
             ),
-            const SizedBox(height: 12),
-
-            _buildOptionRow(
-              icon: Icons.reply_rounded,
-              label: "Reply",
-              color: Colors.black87,
-              onTap: () {
-                Navigator.pop(ctx);
-                controller.replyingToMessage.value = message;
-                controller.focusNode.requestFocus();
-              },
-            ),
-
-            _buildOptionRow(
-              icon: Icons.copy_rounded,
-              label: "Copy",
-              color: Colors.black87,
-              onTap: () {
-                Navigator.pop(ctx);
-                Clipboard.setData(ClipboardData(text: message.content));
-                CustomSnackBar.showSuccess(message: "Message copied to clipboard!");
-              },
-            ),
-
-            _buildOptionRow(
-              icon: Icons.delete_outline_rounded,
-              label: "Delete for me",
-              color: Colors.red.shade300,
-              onTap: () async {
-                Navigator.pop(ctx);
-                await controller.deleteMessage(message.id, deleteForEveryone: false);
-                CustomSnackBar.showInfo(message: "Message deleted.");
-              },
-            ),
-
-            // Only owner can delete for everyone
-            if (message.isMine)
-              _buildOptionRow(
-                icon: Icons.delete_forever_rounded,
-                label: "Delete for everyone",
-                color: Colors.red,
-                onTap: () async {
-                  Navigator.pop(ctx);
-                  await controller.deleteMessage(message.id, deleteForEveryone: true);
-                  CustomSnackBar.showSuccess(message: "Message deleted for everyone.");
-                },
-              ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              child: GestureDetector(
-                onTap: () => Navigator.pop(ctx),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 13),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 8),
+                Container(
+                  width: 38,
+                  height: 4.5,
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(25),
+                    color: AppColors.premiumGold.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(3),
                   ),
-                  child: Text(
-                    "Cancel",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54,
+                ),
+                const SizedBox(height: 12),
+
+                _buildOptionRow(
+                  icon: Icons.reply_rounded,
+                  label: "Reply",
+                  color: AppColors.white,
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    controller.replyingToMessage.value = message;
+                    controller.focusNode.requestFocus();
+                  },
+                ),
+
+                _buildOptionRow(
+                  icon: Icons.copy_rounded,
+                  label: "Copy",
+                  color: AppColors.white,
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    Clipboard.setData(ClipboardData(text: message.content));
+                    CustomSnackBar.showSuccess(
+                      message: "Message copied to clipboard!",
+                    );
+                  },
+                ),
+
+                _buildOptionRow(
+                  icon: Icons.delete_outline_rounded,
+                  label: "Delete for me",
+                  color: Colors.red.shade300,
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    await controller.deleteMessage(
+                      message.id,
+                      deleteForEveryone: false,
+                    );
+                    CustomSnackBar.showInfo(message: "Message deleted.");
+                  },
+                ),
+
+                // Only owner can delete for everyone
+                if (message.isMine)
+                  _buildOptionRow(
+                    icon: Icons.delete_forever_rounded,
+                    label: "Delete for everyone",
+                    color: Colors.red,
+                    onTap: () async {
+                      Navigator.pop(ctx);
+                      await controller.deleteMessage(
+                        message.id,
+                        deleteForEveryone: true,
+                      );
+                      CustomSnackBar.showSuccess(
+                        message: "Message deleted for everyone.",
+                      );
+                    },
+                  ),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(ctx),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      decoration: BoxDecoration(
+                        color: AppColors.premiumGold.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: Text(
+                        "Cancel",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 6),
+              ],
             ),
-            const SizedBox(height: 6),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -1153,13 +1398,17 @@ class LiveGroupChatScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.chat_bubble_outline_rounded, size: 48, color: Colors.grey[300]),
+          Icon(
+            Icons.chat_bubble_outline_rounded,
+            size: 48,
+            color: AppColors.premiumGold.withOpacity(0.3),
+          ),
           const SizedBox(height: 12),
           Text(
             "No messages yet. Say hello!",
             style: GoogleFonts.poppins(
               fontSize: 14,
-              color: Colors.grey[500],
+              color: AppColors.premiumGold.withOpacity(0.5),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -1175,10 +1424,16 @@ class LiveGroupChatScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         border: Border(
-          top: BorderSide(color: Colors.grey[200]!, width: 0.5),
-          bottom: BorderSide(color: Colors.grey[100]!, width: 0.5),
+          top: BorderSide(
+            color: AppColors.premiumGold.withOpacity(0.2),
+            width: 0.5,
+          ),
+          bottom: BorderSide(
+            color: AppColors.premiumGold.withOpacity(0.1),
+            width: 0.5,
+          ),
         ),
       ),
       child: Row(
@@ -1209,19 +1464,25 @@ class LiveGroupChatScreen extends StatelessWidget {
                 Text(
                   replyMsg.messageType == 'image'
                       ? "📷 Image"
-                      : (replyMsg.messageType == 'file' ? "📄 Document" : replyMsg.content),
+                      : (replyMsg.messageType == 'file'
+                          ? "📄 Document"
+                          : replyMsg.content),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(
                     fontSize: 12,
-                    color: Colors.grey[600],
+                    color: AppColors.premiumGold.withOpacity(0.6),
                   ),
                 ),
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close_rounded, size: 20, color: Colors.black54),
+            icon: const Icon(
+              Icons.close_rounded,
+              size: 20,
+              color: AppColors.white,
+            ),
             onPressed: () {
               controller.replyingToMessage.value = null;
             },
@@ -1239,10 +1500,16 @@ class LiveGroupChatScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         border: Border(
-          top: BorderSide(color: Colors.grey[200]!, width: 0.5),
-          bottom: BorderSide(color: Colors.grey[100]!, width: 0.5),
+          top: BorderSide(
+            color: AppColors.premiumGold.withOpacity(0.2),
+            width: 0.5,
+          ),
+          bottom: BorderSide(
+            color: AppColors.premiumGold.withOpacity(0.1),
+            width: 0.5,
+          ),
         ),
       ),
       child: Row(
@@ -1265,7 +1532,11 @@ class LiveGroupChatScreen extends StatelessWidget {
                 color: Colors.blue.withOpacity(0.12),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.insert_drive_file_rounded, color: Colors.blue, size: 20),
+              child: const Icon(
+                Icons.insert_drive_file_rounded,
+                color: Colors.blue,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 12),
           ],
@@ -1279,7 +1550,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 12.5,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: AppColors.white,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -1289,14 +1560,18 @@ class LiveGroupChatScreen extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(
                     fontSize: 11.5,
-                    color: Colors.grey[600],
+                    color: AppColors.premiumGold.withOpacity(0.6),
                   ),
                 ),
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close_rounded, size: 20, color: Colors.black54),
+            icon: const Icon(
+              Icons.close_rounded,
+              size: 20,
+              color: AppColors.white,
+            ),
             onPressed: () {
               controller.selectedAttachment.value = null;
               controller.selectedAttachmentType.value = "";
@@ -1315,19 +1590,23 @@ class FullScreenImageViewer extends StatelessWidget {
   final String imageUrl;
   final bool isLocal;
 
-  const FullScreenImageViewer({super.key, required this.imageUrl, this.isLocal = false});
+  const FullScreenImageViewer({
+    super.key,
+    required this.imageUrl,
+    this.isLocal = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: AppColors.white),
         actions: [
           IconButton(
-            icon: const Icon(Icons.download_rounded, color: Colors.white),
+            icon: const Icon(Icons.download_rounded, color: AppColors.white),
             onPressed: () {
               CustomSnackBar.showSuccess(message: "Image saved successfully!");
             },
@@ -1339,28 +1618,32 @@ class FullScreenImageViewer extends StatelessWidget {
           clipBehavior: Clip.none,
           minScale: 0.5,
           maxScale: 4.0,
-          child: isLocal
-              ? Image.file(
-                  File(imageUrl),
-                  fit: BoxFit.contain,
-                )
-              : Image.network(
-                  imageUrl,
-                  fit: BoxFit.contain,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Center(
-                      child: Icon(Icons.broken_image_rounded, color: Colors.white60, size: 64),
-                    );
-                  },
-                ),
+          child:
+              isLocal
+                  ? Image.file(File(imageUrl), fit: BoxFit.contain)
+                  : Image.network(
+                    imageUrl,
+                    fit: BoxFit.contain,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.white,
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Center(
+                        child: Icon(
+                          Icons.broken_image_rounded,
+                          color: AppColors.white,
+                          size: 64,
+                        ),
+                      );
+                    },
+                  ),
         ),
       ),
     );
@@ -1392,7 +1675,7 @@ class _SwipeToReplyWrapperState extends State<_SwipeToReplyWrapper>
   late Animation<double> _snapAnimation;
 
   static const double _threshold = 72.0;
-  static const double _maxDrag   = 90.0;
+  static const double _maxDrag = 90.0;
 
   @override
   void initState() {
@@ -1412,8 +1695,7 @@ class _SwipeToReplyWrapperState extends State<_SwipeToReplyWrapper>
   void _onDragUpdate(DragUpdateDetails details) {
     if (details.delta.dx < 0 && _dragOffset <= 0) return; // block left swipe
     setState(() {
-      _dragOffset =
-          (_dragOffset + details.delta.dx).clamp(0.0, _maxDrag);
+      _dragOffset = (_dragOffset + details.delta.dx).clamp(0.0, _maxDrag);
     });
 
     // Haptic + trigger once the threshold is crossed
@@ -1439,7 +1721,7 @@ class _SwipeToReplyWrapperState extends State<_SwipeToReplyWrapper>
   @override
   Widget build(BuildContext context) {
     final double iconOpacity = (_dragOffset / _threshold).clamp(0.0, 1.0);
-    final double iconScale   = 0.6 + 0.4 * iconOpacity;
+    final double iconScale = 0.6 + 0.4 * iconOpacity;
 
     return GestureDetector(
       onHorizontalDragUpdate: _onDragUpdate,
@@ -1486,17 +1768,17 @@ class _SwipeToReplyWrapperState extends State<_SwipeToReplyWrapper>
   }
 }
 
-  // Helper function to scroll to bottom
-  void _scrollToBottom(ScrollController scrollController) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 100), () {
-        if (scrollController.hasClients) {
-          scrollController.animateTo(
-            scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
-      });
+// Helper function to scroll to bottom
+void _scrollToBottom(ScrollController scrollController) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
     });
-  }
+  });
+}

@@ -32,8 +32,8 @@ class DashboardPage extends StatelessWidget {
             "Exit App",
             "Press again to exit",
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.black87,
-            colorText: Colors.white,
+            backgroundColor: AppColors.transparent,
+            colorText: AppColors.white,
             margin: const EdgeInsets.all(16),
             borderRadius: 12,
             duration: const Duration(seconds: 2),
@@ -51,7 +51,7 @@ class DashboardPage extends StatelessWidget {
         ),
         child: Scaffold(
           extendBody: true,
-          backgroundColor: Colors.transparent,
+          backgroundColor: AppColors.transparent,
           body: Stack(
             children: [
               PageView(
@@ -107,7 +107,7 @@ class DashboardPage extends StatelessWidget {
             color: AppColors.cardSurface,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.4),
+                color: AppColors.white.withOpacity(0.4),
                 blurRadius: 10,
                 offset: const Offset(0, -5),
               ),
@@ -127,7 +127,7 @@ class DashboardPage extends StatelessWidget {
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
-                      color: Colors.white,
+                      color: AppColors.white,
                     ),
                   )),
                   Obx(() => Text(
@@ -200,7 +200,7 @@ class DashboardPage extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isSelected ? AppColors.premiumGold : Colors.transparent,
+                      color: isSelected ? AppColors.premiumGold : AppColors.transparent,
                       width: 1.2,
                     ),
                   ),
@@ -258,26 +258,26 @@ class BusinessDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: AppColors.premiumGold.withOpacity(0.1),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         leading: IconButton(
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: AppColors.premiumGold,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.arrow_back_rounded, color: Colors.black87),
+            child: const Icon(Icons.arrow_back_rounded, color: AppColors.white),
           ),
           onPressed: () => Get.back(),
         ),
         title: const Text(
           'Business Dashboard',
           style: TextStyle(
-            color: Colors.black87,
+            color: AppColors.white,
             fontSize: 20,
             fontWeight: FontWeight.bold,
             letterSpacing: -0.5,
@@ -288,10 +288,10 @@ class BusinessDashboardScreen extends StatelessWidget {
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: AppColors.premiumGold,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.more_vert_rounded, color: Colors.black87),
+              child: const Icon(Icons.more_vert_rounded, color: AppColors.white),
             ),
             onPressed: () {},
           ),
@@ -351,12 +351,12 @@ class BusinessDashboardScreen extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: const [
-                    Icon(Icons.star_rounded, color: Colors.white, size: 16),
+                    Icon(Icons.star_rounded, color: AppColors.white, size: 16),
                     SizedBox(width: 4),
                     Text(
                       'Featured',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.white,
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
@@ -379,7 +379,7 @@ class BusinessDashboardScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: AppColors.white,
                         letterSpacing: -0.5,
                       ),
                     ),
@@ -412,13 +412,13 @@ class BusinessDashboardScreen extends StatelessWidget {
                         Icon(
                           Icons.access_time_rounded,
                           size: 14,
-                          color: Colors.grey.shade600,
+                          color: AppColors.premiumGold,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           'Created 4 days ago',
                           style: TextStyle(
-                            color: Colors.grey.shade600,
+                            color: AppColors.premiumGold,
                             fontSize: 12,
                           ),
                         ),
@@ -471,7 +471,7 @@ class BusinessDashboardScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
+          color: AppColors.premiumGold,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -494,8 +494,8 @@ class BusinessDashboardScreen extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
+                    backgroundColor: AppColors.transparent,
+                    shadowColor: AppColors.transparent,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -504,7 +504,7 @@ class BusinessDashboardScreen extends StatelessWidget {
                   child: const Text(
                     'All Businesses',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
@@ -525,7 +525,7 @@ class BusinessDashboardScreen extends StatelessWidget {
                 child: const Text(
                   'My Business',
                   style: TextStyle(
-                    color: Colors.black87,
+                    color: AppColors.white,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
@@ -548,14 +548,14 @@ class BusinessDashboardScreen extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.white,
-              Colors.grey.shade50,
+              AppColors.white,
+              AppColors.premiumGold.withOpacity(0.1),
             ],
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: AppColors.white.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -581,7 +581,7 @@ class BusinessDashboardScreen extends StatelessWidget {
               ),
               child: const Icon(
                 Icons.business_rounded,
-                color: Colors.white,
+                color: AppColors.white,
                 size: 30,
               ),
             ),
@@ -595,14 +595,14 @@ class BusinessDashboardScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: AppColors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Explore more opportunities',
                     style: TextStyle(
-                      color: Colors.grey.shade600,
+                      color: AppColors.premiumGold,
                       fontSize: 13,
                     ),
                   ),
@@ -622,7 +622,7 @@ class BusinessDashboardScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColors.white,
                 ),
               ),
             ),
@@ -645,7 +645,7 @@ class BusinessDashboardScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: AppColors.white,
                 ),
               ),
               TextButton.icon(
@@ -696,18 +696,18 @@ class BusinessDashboardScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.white.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Material(
-        color: Colors.transparent,
+        color: AppColors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {},
@@ -725,7 +725,7 @@ class BusinessDashboardScreen extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: AppColors.white,
                         ),
                       ),
                     ),
@@ -793,13 +793,13 @@ class BusinessDashboardScreen extends StatelessWidget {
                     Icon(
                       Icons.location_on_rounded,
                       size: 16,
-                      color: Colors.grey.shade600,
+                      color: AppColors.premiumGold,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       location,
                       style: TextStyle(
-                        color: Colors.grey.shade700,
+                        color: AppColors.premiumGold,
                         fontSize: 13,
                       ),
                     ),
@@ -811,13 +811,13 @@ class BusinessDashboardScreen extends StatelessWidget {
                     Icon(
                       Icons.calendar_today_rounded,
                       size: 14,
-                      color: Colors.grey.shade600,
+                      color: AppColors.premiumGold,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       'Created $date',
                       style: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: AppColors.premiumGold,
                         fontSize: 12,
                       ),
                     ),
@@ -832,7 +832,7 @@ class BusinessDashboardScreen extends StatelessWidget {
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           side: BorderSide(
-                            color: Colors.grey.shade300,
+                            color: AppColors.premiumGold,
                             width: 1.5,
                           ),
                           shape: RoundedRectangleBorder(
@@ -842,12 +842,12 @@ class BusinessDashboardScreen extends StatelessWidget {
                         icon: Icon(
                           Icons.remove_red_eye_rounded,
                           size: 18,
-                          color: Colors.grey.shade700,
+                          color: AppColors.premiumGold,
                         ),
                         label: Text(
                           'View Details',
                           style: TextStyle(
-                            color: Colors.grey.shade700,
+                            color: AppColors.premiumGold,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
@@ -904,7 +904,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //       },
 //       child: Scaffold(
 //         extendBody: true,
-//         backgroundColor: AppColors.white,
+//         backgroundColor: AppColors.transparent,
 //         body: PageView(
 //           controller: controller.pageController,
 //           physics: const NeverScrollableScrollPhysics(),
@@ -922,7 +922,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //             shape: BoxShape.circle,
 //             boxShadow: [
 //               BoxShadow(
-//                 color: Colors.black26,
+//                 color: AppColors.white,
 //                 blurRadius: 4,
 //                 offset: Offset(0, 2),
 //               ),
@@ -930,7 +930,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //           ),
 //           child: FloatingActionButton(
 //             onPressed: () => controller.changeIndex(2),
-//             backgroundColor: Colors.transparent, // make button circular with container color
+//             backgroundColor: AppColors.transparent, // make button circular with container color
 //             elevation: 0,
 //             child: const Icon(Icons.slow_motion_video, size: 30,color: AppColors.white,),
 //           ),
@@ -966,7 +966,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //   Widget _item(BuildContext context, IconData icon, String label, int index) {
 //     return Obx(() {
 //       final isSelected = controller.selectedIndex.value == index;
-//       final color = isSelected ? AppColors.black : Colors.grey;
+//       final color = isSelected ? AppColors.black : AppColors.premiumGold;
 //
 //       return InkWell(
 //         onTap: () => controller.changeIndex(index),
@@ -1001,18 +1001,18 @@ class BusinessDashboardScreen extends StatelessWidget {
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
-//       backgroundColor: Colors.white,
+//       backgroundColor: AppColors.transparent,
 //       appBar: AppBar(
-//         backgroundColor: Colors.white,
+//         backgroundColor: AppColors.transparent,
 //         elevation: 0,
 //         leading: IconButton(
-//           icon: const Icon(Icons.arrow_back, color: Colors.black),
+//           icon: const Icon(Icons.arrow_back, color: AppColors.white),
 //           onPressed: () {},
 //         ),
 //         title: const Text(
 //           'Business Dashboard',
 //           style: TextStyle(
-//             color: Colors.black,
+//             color: AppColors.white,
 //             fontSize: 20,
 //             fontWeight: FontWeight.w600,
 //           ),
@@ -1059,7 +1059,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //                   Text(
 //                     'Product Business',
 //                     style: TextStyle(
-//                       color: Colors.grey,
+//                       color: AppColors.premiumGold,
 //                       fontSize: 14,
 //                     ),
 //                   ),
@@ -1067,7 +1067,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //                   Text(
 //                     'Created 4 days ago',
 //                     style: TextStyle(
-//                       color: Colors.grey,
+//                       color: AppColors.premiumGold,
 //                       fontSize: 12,
 //                     ),
 //                   ),
@@ -1127,7 +1127,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //               child: const Text(
 //                 'All Businesses',
 //                 style: TextStyle(
-//                   color: Colors.white,
+//                   color: AppColors.white,
 //                   fontSize: 16,
 //                   fontWeight: FontWeight.w600,
 //                 ),
@@ -1166,7 +1166,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //       child: Container(
 //         padding: const EdgeInsets.all(20),
 //         decoration: BoxDecoration(
-//           color: Colors.grey[100],
+//           color: AppColors.premiumGold.withOpacity(0.1),
 //           borderRadius: BorderRadius.circular(12),
 //         ),
 //         child: Row(
@@ -1182,7 +1182,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //               ),
 //               child: const Icon(
 //                 Icons.business,
-//                 color: Colors.white,
+//                 color: AppColors.white,
 //                 size: 28,
 //               ),
 //             ),
@@ -1202,7 +1202,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //                   Text(
 //                     'Explore more business opportunities',
 //                     style: TextStyle(
-//                       color: Colors.grey,
+//                       color: AppColors.premiumGold,
 //                       fontSize: 13,
 //                     ),
 //                   ),
@@ -1243,7 +1243,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //                 child: const Text(
 //                   'View all',
 //                   style: TextStyle(
-//                     color: Colors.grey,
+//                     color: AppColors.premiumGold,
 //                     fontSize: 14,
 //                   ),
 //                 ),
@@ -1278,7 +1278,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
 //       padding: const EdgeInsets.all(20),
 //       decoration: BoxDecoration(
-//         color: Colors.grey[100],
+//         color: AppColors.premiumGold.withOpacity(0.1),
 //         borderRadius: BorderRadius.circular(12),
 //       ),
 //       child: Column(
@@ -1295,7 +1295,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //           Text(
 //             type,
 //             style: const TextStyle(
-//               color: Colors.grey,
+//               color: AppColors.premiumGold,
 //               fontSize: 14,
 //             ),
 //           ),
@@ -1303,7 +1303,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //           Text(
 //             location,
 //             style: const TextStyle(
-//               color: Colors.grey,
+//               color: AppColors.premiumGold,
 //               fontSize: 13,
 //             ),
 //           ),
@@ -1311,7 +1311,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //           Text(
 //             'Created $date',
 //             style: const TextStyle(
-//               color: Colors.grey,
+//               color: AppColors.premiumGold,
 //               fontSize: 12,
 //             ),
 //           ),
@@ -1342,7 +1342,7 @@ class BusinessDashboardScreen extends StatelessWidget {
 //                 child: const Text(
 //                   'See detail',
 //                   style: TextStyle(
-//                     color: Colors.grey,
+//                     color: AppColors.premiumGold,
 //                     fontSize: 14,
 //                   ),
 //                 ),

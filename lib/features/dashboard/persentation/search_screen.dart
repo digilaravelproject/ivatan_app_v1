@@ -38,7 +38,7 @@ class _SearchScreenState extends State<SearchScreen> {
       length: 3,
       child: Scaffold(
         extendBody: true,
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         body: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
@@ -100,7 +100,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   delegate: _SliverTabBarDelegate(
                     TabBar(
                       isScrollable: true,
-                      dividerColor: Colors.transparent,
+                      dividerColor: AppColors.transparent,
                       indicatorColor: AppColors.premiumGold,
                       indicatorSize: TabBarIndicatorSize.label,
                       tabAlignment: TabAlignment.start,
@@ -150,7 +150,7 @@ class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      color: Colors.transparent, // Let background image show through
+      color: AppColors.transparent, // Let background image show through
       child: _tabBar,
     );
   }
@@ -179,7 +179,7 @@ class TrendingScreen extends StatelessWidget {
     ];
     return RefreshIndicator(
       onRefresh: () => controller.refreshAll(),
-      color: Colors.black,
+      color: AppColors.white,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         slivers: [
@@ -301,12 +301,12 @@ class TrendingScreen extends StatelessWidget {
                               imageUrl: AppUrls.getFullImageUrl(thumb),
                               fit: BoxFit.cover,
                               placeholder: (context, url) => Shimmer.fromColors(
-                                baseColor: Colors.grey.shade300,
-                                highlightColor: Colors.grey.shade100,
-                                child: Container(color: Colors.grey.shade300),
+                                baseColor: AppColors.premiumGold,
+                                highlightColor: AppColors.premiumGold,
+                                child: Container(color: AppColors.premiumGold),
                               ),
                               errorWidget: (context, url, error) => Container(
-                                color: Colors.grey.shade200,
+                                color: AppColors.premiumGold,
                                 child: Image.asset(AppAssets.imgAppLogo, fit: BoxFit.contain),
                               ),
                             ),
@@ -319,7 +319,7 @@ class TrendingScreen extends StatelessWidget {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.6),
+                                  color: AppColors.white.withOpacity(0.6),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Row(
@@ -327,13 +327,13 @@ class TrendingScreen extends StatelessWidget {
                                   children: [
                                     Icon(
                                       item.type == "reel" ? Icons.slow_motion_video : Icons.play_arrow_rounded,
-                                      color: Colors.white,
+                                      color: AppColors.white,
                                       size: 14,
                                     ),
                                     const SizedBox(width: 2),
                                     Text(
                                       item.stats.viewCount > 0 ? '${item.stats.viewCount}' : '',
-                                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600),
+                                      style: const TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.w600),
                                     ),
                                   ],
                                 ),
@@ -416,12 +416,12 @@ class TrendingScreen extends StatelessWidget {
                   width: 100,
                   height: 130,
                   placeholder: (context, url) => Shimmer.fromColors(
-                    baseColor: Colors.grey.shade300,
-                    highlightColor: Colors.grey.shade100,
-                    child: Container(color: Colors.grey.shade300),
+                    baseColor: AppColors.premiumGold,
+                    highlightColor: AppColors.premiumGold,
+                    child: Container(color: AppColors.premiumGold),
                   ),
                   errorWidget: (context, url, error) => Container(
-                    color: Colors.grey.shade200,
+                    color: AppColors.premiumGold,
                     child: Image.asset(AppAssets.imgAppLogo, fit: BoxFit.contain),
                   ),
                 ),
@@ -437,11 +437,11 @@ class TrendingScreen extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.play_arrow_rounded, color: Colors.white, size: 16),
+                    Icon(Icons.play_arrow_rounded, color: AppColors.white, size: 16),
                     SizedBox(width: 4),
                     Text(
                       viewsCount,
-                      style: TextStyle(color: Colors.white, fontSize: 12,fontWeight: FontWeight.bold),
+                      style: TextStyle(color: AppColors.white, fontSize: 12,fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -463,13 +463,13 @@ class TrendingScreen extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.only(right: 6),
           child: Shimmer.fromColors(
-            baseColor: Colors.grey.shade300,
-            highlightColor: Colors.grey.shade100,
+            baseColor: AppColors.premiumGold,
+            highlightColor: AppColors.premiumGold,
             child: Container(
               width: 100,
               height: 130,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: AppColors.premiumGold,
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -485,13 +485,13 @@ class TrendingScreen extends StatelessWidget {
       runSpacing: 12,
       children: List.generate(6, (index) {
         return Shimmer.fromColors(
-          baseColor: Colors.grey.shade300,
-          highlightColor: Colors.grey.shade100,
+          baseColor: AppColors.premiumGold,
+          highlightColor: AppColors.premiumGold,
           child: Container(
             width: (MediaQuery.of(Get.context!).size.width - 36) / 2,
             height: (index % 2 == 0) ? 220 : 150,
             decoration: BoxDecoration(
-              color: Colors.grey.shade300,
+              color: AppColors.premiumGold,
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -624,7 +624,7 @@ class LiveScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color: AppColors.premiumGold,
                         image: DecorationImage(
                           image: NetworkImage(sliderImages[index]),
                           fit: BoxFit.cover,
@@ -680,7 +680,7 @@ class LiveScreen extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(10)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: AppColors.white.withOpacity(0.1),
                   blurRadius: 8,
                   offset: Offset(0, 2),
                 ),
@@ -692,7 +692,7 @@ class LiveScreen extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 15,
-                    backgroundColor: Colors.white,
+                    backgroundColor: AppColors.transparent,
                     child: CircleAvatar(
                       radius: 13,
                       backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=1'),
@@ -736,7 +736,7 @@ class LiveScreen extends StatelessWidget {
             left: (150 / 2) - avatarRadius, // Center horizontally
             child: CircleAvatar(
               radius: avatarRadius,
-             // backgroundColor: Colors.white,
+             // backgroundColor: AppColors.transparent,
               child: CircleAvatar(
                 radius: avatarRadius - 3,
                 backgroundImage: NetworkImage(AppUrls.getFullImageUrl(imageUrl)),
@@ -768,7 +768,7 @@ class ForYouScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -842,11 +842,11 @@ class ForYouScreen extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.play_arrow_rounded, color: Colors.white, size: 16),
+                    Icon(Icons.play_arrow_rounded, color: AppColors.white, size: 16),
                     SizedBox(width: 4),
                     Text(
                       "1.2K",
-                      style: TextStyle(color: Colors.white, fontSize: 12,fontWeight: FontWeight.bold),
+                      style: TextStyle(color: AppColors.white, fontSize: 12,fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -868,7 +868,7 @@ class ForYouScreen extends StatelessWidget {
                     SizedBox(width: 5,),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.8),
+                        color: AppColors.white.withOpacity(0.8),
                         // border: Border.all(color: Colors.blue, width: 2),
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(20),
@@ -921,7 +921,7 @@ class VideoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: AppColors.white.withOpacity(0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -934,11 +934,11 @@ class VideoCard extends StatelessWidget {
           children: [
             // Background Image
             Container(
-              color: Colors.grey[300],
+              color: AppColors.premiumGold.withOpacity(0.3),
               child: const Icon(
                 Icons.play_circle_outline,
                 size: 60,
-                color: Colors.white70,
+                color: AppColors.white,
               ),
             ),
 
@@ -959,7 +959,7 @@ class VideoCard extends StatelessWidget {
                   child: const Text(
                     'LIVE',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -974,17 +974,17 @@ class VideoCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.black54,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.play_arrow, color: Colors.white, size: 14),
+                    const Icon(Icons.play_arrow, color: AppColors.white, size: 14),
                     const SizedBox(width: 2),
                     Text(
                       views,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AppColors.white,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1001,12 +1001,12 @@ class VideoCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Colors.black54,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: const Icon(
                   Icons.bookmark_border,
-                  color: Colors.white,
+                  color: AppColors.white,
                   size: 16,
                 ),
               ),
@@ -1053,7 +1053,7 @@ class VideoCard extends StatelessWidget {
     double w = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.transparent,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -1105,12 +1105,12 @@ class VideoCard extends StatelessWidget {
             top: 10,
             child: Row(
               children: [
-                const Icon(Icons.play_circle_fill, color: Colors.white, size: 28),
+                const Icon(Icons.play_circle_fill, color: AppColors.white, size: 28),
                 const SizedBox(width: 4),
                 Text(
                   data["views"]!,
                   style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
+                      color: AppColors.white, fontWeight: FontWeight.bold),
                 )
               ],
             ),
@@ -1130,7 +1130,7 @@ class VideoCard extends StatelessWidget {
                   padding:
                   const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.45),
+                    color: AppColors.white.withOpacity(0.45),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Column(
@@ -1139,14 +1139,14 @@ class VideoCard extends StatelessWidget {
                       Text(
                         data["name"]!,
                         style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.white,
                             fontWeight: FontWeight.w600,
                             fontSize: 16),
                       ),
                       Text(
                         data["username"]!,
                         style: const TextStyle(
-                            color: Colors.white70, fontSize: 12),
+                            color: AppColors.white, fontSize: 12),
                       ),
                     ],
                   ),
@@ -1177,12 +1177,12 @@ class VideoCard extends StatelessWidget {
             top: 10,
             child: Row(
               children: [
-                const Icon(Icons.play_circle_fill, color: Colors.white, size: 28),
+                const Icon(Icons.play_circle_fill, color: AppColors.white, size: 28),
                 const SizedBox(width: 4),
                 Text(
                   data["views"]!,
                   style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
+                      color: AppColors.white, fontWeight: FontWeight.bold),
                 )
               ],
             ),
@@ -1202,8 +1202,8 @@ class VideoCard extends StatelessWidget {
                     bottomRight: Radius.circular(14)),
                 gradient: LinearGradient(
                   colors: [
-                    Colors.transparent,
-                    Colors.black.withOpacity(0.6)
+                    AppColors.transparent,
+                    AppColors.white.withOpacity(0.6)
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -1222,14 +1222,14 @@ class VideoCard extends StatelessWidget {
                       Text(
                         data["name"]!,
                         style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.white,
                             fontWeight: FontWeight.w600,
                             fontSize: 14),
                       ),
                       Text(
                         data["username"]!,
                         style: const TextStyle(
-                            color: Colors.white70, fontSize: 11),
+                            color: AppColors.white, fontSize: 11),
                       ),
                     ],
                   ),
@@ -1252,7 +1252,7 @@ class ForYouGridScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () => controller.fetchForYou(),
-      color: Colors.black,
+      color: AppColors.white,
       child: Obx(() {
         if (controller.isLoading.value && controller.forYouPosts.isEmpty) {
           return Padding(
@@ -1262,13 +1262,13 @@ class ForYouGridScreen extends StatelessWidget {
               runSpacing: 12,
               children: List.generate(6, (index) {
                 return Shimmer.fromColors(
-                  baseColor: Colors.grey.shade300,
-                  highlightColor: Colors.grey.shade100,
+                  baseColor: AppColors.premiumGold,
+                  highlightColor: AppColors.premiumGold,
                   child: Container(
                     width: (MediaQuery.of(context).size.width - 36) / 2,
                     height: (index % 2 == 0) ? 220 : 150,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
+                      color: AppColors.premiumGold,
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
@@ -1347,17 +1347,17 @@ class ForYouGridScreen extends StatelessWidget {
                               imageUrl: AppUrls.getFullImageUrl(thumb),
                               fit: BoxFit.cover,
                               placeholder: (context, url) => Shimmer.fromColors(
-                                baseColor: Colors.grey.shade300,
-                                highlightColor: Colors.grey.shade100,
-                                child: Container(color: Colors.grey.shade300),
+                                baseColor: AppColors.premiumGold,
+                                highlightColor: AppColors.premiumGold,
+                                child: Container(color: AppColors.premiumGold),
                               ),
                               errorWidget: (context, url, error) => Container(
-                                color: Colors.grey.shade200,
+                                color: AppColors.premiumGold,
                                 child: Image.asset(AppAssets.imgAppLogo, fit: BoxFit.contain),
                               ),
                             )
                           : Container(
-                              color: Colors.grey.shade200,
+                              color: AppColors.premiumGold,
                               child: Image.asset(AppAssets.imgAppLogo, fit: BoxFit.contain),
                             ),
                     ),
@@ -1368,7 +1368,7 @@ class ForYouGridScreen extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.6),
+                            color: AppColors.white.withOpacity(0.6),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Row(
@@ -1376,13 +1376,13 @@ class ForYouGridScreen extends StatelessWidget {
                             children: [
                               Icon(
                                 item.type == "reel" ? Icons.slow_motion_video : Icons.play_arrow_rounded,
-                                color: Colors.white,
+                                color: AppColors.white,
                                 size: 14,
                               ),
                               const SizedBox(width: 2),
                               Text(
                                 item.stats.viewCount > 0 ? '${item.stats.viewCount}' : '',
-                                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600),
+                                style: const TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.w600),
                               ),
                             ],
                           ),

@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:io';
@@ -92,7 +93,7 @@ class CreateServiceController extends GetxController {
     debugPrint("Submit Service called - Title: $title, isEdit: ${isEdit.value}");
     if (title.isEmpty || price.isEmpty) {
       Get.snackbar("Error", "Title and Price are required",
-          backgroundColor: AppColors.error, colorText: Colors.white);
+          backgroundColor: AppColors.error, colorText: AppColors.white);
       return;
     }
 
@@ -148,7 +149,7 @@ class CreateServiceController extends GetxController {
           }
           Get.back();
           Get.snackbar("Success", response['message'] ?? "Operation successful",
-              backgroundColor: AppColors.success, colorText: Colors.white);
+              backgroundColor: AppColors.success, colorText: AppColors.white);
         } else {
           debugPrint("Service operation failed: ${response['message']}");
           // Handle specific validation errors
@@ -164,17 +165,17 @@ class CreateServiceController extends GetxController {
             }
           }
           Get.snackbar("Error", errorMsg,
-              backgroundColor: AppColors.error, colorText: Colors.white);
+              backgroundColor: AppColors.error, colorText: AppColors.white);
         }
       } else {
         debugPrint("Service operation failed: Response is null");
         Get.snackbar("Error", "No response from server. Please check your connection.",
-            backgroundColor: AppColors.error, colorText: Colors.white);
+            backgroundColor: AppColors.error, colorText: AppColors.white);
       }
     } catch (e) {
       debugPrint("Service operation error: $e");
       Get.snackbar("Error", e.toString(),
-          backgroundColor: AppColors.error, colorText: Colors.white);
+          backgroundColor: AppColors.error, colorText: AppColors.white);
     } finally {
       isLoading.value = false;
     }

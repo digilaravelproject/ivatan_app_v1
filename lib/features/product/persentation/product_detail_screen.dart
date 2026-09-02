@@ -88,7 +88,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           "Success",
           response['message'] ?? "Product deleted successfully",
           backgroundColor: AppColors.success,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           snackPosition: SnackPosition.BOTTOM,
         );
       } else {
@@ -100,7 +100,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         "Error",
         e.toString(),
         backgroundColor: AppColors.error,
-        colorText: Colors.white,
+        colorText: AppColors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
     }
@@ -113,12 +113,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.transparent,
             appBar: AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.transparent,
               elevation: 0,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                icon: const Icon(Icons.arrow_back, color: AppColors.white),
                 onPressed: () => Get.back(),
               ),
             ),
@@ -130,12 +130,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
         if (snapshot.hasError) {
           return Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.transparent,
             appBar: AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.transparent,
               elevation: 0,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                icon: const Icon(Icons.arrow_back, color: AppColors.white),
                 onPressed: () => Get.back(),
               ),
             ),
@@ -198,12 +198,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         : 'https://via.placeholder.com/300';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: AppColors.white),
           onPressed: () => Get.back(),
         ),
         actions: [
@@ -247,7 +247,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     height: 300,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                      color: AppColors.premiumGold,
                     ),
                     child: Image.network(
                       imageUrl,
@@ -257,7 +257,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           child: Icon(
                             Icons.image_not_supported,
                             size: 80,
-                            color: Colors.grey.shade400,
+                            color: AppColors.premiumGold,
                           ),
                         );
                       },
@@ -294,7 +294,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                         '₹${price.toStringAsFixed(0)}',
                                         style: TextStyle(
                                           decoration: TextDecoration.lineThrough,
-                                          color: Colors.grey.shade600,
+                                          color: AppColors.premiumGold,
                                           fontSize: 16,
                                         ),
                                       ),
@@ -329,7 +329,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           Text(
                             'Stock: ${product.stock} units',
                             style: TextStyle(
-                              color: product.stock > 0 ? Colors.grey.shade600 : AppColors.error,
+                              color: product.stock > 0 ? AppColors.premiumGold : AppColors.error,
                               fontSize: 14,
                               fontWeight: product.stock == 0 ? FontWeight.bold : FontWeight.normal,
                             ),
@@ -369,7 +369,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         Text(
                           description,
                           style: TextStyle(
-                            color: Colors.grey.shade700,
+                            color: AppColors.premiumGold,
                             height: 1.6,
                             fontSize: 15,
                           ),
@@ -420,8 +420,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                         fit: BoxFit.cover,
                                         errorBuilder: (context, error, stackTrace) {
                                           return Container(
-                                            color: Colors.grey.shade200,
-                                            child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                                            color: AppColors.premiumGold,
+                                            child: const Icon(Icons.image_not_supported, color: AppColors.premiumGold),
                                           );
                                         },
                                       ),
@@ -447,10 +447,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: AppColors.white.withOpacity(0.1),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),
@@ -477,10 +477,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
+                                color: AppColors.premiumGold,
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.remove, size: 24, color: Colors.black87),
+                              child: const Icon(Icons.remove, size: 24, color: AppColors.white),
                             ),
                           ),
                           Padding(
@@ -490,7 +490,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: AppColors.white,
                               ),
                             ),
                           ),
@@ -503,7 +503,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 color: AppColors.black,
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.add, size: 24, color: Colors.white),
+                              child: const Icon(Icons.add, size: 24, color: AppColors.white),
                             ),
                           ),
                         ],
@@ -556,7 +556,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           //     },
                           //     style: ElevatedButton.styleFrom(
                           //       backgroundColor: AppColors.black,
-                          //       foregroundColor: Colors.white,
+                          //       foregroundColor: AppColors.white,
                           //       shape: RoundedRectangleBorder(
                           //         borderRadius: BorderRadius.circular(12),
                           //       ),

@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -16,14 +17,14 @@ class SellerOrderDetailScreen extends StatelessWidget {
     final controller = Get.put(SellerOrderDetailController(orderId: orderId), tag: orderId.toString());
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
         title: const Text(
           "Received Order Details",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.white),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: AppColors.transparent,
+        foregroundColor: AppColors.white,
         elevation: 0,
       ),
       body: Obx(() {
@@ -68,10 +69,10 @@ class SellerOrderDetailScreen extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: AppColors.white.withOpacity(0.05),
                 blurRadius: 10,
                 offset: const Offset(0, -5),
               ),
@@ -81,7 +82,7 @@ class SellerOrderDetailScreen extends StatelessWidget {
             onPressed: () => _showStatusUpdateBottomSheet(context, controller, order.status ?? 'pending'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.black,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -96,9 +97,9 @@ class SellerOrderDetailScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.premiumGold.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.premiumGold),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -113,7 +114,7 @@ class SellerOrderDetailScreen extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 order.createdAt != null ? DateFormat('dd MMM yyyy, hh:mm a').format(order.createdAt!) : '',
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 12, color: AppColors.premiumGold),
               ),
             ],
           ),
@@ -138,9 +139,9 @@ class SellerOrderDetailScreen extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(color: AppColors.premiumGold),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,13 +153,13 @@ class SellerOrderDetailScreen extends StatelessWidget {
                       width: 50,
                       height: 50,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
+                        color: AppColors.premiumGold,
                         shape: BoxShape.circle,
                       ),
                       child: ClipOval(
                         child: order.buyer!.profilePhotoPath != null
                           ? Image.network(AppUrls.getFullImageUrl(order.buyer!.profilePhotoPath!), fit: BoxFit.cover)
-                          : const Icon(Icons.person, color: Colors.grey),
+                          : const Icon(Icons.person, color: AppColors.premiumGold),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -174,11 +175,11 @@ class SellerOrderDetailScreen extends StatelessWidget {
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                const Icon(Icons.phone_outlined, size: 14, color: Colors.grey),
+                                const Icon(Icons.phone_outlined, size: 14, color: AppColors.premiumGold),
                                 const SizedBox(width: 4),
                                 Text(
                                   order.buyer!.phone!,
-                                  style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                                  style: TextStyle(color: AppColors.premiumGold, fontSize: 13),
                                 ),
                               ],
                             ),
@@ -187,11 +188,11 @@ class SellerOrderDetailScreen extends StatelessWidget {
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                const Icon(Icons.email_outlined, size: 14, color: Colors.grey),
+                                const Icon(Icons.email_outlined, size: 14, color: AppColors.premiumGold),
                                 const SizedBox(width: 4),
                                 Text(
                                   order.buyer!.email!,
-                                  style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                                  style: TextStyle(color: AppColors.premiumGold, fontSize: 13),
                                 ),
                               ],
                             ),
@@ -202,13 +203,13 @@ class SellerOrderDetailScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const Divider(height: 1, color: Colors.black12),
+                const Divider(height: 1, color: AppColors.white),
                 const SizedBox(height: 16),
               ],
               if (order.address != null) ...[
                 const Text(
                   "Shipping Address",
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.grey),
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.premiumGold),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -218,21 +219,21 @@ class SellerOrderDetailScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   "${order.address!.addressLine1}${order.address!.addressLine2 != null ? ', ${order.address!.addressLine2}' : ''}",
-                  style: TextStyle(color: Colors.grey.shade800, fontSize: 13),
+                  style: TextStyle(color: AppColors.premiumGold, fontSize: 13),
                 ),
                 Text(
                   "${order.address!.city}, ${order.address!.state} - ${order.address!.postalCode}",
-                  style: TextStyle(color: Colors.grey.shade800, fontSize: 13),
+                  style: TextStyle(color: AppColors.premiumGold, fontSize: 13),
                 ),
                 if (order.address!.phone != null) ...[
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.phone_outlined, size: 14, color: Colors.grey),
+                      const Icon(Icons.phone_outlined, size: 14, color: AppColors.premiumGold),
                       const SizedBox(width: 4),
                       Text(
                         order.address!.phone!,
-                        style: TextStyle(color: Colors.grey.shade800, fontSize: 13),
+                        style: TextStyle(color: AppColors.premiumGold, fontSize: 13),
                       ),
                     ],
                   ),
@@ -266,12 +267,12 @@ class SellerOrderDetailScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: AppColors.premiumGold),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: AppColors.white.withOpacity(0.02),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -283,7 +284,7 @@ class SellerOrderDetailScreen extends StatelessWidget {
             width: 70,
             height: 70,
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: AppColors.premiumGold,
               borderRadius: BorderRadius.circular(8),
             ),
             child: ClipRRect(
@@ -292,9 +293,9 @@ class SellerOrderDetailScreen extends StatelessWidget {
                   ? Image.network(
                       AppUrls.getFullImageUrl(item.image),
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.grey),
+                      errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, color: AppColors.premiumGold),
                     )
-                  : const Icon(Icons.shopping_bag_outlined, color: Colors.grey),
+                  : const Icon(Icons.shopping_bag_outlined, color: AppColors.premiumGold),
             ),
           ),
           const SizedBox(width: 12),
@@ -314,12 +315,12 @@ class SellerOrderDetailScreen extends StatelessWidget {
                   children: [
                     Text(
                       "₹${double.tryParse(item.price ?? '0')?.toStringAsFixed(0)}",
-                      style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+                      style: TextStyle(color: AppColors.premiumGold, fontSize: 13),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
+                        color: AppColors.premiumGold,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -349,9 +350,9 @@ class SellerOrderDetailScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(color: AppColors.premiumGold),
           ),
           child: Column(
             children: [
@@ -373,13 +374,13 @@ class SellerOrderDetailScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
+          Text(label, style: TextStyle(color: AppColors.premiumGold, fontSize: 14)),
           Text(
             value,
             style: TextStyle(
               fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
               fontSize: fontSize,
-              color: isGreen ? Colors.green : Colors.black,
+              color: isGreen ? Colors.green : AppColors.white,
             ),
           ),
         ],
@@ -394,7 +395,7 @@ class SellerOrderDetailScreen extends StatelessWidget {
       case 'rejected': color = Colors.red; break;
       case 'shipped': color = Colors.purple; break;
       case 'delivered': color = Colors.blue; break;
-      case 'cancelled': color = Colors.grey; break;
+      case 'cancelled': color = AppColors.premiumGold; break;
       default: color = Colors.orange;
     }
 
@@ -415,7 +416,7 @@ class SellerOrderDetailScreen extends StatelessWidget {
     final List<String> statuses = ['accepted', 'rejected', 'processing','paid','shipped', 'delivered', 'cancelled',];
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -441,7 +442,7 @@ class SellerOrderDetailScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: status == currentStatus ? FontWeight.bold : FontWeight.normal,
-                    color: status == currentStatus ? AppColors.black : Colors.black87,
+                    color: status == currentStatus ? AppColors.black : AppColors.white,
                   ),
                 ),
                 trailing: status == currentStatus 
@@ -474,7 +475,7 @@ class SellerOrderDetailScreen extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Get.back(),
-              child: Text("Cancel", style: TextStyle(color: Colors.grey.shade700)),
+              child: Text("Cancel", style: TextStyle(color: AppColors.premiumGold)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -483,7 +484,7 @@ class SellerOrderDetailScreen extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.black,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.white,
               ),
               child: const Text("Yes, Update"),
             ),

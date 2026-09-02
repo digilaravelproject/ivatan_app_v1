@@ -7,7 +7,7 @@ class CreatorAnalysisScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: AppColors.premiumGold.withOpacity(0.1),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -38,7 +38,7 @@ class CreatorAnalysisScreen extends StatelessWidget {
                   const Text(
                     'Total Earnings',
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: AppColors.white,
                       fontSize: 16,
                     ),
                   ),
@@ -48,7 +48,7 @@ class CreatorAnalysisScreen extends StatelessWidget {
                       const Text(
                         '₹1,25,000',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.white,
                           fontSize: 36,
                           fontWeight: FontWeight.bold,
                         ),
@@ -60,20 +60,20 @@ class CreatorAnalysisScreen extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: AppColors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Row(
                           children: [
                             Icon(
                               Icons.arrow_upward,
-                              color: Colors.white,
+                              color: AppColors.white,
                               size: 16,
                             ),
                             Text(
                               '+12%',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -86,7 +86,7 @@ class CreatorAnalysisScreen extends StatelessWidget {
                   Text(
                     'vs last month ₹1,11,000',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: AppColors.white.withOpacity(0.7),
                       fontSize: 12,
                     ),
                   ),
@@ -144,11 +144,11 @@ class CreatorAnalysisScreen extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: AppColors.premiumGold.withOpacity(0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 5),
                   ),
@@ -180,11 +180,11 @@ class CreatorAnalysisScreen extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: AppColors.premiumGold.withOpacity(0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 5),
                   ),
@@ -240,11 +240,11 @@ class CreatorAnalysisScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: AppColors.premiumGold.withOpacity(0.1),
             blurRadius: 5,
             offset: const Offset(0, 3),
           ),
@@ -297,7 +297,7 @@ class CreatorAnalysisScreen extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey.shade600,
+              color: AppColors.premiumGold,
             ),
           ),
         ],
@@ -331,7 +331,7 @@ class CreatorAnalysisScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
               value: percentage / 100,
-              backgroundColor: Colors.grey.shade200,
+              backgroundColor: AppColors.premiumGold,
               valueColor: AlwaysStoppedAnimation<Color>(color),
               minHeight: 8,
             ),
@@ -354,10 +354,10 @@ class CreatorAnalysisScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: AppColors.premiumGold,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, size: 20, color: Colors.grey.shade700),
+            child: Icon(icon, size: 20, color: AppColors.premiumGold),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -377,18 +377,18 @@ class CreatorAnalysisScreen extends StatelessWidget {
                       time,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade500,
+                        color: AppColors.premiumGold,
                       ),
                     ),
                     Text(
                       ' • ',
-                      style: TextStyle(color: Colors.grey.shade400),
+                      style: TextStyle(color: AppColors.premiumGold),
                     ),
                     Text(
                       views,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade500,
+                        color: AppColors.premiumGold,
                       ),
                     ),
                   ],
@@ -396,7 +396,7 @@ class CreatorAnalysisScreen extends StatelessWidget {
               ],
             ),
           ),
-          Icon(Icons.more_horiz, color: Colors.grey.shade400),
+          Icon(Icons.more_horiz, color: AppColors.premiumGold),
         ],
       ),
     );
@@ -417,8 +417,8 @@ class CreatorAnalysisScreen extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.grey.shade50,
-            Colors.white,
+            AppColors.premiumGold.withOpacity(0.1),
+            AppColors.white,
           ],
         ),
       ),
@@ -459,7 +459,7 @@ class CreatorAnalysisScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.white,
+                            color: AppColors.white,
                             width: 3,
                           ),
                         ),
@@ -480,7 +480,7 @@ class CreatorAnalysisScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: AppColors.white,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -488,7 +488,7 @@ class CreatorAnalysisScreen extends StatelessWidget {
                               '@priyacreates • 2 years',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white.withOpacity(0.9),
+                                color: AppColors.white.withOpacity(0.9),
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -498,13 +498,13 @@ class CreatorAnalysisScreen extends StatelessWidget {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: AppColors.white.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: const Text(
                                 'Lifestyle & Fashion',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                   fontSize: 12,
                                 ),
                               ),
@@ -567,11 +567,11 @@ class CreatorAnalysisScreen extends StatelessWidget {
               // Engagement Rate Card
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: AppColors.premiumGold.withOpacity(0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
@@ -596,13 +596,13 @@ class CreatorAnalysisScreen extends StatelessWidget {
                         Container(
                           height: 30,
                           width: 1,
-                          color: Colors.grey.shade300,
+                          color: AppColors.premiumGold,
                         ),
                         _buildEngagementItem('2.3K', 'Avg Likes', AppColors.primary),
                         Container(
                           height: 30,
                           width: 1,
-                          color: Colors.grey.shade300,
+                          color: AppColors.premiumGold,
                         ),
                         _buildEngagementItem('156', 'Avg Comments', AppColors.primary),
                       ],
@@ -661,11 +661,11 @@ class CreatorAnalysisScreen extends StatelessWidget {
               // Performance Graph Section
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: AppColors.premiumGold.withOpacity(0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
@@ -707,11 +707,11 @@ class CreatorAnalysisScreen extends StatelessWidget {
               // Earnings Breakdown
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: AppColors.premiumGold.withOpacity(0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
@@ -746,11 +746,11 @@ class CreatorAnalysisScreen extends StatelessWidget {
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: AppColors.premiumGold.withOpacity(0.1),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -800,7 +800,7 @@ class CreatorAnalysisScreen extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey.shade600,
+                color: AppColors.premiumGold,
               ),
             ),
           ],
@@ -825,7 +825,7 @@ class CreatorAnalysisScreen extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 11,
-            color: Colors.grey.shade600,
+            color: AppColors.premiumGold,
           ),
         ),
       ],
@@ -836,11 +836,11 @@ class CreatorAnalysisScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.05),
+            color: AppColors.premiumGold.withOpacity(0.05),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -872,7 +872,7 @@ class CreatorAnalysisScreen extends StatelessWidget {
         trailing: Text(
           time,
           style: TextStyle(
-            color: Colors.grey.shade500,
+            color: AppColors.premiumGold,
             fontSize: 12,
           ),
         ),
@@ -897,7 +897,7 @@ class CreatorAnalysisScreen extends StatelessWidget {
           day,
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey.shade600,
+            color: AppColors.premiumGold,
           ),
         ),
       ],
@@ -923,7 +923,7 @@ class CreatorAnalysisScreen extends StatelessWidget {
                 Container(
                   height: 8,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
+                    color: AppColors.premiumGold,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -964,7 +964,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: AppColors.white,
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -974,11 +974,11 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
               // Profile Summary Card - Black & White Style
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
+                      color: AppColors.premiumGold.withOpacity(0.2),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),
@@ -992,7 +992,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.white,
+                            color: AppColors.white,
                             width: 2,
                           ),
                         ),
@@ -1013,7 +1013,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: AppColors.white,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -1021,7 +1021,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
                               '@priyacreates',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey.shade400,
+                                color: AppColors.premiumGold,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -1031,13 +1031,13 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1),
+                                color: AppColors.white.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: const Text(
                                 'Lifestyle Creator',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                   fontSize: 11,
                                 ),
                               ),
@@ -1096,9 +1096,9 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
               // Engagement Card - Minimal
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
+                  color: AppColors.premiumGold.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey.shade200),
+                  border: Border.all(color: AppColors.premiumGold),
                 ),
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -1109,7 +1109,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black54,
+                        color: AppColors.white,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -1121,13 +1121,13 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
                         Container(
                           height: 30,
                           width: 1,
-                          color: Colors.grey.shade300,
+                          color: AppColors.premiumGold,
                         ),
                         _buildSimpleMetric('2.3K', 'Avg Likes'),
                         Container(
                           height: 30,
                           width: 1,
-                          color: Colors.grey.shade300,
+                          color: AppColors.premiumGold,
                         ),
                         _buildSimpleMetric('156', 'Comments'),
                       ],
@@ -1147,7 +1147,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black54,
+                      color: AppColors.white,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -1155,7 +1155,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
                     'View All',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey.shade600,
+                      color: AppColors.premiumGold,
                     ),
                   ),
                 ],
@@ -1185,9 +1185,9 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
               // Performance Graph - Black & White
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey.shade200),
+                  border: Border.all(color: AppColors.premiumGold),
                 ),
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -1198,7 +1198,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black54,
+                        color: AppColors.white,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -1227,9 +1227,9 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
               // Income Sources - Monochrome
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey.shade200),
+                  border: Border.all(color: AppColors.premiumGold),
                 ),
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -1240,7 +1240,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black54,
+                        color: AppColors.white,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -1277,9 +1277,9 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: AppColors.premiumGold),
         ),
         padding: const EdgeInsets.all(14),
         child: Column(
@@ -1288,17 +1288,17 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(icon, color: Colors.black87, size: 20),
+                Icon(icon, color: AppColors.white, size: 20),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: AppColors.white,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     growth,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 9,
                       fontWeight: FontWeight.w500,
                     ),
@@ -1312,14 +1312,14 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: AppColors.white,
               ),
             ),
             Text(
               label,
               style: TextStyle(
                 fontSize: 11,
-                color: Colors.grey.shade600,
+                color: AppColors.premiumGold,
               ),
             ),
           ],
@@ -1336,7 +1336,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: AppColors.white,
           ),
         ),
         const SizedBox(height: 4),
@@ -1344,7 +1344,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 11,
-            color: Colors.grey.shade600,
+            color: AppColors.premiumGold,
           ),
         ),
       ],
@@ -1355,36 +1355,36 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.premiumGold),
       ),
       child: ListTile(
         leading: Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: Colors.grey.shade100,
+            color: AppColors.premiumGold,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Icon(Icons.play_arrow, color: Colors.black54, size: 20),
+          child: const Icon(Icons.play_arrow, color: AppColors.white, size: 20),
         ),
         title: Text(
           title,
           style: const TextStyle(
             fontWeight: FontWeight.w500,
-            color: Colors.black,
+            color: AppColors.white,
             fontSize: 14,
           ),
         ),
         subtitle: Text(
           stats,
-          style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
+          style: TextStyle(color: AppColors.premiumGold, fontSize: 11),
         ),
         trailing: Text(
           time,
           style: TextStyle(
-            color: Colors.grey.shade500,
+            color: AppColors.premiumGold,
             fontSize: 11,
           ),
         ),
@@ -1399,7 +1399,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
           width: 24,
           height: 80 * heightFactor,
           decoration: BoxDecoration(
-            color: Colors.black,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(4),
           ),
         ),
@@ -1408,7 +1408,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
           day,
           style: TextStyle(
             fontSize: 11,
-            color: Colors.grey.shade700,
+            color: AppColors.premiumGold,
           ),
         ),
       ],
@@ -1424,7 +1424,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
             flex: 2,
             child: Text(
               source,
-              style: const TextStyle(fontSize: 13, color: Colors.black87),
+              style: const TextStyle(fontSize: 13, color: AppColors.white),
             ),
           ),
           Expanded(
@@ -1434,7 +1434,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
                 Container(
                   height: 6,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
+                    color: AppColors.premiumGold,
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -1442,7 +1442,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
                   width: 100 * percentage,
                   height: 6,
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: AppColors.white,
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -1455,7 +1455,7 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
             style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 13,
-              color: Colors.black,
+              color: AppColors.white,
             ),
           ),
         ],
@@ -1471,14 +1471,14 @@ class CreatorAnalysisScreen1 extends StatelessWidget {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: AppColors.white,
           ),
         ),
         Text(
           label,
           style: TextStyle(
             fontSize: 11,
-            color: Colors.grey.shade600,
+            color: AppColors.premiumGold,
           ),
         ),
       ],

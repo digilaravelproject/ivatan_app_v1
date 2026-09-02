@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -40,14 +41,14 @@ class _dashboardState extends State<dashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.transparent,
       body: _pages[_selectedIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppColors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: AppColors.white.withOpacity(0.08),
               blurRadius: 8,
               offset: const Offset(0, -2),
             ),
@@ -210,7 +211,7 @@ class LoginPage123 extends StatelessWidget {
                               width: 50,
                               height: 4,
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
+                                color: AppColors.premiumGold,
                                 borderRadius: BorderRadius.circular(2),
                               ),
                             ),
@@ -228,7 +229,7 @@ class LoginPage123 extends StatelessWidget {
                           Text(
                             "Enter your mobile number and start connecting with amazing date!",
                             style: context.textTheme.bodyMedium?.copyWith(
-                              color: Colors.grey.shade600,
+                              color: AppColors.premiumGold,
                             ),
                           ),
 
@@ -241,8 +242,8 @@ class LoginPage123 extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                               letterSpacing: 2,
                               color: context.isDarkMode
-                                  ? Colors.white70
-                                  : Colors.grey.shade700,
+                                  ? AppColors.white
+                                  : AppColors.premiumGold,
                             ),
                           ),                          const SizedBox(height: 8),
 
@@ -390,7 +391,7 @@ class LoginPage123 extends StatelessWidget {
                               textAlign: TextAlign.center,
                               text: TextSpan(
                                 style: TextStyle(
-                                  color: Colors.grey.shade500,
+                                  color: AppColors.premiumGold,
                                   fontSize: 12,
                                   height: 1.4,
                                 ),
@@ -458,7 +459,7 @@ class LoginPage123 extends StatelessWidget {
                               width: 50,
                               height: 4,
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
+                                color: AppColors.premiumGold,
                                 borderRadius: BorderRadius.circular(2),
                               ),
                             ),
@@ -476,7 +477,7 @@ class LoginPage123 extends StatelessWidget {
                           Text(
                             "Enter your mobile number and start connecting with amazing date!",
                             style: context.textTheme.bodyMedium?.copyWith(
-                              color: Colors.grey.shade600,
+                              color: AppColors.premiumGold,
                             ),
                           ),
 
@@ -489,8 +490,8 @@ class LoginPage123 extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                               letterSpacing: 2,
                               color: context.isDarkMode
-                                  ? Colors.white70
-                                  : Colors.grey.shade700,
+                                  ? AppColors.white
+                                  : AppColors.premiumGold,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -639,7 +640,7 @@ class LoginPage123 extends StatelessWidget {
                               textAlign: TextAlign.center,
                               text: TextSpan(
                                 style: TextStyle(
-                                  color: Colors.grey.shade500,
+                                  color: AppColors.premiumGold,
                                   fontSize: 12,
                                   height: 1.4,
                                 ),
@@ -789,7 +790,7 @@ class LoopHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         body: Stack(
           children: [
             Positioned.fill(
@@ -800,7 +801,7 @@ class LoopHomeScreen extends StatelessWidget {
             ),
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.3), // optional dark overlay
+                color: AppColors.white.withOpacity(0.3), // optional dark overlay
               ),
             ),
             SafeArea(
@@ -853,7 +854,7 @@ class LoopHomeScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: Colors.white
+              color: AppColors.white
               ,
             ),
           ),
@@ -876,7 +877,7 @@ class LoopHomeScreen extends StatelessWidget {
                       child: const Text(
                         '3',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
@@ -931,7 +932,7 @@ class LoopHomeScreen extends StatelessWidget {
                         padding: const EdgeInsets.all(3), // border thickness
                         child: Container(
                           decoration: const BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.white,
                             shape: BoxShape.circle,
                           ),
                           child: ClipOval(
@@ -961,11 +962,11 @@ class LoopHomeScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.blue,
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
+                            border: Border.all(color: AppColors.white, width: 2),
                           ),
                           child: const Icon(
                             Icons.add,
-                            color: Colors.white,
+                            color: AppColors.white,
                             size: 12,
                           ),
                         ),
@@ -1038,7 +1039,7 @@ class LoopHomeScreen extends StatelessWidget {
                     ),
                     const Text(
                       '🎵 Imam Malboo • Neha Nair, Kinanu Kondu',
-                      style: TextStyle(fontSize: 11, color: Colors.grey),
+                      style: TextStyle(fontSize: 11, color: AppColors.premiumGold),
                     ),
                   ],
                 ),
@@ -1099,13 +1100,13 @@ class LoopHomeScreen extends StatelessWidget {
                     Text(
                       '$likes Liked',
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AppColors.white,
                         fontWeight: FontWeight.bold,
                         shadows: [
                           Shadow(
                             offset: Offset(0, 1),
                             blurRadius: 4,
-                            color: Colors.black45,
+                            color: AppColors.white,
                           ),
                         ],
                       ),
@@ -1141,12 +1142,12 @@ class LoopHomeScreen extends StatelessWidget {
             children: [
               Text(
                 time,
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: const TextStyle(fontSize: 12, color: AppColors.premiumGold),
               ),
               const SizedBox(height: 4),
               const Text(
                 '@vibeteller, @mooddreamlms and others liked this post!',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+                style: TextStyle(fontSize: 12, color: AppColors.premiumGold),
               ),
               const SizedBox(height: 4),
               const Text(
@@ -1168,7 +1169,7 @@ class LoopHomeScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 2),
+        border: Border.all(color: AppColors.white, width: 2),
       ),
     );
   }
@@ -1178,8 +1179,8 @@ class LoopHomeScreen extends StatelessWidget {
     return Container(
       height: 70,
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        color: AppColors.white,
+        border: Border(top: BorderSide(color: AppColors.premiumGold)),
       ),
       child: Stack(
         clipBehavior: Clip.none,
@@ -1205,7 +1206,7 @@ class LoopHomeScreen extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black26,
+                    color: AppColors.white,
                     blurRadius: 8,
                     offset: Offset(0, 4),
                   ),
@@ -1213,7 +1214,7 @@ class LoopHomeScreen extends StatelessWidget {
               ),
               child: const Icon(
                 Icons.add_circle,
-                color: Colors.white,
+                color: AppColors.white,
                 size: 32,
               ),
             ),
@@ -1230,7 +1231,7 @@ class LoopHomeScreen extends StatelessWidget {
       children: [
         Icon(
           icon,
-          color: isActive ? Colors.blue : Colors.grey,
+          color: isActive ? Colors.blue : AppColors.premiumGold,
           size: 24,
         ),
         const SizedBox(height: 4),
@@ -1238,7 +1239,7 @@ class LoopHomeScreen extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: isActive ? Colors.blue : Colors.grey,
+            color: isActive ? Colors.blue : AppColors.premiumGold,
             fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
           ),
         ),
@@ -1266,13 +1267,13 @@ class DashboardPage extends StatelessWidget {
           shape: const CircleBorder(),
           backgroundColor: AppColors.primary,
           onPressed: () => controller.changeIndex(2),
-          child: const Icon(Icons.slow_motion_video, color: Colors.white),
+          child: const Icon(Icons.slow_motion_video, color: AppColors.white),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: BottomAppBar(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           height: 65,
-          shadowColor: Colors.transparent,
+          shadowColor: AppColors.transparent,
           shape: const CircularNotchedRectangle(),
           notchMargin: 8.0,
           child: Row(
@@ -1440,7 +1441,7 @@ class DatingLoginScreen extends StatelessWidget {
             alignment: Alignment.bottomCenter,
             child: Container(
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(30),
                   topRight: Radius.circular(30),
@@ -1455,7 +1456,7 @@ class DatingLoginScreen extends StatelessWidget {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: Colors.grey[300],
+                      color: AppColors.premiumGold.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -1473,7 +1474,7 @@ class DatingLoginScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 26,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black87,
+                                color: AppColors.white,
                               ),
                             ),
                             Text(
@@ -1490,7 +1491,7 @@ class DatingLoginScreen extends StatelessWidget {
                           'Enter your mobile number and start connecting with amazing date!',
                           style: TextStyle(
                             fontSize: 15,
-                            color: Colors.grey,
+                            color: AppColors.premiumGold,
                             height: 1.4,
                           ),
                         ),
@@ -1503,7 +1504,7 @@ class DatingLoginScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: Colors.grey,
+                            color: AppColors.premiumGold,
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -1513,7 +1514,7 @@ class DatingLoginScreen extends StatelessWidget {
                         // Phone Number Input
                         Container(
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey[300]!),
+                            border: Border.all(color: AppColors.premiumGold.withOpacity(0.3)),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -1533,7 +1534,7 @@ class DatingLoginScreen extends StatelessWidget {
                                       ),
                                     ),
                                     SizedBox(width: 4),
-                                    Icon(Icons.arrow_drop_down, color: Colors.grey),
+                                    Icon(Icons.arrow_drop_down, color: AppColors.premiumGold),
                                   ],
                                 ),
                               ),
@@ -1542,7 +1543,7 @@ class DatingLoginScreen extends StatelessWidget {
                               Container(
                                 height: 40,
                                 width: 1,
-                                color: Colors.grey[300],
+                                color: AppColors.premiumGold.withOpacity(0.3),
                               ),
 
                               // Phone Number Field
@@ -1551,7 +1552,7 @@ class DatingLoginScreen extends StatelessWidget {
                                   decoration: InputDecoration(
                                     hintText: '9651017054',
                                     hintStyle: TextStyle(
-                                      color: Colors.grey[400],
+                                      color: AppColors.premiumGold.withOpacity(0.4),
                                       fontSize: 16,
                                     ),
                                     border: InputBorder.none,
@@ -1581,7 +1582,7 @@ class DatingLoginScreen extends StatelessWidget {
                                 'We will send OTP on',
                                 style: TextStyle(
                                   fontSize: 15,
-                                  color: Colors.black87,
+                                  color: AppColors.white,
                                 ),
                               ),
                               SizedBox(height: 4),
@@ -1590,7 +1591,7 @@ class DatingLoginScreen extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
+                                  color: AppColors.white,
                                 ),
                               ),
                             ],
@@ -1611,7 +1612,7 @@ class DatingLoginScreen extends StatelessWidget {
                               ),
                               child: const Icon(
                                 Icons.check,
-                                color: Colors.white,
+                                color: AppColors.white,
                                 size: 18,
                               ),
                             ),
@@ -1620,7 +1621,7 @@ class DatingLoginScreen extends StatelessWidget {
                               'Login with otp',
                               style: TextStyle(
                                 fontSize: 15,
-                                color: Colors.black87,
+                                color: AppColors.white,
                               ),
                             ),
                           ],
@@ -1647,7 +1648,7 @@ class DatingLoginScreen extends StatelessWidget {
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 0.5,
-                                color: Colors.white,
+                                color: AppColors.white,
                               ),
                             ),
                           ),
@@ -1662,7 +1663,7 @@ class DatingLoginScreen extends StatelessWidget {
                             text: TextSpan(
                               style: const TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey,
+                                color: AppColors.premiumGold,
                               ),
                               children: [
                                 const TextSpan(text: 'By continuing, you agree to our\n'),

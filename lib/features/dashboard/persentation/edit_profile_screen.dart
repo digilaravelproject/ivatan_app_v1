@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,25 +20,34 @@ class EditProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Safely retrieve or initialize controller tag-based
-    final profileController = Get.isRegistered<SettingsController>(tag: currentUserName)
-        ? Get.find<SettingsController>(tag: currentUserName)
-        : Get.put(
-            SettingsController(userName: currentUserName ?? ""),
-            tag: currentUserName,
-          );
+    final profileController =
+        Get.isRegistered<SettingsController>(tag: currentUserName)
+            ? Get.find<SettingsController>(tag: currentUserName)
+            : Get.put(
+              SettingsController(userName: currentUserName ?? ""),
+              tag: currentUserName,
+            );
 
     return Scaffold(
-      backgroundColor: AppColors.white, // Clean White Background
+      backgroundColor: AppColors.transparent, // Clean White Background
       appBar: AppBar(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         centerTitle: true,
         leading: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: const Icon(CupertinoIcons.back, color: Colors.black)),
-        title: const Text("Edit Profile", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: const Icon(CupertinoIcons.back, color: AppColors.white),
+        ),
+        title: const Text(
+          "Edit Profile",
+          style: TextStyle(
+            color: AppColors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
       ),
       body: Obx(() {
         final userProfile = profileController.userProfile.value;
@@ -55,24 +65,33 @@ class EditProfileScreen extends StatelessWidget {
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.primary.withOpacity(0.1), width: 1),
+                            border: Border.all(
+                              color: AppColors.primary.withOpacity(0.1),
+                              width: 1,
+                            ),
                           ),
                           child: ClipOval(
                             child: Container(
                               width: 100,
                               height: 100,
-                              color: Colors.grey.shade50, // Subtle background for avatars
+                              color: AppColors.premiumGold.withOpacity(
+                                0.1,
+                              ), // Subtle background for avatars
                               child: Obx(() {
                                 Widget avatarChild;
                                 if (profileController.imageFile.value != null) {
                                   avatarChild = Center(
-                                    key: ValueKey(profileController.imageFile.value!.path),
+                                    key: ValueKey(
+                                      profileController.imageFile.value!.path,
+                                    ),
                                     child: Image.file(
                                       profileController.imageFile.value!,
                                       fit: BoxFit.contain,
                                     ),
                                   );
-                                } else if (userProfile?.profilePhotoPath != null && userProfile!.profilePhotoPath!.isNotEmpty) {
+                                } else if (userProfile?.profilePhotoPath !=
+                                        null &&
+                                    userProfile!.profilePhotoPath!.isNotEmpty) {
                                   avatarChild = CustomImageView(
                                     key: ValueKey(userProfile.profilePhotoPath),
                                     url: "${userProfile.profilePhotoPath}",
@@ -81,24 +100,47 @@ class EditProfileScreen extends StatelessWidget {
                                 } else {
                                   avatarChild = const Center(
                                     key: ValueKey("placeholder"),
-                                    child: Icon(Icons.person, size: 70, color: Colors.grey),
+                                    child: Icon(
+                                      Icons.person,
+                                      size: 70,
+                                      color: AppColors.premiumGold,
+                                    ),
                                   );
                                 }
 
                                 return AnimatedSwitcher(
-                                  duration: 400.ms,
-                                  transitionBuilder: (child, animation) {
-                                    return FadeTransition(
-                                      opacity: animation,
-                                      child: ScaleTransition(scale: animation, child: child),
+                                      duration: 400.ms,
+                                      transitionBuilder: (child, animation) {
+                                        return FadeTransition(
+                                          opacity: animation,
+                                          child: ScaleTransition(
+                                            scale: animation,
+                                            child: child,
+                                          ),
+                                        );
+                                      },
+                                      child:
+                                          avatarChild
+                                              .animate(
+                                                key: ValueKey(avatarChild.key),
+                                              )
+                                              .scale(
+                                                duration: 400.ms,
+                                                curve: Curves.easeOutBack,
+                                              )
+                                              .fadeIn(),
+                                    )
+                                    .animate(
+                                      onPlay:
+                                          (controller) =>
+                                              controller.repeat(reverse: true),
+                                    )
+                                    .moveY(
+                                      begin: 0,
+                                      end: -5,
+                                      duration: 1500.ms,
+                                      curve: Curves.easeInOut,
                                     );
-                                  },
-                                  child: avatarChild
-                                      .animate(key: ValueKey(avatarChild.key))
-                                      .scale(duration: 400.ms, curve: Curves.easeOutBack)
-                                      .fadeIn(),
-                                ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                                 .moveY(begin: 0, end: -5, duration: 1500.ms, curve: Curves.easeInOut);
                               }),
                             ),
                           ),
@@ -113,16 +155,23 @@ class EditProfileScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: AppColors.primary,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2),
+                                border: Border.all(
+                                  color: AppColors.white,
+                                  width: 2,
+                                ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
+                                    color: AppColors.white.withOpacity(0.1),
                                     blurRadius: 4,
                                     offset: const Offset(0, 2),
                                   ),
                                 ],
                               ),
-                              child: const Icon(Icons.camera_alt, size: 18, color: Colors.white),
+                              child: const Icon(
+                                Icons.camera_alt,
+                                size: 18,
+                                color: AppColors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -146,7 +195,7 @@ class EditProfileScreen extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 "@${userProfile?.username ?? "username"}",
-                style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+                style: TextStyle(color: AppColors.premiumGold, fontSize: 13),
               ),
 
               const SizedBox(height: 30),
@@ -185,7 +234,7 @@ class EditProfileScreen extends StatelessWidget {
                   readOnly: true,
                 ),
               ),
-              
+
               _buildCleanField(
                 child: AuthInputFieldsBorder(
                   label: "Bio",
@@ -193,7 +242,7 @@ class EditProfileScreen extends StatelessWidget {
                   controller: profileController.bioController,
                 ),
               ),
-              
+
               _buildCleanField(
                 child: CustomSearchableDropdown(
                   label: "Occupation",
@@ -210,23 +259,28 @@ class EditProfileScreen extends StatelessWidget {
 
               // BUTTON
               Obx(
-                () => profileController.isLoading.value
-                    ? const Center(child: CircularProgressIndicator())
-                    : MyButton(
-                  title: "Save Changes",
-                  onPressed: () {
-                    profileController.updateProfile();
-                  },
-                  gradient: const LinearGradient(
-                    colors: [AppColors.primary, AppColors.primary],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  height: 50,
-                  borderRadius: 25,
-                ),
+                () =>
+                    profileController.isLoading.value
+                        ? const Center(child: CircularProgressIndicator())
+                        : MyButton(
+                          title: "Save Changes",
+                          textColor: AppColors.black,
+                          onPressed: () {
+                            profileController.updateProfile();
+                          },
+                          gradient: const LinearGradient(
+                            colors: [
+                              AppColors.premiumGold,
+                              AppColors.premiumGold,
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          height: 50,
+                          borderRadius: 25,
+                        ),
               ),
-              
+
               const SizedBox(height: 30),
             ],
           ),
@@ -236,9 +290,6 @@ class EditProfileScreen extends StatelessWidget {
   }
 
   Widget _buildCleanField({required Widget child}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: child,
-    );
+    return Padding(padding: const EdgeInsets.only(bottom: 20), child: child);
   }
 }

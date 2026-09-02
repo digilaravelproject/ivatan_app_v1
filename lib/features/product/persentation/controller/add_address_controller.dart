@@ -57,12 +57,12 @@ class AddAddressController extends GetxController {
     // Validation
     if (nameController.text.isEmpty) {
       Get.snackbar('Error', 'Please enter your name',
-          backgroundColor: AppColors.error, colorText: Colors.white);
+          backgroundColor: AppColors.error, colorText: AppColors.white);
       return;
     }
     if (phoneController.text.isEmpty) {
       Get.snackbar('Error', 'Please enter your phone number',
-          backgroundColor: AppColors.error, colorText: Colors.white);
+          backgroundColor: AppColors.error, colorText: AppColors.white);
       return;
     }
     
@@ -71,27 +71,27 @@ class AddAddressController extends GetxController {
     final cleanPhone = phoneController.text.replaceAll(RegExp(r'[^\d]'), '');
     if (!phoneRegex.hasMatch(cleanPhone)) {
       Get.snackbar('Error', 'Please enter a valid phone number (10-15 digits)',
-          backgroundColor: AppColors.error, colorText: Colors.white);
+          backgroundColor: AppColors.error, colorText: AppColors.white);
       return;
     }
     if (addressLine1Controller.text.isEmpty) {
       Get.snackbar('Error', 'Please enter address line 1',
-          backgroundColor: AppColors.error, colorText: Colors.white);
+          backgroundColor: AppColors.error, colorText: AppColors.white);
       return;
     }
     if (cityController.text.isEmpty) {
       Get.snackbar('Error', 'Please enter city',
-          backgroundColor: AppColors.error, colorText: Colors.white);
+          backgroundColor: AppColors.error, colorText: AppColors.white);
       return;
     }
     if (stateController.text.isEmpty) {
       Get.snackbar('Error', 'Please enter state',
-          backgroundColor: AppColors.error, colorText: Colors.white);
+          backgroundColor: AppColors.error, colorText: AppColors.white);
       return;
     }
     if (pinCodeController.text.isEmpty) {
       Get.snackbar('Error', 'Please enter PIN code',
-          backgroundColor: AppColors.error, colorText: Colors.white);
+          backgroundColor: AppColors.error, colorText: AppColors.white);
       return;
     }
 
@@ -132,7 +132,7 @@ class AddAddressController extends GetxController {
           'Success',
           response['message'] ?? 'Address saved successfully',
           backgroundColor: AppColors.success,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           snackPosition: SnackPosition.BOTTOM,
         );
       } else {
@@ -156,7 +156,7 @@ class AddAddressController extends GetxController {
           'Error',
           errorMessage,
           backgroundColor: AppColors.error,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           snackPosition: SnackPosition.BOTTOM,
         );
       }
@@ -165,7 +165,7 @@ class AddAddressController extends GetxController {
         'Error',
         e.toString(),
         backgroundColor: AppColors.error,
-        colorText: Colors.white,
+        colorText: AppColors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {

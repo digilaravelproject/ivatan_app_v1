@@ -224,7 +224,7 @@ class _LottieSliderState extends State<LottieSlider> {
                     decoration: BoxDecoration(
                       gradient: _currentPage == i + 1
                           ? LinearGradient(colors: [Colors.blue, Colors.green])
-                          : LinearGradient(colors: [Colors.grey, Colors.grey]),
+                          : LinearGradient(colors: [AppColors.premiumGold, AppColors.premiumGold]),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -480,7 +480,7 @@ class _InfiniteScrollImagesState extends State<InfiniteScrollImages>
                     width: 50,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
+                      color: AppColors.premiumGold.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(Icons.error, color: Colors.red),

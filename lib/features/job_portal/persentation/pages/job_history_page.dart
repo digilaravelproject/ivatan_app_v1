@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -108,7 +109,7 @@ class JobHistoryController extends GetxController {
       case 'applied':
         return Colors.blue.withOpacity(0.9);
       default:
-        return Colors.grey;
+        return AppColors.premiumGold;
     }
   }
 
@@ -123,7 +124,7 @@ class JobHistoryController extends GetxController {
       case 'applied':
         return Colors.blue[50]!;
       default:
-        return Colors.grey[50]!;
+        return AppColors.premiumGold.withOpacity(0.1);
     }
   }
 
@@ -162,16 +163,16 @@ class JobHistoryScreen extends StatelessWidget {
     return GetBuilder<JobHistoryController>(
       init: JobHistoryController(Get.find()),
       builder: (controller) => Scaffold(
-        backgroundColor: Colors.grey[50],
+        backgroundColor: AppColors.premiumGold.withOpacity(0.1),
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.transparent,
           elevation: 0,
-          iconTheme: const IconThemeData(color: Colors.black),
+          iconTheme: const IconThemeData(color: AppColors.white),
           title: Text(
             'Application History',
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: AppColors.white,
             ),
           ),
         ),
@@ -201,7 +202,7 @@ class JobHistoryScreen extends StatelessWidget {
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: isSelected ? Colors.white : Colors.black87,
+                            color: isSelected ? AppColors.black : AppColors.white,
                           ),
                         ),
                         selected: isSelected,
@@ -209,14 +210,14 @@ class JobHistoryScreen extends StatelessWidget {
                           controller.selectedFilter.value = filter['value']!;
                           controller.fetchApplications(refresh: true);
                         },
-                        selectedColor: Colors.black,
-                        backgroundColor: Colors.grey[200],
+                        selectedColor: AppColors.premiumGold,
+                        backgroundColor: AppColors.premiumGold.withOpacity(0.2),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                           side: BorderSide(
                               color: isSelected
-                                  ? Colors.black
-                                  : Colors.grey[300]!),
+                                  ? AppColors.premiumGold
+                                  : AppColors.premiumGold.withOpacity(0.3)),
                         ),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
@@ -239,7 +240,7 @@ class JobHistoryScreen extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Colors.grey[700],
+                        color: AppColors.premiumGold.withOpacity(0.7),
                       ),
                     ),
                     Expanded(
@@ -250,7 +251,7 @@ class JobHistoryScreen extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.poppins(
                           fontSize: 12,
-                          color: Colors.grey[600],
+                          color: AppColors.premiumGold.withOpacity(0.6),
                         ),
                       ),
                     ),
@@ -308,12 +309,12 @@ class JobHistoryScreen extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.black,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.withOpacity(0.5)),
+          border: Border.all(color: AppColors.premiumGold),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: AppColors.transparent,
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -332,7 +333,7 @@ class JobHistoryScreen extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: AppColors.white,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -374,7 +375,7 @@ class JobHistoryScreen extends StatelessWidget {
             // Company Name
             Text(
               application.job.companyName,
-              style: GoogleFonts.poppins(color: Colors.grey[800]),
+              style: GoogleFonts.poppins(color: AppColors.premiumGold.withOpacity(0.8)),
             ),
 
             const SizedBox(height: 8),
@@ -383,7 +384,7 @@ class JobHistoryScreen extends StatelessWidget {
             Text(
               'Applied: ${_formatDate(application.createdAt)}',
               style: GoogleFonts.poppins(
-                color: Colors.grey[600],
+                color: AppColors.premiumGold.withOpacity(0.6),
                 fontSize: 13,
               ),
             ),
@@ -394,7 +395,7 @@ class JobHistoryScreen extends StatelessWidget {
               Text(
                 application.coverMessage!,
                 style: GoogleFonts.poppins(
-                  color: Colors.grey[600],
+                  color: AppColors.premiumGold.withOpacity(0.6),
                   fontSize: 13,
                 ),
                 maxLines: 3,
@@ -415,7 +416,7 @@ class JobHistoryScreen extends StatelessWidget {
           Icon(
             Icons.history,
             size: 80,
-            color: Colors.grey[300],
+            color: AppColors.premiumGold.withOpacity(0.3),
           ),
           const SizedBox(height: 16),
           Text(
@@ -423,7 +424,7 @@ class JobHistoryScreen extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
+              color: AppColors.premiumGold.withOpacity(0.6),
             ),
           ),
           const SizedBox(height: 8),
@@ -431,7 +432,7 @@ class JobHistoryScreen extends StatelessWidget {
             'Start applying to jobs to see them here',
             style: GoogleFonts.poppins(
               fontSize: 14,
-              color: Colors.grey[500],
+              color: AppColors.premiumGold.withOpacity(0.5),
             ),
             textAlign: TextAlign.center,
           ),
@@ -481,9 +482,9 @@ class JobHistoryScreen extends StatelessWidget {
       child: Container(
         height: 45,
         decoration: BoxDecoration(
-          color: Colors.grey[50],
+          color: AppColors.premiumGold.withOpacity(0.1),
           borderRadius: BorderRadius.circular(25),
-          border: Border.all(color: Colors.grey[400]!),
+          border: Border.all(color: AppColors.premiumGold.withOpacity(0.4)),
         ),
         child: Row(
           children: [
@@ -504,12 +505,12 @@ class JobHistoryScreen extends StatelessWidget {
                 decoration: InputDecoration(
                   hintText: 'Search jobs, companies...',
                   hintStyle: GoogleFonts.poppins(
-                    color: Colors.grey[500],
+                    color: AppColors.premiumGold.withOpacity(0.5),
                     fontSize: 14,
                   ),
                   border: InputBorder.none,
                 ),
-                style: GoogleFonts.poppins(color: Colors.black, fontSize: 14),
+                style: GoogleFonts.poppins(color: AppColors.white, fontSize: 14),
               ),
             ),
             const SizedBox(width: 16),

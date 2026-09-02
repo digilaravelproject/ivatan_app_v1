@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,19 +13,19 @@ class ApplicantList extends GetView<ApplicantController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
         title: const Text(
           'Applicants',
           style: TextStyle(
-            color: Colors.black,
+            color: AppColors.white,
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0.5,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: AppColors.white),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
@@ -57,12 +58,12 @@ class ApplicantList extends GetView<ApplicantController> {
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        border: Border.all(color: AppColors.premiumGold, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: AppColors.white.withOpacity(0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -82,7 +83,7 @@ class ApplicantList extends GetView<ApplicantController> {
               children: [
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: Colors.grey.shade100,
+                  backgroundColor: AppColors.premiumGold,
                   backgroundImage: applicant.profilePhotoPath != null 
                     ? NetworkImage(AppUrls.imageurl+applicant.profilePhotoPath!)
                     : null,
@@ -90,7 +91,7 @@ class ApplicantList extends GetView<ApplicantController> {
                     ? Text(
                         applicant.name[0].toUpperCase(),
                         style: const TextStyle(
-                          color: Colors.black,
+                          color: AppColors.white,
                           fontWeight: FontWeight.w600,
                           fontSize: 18,
                         ),
@@ -116,7 +117,7 @@ class ApplicantList extends GetView<ApplicantController> {
                         applicant.occupation ?? 'Applicant',
                         style: TextStyle(
                           fontSize: 13,
-                          color: Colors.grey.shade600,
+                          color: AppColors.premiumGold,
                         ),
                       ),
                     ],
@@ -146,7 +147,7 @@ class ApplicantList extends GetView<ApplicantController> {
             ),
 
             const SizedBox(height: 14),
-            Divider(color: Colors.grey[200], height: 1),
+            Divider(color: AppColors.premiumGold.withOpacity(0.2), height: 1),
             const SizedBox(height: 14),
 
             /// 🔹 Info Row
@@ -172,7 +173,7 @@ class ApplicantList extends GetView<ApplicantController> {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey.shade600,
+                  color: AppColors.premiumGold,
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -193,7 +194,7 @@ class ApplicantList extends GetView<ApplicantController> {
         Icon(
           icon,
           size: 14,
-          color: Colors.grey.shade500,
+          color: AppColors.premiumGold,
         ),
         const SizedBox(width: 6),
         Flexible(
@@ -202,7 +203,7 @@ class ApplicantList extends GetView<ApplicantController> {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey.shade700,
+              color: AppColors.premiumGold,
               fontWeight: FontWeight.w500,
             ),
           ),

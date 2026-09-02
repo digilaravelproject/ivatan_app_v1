@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
@@ -19,17 +20,17 @@ class BookmarksScreen extends StatelessWidget {
     final controller = Get.put(BookmarkController());
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        title: const Text("Bookmarks", style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold)),
-        backgroundColor: AppColors.white,
+        title: const Text("Bookmarks", style: TextStyle(color: AppColors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.white, size: 20),
           onPressed: () => Get.back(),
         ),
       ),
-      body: RefreshIndicator(color: Colors.black, 
+      body: RefreshIndicator(color: AppColors.white, 
         onRefresh: () async {
           await controller.fetchBookmarks();
         },
@@ -43,11 +44,11 @@ class BookmarksScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.bookmark_border_rounded, size: 60, color: Colors.grey.shade300),
+                  Icon(Icons.bookmark_border_rounded, size: 60, color: AppColors.premiumGold),
                   const SizedBox(height: 16),
-                  const Text("No bookmarks yet", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black54)),
+                  const Text("No bookmarks yet", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.white)),
                   const SizedBox(height: 8),
-                  const Text("Saved posts will appear here", style: TextStyle(color: Colors.grey)),
+                  const Text("Saved posts will appear here", style: TextStyle(color: AppColors.premiumGold)),
                 ],
               ),
             );
@@ -129,9 +130,9 @@ class BookmarksScreen extends StatelessWidget {
                   child: Container(
                     height: (index % 2 == 0) ? 240 : 180,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                      color: AppColors.premiumGold,
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5)),
+                        BoxShadow(color: AppColors.white.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5)),
                       ],
                     ),
                     child: Stack(
@@ -140,9 +141,9 @@ class BookmarksScreen extends StatelessWidget {
                         CachedNetworkImage(
                           imageUrl: thumb,
                           placeholder: (context, url) => Shimmer.fromColors(
-                            baseColor: Colors.grey[300]!,
-                            highlightColor: Colors.grey[100]!,
-                            child: Container(color: Colors.white),
+                            baseColor: AppColors.premiumGold.withOpacity(0.3),
+                            highlightColor: AppColors.premiumGold.withOpacity(0.1),
+                            child: Container(color: AppColors.white),
                           ),
                           errorWidget: (context, url, error) => Image.asset(
                             AppAssets.imgAppLogo,
@@ -154,7 +155,7 @@ class BookmarksScreen extends StatelessWidget {
                           const Positioned(
                             top: 8,
                             right: 8,
-                            child: Icon(Icons.play_circle_fill_rounded, color: Colors.white, size: 24),
+                            child: Icon(Icons.play_circle_fill_rounded, color: AppColors.white, size: 24),
                           ),
                       ],
                     ),

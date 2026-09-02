@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
@@ -16,12 +17,12 @@ class ForgetPassword extends GetWidget<LoginController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back, color: AppColors.white),
           onPressed: () => Get.back(),
         ),
       ),
@@ -38,14 +39,14 @@ class ForgetPassword extends GetWidget<LoginController> {
                 "Forgot Password?",
                 style: context.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: AppColors.white,
                 ),
               ),
               const SizedBox(height: 12),
               Text(
                 "Enter your phone number to receive an OTP",
                 style: context.textTheme.bodyLarge?.copyWith(
-                  color: Colors.grey.shade600,
+                  color: AppColors.premiumGold,
                   height: 1.4,
                 ),
               ),
@@ -59,18 +60,18 @@ class ForgetPassword extends GetWidget<LoginController> {
                   labelText: 'Mobile Number',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
+                    borderSide: BorderSide(color: AppColors.premiumGold),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
+                    borderSide: BorderSide(color: AppColors.premiumGold),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: AppColors.primary, width: 2),
                   ),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: AppColors.white,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                 ),
                 initialCountryCode: 'IN',
@@ -81,10 +82,10 @@ class ForgetPassword extends GetWidget<LoginController> {
                 dropdownIconPosition: IconPosition.trailing,
                 flagsButtonPadding: const EdgeInsets.only(left: 12),
                 showCountryFlag: true,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.white),
                 keyboardType: TextInputType.phone,
                 pickerDialogStyle: PickerDialogStyle(
-                  backgroundColor: Colors.white,
+                  backgroundColor: AppColors.transparent,
                   searchFieldInputDecoration: InputDecoration(
                     labelText: 'Search Country',
                     prefixIcon: const Icon(Icons.search, color: AppColors.primary),
@@ -99,11 +100,11 @@ class ForgetPassword extends GetWidget<LoginController> {
                   countryCodeStyle: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: AppColors.white,
                   ),
                   countryNameStyle: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey.shade700,
+                    color: AppColors.premiumGold,
                   ),
                   listTilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),

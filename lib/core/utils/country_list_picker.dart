@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7610,13 +7611,13 @@ class CountriesList extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: AppColors.premiumGold,
       appBar: AppBar(
         title: const Text("Select Country"),
         centerTitle: true,
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle(
-          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarColor: AppColors.transparent,
         ),
         leadingWidth: AppDimens.leadingWidth,
         leading: IconButton(
@@ -7633,11 +7634,11 @@ class CountriesList extends StatelessWidget {
             child: Container(
               height: 45,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(25),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: AppColors.white.withValues(alpha: 0.1),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -7665,7 +7666,7 @@ class CountriesList extends StatelessWidget {
             return const Center(
               child: Text(
                 "No countries found",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(fontSize: 16, color: AppColors.premiumGold),
               ),
             );
           }
@@ -7693,7 +7694,7 @@ class CountriesList extends StatelessWidget {
                   ),
                   subtitle: Text(
                     "Code: ${country.code}   Dial: ${country.dialCode}",
-                    style: const TextStyle(color: Colors.grey),
+                    style: const TextStyle(color: AppColors.premiumGold),
                   ),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {

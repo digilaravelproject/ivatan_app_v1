@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -104,13 +105,13 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
       appBar: AppBar(
         title: const Text(
           "Secure Payment",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 16),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         centerTitle: true,
         elevation: 0.5,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black),
+          icon: const Icon(Icons.close, color: AppColors.white),
           onPressed: () {
             Navigator.of(context).pop(null); // Cancelled
           },
@@ -122,7 +123,7 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
           if (_isLoading)
             const Center(
               child: CircularProgressIndicator(
-                color: Colors.black,
+                color: AppColors.white,
               ),
             ),
         ],

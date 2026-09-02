@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -15,16 +16,16 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: AppColors.premiumGold.withOpacity(0.1),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: AppColors.white),
         title: Text(
           'My Created Jobs',
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: AppColors.white,
           ),
         ),
       ),
@@ -49,13 +50,13 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.work_off_outlined, size: 64, color: Colors.grey[400]),
+                      Icon(Icons.work_off_outlined, size: 64, color: AppColors.premiumGold.withOpacity(0.4)),
                       const SizedBox(height: 16),
                       Text(
                         controller.searchText.value.isEmpty ? "No jobs found" : "No jobs match your search",
                         style: GoogleFonts.poppins(
                           fontSize: 16,
-                          color: Colors.grey[600],
+                          color: AppColors.premiumGold.withOpacity(0.6),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -85,7 +86,7 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
                           height: 30,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.grey[400]!),
+                            valueColor: AlwaysStoppedAnimation<Color>(AppColors.premiumGold.withOpacity(0.4)),
                           ),
                         ),
                       ),
@@ -109,12 +110,12 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey[200]!),
+          border: Border.all(color: AppColors.premiumGold.withOpacity(0.2)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: AppColors.white.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -137,12 +138,12 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
                       height: 48,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Container(
-                        color: Colors.grey[100],
-                        child: const Icon(Icons.business, color: Colors.grey),
+                        color: AppColors.premiumGold.withOpacity(0.1),
+                        child: const Icon(Icons.business, color: AppColors.premiumGold),
                       ),
                       errorWidget: (context, url, error) => Container(
-                        color: Colors.grey[100],
-                        child: const Icon(Icons.business, color: Colors.grey),
+                        color: AppColors.premiumGold.withOpacity(0.1),
+                        child: const Icon(Icons.business, color: AppColors.premiumGold),
                       ),
                     ),
                   ),
@@ -157,7 +158,7 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: AppColors.white,
                           ),
                         ),
                         Text(
@@ -165,29 +166,29 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: Colors.grey[600],
+                            color: AppColors.premiumGold.withOpacity(0.6),
                           ),
                         ),
                         const SizedBox(height: 8),
                         Row(
                           children: [
-                            Icon(Icons.location_on_outlined, size: 14, color: Colors.grey[500]),
+                            Icon(Icons.location_on_outlined, size: 14, color: AppColors.premiumGold.withOpacity(0.5)),
                             const SizedBox(width: 4),
                             Text(
                               job.location,
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
-                                color: Colors.grey[600],
+                                color: AppColors.premiumGold.withOpacity(0.6),
                               ),
                             ),
                             const SizedBox(width: 12),
-                            Icon(Icons.work_outline, size: 14, color: Colors.grey[500]),
+                            Icon(Icons.work_outline, size: 14, color: AppColors.premiumGold.withOpacity(0.5)),
                             const SizedBox(width: 4),
                             Text(
                               job.employmentType,
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
-                                color: Colors.grey[600],
+                                color: AppColors.premiumGold.withOpacity(0.6),
                               ),
                             ),
                           ],
@@ -231,7 +232,7 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
                         'Salary Range',
                         style: GoogleFonts.poppins(
                           fontSize: 11,
-                          color: Colors.grey[500],
+                          color: AppColors.premiumGold.withOpacity(0.5),
                         ),
                       ),
                       Text(
@@ -239,7 +240,7 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                          color: AppColors.white,
                         ),
                       ),
                     ],
@@ -250,8 +251,8 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
                       Get.toNamed(AppRoutes.applicantListScreen, arguments: job.id);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.transparent,
+                      foregroundColor: AppColors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -280,11 +281,11 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
       child: Container(
         height: 50,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: AppColors.white.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -298,10 +299,10 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
           decoration: InputDecoration(
             hintText: 'Search by job title...',
             hintStyle: GoogleFonts.poppins(
-              color: Colors.grey[400],
+              color: AppColors.premiumGold.withOpacity(0.4),
               fontSize: 14,
             ),
-            prefixIcon: const Icon(Icons.search, color: Colors.black),
+            prefixIcon: const Icon(Icons.search, color: AppColors.white),
             suffixIcon: IconButton(
               icon: const Icon(Icons.clear, size: 18),
               onPressed: () {
@@ -313,7 +314,7 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 15),
           ),
-          style: GoogleFonts.poppins(color: Colors.black, fontSize: 14),
+          style: GoogleFonts.poppins(color: AppColors.white, fontSize: 14),
         ),
       ),
     );

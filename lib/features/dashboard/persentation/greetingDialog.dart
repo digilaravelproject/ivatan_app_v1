@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -90,7 +91,7 @@ class GreetingDialogHelper {
     return showDialog(
       context: context,
       barrierDismissible: true,
-      barrierColor: Colors.black.withOpacity(0.4),
+      barrierColor: AppColors.white.withOpacity(0.4),
       builder: (BuildContext dialogContext) {
         return _GreetingDialogContent(
           userName: userName,
@@ -166,7 +167,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
       child: ScaleTransition(
         scale: _scaleAnimation,
         child: Dialog(
-          backgroundColor: Colors.transparent,
+          backgroundColor: AppColors.transparent,
           insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -176,11 +177,11 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
                 maxWidth: 500,
               ),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(32),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
+                    color: AppColors.white.withOpacity(0.15),
                     blurRadius: 30,
                     offset: const Offset(0, 15),
                   ),
@@ -220,7 +221,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
                         height: 150,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.1),
+                          color: AppColors.white.withOpacity(0.1),
                         ),
                       ),
                     ),
@@ -232,7 +233,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
                         height: 100,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.1),
+                          color: AppColors.white.withOpacity(0.1),
                         ),
                       ),
                     ),
@@ -242,23 +243,23 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
                       top: 16,
                       right: 16,
                       child: Material(
-                        color: Colors.transparent,
+                        color: AppColors.transparent,
                         child: InkWell(
                           onTap: () => Navigator.of(context).pop(),
                           borderRadius: BorderRadius.circular(20),
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.3),
+                              color: AppColors.white.withOpacity(0.3),
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.5),
+                                color: AppColors.white.withOpacity(0.5),
                                 width: 1.5,
                               ),
                             ),
                             child: const Icon(
                               Icons.close_rounded,
-                              color: Colors.white,
+                              color: AppColors.white,
                               size: 22,
                             ),
                           ),
@@ -281,10 +282,10 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
                                 width: 80,
                                 height: 80,
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
+                                  color: AppColors.white.withOpacity(0.2),
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: Colors.white.withOpacity(0.3),
+                                    color: AppColors.white.withOpacity(0.3),
                                     width: 3,
                                   ),
                                 ),
@@ -303,7 +304,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
                                 style: const TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                   letterSpacing: 0.5,
                                 ),
                               ),
@@ -316,7 +317,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
                                   vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
+                                  color: AppColors.white.withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
@@ -324,7 +325,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                   ),
                                 ),
                               ),
@@ -336,7 +337,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
                         Flexible(
                           child: Container(
                             decoration: const BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.white,
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(32),
                                 topRight: Radius.circular(32),
@@ -365,7 +366,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
                                         ),
                                         child: const Icon(
                                           Icons.history_rounded,
-                                          color: Colors.white,
+                                          color: AppColors.white,
                                           size: 22,
                                         ),
                                       ),
@@ -375,7 +376,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
                                         style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.black87,
+                                          color: AppColors.white,
                                         ),
                                       ),
                                     ],
@@ -460,7 +461,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
                                             style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.w600,
-                                              color: Colors.black87,
+                                              color: AppColors.white,
                                             ),
                                           ),
                                         ),
@@ -492,7 +493,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
           Icon(
             Icons.inbox_rounded,
             size: 64,
-            color: Colors.grey.shade300,
+            color: AppColors.premiumGold,
           ),
           const SizedBox(height: 16),
           Text(
@@ -500,7 +501,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.grey.shade600,
+              color: AppColors.premiumGold,
             ),
           ),
           const SizedBox(height: 8),
@@ -508,7 +509,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
             'Start exploring to see your activity here',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey.shade500,
+              color: AppColors.premiumGold,
             ),
           ),
         ],
@@ -520,7 +521,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: activity.color.withOpacity(0.2),
@@ -535,7 +536,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
         ],
       ),
       child: Material(
-        color: Colors.transparent,
+        color: AppColors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
@@ -578,7 +579,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87,
+                          color: AppColors.white,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -586,7 +587,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
                         activity.description,
                         style: TextStyle(
                           fontSize: 13,
-                          color: Colors.grey.shade600,
+                          color: AppColors.premiumGold,
                           height: 1.3,
                         ),
                       ),
@@ -623,7 +624,7 @@ class _GreetingDialogContentState extends State<_GreetingDialogContent>
                       '${activity.count}',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AppColors.white,
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                       ),
@@ -773,7 +774,7 @@ ElevatedButton(
   //     showDialog(
   //       context: context,
   //       barrierDismissible: true,
-  //       barrierColor: Colors.black.withOpacity(0.3),
+  //       barrierColor: AppColors.white.withOpacity(0.3),
   //       builder: (BuildContext context) {
   //         // Auto dismiss after 5 seconds
   //         Future.delayed(Duration(seconds: 5000), () {
@@ -784,18 +785,18 @@ ElevatedButton(
   //         );
   //
   //         return Dialog(
-  //           backgroundColor: Colors.transparent,
+  //           backgroundColor: AppColors.transparent,
   //           insetPadding: EdgeInsets.all(20),
   //           child: BackdropFilter(
   //             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
   //             child: Container(
   //               width: double.infinity,
   //               decoration: BoxDecoration(
-  //                 color: Colors.white.withOpacity(0.95),
+  //                 color: AppColors.white.withOpacity(0.95),
   //                 borderRadius: BorderRadius.circular(30),
   //                 boxShadow: [
   //                   BoxShadow(
-  //                     color: Colors.black.withOpacity(0.1),
+  //                     color: AppColors.white.withOpacity(0.1),
   //                     blurRadius: 20,
   //                     offset: Offset(0, 10),
   //                   ),
@@ -836,12 +837,12 @@ ElevatedButton(
   //                       child: Container(
   //                         padding: EdgeInsets.all(8),
   //                         decoration: BoxDecoration(
-  //                           color: Colors.black.withOpacity(0.1),
+  //                           color: AppColors.white.withOpacity(0.1),
   //                           shape: BoxShape.circle,
   //                         ),
   //                         child: Icon(
   //                           Icons.close,
-  //                           color: Colors.black54,
+  //                           color: AppColors.white,
   //                           size: 20,
   //                         ),
   //                       ),
@@ -863,7 +864,7 @@ ElevatedButton(
   //                           style: TextStyle(
   //                             fontSize: 32,
   //                             fontWeight: FontWeight.bold,
-  //                             color: Colors.black87,
+  //                             color: AppColors.white,
   //                             letterSpacing: 0.5,
   //                           ),
   //                         ),
@@ -901,7 +902,7 @@ ElevatedButton(
   //                               style: TextStyle(
   //                                 fontSize: 16,
   //                                 fontWeight: FontWeight.w600,
-  //                                 color: Colors.black87,
+  //                                 color: AppColors.white,
   //                               ),
   //                             ),
   //                           ],
@@ -951,7 +952,7 @@ ElevatedButton(
   //                                   style: TextStyle(
   //                                     fontSize: 14,
   //                                     fontWeight: FontWeight.w500,
-  //                                     color: Colors.black87,
+  //                                     color: AppColors.white,
   //                                   ),
   //                                 ),
   //                               ),
@@ -976,7 +977,7 @@ ElevatedButton(
   //       margin: EdgeInsets.only(bottom: 12),
   //       padding: EdgeInsets.all(15),
   //       decoration: BoxDecoration(
-  //         color: Colors.white.withOpacity(0.7),
+  //         color: AppColors.white.withOpacity(0.7),
   //         borderRadius: BorderRadius.circular(15),
   //         border: Border.all(
   //           color: activity.color.withOpacity(0.3),
@@ -1017,7 +1018,7 @@ ElevatedButton(
   //                   style: TextStyle(
   //                     fontSize: 15,
   //                     fontWeight: FontWeight.w600,
-  //                     color: Colors.black87,
+  //                     color: AppColors.white,
   //                   ),
   //                 ),
   //                 SizedBox(height: 4),
@@ -1025,7 +1026,7 @@ ElevatedButton(
   //                   activity.description,
   //                   style: TextStyle(
   //                     fontSize: 13,
-  //                     color: Colors.black54,
+  //                     color: AppColors.white,
   //                   ),
   //                 ),
   //               ],
@@ -1043,7 +1044,7 @@ ElevatedButton(
   //               child: Text(
   //                 '${activity.count}',
   //                 style: TextStyle(
-  //                   color: Colors.white,
+  //                   color: AppColors.white,
   //                   fontSize: 12,
   //                   fontWeight: FontWeight.bold,
   //                 ),
@@ -1139,7 +1140,7 @@ ElevatedButton(
   //     showDialog(
   //       context: context,
   //       barrierDismissible: true,
-  //       barrierColor: Colors.black.withOpacity(0.3),
+  //       barrierColor: AppColors.white.withOpacity(0.3),
   //       builder: (BuildContext context) {
   //         // Auto dismiss after 5 seconds
   //         Future.delayed(Duration(seconds: 500), () {
@@ -1149,18 +1150,18 @@ ElevatedButton(
   //         });
   //
   //         return Dialog(
-  //           backgroundColor: Colors.transparent,
+  //           backgroundColor: AppColors.transparent,
   //           insetPadding: EdgeInsets.all(20),
   //           child: BackdropFilter(
   //             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
   //             child: Container(
   //               width: double.infinity,
   //               decoration: BoxDecoration(
-  //                 color: Colors.white.withOpacity(0.95),
+  //                 color: AppColors.white.withOpacity(0.95),
   //                 borderRadius: BorderRadius.circular(30),
   //                 boxShadow: [
   //                   BoxShadow(
-  //                     color: Colors.black.withOpacity(0.1),
+  //                     color: AppColors.white.withOpacity(0.1),
   //                     blurRadius: 20,
   //                     offset: Offset(0, 10),
   //                   ),
@@ -1201,12 +1202,12 @@ ElevatedButton(
   //                       child: Container(
   //                         padding: EdgeInsets.all(8),
   //                         decoration: BoxDecoration(
-  //                           color: Colors.black.withOpacity(0.1),
+  //                           color: AppColors.white.withOpacity(0.1),
   //                           shape: BoxShape.circle,
   //                         ),
   //                         child: Icon(
   //                           Icons.close,
-  //                           color: Colors.black54,
+  //                           color: AppColors.white,
   //                           size: 20,
   //                         ),
   //                       ),
@@ -1228,7 +1229,7 @@ ElevatedButton(
   //                           style: TextStyle(
   //                             fontSize: 32,
   //                             fontWeight: FontWeight.bold,
-  //                             color: Colors.black87,
+  //                             color: AppColors.white,
   //                             letterSpacing: 0.5,
   //                           ),
   //                         ),
@@ -1266,7 +1267,7 @@ ElevatedButton(
   //                               style: TextStyle(
   //                                 fontSize: 16,
   //                                 fontWeight: FontWeight.w600,
-  //                                 color: Colors.black87,
+  //                                 color: AppColors.white,
   //                               ),
   //                             ),
   //                           ],
@@ -1316,7 +1317,7 @@ ElevatedButton(
   //                                   style: TextStyle(
   //                                     fontSize: 14,
   //                                     fontWeight: FontWeight.w500,
-  //                                     color: Colors.black87,
+  //                                     color: AppColors.white,
   //                                   ),
   //                                 ),
   //                               ),
@@ -1341,7 +1342,7 @@ ElevatedButton(
   //       margin: EdgeInsets.only(bottom: 12),
   //       padding: EdgeInsets.all(15),
   //       decoration: BoxDecoration(
-  //         color: Colors.white.withOpacity(0.7),
+  //         color: AppColors.white.withOpacity(0.7),
   //         borderRadius: BorderRadius.circular(15),
   //         border: Border.all(
   //           color: activity.color.withOpacity(0.3),
@@ -1382,7 +1383,7 @@ ElevatedButton(
   //                   style: TextStyle(
   //                     fontSize: 15,
   //                     fontWeight: FontWeight.w600,
-  //                     color: Colors.black87,
+  //                     color: AppColors.white,
   //                   ),
   //                 ),
   //                 SizedBox(height: 4),
@@ -1390,7 +1391,7 @@ ElevatedButton(
   //                   activity.description,
   //                   style: TextStyle(
   //                     fontSize: 13,
-  //                     color: Colors.black54,
+  //                     color: AppColors.white,
   //                   ),
   //                 ),
   //               ],
@@ -1408,7 +1409,7 @@ ElevatedButton(
   //               child: Text(
   //                 '${activity.count}',
   //                 style: TextStyle(
-  //                   color: Colors.white,
+  //                   color: AppColors.white,
   //                   fontSize: 12,
   //                   fontWeight: FontWeight.bold,
   //                 ),

@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -77,15 +78,15 @@ class _DigitalProductListScreenState extends State<DigitalProductListScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.room_service_outlined, size: 40, color: Colors.grey.shade300),
+              Icon(Icons.room_service_outlined, size: 40, color: AppColors.premiumGold),
               const SizedBox(height: 8),
-              const Text('No products found', style: TextStyle(color: Colors.grey)),
+              const Text('No products found', style: TextStyle(color: AppColors.premiumGold)),
             ],
           ),
         );
       }
 
-      return RefreshIndicator(color: Colors.black, 
+      return RefreshIndicator(color: AppColors.white, 
         onRefresh: () => controller.fetchMarketplaceServices(isRefresh: true),
         child: ListView.builder(
           controller: _scrollController,
@@ -147,7 +148,7 @@ class DigitalProductListItem extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
+          border: Border.all(color: AppColors.premiumGold),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -166,12 +167,12 @@ class DigitalProductListItem extends StatelessWidget {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      color: Colors.grey.shade200,
+                      color: AppColors.premiumGold,
                       child: Center(
                         child: Icon(
                           Icons.broken_image,
                           size: 40,
-                          color: Colors.grey.shade400,
+                          color: AppColors.premiumGold,
                         ),
                       ),
                     );
@@ -202,7 +203,7 @@ class DigitalProductListItem extends StatelessWidget {
                       product.description,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade600,
+                        color: AppColors.premiumGold,
                         height: 1.3,
                       ),
                       maxLines: 2,
@@ -221,7 +222,7 @@ class DigitalProductListItem extends StatelessWidget {
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
-                                color: Colors.black,
+                                color: AppColors.white,
                               ),
                             ),
                             if (product.discountPrice != null && product.discountPrice!.isNotEmpty)
@@ -229,7 +230,7 @@ class DigitalProductListItem extends StatelessWidget {
                                 '₹${product.discountPrice}',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.grey.shade500,
+                                  color: AppColors.premiumGold,
                                   decoration: TextDecoration.lineThrough,
                                 ),
                               ),
@@ -244,7 +245,7 @@ class DigitalProductListItem extends StatelessWidget {
                             height: 25,
                             decoration: BoxDecoration(
                               color: AppColors.primary,
-                              border: Border.all(color: Colors.black),
+                              border: Border.all(color: AppColors.white),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Center(
@@ -253,7 +254,7 @@ class DigitalProductListItem extends StatelessWidget {
                                 child: Text(
                                   'Enquiry',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12,
                                   ),
@@ -314,13 +315,13 @@ class _MyServicesTabView extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.room_service_outlined, size: 80, color: Colors.grey.shade300),
+              Icon(Icons.room_service_outlined, size: 80, color: AppColors.premiumGold),
               const SizedBox(height: 16),
               const Text(
                 'No services yet',
                 style: TextStyle(
                   fontSize: 18,
-                  color: Colors.grey,
+                  color: AppColors.premiumGold,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -353,12 +354,12 @@ class _MyServicesTabView extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: AppColors.premiumGold),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: AppColors.white.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -380,8 +381,8 @@ class _MyServicesTabView extends StatelessWidget {
                       height: double.infinity,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Container(
-                        color: Colors.grey.shade200,
-                        child: const Icon(Icons.room_service, size: 40, color: Colors.grey),
+                        color: AppColors.premiumGold,
+                        child: const Icon(Icons.room_service, size: 40, color: AppColors.premiumGold),
                       ),
                     ),
                   ),
@@ -398,7 +399,7 @@ class _MyServicesTabView extends StatelessWidget {
                       child: Text(
                         service.status.toUpperCase(),
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.white,
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
                         ),
@@ -448,7 +449,7 @@ class _MyServicesTabView extends StatelessWidget {
                             '₹${service.discountPrice}',
                             style: TextStyle(
                               fontSize: 10,
-                              color: Colors.grey.shade500,
+                              color: AppColors.premiumGold,
                               decoration: TextDecoration.lineThrough,
                             ),
                           ),

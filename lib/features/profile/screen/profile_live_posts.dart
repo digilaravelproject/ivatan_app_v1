@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_assets.dart';
@@ -53,7 +54,7 @@ class ProfileLivePostsScreen extends StatelessWidget {
                         height: 70,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.grey.shade300),
+                          border: Border.all(color: AppColors.premiumGold),
                           image: DecorationImage(
                             image: NetworkImage(images[index % images.length]),
                             fit: BoxFit.cover,
@@ -62,7 +63,7 @@ class ProfileLivePostsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(names[index % names.length], style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                      Text("12.5k", style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                      Text("12.5k", style: const TextStyle(fontSize: 10, color: AppColors.premiumGold)),
                     ],
                   );
                 },
@@ -104,9 +105,9 @@ class ProfileLivePostsScreen extends StatelessWidget {
                           left: 8,
                           child: Row(
                             children: [
-                               const Icon(Icons.play_arrow, color: Colors.white, size: 16),
+                               const Icon(Icons.play_arrow, color: AppColors.white, size: 16),
                                const SizedBox(width: 4),
-                               Text("${(index + 2.1).toStringAsFixed(1)}M", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold,  shadows: [Shadow(color: Colors.black, blurRadius: 4)])),
+                               Text("${(index + 2.1).toStringAsFixed(1)}M", style: TextStyle(color: AppColors.white, fontSize: 12, fontWeight: FontWeight.bold,  shadows: [Shadow(color: AppColors.white, blurRadius: 4)])),
                             ],
                           ),
                         )
@@ -144,9 +145,9 @@ class ProfileLivePostsScreen extends StatelessWidget {
                       decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(4)),
                       child: const Row(
                         children: [
-                          Icon(Icons.wifi_tethering, color: Colors.white, size: 14),
+                          Icon(Icons.wifi_tethering, color: AppColors.white, size: 14),
                           SizedBox(width: 4),
-                          Text("LIVE", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                          Text("LIVE", style: TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
@@ -157,7 +158,7 @@ class ProfileLivePostsScreen extends StatelessWidget {
                     right: 10,
                      child: Text(
                       "How to perform search engine optimization?",
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14, shadows: [Shadow(color: Colors.black, blurRadius: 4)]),
+                      style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 14, shadows: [Shadow(color: AppColors.white, blurRadius: 4)]),
                      ),
                    ),
                     Positioned(
@@ -165,12 +166,12 @@ class ProfileLivePostsScreen extends StatelessWidget {
                     right: 10,
                      child: Container(
                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                       decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(4)),
+                       decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(4)),
                        child: Row(
                          children: [
-                           Icon(Icons.remove_red_eye, color: Colors.white, size: 12),
+                           Icon(Icons.remove_red_eye, color: AppColors.white, size: 12),
                            SizedBox(width: 4),
-                           Text("40k", style: TextStyle(color: Colors.white, fontSize: 10)),
+                           Text("40k", style: TextStyle(color: AppColors.white, fontSize: 10)),
                          ],
                        ),
                      )

@@ -43,7 +43,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white, // Clean White Background
+        backgroundColor: AppColors.transparent, // Clean White Background
         appBar: _buildAppBar(context),
         body: Column(
           children: [
@@ -123,28 +123,35 @@ class ChattingScreen extends GetView<ChatMessagesController> {
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white, // Clean White AppBar
+      backgroundColor: AppColors.transparent, // Clean White AppBar
       elevation: 0,
-      iconTheme: IconThemeData(color: Colors.black),
+      iconTheme: IconThemeData(color: AppColors.white),
       leadingWidth: 70,
       leading: InkWell(
         onTap: () => Navigator.pop(context),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.arrow_back, color: Colors.black),
+            const Icon(Icons.arrow_back, color: AppColors.white),
             const SizedBox(width: 4),
             Obx(() {
               final profile = controller.chatProfile.value;
-              return CircleAvatar(
-                radius: 18,
-                backgroundColor: Colors.grey[200],
-                backgroundImage: (profile?.avatar != null && profile!.avatar!.isNotEmpty)
-                    ? NetworkImage(profile.avatar!)
-                    : null,
-                child: (profile?.avatar == null || profile!.avatar!.isEmpty)
-                    ? const Icon(Icons.person, color: Colors.grey)
-                    : null,
+              return Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.premiumGold,
+                ),
+                child: ClipOval(
+                  child: (profile?.avatar != null && profile!.avatar!.isNotEmpty)
+                      ? CachedNetworkImage(
+                          imageUrl: profile.avatar!,
+                          fit: BoxFit.cover,
+                          errorWidget: (context, url, error) => const Icon(Icons.person, color: AppColors.black),
+                        )
+                      : const Icon(Icons.person, color: AppColors.black),
+                ),
               );
             }),
           ],
@@ -168,7 +175,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: AppColors.white,
                 ),
               ),
             Text(
@@ -177,7 +184,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                   : (profile?.isOnline == true ? "Online" : "Offline"),
               style: TextStyle(
                 fontSize: 12,
-                color: isGroup ? Colors.grey : (profile?.isOnline == true ? Colors.green : Colors.grey),
+                color: isGroup ? AppColors.premiumGold : (profile?.isOnline == true ? Colors.green : AppColors.premiumGold),
               ),
             ),
             ],
@@ -186,21 +193,21 @@ class ChattingScreen extends GetView<ChatMessagesController> {
       }),
       /*actions: [
         IconButton(
-          icon: const Icon(Icons.videocam_outlined, color: Colors.black),
+          icon: const Icon(Icons.videocam_outlined, color: AppColors.white),
           onPressed: () {
             // Coming Soon Update
             ComingSoonDialog.show(context);
           },
         ),
         IconButton(
-          icon: const Icon(Icons.call_outlined, color: Colors.black),
+          icon: const Icon(Icons.call_outlined, color: AppColors.white),
           onPressed: () {
             // Coming Soon Update
             ComingSoonDialog.show(context);
           },
         ),
         // IconButton(
-        //   icon: const Icon(Icons.more_vert, color: Colors.black),
+        //   icon: const Icon(Icons.more_vert, color: AppColors.white),
         //   onPressed: () {},
         // ),
       ],*/
@@ -212,18 +219,18 @@ class ChattingScreen extends GetView<ChatMessagesController> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
         decoration: BoxDecoration(
-          color: Colors.grey.shade50,
+          color: AppColors.premiumGold.withOpacity(0.1),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.waving_hand_rounded, size: 40, color: Colors.grey.shade400),
+            Icon(Icons.waving_hand_rounded, size: 40, color: AppColors.premiumGold),
             SizedBox(height: 10),
             const Text(
               "Say Hello!\nStart a conversation.",
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: AppColors.premiumGold),
             ),
           ],
         ),
@@ -244,7 +251,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         decoration: BoxDecoration(
-          color: isMe ? AppColors.black : Colors.grey.shade100, // Black vs Grey
+          color: isMe ? AppColors.black : AppColors.premiumGold, // Black vs Grey
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(18),
             topRight: const Radius.circular(18),
@@ -264,7 +271,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                   formatChatTime(message.createdAt.toString()),
                   style: TextStyle(
                     fontSize: 10,
-                    color: isMe ? Colors.grey.shade400 : Colors.grey.shade500,
+                    color: isMe ? AppColors.premiumGold : AppColors.premiumGold,
                   ),
                 ),
                 if (isMe) ...[
@@ -272,7 +279,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                   Icon(
                     Icons.done_all, 
                     size: 14, 
-                    color: message.status == "read" ? Colors.blueAccent : Colors.grey.shade500,
+                    color: message.status == "read" ? Colors.blueAccent : AppColors.premiumGold,
                   ),
                 ],
               ],
@@ -296,20 +303,24 @@ class ChattingScreen extends GetView<ChatMessagesController> {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              if (avatarUrl != null && avatarUrl.isNotEmpty) ...[
-                CircleAvatar(
-                  radius: 16,
-                  backgroundImage: NetworkImage(avatarUrl),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.premiumGold,
                 ),
-                const SizedBox(width: 8),
-              ] else ...[
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Colors.grey[200],
-                  child: const Icon(Icons.person, size: 18, color: Colors.grey),
+                child: ClipOval(
+                  child: (avatarUrl != null && avatarUrl.isNotEmpty)
+                      ? CachedNetworkImage(
+                          imageUrl: avatarUrl,
+                          fit: BoxFit.cover,
+                          errorWidget: (context, url, error) => const Icon(Icons.person, color: AppColors.black, size: 20),
+                        )
+                      : const Icon(Icons.person, color: AppColors.black, size: 20),
                 ),
-                const SizedBox(width: 8),
-              ],
+              ),
+              const SizedBox(width: 8),
               Flexible(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -323,7 +334,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade700,
+                            color: AppColors.premiumGold,
                           ),
                         ),
                       ),
@@ -342,7 +353,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
   Widget _buildInputArea(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: Colors.white,
+      color: AppColors.transparent,
       child: SafeArea( // Ensure safety on bottom
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -350,7 +361,8 @@ class ChattingScreen extends GetView<ChatMessagesController> {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: AppColors.black.withOpacity(0.5),
+                  border: Border.all(color: AppColors.premiumGold, width: 1),
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: Row(
@@ -361,7 +373,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                         controller.isEmojiVisible.value 
                             ? Icons.keyboard 
                             : Icons.emoji_emotions_outlined,
-                        color: Colors.grey[600],
+                        color: AppColors.premiumGold.withOpacity(0.6),
                       )),
                       onPressed: () {
                         if (controller.isEmojiVisible.value) {
@@ -379,9 +391,11 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                         focusNode: controller.focusNode,
                         maxLines: 5, // Reduced max lines slightly
                         minLines: 1,
-                        style: const TextStyle(fontSize: 16),
+                        cursorColor: AppColors.premiumGold,
+                        style: const TextStyle(fontSize: 16, color: AppColors.white),
                         decoration: const InputDecoration(
                           hintText: "Message...",
+                          hintStyle: TextStyle(color: AppColors.premiumGold),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(vertical: 12), // Better vertical alignment
                         ),
@@ -393,11 +407,11 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.attach_file, color: Colors.grey[600], size: 22),
+                      icon: Icon(Icons.attach_file, color: AppColors.premiumGold.withOpacity(0.6), size: 22),
                       onPressed: () => _showAttachmentBottomSheet(context),
                     ),
                     IconButton(
-                      icon: Icon(Icons.camera_alt_outlined, color: Colors.grey[600], size: 22),
+                      icon: Icon(Icons.camera_alt_outlined, color: AppColors.premiumGold.withOpacity(0.6), size: 22),
                       onPressed: () async {
                         final ImagePicker picker = ImagePicker();
                         final XFile? image = await picker.pickImage(source: ImageSource.camera);
@@ -428,9 +442,9 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                   ? const Center(child: SizedBox(
                       width: 20, 
                       height: 20, 
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                      child: CircularProgressIndicator(color: AppColors.white, strokeWidth: 2)
                     ))
-                  : const Icon(Icons.send_rounded, color: Colors.white, size: 22) // Modern clean icon
+                  : const Icon(Icons.send_rounded, color: AppColors.white, size: 22) // Modern clean icon
                 ),
               ),
             ),
@@ -445,12 +459,12 @@ class ChattingScreen extends GetView<ChatMessagesController> {
   /*void _showAttachmentBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (context) => Container(
         height: 180,
         margin: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -460,7 +474,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
               child: SizedBox(
                 width: 40, 
                 height: 4, 
-                // decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+                // decoration: BoxDecoration(color: AppColors.premiumGold.withOpacity(0.3), borderRadius: BorderRadius.circular(2)),
               ),
             ),
             Expanded(
@@ -562,15 +576,16 @@ class ChattingScreen extends GetView<ChatMessagesController> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (context) => Container(
         padding: EdgeInsets.only(
           top: 12, 
           bottom: MediaQuery.of(context).padding.bottom + 20,
         ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(
+        decoration: BoxDecoration(
+          color: AppColors.black,
+          border: Border.all(color: AppColors.premiumGold, width: 1),
+          borderRadius: const BorderRadius.vertical(
             top: Radius.circular(24),
           ),
         ),
@@ -582,7 +597,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
               width: 50,
               height: 5,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: AppColors.premiumGold,
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -598,7 +613,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: AppColors.white,
                     ),
                   ),
                   const Spacer(),
@@ -606,10 +621,10 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                     icon: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
+                        color: AppColors.premiumGold,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.close, size: 18, color: Colors.black54),
+                      child: const Icon(Icons.close, size: 18, color: AppColors.black),
                     ),
                     onPressed: () => Navigator.pop(context),
                   ),
@@ -715,10 +730,10 @@ class ChattingScreen extends GetView<ChatMessagesController> {
               color: color,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: Colors.white, size: 28),
+            child: Icon(icon, color: AppColors.white, size: 28),
           ),
           const SizedBox(height: 8),
-          Text(label, style: const TextStyle(fontSize: 12, color: Colors.black87)),
+          Text(label, style: const TextStyle(fontSize: 12, color: AppColors.premiumGold)),
         ],
       ),
     );
@@ -757,7 +772,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                   errorWidget: (context, url, error) => const SizedBox(
                     width: 150,
                     height: 150,
-                    child: Center(child: Icon(Icons.broken_image, size: 50, color: Colors.grey)),
+                    child: Center(child: Icon(Icons.broken_image, size: 50, color: AppColors.premiumGold)),
                   ),
                   fit: BoxFit.cover,
                   width: 200,
@@ -771,7 +786,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
               caption,
               style: TextStyle(
                 fontSize: 15,
-                color: isMe ? Colors.white : Colors.black87,
+                color: isMe ? AppColors.white : AppColors.white,
                 height: 1.3,
               ),
             ),
@@ -815,7 +830,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
-            color: isMe ? Colors.white24 : Colors.grey.shade200,
+            color: isMe ? AppColors.white : AppColors.premiumGold,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
@@ -823,7 +838,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
             children: [
               Icon(
                 isAudio ? Icons.audiotrack : Icons.insert_drive_file,
-                color: isMe ? Colors.white : Colors.black87,
+                color: isMe ? AppColors.white : AppColors.white,
                 size: 28,
               ),
               const SizedBox(width: 10),
@@ -839,7 +854,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
-                        color: isMe ? Colors.white : Colors.black87,
+                        color: isMe ? AppColors.white : AppColors.white,
                       ),
                     ),
                     if (sizeStr.isNotEmpty) ...[
@@ -848,7 +863,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                         sizeStr,
                         style: TextStyle(
                           fontSize: 11,
-                          color: isMe ? Colors.white70 : Colors.grey.shade600,
+                          color: isMe ? AppColors.white : AppColors.premiumGold,
                         ),
                       ),
                     ],
@@ -858,7 +873,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
               const SizedBox(width: 8),
               Icon(
                 Icons.download_rounded,
-                color: isMe ? Colors.white70 : Colors.grey.shade600,
+                color: isMe ? AppColors.white : AppColors.premiumGold,
                 size: 20,
               ),
             ],
@@ -871,7 +886,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
         message.content,
         style: TextStyle(
           fontSize: 15,
-          color: isMe ? Colors.white : Colors.black87,
+          color: isMe ? AppColors.white : AppColors.white,
           height: 1.3,
         ),
       );
@@ -887,11 +902,11 @@ class ChattingScreen extends GetView<ChatMessagesController> {
   void _showMessageOptions(BuildContext context, ChatMessage message) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (ctx) => Container(
         margin: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Padding(
@@ -904,7 +919,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
               width: 38,
               height: 4.5,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: AppColors.premiumGold.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -913,7 +928,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
             _buildOptionRow(
               icon: Icons.reply_rounded,
               label: "Reply",
-              color: Colors.black87,
+              color: AppColors.white,
               onTap: () {
                 Navigator.pop(ctx);
                 // TODO: Implement reply functionality
@@ -924,7 +939,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
             _buildOptionRow(
               icon: Icons.copy_rounded,
               label: "Copy",
-              color: Colors.black87,
+              color: AppColors.white,
               onTap: () {
                 Navigator.pop(ctx);
                 Clipboard.setData(ClipboardData(text: message.content));
@@ -976,7 +991,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 13),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: AppColors.premiumGold.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: const Text(
@@ -985,7 +1000,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                     style: TextStyle(
                       fontSize: 14.5,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black54,
+                      color: AppColors.white,
                     ),
                   ),
                 ),
@@ -1005,11 +1020,11 @@ class ChattingScreen extends GetView<ChatMessagesController> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (ctx) => Container(
         margin: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Padding(
@@ -1022,7 +1037,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
               width: 38,
               height: 4.5,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: AppColors.premiumGold.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -1049,7 +1064,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                 padding: EdgeInsets.symmetric(vertical: 30),
                 child: Text(
                   "No one has read this yet",
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(color: AppColors.premiumGold),
                 ),
               )
             else
@@ -1059,7 +1074,7 @@ class ChattingScreen extends GetView<ChatMessagesController> {
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundColor: Colors.grey[200],
+                      backgroundColor: AppColors.premiumGold.withOpacity(0.2),
                       backgroundImage: reader.avatar.isNotEmpty
                           ? NetworkImage(reader.avatar)
                           : null,
@@ -1130,18 +1145,18 @@ class FullImagePreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: AppColors.white),
       ),
       body: Center(
         child: InteractiveViewer(
           child: CachedNetworkImage(
             imageUrl: imageUrl,
-            placeholder: (context, url) => const CustomLoadingIndicator(color: Colors.white),
-            errorWidget: (context, url, error) => const Icon(Icons.error, color: Colors.white, size: 50),
+            placeholder: (context, url) => const CustomLoadingIndicator(color: AppColors.white),
+            errorWidget: (context, url, error) => const Icon(Icons.error, color: AppColors.white, size: 50),
             fit: BoxFit.contain,
           ),
         ),

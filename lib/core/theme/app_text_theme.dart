@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
@@ -73,18 +74,18 @@ class AppTextTheme {
     headlineLarge: TextStyle(
       fontSize: 32,
       fontWeight: FontWeight.bold,
-      color: Colors.black87,
+      color: AppColors.white,
       letterSpacing: 0.5,
     ),
     labelMedium: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w500,
-      color: Colors.grey.shade800,
+      color: AppColors.premiumGold,
     ),
     labelSmall: TextStyle(
       fontSize: 12,
       fontWeight: FontWeight.w400,
-      color: Colors.grey.shade700,
+      color: AppColors.premiumGold,
     ),
     titleMedium: TextStyle(
       fontSize: 16,
@@ -163,18 +164,18 @@ class AppTextTheme {
     headlineLarge: TextStyle(
       fontSize: 32,
       fontWeight: FontWeight.bold,
-      color: Colors.white,
+      color: AppColors.white,
       letterSpacing: 0.5,
     ),
     labelMedium: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w500,
-      color: Colors.grey.shade300,
+      color: AppColors.premiumGold,
     ),
     labelSmall: TextStyle(
       fontSize: 12,
       fontWeight: FontWeight.w400,
-      color: Colors.grey.shade400,
+      color: AppColors.premiumGold,
     ),
     titleMedium: TextStyle(
       fontSize: 16,

@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -74,7 +75,7 @@ class AppInputTextField extends StatelessWidget {
                     style: Theme.of(context).iconButtonTheme.style?.copyWith(
                       side: const WidgetStatePropertyAll(BorderSide.none),
                       backgroundColor: const WidgetStatePropertyAll(
-                        Colors.transparent,
+                        AppColors.transparent,
                       ),
                     ),
                   ).marginOnly(right: 8),

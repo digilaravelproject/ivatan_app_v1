@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../auth/data/model/res/user_model.dart';
@@ -149,10 +150,13 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
               children: [
                 // Background Image
                 Container(
-                  color: Colors.grey.shade300,
+                  decoration: BoxDecoration(
+                    color: AppColors.black,
+                    border: Border.all(color: AppColors.premiumGold),
+                  ),
                   child: imageUrl.isNotEmpty 
                       ? Image.network(imageUrl, fit: BoxFit.cover)
-                      : const Icon(Icons.image, color: Colors.grey, size: 40),
+                      : const Icon(Icons.image, color: AppColors.premiumGold, size: 40),
                 ),
                 
                 // Blur & Lock Overlay if locked
@@ -161,7 +165,7 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 12.0, sigmaY: 12.0),
                       child: Container(
-                        color: Colors.black26, // Light dark overlay so image is still visible
+                        color: AppColors.black.withOpacity(0.4), // Dark overlay so image is still visible
                       ),
                     ),
                   ),
@@ -169,16 +173,16 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white70, width: 1),
+                        border: Border.all(color: AppColors.premiumGold, width: 1),
                         borderRadius: BorderRadius.circular(16),
-                        color: Colors.black12, // Very subtle dark tint
+                        color: AppColors.black.withOpacity(0.8), // Very subtle dark tint
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.lock, color: Colors.white, size: 12),
+                          const Icon(Icons.lock, color: AppColors.premiumGold, size: 12),
                           const SizedBox(width: 4),
-                          Text("Unlock for $price", style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500)),
+                          Text("Unlock for $price", style: const TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.w500)),
                         ],
                       ),
                     ),
@@ -189,13 +193,13 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
                 const Positioned(
                   top: 8,
                   right: 8,
-                  child: Icon(Icons.lock, color: Colors.grey, size: 18),
+                  child: Icon(Icons.lock, color: AppColors.premiumGold, size: 18),
                 )
               else if (!widget.isOwnProfile)
                 const Positioned(
                   top: 8,
                   right: 8,
-                  child: Icon(Icons.lock_open, color: Colors.grey, size: 18),
+                  child: Icon(Icons.lock_open, color: AppColors.premiumGold, size: 18),
                 ),
             ],
             ),
@@ -210,12 +214,17 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Unlock Content"),
-          content: Text("This is exclusive content. Would you like to unlock it for $price?"),
+          backgroundColor: AppColors.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: AppColors.premiumGold),
+          ),
+          title: const Text("Unlock Content", style: TextStyle(color: AppColors.white)),
+          content: Text("This is exclusive content. Would you like to unlock it for $price?", style: const TextStyle(color: AppColors.white)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
+              child: const Text("Cancel", style: TextStyle(color: AppColors.premiumGold)),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -226,7 +235,10 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
                   onSuccess();
                 }
               },
-              child: const Text("Unlock"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.premiumGold,
+              ),
+              child: const Text("Unlock", style: TextStyle(color: AppColors.black, fontWeight: FontWeight.bold)),
             ),
           ],
         );

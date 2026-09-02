@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -37,12 +38,12 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
   Widget build(BuildContext context) {
     return Theme(
       data: ThemeData.light().copyWith(
-        scaffoldBackgroundColor: Colors.grey.shade50,
-        appBarTheme: AppBarTheme(backgroundColor: Colors.grey.shade50, elevation: 0),
+        scaffoldBackgroundColor: AppColors.premiumGold.withOpacity(0.1),
+        appBarTheme: AppBarTheme(backgroundColor: AppColors.premiumGold.withOpacity(0.1), elevation: 0),
         cardColor: const Color(0xFFFFFFFF),
       ),
       child: Scaffold(
-        backgroundColor: Colors.grey.shade50,
+        backgroundColor: AppColors.premiumGold.withOpacity(0.1),
         body: RefreshIndicator(
           onRefresh: () async {
             await controller.fetchDashboardStats();
@@ -88,7 +89,7 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
                     children: [
                       const Text(
                         "Top Performing Content",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.white),
                       ),
                       Row(
                         children: [
@@ -96,8 +97,8 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
                             value: controller.selectedSortBy.value,
                             dropdownColor: const Color(0xFFF5F5F5),
                             underline: const SizedBox(),
-                            icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
-                            style: const TextStyle(color: Colors.grey, fontSize: 12),
+                            icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.premiumGold),
+                            style: const TextStyle(color: AppColors.premiumGold, fontSize: 12),
                             onChanged: (val) {
                               if (val != null) controller.onSortChange(val);
                             },
@@ -111,10 +112,10 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade800),
+                              border: Border.all(color: AppColors.premiumGold),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: const Icon(Icons.filter_alt_outlined, color: Colors.grey, size: 16),
+                            child: const Icon(Icons.filter_alt_outlined, color: AppColors.premiumGold, size: 16),
                           )
                         ],
                       ),
@@ -149,7 +150,7 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: const Color(0xFFF5F5F5),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.premiumGold),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Obx(() => DropdownButton<String>(
@@ -157,8 +158,8 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
         dropdownColor: const Color(0xFFF5F5F5),
         isDense: true,
         underline: const SizedBox(),
-        icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black, size: 18),
-        style: const TextStyle(color: Colors.black, fontSize: 13),
+        icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.white, size: 18),
+        style: const TextStyle(color: AppColors.white, fontSize: 13),
         onChanged: (val) {
           if (val != null) controller.applyFilter(dateRange: val);
         },
@@ -181,16 +182,16 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: const Color(0xFFF5F5F5),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: AppColors.premiumGold),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           children: [
-            const Icon(Icons.calendar_today_outlined, color: Colors.grey, size: 14),
+            const Icon(Icons.calendar_today_outlined, color: AppColors.premiumGold, size: 14),
             const SizedBox(width: 8),
             Text(
               "${formatter.format(dFrom)} - ${formatter.format(dTo)}",
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
+              style: const TextStyle(color: AppColors.premiumGold, fontSize: 12),
             ),
           ],
         ),
@@ -209,7 +210,7 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Overview", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
+          const Text("Overview", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.white)),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -236,7 +237,7 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFFFFFFFF),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: AppColors.white.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -251,9 +252,9 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
             child: Icon(icon, color: Colors.blue.shade700, size: 20),
           ),
           const SizedBox(height: 12),
-          Text(title, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+          Text(title, style: const TextStyle(color: AppColors.premiumGold, fontSize: 12)),
           const SizedBox(height: 4),
-          Text(value, style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold)),
+          Text(value, style: const TextStyle(color: AppColors.white, fontSize: 20, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -273,7 +274,7 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text("Spotlight", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
+                const Text("Spotlight", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.white)),
                 InkWell(
                   onTap: () {
                     Get.to(() => SpotlightAllScreen());
@@ -312,7 +313,7 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
       margin: const EdgeInsets.only(right: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFFFFFFF),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: AppColors.white.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -324,8 +325,8 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                 child: item.thumbnailUrl.isNotEmpty
-                    ? Image.network(item.thumbnailUrl, height: 120, width: double.infinity, fit: BoxFit.cover, errorBuilder: (_,__,___) => Container(height: 120, color: Colors.grey.shade200))
-                    : Container(height: 120, color: Colors.grey.shade200),
+                    ? Image.network(item.thumbnailUrl, height: 120, width: double.infinity, fit: BoxFit.cover, errorBuilder: (_,__,___) => Container(height: 120, color: AppColors.premiumGold))
+                    : Container(height: 120, color: AppColors.premiumGold),
               ),
               Positioned(
                 top: 8,
@@ -333,10 +334,10 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.black87,
+                    color: AppColors.white,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600)),
+                  child: Text(label, style: const TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.w600)),
                 ),
               ),
               Positioned(
@@ -344,7 +345,7 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
                 right: 8,
                 child: Icon(
                   item.type == 'video' ? Icons.play_circle_fill : item.type == 'reel' ? Icons.movie : Icons.image,
-                  color: Colors.black,
+                  color: AppColors.white,
                   size: 20,
                 ),
               ),
@@ -359,30 +360,30 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
                   item.caption,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.w500),
+                  style: const TextStyle(color: AppColors.white, fontSize: 12, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.visibility_outlined, color: Colors.grey, size: 14),
+                    const Icon(Icons.visibility_outlined, color: AppColors.premiumGold, size: 14),
                     const SizedBox(width: 4),
-                    Text("${formatNumber.format(item.viewsCount)} Views", style: const TextStyle(color: Colors.grey, fontSize: 10)),
+                    Text("${formatNumber.format(item.viewsCount)} Views", style: const TextStyle(color: AppColors.premiumGold, fontSize: 10)),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.shopping_cart_outlined, color: Colors.grey, size: 14),
+                    const Icon(Icons.shopping_cart_outlined, color: AppColors.premiumGold, size: 14),
                     const SizedBox(width: 4),
-                    Text("${formatNumber.format(item.purchasesCount)} Purchases", style: const TextStyle(color: Colors.grey, fontSize: 10)),
+                    Text("${formatNumber.format(item.purchasesCount)} Purchases", style: const TextStyle(color: AppColors.premiumGold, fontSize: 10)),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.monetization_on_outlined, color: Colors.grey, size: 14),
+                    const Icon(Icons.monetization_on_outlined, color: AppColors.premiumGold, size: 14),
                     const SizedBox(width: 4),
-                    Text("${formatCurrency.format(item.totalEarnings)} Earnings", style: const TextStyle(color: Colors.grey, fontSize: 10)),
+                    Text("${formatCurrency.format(item.totalEarnings)} Earnings", style: const TextStyle(color: AppColors.premiumGold, fontSize: 10)),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -421,7 +422,7 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color(0xFFFFFFFF),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))],
+        boxShadow: [BoxShadow(color: AppColors.white.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))],
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -431,8 +432,8 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: item.thumbnailUrl.isNotEmpty
-                ? Image.network(item.thumbnailUrl, width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (_,__,___) => Container(width: 60, height: 60, color: Colors.grey.shade200))
-                : Container(width: 60, height: 60, color: Colors.grey.shade200),
+                ? Image.network(item.thumbnailUrl, width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (_,__,___) => Container(width: 60, height: 60, color: AppColors.premiumGold))
+                : Container(width: 60, height: 60, color: AppColors.premiumGold),
           ),
           const SizedBox(width: 12),
           // Info
@@ -444,7 +445,7 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
                   item.caption,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w500, fontSize: 13),
+                  style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 13),
                 ),
                 const SizedBox(height: 4),
                 Wrap(
@@ -452,13 +453,13 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
                   spacing: 4,
                   runSpacing: 4,
                   children: [
-                    Text(formatCurrency.format(item.price), style: const TextStyle(color: Colors.black54, fontSize: 11)),
-                    const Text("•", style: TextStyle(color: Colors.black54, fontSize: 11)),
-                    Text(dateStr, style: const TextStyle(color: Colors.black54, fontSize: 11)),
+                    Text(formatCurrency.format(item.price), style: const TextStyle(color: AppColors.white, fontSize: 11)),
+                    const Text("•", style: TextStyle(color: AppColors.white, fontSize: 11)),
+                    Text(dateStr, style: const TextStyle(color: AppColors.white, fontSize: 11)),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                      decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(4)),
-                      child: Text(item.type.capitalizeFirst ?? item.type, style: const TextStyle(color: Colors.black87, fontSize: 9)),
+                      decoration: BoxDecoration(color: AppColors.premiumGold, borderRadius: BorderRadius.circular(4)),
+                      child: Text(item.type.capitalizeFirst ?? item.type, style: const TextStyle(color: AppColors.white, fontSize: 9)),
                     )
                   ],
                 ),
@@ -470,25 +471,25 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text("Views", style: TextStyle(color: Colors.black54, fontSize: 10)),
+              const Text("Views", style: TextStyle(color: AppColors.white, fontSize: 10)),
               const SizedBox(height: 2),
-              Text(formatNumber.format(item.totalViews), style: const TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.w600)),
+              Text(formatNumber.format(item.totalViews), style: const TextStyle(color: AppColors.white, fontSize: 12, fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text("Purchases", style: TextStyle(color: Colors.black54, fontSize: 10)),
+              const Text("Purchases", style: TextStyle(color: AppColors.white, fontSize: 10)),
               const SizedBox(height: 2),
-              Text(formatNumber.format(item.totalPurchaseCount), style: const TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.w600)),
+              Text(formatNumber.format(item.totalPurchaseCount), style: const TextStyle(color: AppColors.white, fontSize: 12, fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text("Earnings", style: TextStyle(color: Colors.black54, fontSize: 10)),
+              const Text("Earnings", style: TextStyle(color: AppColors.white, fontSize: 10)),
               const SizedBox(height: 2),
               Text(formatCurrency.format(item.totalEarnings), style: TextStyle(color: Colors.green.shade700, fontSize: 12, fontWeight: FontWeight.w600)),
             ],

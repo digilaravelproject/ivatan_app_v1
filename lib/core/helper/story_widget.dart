@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class StoryWidgets {
@@ -12,10 +13,10 @@ class StoryWidgets {
             width: 55,
             height: 55,
             decoration: const BoxDecoration(
-              color: Colors.black,
+              color: AppColors.white,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.add, color: Colors.white),
+            child: const Icon(Icons.add, color: AppColors.white),
           ),
           const SizedBox(height: 4),
           const Text(
@@ -64,7 +65,7 @@ class StoryWidgets {
             name,
             style: const TextStyle(
               fontSize: 11,
-              color: Colors.black87,
+              color: AppColors.white,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -77,17 +78,17 @@ class StoryWidgets {
   static Widget _placeholder() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: AppColors.premiumGold,
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: Colors.grey.shade300,
+          color: AppColors.premiumGold,
           width: 0.5,
         ),
       ),
       child: Center(
         child: Icon(
           Icons.photo_library_outlined,
-          color: Colors.grey.shade400,
+          color: AppColors.premiumGold,
           size: 24,
         ),
       ),

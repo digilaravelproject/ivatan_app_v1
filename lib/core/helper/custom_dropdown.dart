@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -28,9 +29,10 @@ class CustomSearchableDropdown extends StatelessWidget {
           controller: controller,
           validator: validator,
           readOnly: true,
-          decoration: InputDecoration(
+          style: const TextStyle(color: AppColors.white),
+                      decoration: InputDecoration(
             labelText: label,
-            labelStyle: TextStyle(color: Colors.grey.shade600),
+            labelStyle: TextStyle(color: AppColors.premiumGold),
             floatingLabelStyle: const TextStyle(
               color: AppColors.primary,
               fontWeight: FontWeight.w600,
@@ -38,7 +40,7 @@ class CustomSearchableDropdown extends StatelessWidget {
             suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.shade300),
+              borderSide: BorderSide(color: AppColors.premiumGold),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -56,7 +58,7 @@ class CustomSearchableDropdown extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: AppColors.premiumGold.withOpacity(0.1),
           ),
         ),
       ),
@@ -70,7 +72,7 @@ class CustomSearchableDropdown extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -81,7 +83,13 @@ class CustomSearchableDropdown extends StatelessWidget {
           maxChildSize: 0.9,
           expand: false,
           builder: (context, scrollController) {
-            return Padding(
+            return Container(
+              decoration: BoxDecoration(
+                color: AppColors.black,
+                border: Border.all(color: AppColors.premiumGold),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Padding(
               padding: EdgeInsets.fromLTRB(20, 16, 20, 16 + MediaQuery.of(context).padding.bottom),
               child: Column(
                 children: [
@@ -91,7 +99,7 @@ class CustomSearchableDropdown extends StatelessWidget {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color: AppColors.premiumGold,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -104,7 +112,7 @@ class CustomSearchableDropdown extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: AppColors.white,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -112,14 +120,16 @@ class CustomSearchableDropdown extends StatelessWidget {
                   // Search Bar
                   TextField(
                     controller: searchController,
-                    decoration: InputDecoration(
+                    style: const TextStyle(color: AppColors.white),
+                      decoration: InputDecoration(
                       hintText: "Search $label...",
-                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                      hintStyle: const TextStyle(color: AppColors.premiumGold),
+                      prefixIcon: const Icon(Icons.search, color: AppColors.premiumGold),
                       filled: true,
-                      fillColor: Colors.grey.shade100,
+                      fillColor: AppColors.transparent,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
+                        borderSide: BorderSide(color: AppColors.premiumGold),
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                     ),
@@ -143,14 +153,14 @@ class CustomSearchableDropdown extends StatelessWidget {
                         return Center(
                           child: Text(
                             "No results found",
-                            style: TextStyle(color: Colors.grey.shade500),
+                            style: TextStyle(color: AppColors.premiumGold),
                           ),
                         );
                       }
                       return ListView.separated(
                         controller: scrollController,
                         itemCount: filteredItems.length,
-                        separatorBuilder: (c, i) => const Divider(height: 1),
+                        separatorBuilder: (c, i) => Divider(height: 1, color: AppColors.premiumGold.withOpacity(0.3)),
                         itemBuilder: (context, index) {
                           final item = filteredItems[index];
                           final isSelected = item == controller.text;
@@ -171,7 +181,7 @@ class CustomSearchableDropdown extends StatelessWidget {
                                     item,
                                     style: TextStyle(
                                       fontSize: 16,
-                                      color: isSelected ? AppColors.primary : Colors.black87,
+                                      color: isSelected ? AppColors.primary : AppColors.white,
                                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                                     ),
                                   ),
@@ -188,6 +198,7 @@ class CustomSearchableDropdown extends StatelessWidget {
                   ),
                 ],
               ),
+              )
             );
           },
         );

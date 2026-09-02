@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:io';
@@ -42,14 +43,14 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
         title: Text(
           widget.service != null ? "Edit Service" : "Create Service",
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: AppColors.transparent,
+        foregroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -153,12 +154,12 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
                 decoration: BoxDecoration(
                   color: controller.status.value == 'active'
                       ? AppColors.success.withOpacity(0.1)
-                      : Colors.grey.shade200,
+                      : AppColors.premiumGold,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: controller.status.value == 'active'
                         ? AppColors.success
-                        : Colors.grey.shade400,
+                        : AppColors.premiumGold,
                     width: 1.5,
                   ),
                 ),
@@ -172,7 +173,7 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
                       size: 18,
                       color: controller.status.value == 'active'
                           ? AppColors.success
-                          : Colors.grey.shade600,
+                          : AppColors.premiumGold,
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -180,7 +181,7 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
                       style: TextStyle(
                         color: controller.status.value == 'active'
                             ? AppColors.success
-                            : Colors.grey.shade700,
+                            : AppColors.premiumGold,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -207,7 +208,7 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor: AppColors.transparent,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -219,13 +220,13 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
                         height: 20,
                         width: 20,
                         child: CircularProgressIndicator(
-                          color: Colors.white,
+                          color: AppColors.white,
                           strokeWidth: 2,
                         ),
                       )
                     : Text(
                   widget.service != null ? "Update Service" : "Create Service",
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               )),
             ),
@@ -247,16 +248,16 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: Colors.black12, width: 1.5),
-            color: Colors.grey.shade50,
+            border: Border.all(color: AppColors.white, width: 1.5),
+            color: AppColors.premiumGold.withOpacity(0.1),
           ),
           child: (controller.coverImage.value == null && !hasExistingImage)
               ? const Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.add_photo_alternate_outlined, size: 45, color: Colors.grey),
+              Icon(Icons.add_photo_alternate_outlined, size: 45, color: AppColors.premiumGold),
               SizedBox(height: 12),
-              Text("Select Cover Image", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500)),
+              Text("Select Cover Image", style: TextStyle(color: AppColors.premiumGold, fontWeight: FontWeight.w500)),
             ],
           )
               : Stack(
@@ -283,15 +284,15 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: AppColors.white.withOpacity(0.7),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.edit, color: Colors.white, size: 14),
+                      Icon(Icons.edit, color: AppColors.white, size: 14),
                       SizedBox(width: 4),
-                      Text("Change", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                      Text("Change", style: TextStyle(color: AppColors.white, fontSize: 12, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
@@ -321,8 +322,8 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black12, width: 1.5),
-                  color: Colors.grey.shade50,
+                  border: Border.all(color: AppColors.white, width: 1.5),
+                  color: AppColors.premiumGold.withOpacity(0.1),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -330,13 +331,13 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
                     Icon(
                       Icons.add_photo_alternate_outlined,
                       size: 28,
-                      color: Colors.grey.shade600,
+                      color: AppColors.premiumGold,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       "Add",
                       style: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: AppColors.premiumGold,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -374,12 +375,12 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: const BoxDecoration(
-                      color: Colors.black54,
+                      color: AppColors.white,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.close,
-                      color: Colors.white,
+                      color: AppColors.white,
                       size: 14,
                     ),
                   ),
@@ -406,20 +407,20 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
       decoration: InputDecoration(
         hintText: hint,
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: AppColors.premiumGold.withOpacity(0.1),
         contentPadding:
         const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.black12, width: 1),
+          borderSide: const BorderSide(color: AppColors.white, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.black12, width: 1),
+          borderSide: const BorderSide(color: AppColors.white, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.black, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.white, width: 1.5),
         ),
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/network/api_services.dart';
@@ -73,7 +74,7 @@ class ProductController extends GetxController {
             response['message'] ?? 'Added to cart',
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: AppColors.success,
-            colorText: Colors.white,
+            colorText: AppColors.white,
             duration: const Duration(seconds: 2),
           );
         } else {
@@ -96,7 +97,7 @@ class ProductController extends GetxController {
             errorMsg,
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: AppColors.error,
-            colorText: Colors.white,
+            colorText: AppColors.white,
             duration: const Duration(seconds: 3),
           );
         }
@@ -107,7 +108,7 @@ class ProductController extends GetxController {
         'Something went wrong. Please try again.',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: AppColors.error,
-        colorText: Colors.white,
+        colorText: AppColors.white,
       );
       debugPrint("Add to Cart Error: $e");
     } finally {

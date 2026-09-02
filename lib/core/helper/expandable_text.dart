@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,7 @@ class ExpandableCaption extends StatefulWidget {
     required this.text,
     this.username = "",
     this.onUsernameTap,
-    this.textColor = Colors.black87,
+    this.textColor = AppColors.white,
   }) : super(key: key);
 
   @override
@@ -41,7 +42,7 @@ class _ExpandableCaptionState extends State<ExpandableCaption> {
     );
     const styleMore = TextStyle(
       fontSize: 14,
-      color: Colors.grey,
+      color: AppColors.premiumGold,
     );
 
     // Build the full text span with Username + Caption (Parsing hashtags)

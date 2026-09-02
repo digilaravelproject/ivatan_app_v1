@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -74,18 +75,18 @@ class _PreviewScreenState extends State<PreviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.black,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: AppColors.white),
           onPressed: () => Get.back(),
         ),
         title: Obx(() => Text(
           "Create ${_getPostTypeLabel(controller.selectedType.value)}",
           style: const TextStyle(
-            color: Colors.black,
+            color: AppColors.white,
             fontWeight: FontWeight.w600,
             fontSize: 18,
           ),
@@ -120,7 +121,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
               child: Text(
                 "Share",
                 style: TextStyle(
-                  color: isValid ? Colors.blue : Colors.grey.shade400,
+                  color: isValid ? Colors.blue : AppColors.premiumGold,
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
                 ),
@@ -169,7 +170,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                           children: [
                             CircleAvatar(
                               radius: 20,
-                              backgroundColor: Colors.grey.shade100,
+                              backgroundColor: AppColors.premiumGold,
                               backgroundImage: SharedPrefManager().user?.profilePhotoPath != null &&
                                       SharedPrefManager().user!.profilePhotoPath!.isNotEmpty
                                   ? NetworkImage(
@@ -179,7 +180,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                                   : null,
                               child: SharedPrefManager().user?.profilePhotoPath == null ||
                                       SharedPrefManager().user!.profilePhotoPath!.isEmpty
-                                  ? const Icon(Icons.person, color: Colors.grey, size: 24)
+                                  ? const Icon(Icons.person, color: AppColors.premiumGold, size: 24)
                                   : null,
                             ),
                             const SizedBox(width: 12),
@@ -192,7 +193,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                                     style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
-                                      color: Colors.black87,
+                                      color: AppColors.white,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
@@ -208,14 +209,14 @@ class _PreviewScreenState extends State<PreviewScreen> {
                                         Icon(
                                           _getVisibilityIcon(controller.selectedVisibility.value),
                                           size: 12,
-                                          color: Colors.white,
+                                          color: AppColors.white,
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
                                           controller.selectedVisibility.value.capitalize ?? "Public",
                                           style: const TextStyle(
                                             fontSize: 11,
-                                            color: Colors.white,
+                                            color: AppColors.white,
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
@@ -230,9 +231,9 @@ class _PreviewScreenState extends State<PreviewScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
+                                  color: AppColors.premiumGold,
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.grey.shade200),
+                                  border: Border.all(color: AppColors.premiumGold),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -241,12 +242,12 @@ class _PreviewScreenState extends State<PreviewScreen> {
                                       "Change",
                                       style: TextStyle(
                                         fontSize: 13,
-                                        color: Colors.grey.shade700,
+                                        //color: AppColors.premiumGold,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                     const SizedBox(width: 4),
-                                    Icon(Icons.keyboard_arrow_down, size: 18, color: Colors.grey.shade700),
+                                    Icon(Icons.keyboard_arrow_down, size: 18, color: AppColors.white),
                                   ],
                                 ),
                               ),
@@ -270,7 +271,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                                         decoration: InputDecoration(
                                           hintText: "Write a title...",
                                           hintStyle: TextStyle(
-                                            color: Colors.grey.shade400,
+                                            color: AppColors.premiumGold,
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -279,7 +280,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                                         ),
                                         style: const TextStyle(
                                           fontSize: 16,
-                                          color: Colors.black,
+                                          color: AppColors.white,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -289,7 +290,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                                       : const SizedBox.shrink()),
                                   ],
                                 ),
-                                Divider(color: Colors.grey.shade100, height: 20),
+                                Divider(color: AppColors.premiumGold, height: 20),
                               ],
                             );
                           }
@@ -307,7 +308,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                                 decoration: InputDecoration(
                                   hintText: "Write a caption...",
                                   hintStyle: TextStyle(
-                                    color: Colors.grey.shade400,
+                                    color: AppColors.premiumGold,
                                     fontSize: 15,
                                   ),
                                   border: InputBorder.none,
@@ -315,7 +316,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                                 ),
                                 style: const TextStyle(
                                   fontSize: 15,
-                                  color: Colors.black87,
+                                  color: AppColors.white,
                                   height: 1.5,
                                 ),
                               ),
@@ -338,9 +339,9 @@ class _PreviewScreenState extends State<PreviewScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.black,
               border: Border(
-                top: BorderSide(color: Colors.grey.shade200, width: 1),
+                top: BorderSide(color: AppColors.premiumGold, width: 1),
               ),
             ),
             child: Row(
@@ -377,13 +378,13 @@ class _PreviewScreenState extends State<PreviewScreen> {
           child: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.black45,
+              color: AppColors.white,
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white24, width: 1),
+              border: Border.all(color: AppColors.white, width: 1),
             ),
             child: Icon(
               type == 'reel' ? Icons.video_settings : Icons.brush,
-              color: Colors.white,
+              color: AppColors.white,
               size: 24,
             ),
           ),
@@ -399,7 +400,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
     return Container(
       width: double.infinity,
       height: 400,
-      color: Colors.black,
+      color: AppColors.white,
       child: Stack(
         children: [
           PageView.builder(
@@ -435,7 +436,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                     shape: BoxShape.circle,
                     color: currentCarouselIndex.value == index
                         ? Colors.blue
-                        : Colors.white.withValues(alpha: 0.5),
+                        : AppColors.white.withValues(alpha: 0.5),
                   ),
                 )),
               ),
@@ -450,7 +451,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
     return Container(
       width: double.infinity,
       constraints: const BoxConstraints(maxHeight: 450),
-      color: Colors.black,
+      color: AppColors.white,
       child: Center(
         child: Obx(() => Image.file(
           controller.imageFile.value!,
@@ -464,7 +465,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
     return Container(
       width: double.infinity,
       constraints: const BoxConstraints(maxHeight: 450),
-      color: Colors.black,
+      color: AppColors.white,
       child: Center(
         child: AspectRatio(
           aspectRatio: controller.videoController?.value.aspectRatio ?? 16/9,
@@ -478,23 +479,23 @@ class _PreviewScreenState extends State<PreviewScreen> {
     return Container(
       width: double.infinity,
       height: 350,
-      color: Colors.grey.shade50,
+      color: AppColors.premiumGold.withOpacity(0.1),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(color: Colors.grey.shade100, shape: BoxShape.circle),
-            child: Icon(Icons.image_outlined, size: 64, color: Colors.grey.shade400),
+            decoration: BoxDecoration(color: AppColors.premiumGold, shape: BoxShape.circle),
+            child: Icon(Icons.image_outlined, size: 64, color: AppColors.premiumGold),
           ),
           const SizedBox(height: 20),
-          const Text("No media selected", style: TextStyle(color: Colors.grey, fontSize: 16, fontWeight: FontWeight.w500)),
+          const Text("No media selected", style: TextStyle(color: AppColors.premiumGold, fontSize: 16, fontWeight: FontWeight.w500)),
           const SizedBox(height: 20),
           ElevatedButton.icon(
             onPressed: () => controller.showPickerOptions(),
             icon: const Icon(Icons.add_photo_alternate),
             label: const Text("Add Media"),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: AppColors.white),
           ),
         ],
       ),
@@ -532,16 +533,16 @@ class _PreviewScreenState extends State<PreviewScreen> {
   void _showVisibilitySheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (context) => Container(
-        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+        decoration: BoxDecoration(color: AppColors.black, border: Border.all(color: AppColors.premiumGold), borderRadius: const BorderRadius.vertical(top: Radius.circular(20))),
         child: Padding(
           padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
           child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Center(child: Container(margin: const EdgeInsets.only(top: 10, bottom: 6), width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)))),
-            const Padding(padding: EdgeInsets.all(16.0), child: Text("Who can see this?", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600))),
+            Center(child: Container(margin: const EdgeInsets.only(top: 10, bottom: 6), width: 40, height: 4, decoration: BoxDecoration(color: AppColors.premiumGold, borderRadius: BorderRadius.circular(2)))),
+            const Padding(padding: EdgeInsets.all(16.0), child: Text("Who can see this?", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.white))),
             _buildVisibilityOption(icon: Icons.public, title: "Public", subtitle: "Anyone can see this post", value: "public", color: Colors.blue),
             _buildVisibilityOption(icon: Icons.people, title: "Friends", subtitle: "Only your friends can see", value: "friends", color: Colors.green),
             _buildVisibilityOption(icon: Icons.lock, title: "Private", subtitle: "Only you can see this post", value: "private", color: Colors.orange),
@@ -558,15 +559,15 @@ class _PreviewScreenState extends State<PreviewScreen> {
       final isSelected = controller.selectedVisibility.value == value;
       return ListTile(
         leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle), child: Icon(icon, color: color, size: 24)),
-        title: Text(title, style: TextStyle(fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500, fontSize: 15)),
-        subtitle: Text(subtitle, style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
-        trailing: isSelected ? Icon(Icons.check_circle, color: color) : Icon(Icons.circle_outlined, color: Colors.grey.shade300),
+        title: Text(title, style: TextStyle(fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500, fontSize: 15, color: AppColors.white)),
+        subtitle: Text(subtitle, style: TextStyle(fontSize: 13, color: AppColors.premiumGold)),
+        trailing: isSelected ? Icon(Icons.check_circle, color: color) : Icon(Icons.circle_outlined, color: AppColors.premiumGold),
         onTap: () { controller.selectedVisibility.value = value; Get.back(); },
       );
     });
   }
 
   Widget _buildActionButton({required IconData icon, required String label, required VoidCallback onTap}) {
-    return Expanded(child: GestureDetector(onTap: onTap, child: Container(padding: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade200)), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(icon, size: 20, color: Colors.grey.shade700), const SizedBox(width: 8), Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.grey.shade700))]))));
+    return Expanded(child: GestureDetector(onTap: onTap, child: Container(padding: const EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: AppColors.premiumGold.withOpacity(0.1), borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.premiumGold)), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(icon, size: 20, color: AppColors.premiumGold), const SizedBox(width: 8), Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.premiumGold))]))));
   }
 }

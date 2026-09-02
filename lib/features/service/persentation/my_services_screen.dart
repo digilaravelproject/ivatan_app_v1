@@ -16,28 +16,28 @@ class MyServicesScreen extends StatelessWidget {
     final ServiceController controller = Get.put(ServiceController());
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: AppColors.white),
           onPressed: () => Get.back(),
         ),
         title: const Text(
           'Your Services',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add, color: Colors.black),
+            icon: const Icon(Icons.add, color: AppColors.white),
             onPressed: () {
               Get.to(() => CreateServiceScreen());
             },
           ),
         ],
       ),
-      body: RefreshIndicator(color: Colors.black, 
+      body: RefreshIndicator(color: AppColors.white, 
         onRefresh: () => controller.fetchServices(),
         child: Obx(() {
           if (controller.isLoading.value && controller.services.isEmpty) {
@@ -75,13 +75,13 @@ class MyServicesScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.room_service_outlined, size: 80, color: Colors.grey.shade300),
+                      Icon(Icons.room_service_outlined, size: 80, color: AppColors.premiumGold),
                       const SizedBox(height: 16),
                       Text(
                         'No services yet',
                         style: TextStyle(
                           fontSize: 18,
-                          color: Colors.grey.shade600,
+                          color: AppColors.premiumGold,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -90,7 +90,7 @@ class MyServicesScreen extends StatelessWidget {
                         'Add your first service to get started',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey.shade500,
+                          color: AppColors.premiumGold,
                         ),
                       ),
                     ],
@@ -117,12 +117,12 @@ class MyServicesScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.premiumGold),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.white.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -144,8 +144,8 @@ class MyServicesScreen extends StatelessWidget {
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
                   height: 150,
-                  color: Colors.grey.shade200,
-                  child: const Icon(Icons.room_service, size: 50, color: Colors.grey),
+                  color: AppColors.premiumGold,
+                  child: const Icon(Icons.room_service, size: 50, color: AppColors.premiumGold),
                 ),
               ),
             ),
@@ -190,7 +190,7 @@ class MyServicesScreen extends StatelessWidget {
                   Text(
                     service.description,
                     style: TextStyle(
-                      color: Colors.grey.shade700,
+                      color: AppColors.premiumGold,
                       fontSize: 14,
                     ),
                     maxLines: 2,
@@ -216,7 +216,7 @@ class MyServicesScreen extends StatelessWidget {
                           '₹${service.discountPrice}',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey.shade500,
+                            color: AppColors.premiumGold,
                             decoration: TextDecoration.lineThrough,
                           ),
                         ),

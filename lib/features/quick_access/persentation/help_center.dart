@@ -15,11 +15,11 @@ class HelpCenter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        color: Colors.white,
+        color: AppColors.black,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.black,
         appBar: AppBar(
-          leadingWidth: 40, // 👈 default padding kam karega
+          leadingWidth: 40,
           titleSpacing: 0,
           backgroundColor: AppColors.transparent,
           leading: GestureDetector(
@@ -28,10 +28,10 @@ class HelpCenter extends StatelessWidget {
             },
             child: Icon(
               Icons.arrow_back_ios_new_rounded,
-              color: AppColors.black,
+              color: AppColors.white,
             ),
           ),
-          title: Text("Help Center",style: TextStyle(color: AppColors.black,fontWeight: FontWeight.bold,fontSize: 24),),
+          title: Text("Help Center",style: TextStyle(color: AppColors.white,fontWeight: FontWeight.bold,fontSize: 24),),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -67,7 +67,7 @@ class HelpCenter extends StatelessWidget {
                 //           ),
                 //           style: const TextStyle(
                 //             fontSize: 16,
-                //             color: Colors.black87,
+                //             color: AppColors.white87,
                 //           ),
                 //         ),
                 //       ),
@@ -78,7 +78,7 @@ class HelpCenter extends StatelessWidget {
                 const Text(
                   "Frequently Asked Questions",
                   style: TextStyle(
-                    color: AppColors.black,
+                    color: AppColors.white,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
@@ -86,7 +86,7 @@ class HelpCenter extends StatelessWidget {
                 Text(
                   "Find quick answers to common questions",
                   style: TextStyle(
-                    color: Colors.grey.shade600,
+                    color: AppColors.premiumGold,
                     fontSize: 14,
                   ),
                 ),
@@ -96,7 +96,7 @@ class HelpCenter extends StatelessWidget {
                 const Text(
                   "Contact Support",
                   style: TextStyle(
-                    color: AppColors.black,
+                    color: AppColors.white,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
@@ -104,7 +104,7 @@ class HelpCenter extends StatelessWidget {
                 Text(
                   "Our team is here to help you 24/7",
                   style: TextStyle(
-                    color: Colors.grey.shade600,
+                    color: AppColors.premiumGold,
                     fontSize: 14,
                   ),
                 ),
@@ -113,10 +113,11 @@ class HelpCenter extends StatelessWidget {
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: AppColors.black,
+                    border: Border.all(color: AppColors.premiumGold),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: AppColors.transparent,
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -186,7 +187,7 @@ class HelpCenter extends StatelessWidget {
                 const Text(
                   "Direct Contact",
                   style: TextStyle(
-                    color: AppColors.black,
+                    color: AppColors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -239,7 +240,7 @@ class HelpCenter extends StatelessWidget {
                           item.question,
                           style: const TextStyle(
                             fontSize: 16,
-                            color: Colors.black,
+                            color: AppColors.white,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -251,6 +252,7 @@ class HelpCenter extends StatelessWidget {
                         child: Icon(
                           Icons.keyboard_arrow_down,
                           size: 28,
+                          color: AppColors.white,
                         ),
                       )),
                     ],
@@ -273,7 +275,7 @@ class HelpCenter extends StatelessWidget {
               )
                   : SizedBox()),
 
-              Divider(color: Colors.grey.shade100, height: 24),
+              Divider(color: AppColors.premiumGold, height: 24),
             ],
           );
         },
@@ -288,13 +290,13 @@ class HelpCenter extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.grey.shade50,
+          color: AppColors.black,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade100),
+          border: Border.all(color: AppColors.premiumGold),
         ),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.primary, size: 24),
+            Icon(icon, color: AppColors.premiumGold, size: 24),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -302,11 +304,11 @@ class HelpCenter extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.white),
                   ),
                   Text(
                     subtitle,
-                    style: TextStyle(fontSize: 16, color: Colors.grey.shade800, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 16, color: AppColors.white, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),

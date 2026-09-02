@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -131,14 +132,14 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: AppColors.premiumGold.withOpacity(0.1),
       appBar: AppBar(
         title: const Text(
           'Orders History',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: AppColors.transparent,
+        foregroundColor: AppColors.white,
         elevation: 0.5,
         centerTitle: true,
       ),
@@ -187,7 +188,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     return Container(
       height: 60,
       width: double.infinity,
-      color: Colors.white,
+      color: AppColors.white,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         scrollDirection: Axis.horizontal,
@@ -208,9 +209,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 margin: const EdgeInsets.only(right: 10),
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.black : Colors.grey.shade100,
+                  color: isSelected ? AppColors.black : AppColors.premiumGold,
                   borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: isSelected ? AppColors.black : Colors.grey.shade300),
+                  border: Border.all(color: isSelected ? AppColors.black : AppColors.premiumGold),
                 ),
                 child: Center(
                   child: Text(
@@ -218,7 +219,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                      color: isSelected ? Colors.white : Colors.grey.shade700,
+                      color: isSelected ? AppColors.white : AppColors.premiumGold,
                     ),
                   ),
                 ),
@@ -235,11 +236,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.shopping_bag_outlined, size: 80, color: Colors.grey.shade300),
+          Icon(Icons.shopping_bag_outlined, size: 80, color: AppColors.premiumGold),
           const SizedBox(height: 16),
           Text(
             'No orders found',
-            style: TextStyle(fontSize: 16, color: Colors.grey.shade500),
+            style: TextStyle(fontSize: 16, color: AppColors.premiumGold),
           ),
           if (controller.selectedStatus.value.isNotEmpty)
             TextButton(
@@ -261,16 +262,16 @@ class _OrdersScreenState extends State<OrdersScreen> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: AppColors.white.withOpacity(0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: AppColors.premiumGold),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -294,13 +295,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                    color: AppColors.premiumGold,
                     shape: BoxShape.circle,
                   ),
                   child: ClipOval(
                     child: order.buyer?.profilePhotoPath != null
                       ? Image.network((AppUrls.imageurl+order.buyer!.profilePhotoPath!), fit: BoxFit.cover)
-                      : const Icon(Icons.person, color: Colors.grey),
+                      : const Icon(Icons.person, color: AppColors.premiumGold),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -314,7 +315,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       ),
                       Text(
                         order.buyer?.phone ?? '',
-                        style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                        style: TextStyle(color: AppColors.premiumGold, fontSize: 12),
                       ),
                     ],
                   ),
@@ -328,7 +329,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     ),
                     Text(
                       order.createdAt != null ? DateFormat('dd MMM').format(order.createdAt!) : '',
-                      style: TextStyle(color: Colors.grey.shade500, fontSize: 11),
+                      style: TextStyle(color: AppColors.premiumGold, fontSize: 11),
                     ),
                   ],
                 ),
@@ -343,13 +344,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     Container(
                       width: 4,
                       height: 4,
-                      decoration: const BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
+                      decoration: const BoxDecoration(color: AppColors.premiumGold, shape: BoxShape.circle),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         item.title ?? "Product #${item.itemId}",
-                        style: TextStyle(fontSize: 13, color: Colors.grey.shade800, fontWeight: FontWeight.w500),
+                        style: TextStyle(fontSize: 13, color: AppColors.premiumGold, fontWeight: FontWeight.w500),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -375,7 +376,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       case 'rejected': color = Colors.red; break;
       case 'shipped': color = Colors.purple; break;
       case 'delivered': color = Colors.blue; break;
-      case 'cancelled': color = Colors.grey; break;
+      case 'cancelled': color = AppColors.premiumGold; break;
       default: color = Colors.orange;
     }
 
@@ -416,7 +417,7 @@ Container(
 padding: const EdgeInsets.all(16),
 decoration: BoxDecoration(
 border: Border(
-top: BorderSide(color: Colors.grey.shade200),
+top: BorderSide(color: AppColors.premiumGold),
 ),
 ),
 child: Row(
@@ -428,7 +429,7 @@ controller.acceptOrder(order.id);
 },
 style: ElevatedButton.styleFrom(
 backgroundColor: Colors.green,
-foregroundColor: Colors.white,
+foregroundColor: AppColors.white,
 shape: RoundedRectangleBorder(
 borderRadius: BorderRadius.circular(30)),
 ),

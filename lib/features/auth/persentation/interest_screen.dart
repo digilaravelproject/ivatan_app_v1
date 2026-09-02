@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -33,7 +34,7 @@ import '../widgets/auth_input_fields.dart';
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: AppColors.white.withOpacity(0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
@@ -57,11 +58,11 @@ import '../widgets/auth_input_fields.dart';
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: AppColors.white.withOpacity(0.1),
                           blurRadius: 10,
                           offset: const Offset(0, 5),
                         ),
@@ -154,12 +155,12 @@ class _InterestScreenState extends State<InterestScreen> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: BackButton(
-          color: Colors.black,
+          color: AppColors.white,
           onPressed: () => Get.back(),
         ),
         actions: [
@@ -169,7 +170,7 @@ class _InterestScreenState extends State<InterestScreen> with SingleTickerProvid
               child: Text(
                 "Step 1/2",
                 style: TextStyle(
-                  color: Colors.grey.shade500,
+                  color: AppColors.premiumGold,
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
@@ -204,7 +205,7 @@ class _InterestScreenState extends State<InterestScreen> with SingleTickerProvid
                   "We'll use this to personalize your feed and recommend people you'll love.",
                   style: TextStyle(
                     fontSize: 16, // Larger readable font
-                    color: Colors.grey.shade600,
+                    color: AppColors.premiumGold,
                     height: 1.5,
                   ),
                 ),
@@ -215,7 +216,7 @@ class _InterestScreenState extends State<InterestScreen> with SingleTickerProvid
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
-                      child: Text("No interests found", style: TextStyle(color: Colors.grey)),
+                      child: Text("No interests found", style: TextStyle(color: AppColors.premiumGold)),
                     ),
                   )
                 else
@@ -245,7 +246,7 @@ class _InterestScreenState extends State<InterestScreen> with SingleTickerProvid
                   },
                   gradient: LinearGradient(
                     colors: selectedItems.isEmpty
-                        ? [Colors.grey.shade300, Colors.grey.shade400]
+                        ? [AppColors.premiumGold, AppColors.premiumGold]
                         : [AppColors.primary, AppColors.primaryDark],
                   ),
                   height: 52,
@@ -281,7 +282,7 @@ class _InterestScreenState extends State<InterestScreen> with SingleTickerProvid
           Text(
             category["category"].toString().toUpperCase(),
             style: TextStyle(
-              color: Colors.grey.shade800,
+              color: AppColors.premiumGold,
               fontSize: 13,
               fontWeight: FontWeight.w700,
               letterSpacing: 1.2,
@@ -311,10 +312,10 @@ class _InterestScreenState extends State<InterestScreen> with SingleTickerProvid
         padding: EdgeInsets.symmetric(
             horizontal: isSelected ? 18 : 20, vertical: 12), // Slight squeeze effect
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.white,
+          color: isSelected ? AppColors.primary : AppColors.white,
           borderRadius: BorderRadius.circular(30),
           border: Border.all(
-            color: isSelected ? AppColors.primary : Colors.grey.shade300,
+            color: isSelected ? AppColors.primary : AppColors.premiumGold,
             width: isSelected ? 0 : 1.5,
           ),
           boxShadow: isSelected
@@ -331,13 +332,13 @@ class _InterestScreenState extends State<InterestScreen> with SingleTickerProvid
           mainAxisSize: MainAxisSize.min,
           children: [
             if (isSelected) ...[
-              const Icon(Icons.check, color: Colors.white, size: 16),
+              const Icon(Icons.check, color: AppColors.white, size: 16),
               const SizedBox(width: 8),
             ],
             Text(
               item,
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
+                color: isSelected ? AppColors.white : AppColors.white,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 fontSize: 15,
               ),

@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -34,16 +35,16 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: AppColors.white),
         title: Text(
           'Occupation',
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: AppColors.white,
           ),
         ),
       ),
@@ -51,15 +52,15 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
         children: [
           // Progress Bar
           Obx(() => Container(
-            color: Colors.grey[50],
+            color: AppColors.premiumGold.withOpacity(0.1),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 LinearProgressIndicator(
                   value: (controller.currentStep.value + 1) / 4,
-                  backgroundColor: Colors.grey[200],
-                  color: Colors.black,
+                  backgroundColor: AppColors.premiumGold.withOpacity(0.2),
+                  color: AppColors.white,
                   minHeight: 6,
                 ),
                 const SizedBox(height: 8),
@@ -68,7 +69,7 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: AppColors.white,
                   ),
                 ),
               ],
@@ -78,7 +79,7 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
           Expanded(
             child: Obx(() {
               if (controller.isProfileLoading.value) {
-                return const Center(child: CircularProgressIndicator(color: Colors.black));
+                return const Center(child: CircularProgressIndicator(color: AppColors.white));
               }
               return SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -91,8 +92,8 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.grey[300]!)),
+              color: AppColors.black,
+              border: Border(top: BorderSide(color: AppColors.premiumGold.withOpacity(0.3))),
             ),
             child: Obx(() => Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -101,8 +102,8 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
                   ElevatedButton(
                     onPressed: controller.previousStep,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[300],
-                      foregroundColor: Colors.black,
+                      backgroundColor: AppColors.premiumGold.withOpacity(0.3),
+                      foregroundColor: AppColors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -123,7 +124,7 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
                   ElevatedButton(
                     onPressed: controller.nextStep,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor: AppColors.transparent,
                       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -133,10 +134,10 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
                       children: [
                         Text('Next', style: GoogleFonts.poppins(
                           fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                          color: AppColors.white,
                         )),
                         const SizedBox(width: 8),
-                        const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
+                        const Icon(Icons.arrow_forward, size: 18, color: AppColors.white),
                       ],
                     ),
                   )
@@ -151,12 +152,12 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
                       ),
                     ),
                     child: controller.isLoading.value 
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: AppColors.white, strokeWidth: 2))
                       : Text(
                           'Apply',
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w500,
-                            color: Colors.white,
+                            color: AppColors.white,
                           ),
                         ),
                   ),
@@ -195,23 +196,23 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.grey[50],
+            color: AppColors.premiumGold.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[300]!),
+            border: Border.all(color: AppColors.premiumGold.withOpacity(0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(Icons.cloud_upload, color: Colors.grey[700]),
+                  Icon(Icons.cloud_upload, color: AppColors.premiumGold.withOpacity(0.7)),
                   const SizedBox(width: 10),
                   Text(
                     'Upload Resume',
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: AppColors.white,
                     ),
                   ),
                 ],
@@ -248,23 +249,23 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Colors.grey[400]!,
+                      color: AppColors.premiumGold.withOpacity(0.4),
                       style: BorderStyle.solid,
                     ),
-                    color: Colors.white,
+                    color: AppColors.white,
                   ),
                   child: Column(
                     children: [
                       if (controller.isUploading.value) ...[
                         CircularProgressIndicator(
                           value: controller.uploadProgress.value,
-                          backgroundColor: Colors.grey[200],
-                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
+                          backgroundColor: AppColors.premiumGold.withOpacity(0.2),
+                          valueColor: const AlwaysStoppedAnimation<Color>(AppColors.white),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'Uploading... ${(controller.uploadProgress.value * 100).toStringAsFixed(0)}%',
-                          style: GoogleFonts.poppins(color: Colors.grey[700]),
+                          style: GoogleFonts.poppins(color: AppColors.premiumGold.withOpacity(0.7)),
                         ),
                       ] else if (controller.selectedFile.value != null) ...[
                         const Icon(Icons.check_circle, size: 48, color: Colors.green),
@@ -274,11 +275,11 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
                           style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.green),
                         ),
                         const SizedBox(height: 8),
-                        Text('Tap to change file', style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey)),
+                        Text('Tap to change file', style: GoogleFonts.poppins(fontSize: 12, color: AppColors.premiumGold)),
                       ] else ...[
-                        Icon(Icons.cloud_upload_outlined, size: 48, color: Colors.grey[400]),
+                        Icon(Icons.cloud_upload_outlined, size: 48, color: AppColors.premiumGold.withOpacity(0.4)),
                         const SizedBox(height: 12),
-                        Text('Tap to upload resume', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: Colors.grey[700])),
+                        Text('Tap to upload resume', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: AppColors.premiumGold.withOpacity(0.7))),
                       ],
                     ],
                   ),
@@ -290,7 +291,8 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.green[50],
+                      color: AppColors.black,
+                      border: Border.all(color: Colors.green),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -302,7 +304,7 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(controller.selectedFile.value!.name, style: GoogleFonts.poppins(fontSize: 14), overflow: TextOverflow.ellipsis),
-                              Text(_formatFileSize(controller.selectedFile.value!.size), style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600])),
+                              Text(_formatFileSize(controller.selectedFile.value!.size), style: GoogleFonts.poppins(fontSize: 12, color: AppColors.premiumGold.withOpacity(0.6))),
                             ],
                           ),
                         ),
@@ -338,23 +340,23 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.grey[50],
+            color: AppColors.premiumGold.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[300]!),
+            border: Border.all(color: AppColors.premiumGold.withOpacity(0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(Icons.school, color: Colors.grey[700]),
+                  Icon(Icons.school, color: AppColors.premiumGold.withOpacity(0.7)),
                   const SizedBox(width: 10),
                   Text(
                     'Education Details',
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: AppColors.white,
                     ),
                   ),
                 ],
@@ -391,11 +393,11 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
                 child: ElevatedButton(
                   onPressed: () => controller.addEducation(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: AppColors.transparent,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
-                  child: Text('Add Education', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)),
+                  child: Text('Add Education', style: GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w600)),
                 ),
               ),
             ],
@@ -429,23 +431,23 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.grey[50],
+            color: AppColors.premiumGold.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[300]!),
+            border: Border.all(color: AppColors.premiumGold.withOpacity(0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(Icons.work, color: Colors.grey[700]),
+                  Icon(Icons.work, color: AppColors.premiumGold.withOpacity(0.7)),
                   const SizedBox(width: 10),
                   Text(
                     'Employment Details',
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: AppColors.white,
                     ),
                   ),
                 ],
@@ -485,11 +487,11 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
                 child: ElevatedButton(
                   onPressed: () => controller.addEmployment(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: AppColors.transparent,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
-                  child: Text('Add Employment', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)),
+                  child: Text('Add Employment', style: GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w600)),
                 ),
               ),
             ],
@@ -523,9 +525,9 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.grey[50],
+            color: AppColors.premiumGold.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[300]!),
+            border: Border.all(color: AppColors.premiumGold.withOpacity(0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -534,7 +536,7 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Popular Skills', style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600)),
-                  Obx(() => Text('${controller.selectedSkills.length}/10 selected', style: GoogleFonts.poppins(fontSize: 12, color: controller.selectedSkills.length >= 10 ? Colors.red : Colors.grey))),
+                  Obx(() => Text('${controller.selectedSkills.length}/10 selected', style: GoogleFonts.poppins(fontSize: 12, color: controller.selectedSkills.length >= 10 ? Colors.red : AppColors.premiumGold))),
                 ],
               ),
               const SizedBox(height: 16),
@@ -545,9 +547,9 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
                   return Obx(() {
                     bool isSelected = controller.selectedSkills.contains(skill);
                     return ChoiceChip(
-                      label: Text(skill, style: GoogleFonts.poppins(fontSize: 13, color: isSelected ? Colors.white : Colors.black)),
+                      label: Text(skill, style: GoogleFonts.poppins(fontSize: 13, color: isSelected ? AppColors.black : AppColors.white)),
                       selected: isSelected,
-                      selectedColor: Colors.black,
+                      selectedColor: AppColors.premiumGold,
                       onSelected: (val) {
                         if (val) {
                           if (controller.selectedSkills.length < 10) controller.selectedSkills.add(skill);
@@ -560,7 +562,7 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
                 }).toList(),
               ),
               const SizedBox(height: 32),
-              Divider(color: Colors.grey[400], thickness: 1),
+              Divider(color: AppColors.premiumGold.withOpacity(0.4), thickness: 1),
               const SizedBox(height: 24),
               Text('Add Custom Skill', style: _labelStyle()),
               const SizedBox(height: 12),
@@ -570,13 +572,13 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
                   const SizedBox(width: 12),
                   Container(
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [Colors.black, Color(0xFF2C3E50)]),
+                      gradient: const LinearGradient(colors: [AppColors.white, Color(0xFF2C3E50)]),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: ElevatedButton(
                       onPressed: () => controller.addSkill(),
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
-                      child: Text('Add', style: GoogleFonts.poppins(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.transparent, shadowColor: AppColors.transparent),
+                      child: Text('Add', style: GoogleFonts.poppins(color: AppColors.white)),
                     ),
                   ),
                 ],
@@ -589,10 +591,10 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
           spacing: 10,
           runSpacing: 12,
           children: controller.selectedSkills.map((skill) => Chip(
-            label: Text(skill, style: GoogleFonts.poppins(fontSize: 13, color: Colors.white)),
-            backgroundColor: Colors.black,
+            label: Text(skill, style: GoogleFonts.poppins(fontSize: 13, color: AppColors.white)),
+            backgroundColor: AppColors.transparent,
             onDeleted: () => controller.removeSkill(skill),
-            deleteIconColor: Colors.white,
+            deleteIconColor: AppColors.white,
           )).toList(),
         )),
       ],
@@ -603,11 +605,11 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(color: AppColors.premiumGold.withOpacity(0.1), borderRadius: BorderRadius.circular(16)),
       child: Column(children: [
-        Icon(Icons.code_off, size: 32, color: Colors.grey[400]),
+        Icon(Icons.code_off, size: 32, color: AppColors.premiumGold.withOpacity(0.4)),
         const SizedBox(height: 16),
-        Text('No skills selected', style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700])),
+        Text('No skills selected', style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.premiumGold.withOpacity(0.7))),
       ]),
     );
   }
@@ -625,15 +627,15 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
               initialDate: DateTime.now(),
               firstDate: DateTime(1900),
               lastDate: DateTime.now(),
-              builder: (context, child) => Theme(data: ThemeData.light().copyWith(colorScheme: const ColorScheme.light(primary: Colors.black)), child: child!),
+              builder: (context, child) => Theme(data: ThemeData.light().copyWith(colorScheme: const ColorScheme.light(primary: AppColors.white)), child: child!),
             );
             if (picked != null) date.value = picked;
           },
           child: Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(border: Border.all(color: Colors.grey[300]!), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(border: Border.all(color: AppColors.premiumGold.withOpacity(0.3)), borderRadius: BorderRadius.circular(8)),
             child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text(date.value == null ? 'Select Date' : DateFormat('dd/MM/yyyy').format(date.value!), style: TextStyle(color: date.value == null ? Colors.grey : Colors.black)),
+              Text(date.value == null ? 'Select Date' : DateFormat('dd/MM/yyyy').format(date.value!), style: TextStyle(color: date.value == null ? AppColors.premiumGold : AppColors.white)),
               const Icon(Icons.calendar_today, size: 18),
             ]),
           ),
@@ -645,26 +647,26 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: GoogleFonts.poppins(color: Colors.grey[500], fontSize: 13),
+      hintStyle: GoogleFonts.poppins(color: AppColors.premiumGold.withOpacity(0.5), fontSize: 13),
       filled: true,
-      fillColor: Colors.white,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey[300]!)),
+      fillColor: AppColors.black,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColors.premiumGold.withOpacity(0.3))),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
 
-  TextStyle _labelStyle() => GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87);
+  TextStyle _labelStyle() => GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.white);
 
   Widget _radioButton(String title, String value, String groupValue, Function(String?) onChanged) {
     return Row(mainAxisSize: MainAxisSize.min, children: [
-      Radio<String>(value: value, groupValue: groupValue, onChanged: onChanged, activeColor: Colors.black),
+      Radio<String>(value: value, groupValue: groupValue, onChanged: onChanged, activeColor: AppColors.white),
       Text(title, style: GoogleFonts.poppins(fontSize: 13)),
     ]);
   }
 
   Widget _buildRadioOption<T>(String title, T value, T groupValue, Function(T?) onChanged) {
     return Row(mainAxisSize: MainAxisSize.min, children: [
-      Radio<T>(value: value, groupValue: groupValue, onChanged: onChanged, activeColor: Colors.black),
+      Radio<T>(value: value, groupValue: groupValue, onChanged: onChanged, activeColor: AppColors.white),
       Text(title, style: GoogleFonts.poppins(fontSize: 13)),
     ]);
   }

@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
@@ -30,16 +31,16 @@ class CustomPhoneField extends StatelessWidget {
       controller: controller,
       keyboardType: TextInputType.phone,
       enabled: enabled,
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.white),
       decoration: InputDecoration(
         labelText: labelText,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: AppColors.premiumGold),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: AppColors.premiumGold),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -47,10 +48,10 @@ class CustomPhoneField extends StatelessWidget {
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: AppColors.premiumGold),
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: AppColors.white,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         suffixIcon: suffixIcon,
         prefixIcon: InkWell(
@@ -68,17 +69,17 @@ class CustomPhoneField extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16, 
                       fontWeight: FontWeight.w600,
-                      color: enabled ? Colors.black87 : Colors.grey,
+                      color: enabled ? AppColors.white : AppColors.premiumGold,
                     ),
                   );
                 }),
                 const SizedBox(width: 4),
-                Icon(Icons.arrow_drop_down, color: enabled ? Colors.grey : Colors.grey.shade400),
+                Icon(Icons.arrow_drop_down, color: enabled ? AppColors.premiumGold : AppColors.premiumGold),
                 const SizedBox(width: 8),
                 Container(
                   width: 1,
                   height: 24,
-                  color: Colors.grey.shade300,
+                  color: AppColors.premiumGold,
                 ),
                 const SizedBox(width: 8),
               ],
@@ -95,7 +96,7 @@ class CustomPhoneField extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       builder: (context) {
         return SafeArea(
           child: Column(
@@ -106,7 +107,7 @@ class CustomPhoneField extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: AppColors.premiumGold,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -120,7 +121,7 @@ class CustomPhoneField extends StatelessWidget {
                 return ListTile(
                   leading: Text(country['flag']!, style: const TextStyle(fontSize: 24)),
                   title: Text(country['name']!, style: const TextStyle(fontWeight: FontWeight.w500)),
-                  trailing: Text(country['dialCode']!, style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                  trailing: Text(country['dialCode']!, style: const TextStyle(color: AppColors.premiumGold, fontWeight: FontWeight.bold)),
                   onTap: () {
                     countryCode.value = country['dialCode']!;
                     Navigator.pop(context);

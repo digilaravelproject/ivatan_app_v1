@@ -42,14 +42,14 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.transparent,
       appBar: AppBar(
         title: const Text(
           'Marketplace',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.white),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: AppColors.transparent,
+        foregroundColor: AppColors.white,
         elevation: 0,
       ),
       body: Obx(() {
@@ -65,12 +65,12 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.shopping_bag_outlined,
-                    size: 80, color: Colors.grey.shade400),
+                    size: 80, color: AppColors.premiumGold),
                 const SizedBox(height: 16),
                 Text(
                   'No products available',
                   style: TextStyle(
-                      fontSize: 18, color: Colors.grey.shade600),
+                      fontSize: 18, color: AppColors.premiumGold),
                 ),
               ],
             ),
@@ -117,12 +117,12 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: AppColors.premiumGold),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: AppColors.white.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -144,9 +144,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   return Container(
                     width: double.infinity,
                     height: 200,
-                    color: Colors.grey.shade200,
+                    color: AppColors.premiumGold,
                     child: const Icon(Icons.image_not_supported,
-                        color: Colors.grey),
+                        color: AppColors.premiumGold),
                   );
                 },
               ),
@@ -166,7 +166,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: AppColors.white,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -188,7 +188,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                           '₹${product.price}',
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey.shade600,
+                            color: AppColors.premiumGold,
                             decoration: TextDecoration.lineThrough,
                           ),
                         ),
@@ -216,10 +216,10 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                                 width: 32,
                                 height: 32,
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
+                                  color: AppColors.premiumGold,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.remove, size: 20, color: Colors.black87),
+                                child: const Icon(Icons.remove, size: 20, color: AppColors.white),
                               ),
                             ),
                             Padding(
@@ -229,7 +229,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                                  color: AppColors.white,
                                 ),
                               ),
                             ),
@@ -242,7 +242,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                                   color: AppColors.primary,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.add, size: 20, color: Colors.white),
+                                child: const Icon(Icons.add, size: 20, color: AppColors.white),
                               ),
                             ),
                           ],
@@ -271,14 +271,14 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                                       height: 18,
                                       width: 18,
                                       child: CircularProgressIndicator(
-                                        color: Colors.white,
+                                        color: AppColors.white,
                                         strokeWidth: 2,
                                       ),
                                     )
                                   : const Text(
                                       'ADD TO CART',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: AppColors.white,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14,
                                       ),
@@ -319,7 +319,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                                     style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
-                                      color: Colors.black87,
+                                      color: AppColors.white,
                                     ),
                                   ),
                                 ),
@@ -332,7 +332,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                               '${product.seller.followersCount} followers',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.grey.shade600,
+                                color: AppColors.premiumGold,
                               ),
                             ),
                           ],
@@ -350,7 +350,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     style: TextStyle(
                       fontSize: 12,
                       color: product.stock > 0
-                          ? Colors.grey.shade600
+                          ? AppColors.premiumGold
                           : Colors.red,
                       fontWeight: product.stock == 0
                           ? FontWeight.bold

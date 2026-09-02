@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -8,18 +9,22 @@ class ComingSoonScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: enableBack ? AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ) : null,
+      backgroundColor: AppColors.transparent,
+      appBar:
+          enableBack
+              ? AppBar(
+                backgroundColor: AppColors.transparent,
+                elevation: 0,
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back_ios, color: AppColors.white),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              )
+              : null,
       body: CustomEmptyState(
         title: "Coming Soon!",
-        subTitle: "We are currently crafting this feature.\nIt will be available in the next update.",
+        subTitle:
+            "We are currently crafting this feature.\nIt will be available in the next update.",
         icon: Icons.rocket_launch_rounded,
       ),
     );
@@ -45,7 +50,8 @@ class CustomEmptyState extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(16.0), // Reduced strict padding
-        child: FittedBox( // Scales content to avoid overflow
+        child: FittedBox(
+          // Scales content to avoid overflow
           fit: BoxFit.scaleDown,
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -72,18 +78,19 @@ class CustomEmptyState extends StatelessWidget {
                 style: TextStyle(
                   fontSize: isSmall ? 16 : 28, // Reduced font size
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: AppColors.white,
                   letterSpacing: -0.5,
                 ),
                 textAlign: TextAlign.center,
               ),
-              if (subTitle.isNotEmpty) ...[ // Only show subtitle and spacer if not empty
+              if (subTitle.isNotEmpty) ...[
+                // Only show subtitle and spacer if not empty
                 const SizedBox(height: 8),
                 Text(
                   subTitle,
                   style: TextStyle(
                     fontSize: isSmall ? 12 : 16,
-                    color: Colors.grey.shade600,
+                    color: AppColors.premiumGold,
                     height: 1.5,
                   ),
                   textAlign: TextAlign.center,
@@ -98,75 +105,84 @@ class CustomEmptyState extends StatelessWidget {
 }
 
 // Coming Soon Dialog Function
-void showComingSoonDialog(BuildContext context, {required String title, required String message}) {
+void showComingSoonDialog(
+  BuildContext context, {
+  required String title,
+  required String message,
+}) {
   showDialog(
     context: context,
-    builder: (context) => Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              height: 80,
-              width: 80,
-              decoration: BoxDecoration(
-                color: Colors.purple.shade50,
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.rocket_launch_rounded,
-                  size: 40,
-                  color: Colors.purple.shade600,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              message,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade600,
-                height: 1.5,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purple.shade600,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+    builder:
+        (context) => Dialog(
+          backgroundColor: AppColors.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: const BorderSide(color: AppColors.premiumGold),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  height: 80,
+                  width: 80,
+                  decoration: BoxDecoration(
+                    color: AppColors.premiumGold.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: const Icon(
+                      Icons.rocket_launch_rounded,
+                      size: 40,
+                      color: AppColors.premiumGold,
+                    ),
                   ),
                 ),
-                child: const Text(
-                  "Got it!",
+                const SizedBox(height: 20),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  message,
                   style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: AppColors.premiumGold,
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.premiumGold,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text(
+                      "Got it!",
+                      style: TextStyle(
+                        color: AppColors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
-    ),
   );
 }

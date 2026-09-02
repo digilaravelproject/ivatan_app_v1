@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'controller/financial_controller.dart';
@@ -29,7 +30,7 @@ class BankDetailsScreen extends StatelessWidget {
           return const Center(
             child: Text(
               'No bank accounts added yet',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              style: TextStyle(fontSize: 16, color: AppColors.premiumGold),
             ),
           );
         }
@@ -63,12 +64,12 @@ class BankDetailsScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.grey.shade800
-            : Colors.white,
+            ? AppColors.premiumGold
+            : AppColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: AppColors.premiumGold.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -162,7 +163,7 @@ class BankDetailsScreen extends StatelessWidget {
                                   value: 'default',
                                   child: Row(
                                     children: [
-                                      Icon(Icons.star, size: 18, color: isDefault ? Colors.grey : Colors.amber),
+                                      Icon(Icons.star, size: 18, color: isDefault ? AppColors.premiumGold : Colors.amber),
                                       const SizedBox(width: 8),
                                       Text(isDefault ? 'Remove Default' : 'Set as Default'),
                                     ],
@@ -193,7 +194,7 @@ class BankDetailsScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: Colors.grey.shade600)),
+          Text(label, style: TextStyle(color: AppColors.premiumGold)),
           Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
         ],
       ),
@@ -210,9 +211,9 @@ class AddBankAccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final FinancialController controller = Get.put(FinancialController());
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? Colors.black : Colors.white;
-    final cardColor = isDark ? Colors.grey.shade900 : Colors.grey.shade100;
-    final textColor = isDark ? Colors.white : Colors.black87;
+    final backgroundColor = isDark ? AppColors.white : AppColors.white;
+    final cardColor = isDark ? AppColors.premiumGold : AppColors.premiumGold;
+    final textColor = isDark ? AppColors.white : AppColors.white;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -234,7 +235,7 @@ class AddBankAccountScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: isDark ? Colors.white10 : Colors.black12,
+                color: isDark ? AppColors.white : AppColors.white,
                 blurRadius: 10,
                 offset: const Offset(0, 5),
               ),
@@ -289,15 +290,15 @@ class AddBankAccountScreen extends StatelessWidget {
               Obx(() => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.grey.shade800 : Colors.white,
+                  color: isDark ? AppColors.premiumGold : AppColors.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: controller.selectedAccountType.value,
                     isExpanded: true,
-                    dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
-                    style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                    dropdownColor: isDark ? AppColors.premiumGold : AppColors.white,
+                    style: TextStyle(color: isDark ? AppColors.white : AppColors.white),
                     items: controller.accountTypes.map((String type) {
                       return DropdownMenuItem<String>(
                         value: type,
@@ -321,7 +322,7 @@ class AddBankAccountScreen extends StatelessWidget {
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
-                            color: isDark ? Colors.white54 : Colors.black45),
+                            color: isDark ? AppColors.white : AppColors.white),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
@@ -330,7 +331,7 @@ class AddBankAccountScreen extends StatelessWidget {
                       child: Text(
                         'Cancel',
                         style: TextStyle(
-                            color: isDark ? Colors.white70 : Colors.black87),
+                            color: isDark ? AppColors.white : AppColors.white),
                       ),
                     ),
                   ),
@@ -339,7 +340,7 @@ class AddBankAccountScreen extends StatelessWidget {
                     child: Obx(() => ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
-                        isDark ? Colors.white12 : Colors.black87,
+                        isDark ? AppColors.white : AppColors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
@@ -358,13 +359,13 @@ class AddBankAccountScreen extends StatelessWidget {
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppColors.white,
                             ),
                           )
                         : const Text(
                             'Add Account',
                             style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 fontWeight: FontWeight.w600),
                           ),
                     )),
@@ -388,14 +389,14 @@ class AddBankAccountScreen extends StatelessWidget {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
-      style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+      style: TextStyle(color: isDark ? AppColors.white : AppColors.white),
       decoration: InputDecoration(
         labelText: label,
         labelStyle:
-        TextStyle(color: isDark ? Colors.white60 : Colors.black54),
-        prefixIcon: Icon(icon, color: isDark ? Colors.white60 : Colors.black54),
+        TextStyle(color: isDark ? AppColors.white : AppColors.white),
+        prefixIcon: Icon(icon, color: isDark ? AppColors.white : AppColors.white),
         filled: true,
-        fillColor: isDark ? Colors.grey.shade800 : Colors.white,
+        fillColor: isDark ? AppColors.premiumGold : AppColors.white,
         contentPadding:
         const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(

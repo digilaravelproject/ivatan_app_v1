@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'dart:io';
 import 'package:camerawesome/camerawesome_plugin.dart';
 import 'package:camerawesome/pigeon.dart';
@@ -101,11 +102,11 @@ class StoryCameraScreen extends StatelessWidget {
           }
         },
         theme: AwesomeTheme(
-          bottomActionsBackgroundColor: Colors.black.withOpacity(0.5),
+          bottomActionsBackgroundColor: AppColors.white.withOpacity(0.5),
           buttonTheme: AwesomeButtonTheme(
-            backgroundColor: Colors.white.withOpacity(0.2),
+            backgroundColor: AppColors.black.withOpacity(0.2),
             iconSize: 32,
-            foregroundColor: Colors.white,
+            foregroundColor: AppColors.white,
           ),
         ),
       ),

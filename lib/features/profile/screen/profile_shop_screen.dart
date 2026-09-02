@@ -24,8 +24,8 @@ class _ProfileShopScreenState extends State<ProfileShopScreen> with SingleTicker
       children: [
         TabBar(
           controller: _tabController,
-          labelColor: Colors.black,
-          unselectedLabelColor: Colors.grey,
+          labelColor: AppColors.white,
+          unselectedLabelColor: AppColors.premiumGold,
           indicatorColor: Colors.blue,
           indicatorWeight: 3,
           labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -127,11 +127,11 @@ class _ProfileShopScreenState extends State<ProfileShopScreen> with SingleTicker
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.white.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -151,7 +151,7 @@ class _ProfileShopScreenState extends State<ProfileShopScreen> with SingleTicker
               width: 120,
               height: 140,
               fit: BoxFit.cover,
-              errorBuilder: (_,__,___) => Container(width: 120, height: 140, color: Colors.grey),
+              errorBuilder: (_,__,___) => Container(width: 120, height: 140, color: AppColors.premiumGold),
             ),
           ),
           
@@ -178,7 +178,7 @@ class _ProfileShopScreenState extends State<ProfileShopScreen> with SingleTicker
                   const SizedBox(height: 4),
                    Text(
                     item["desc"],
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                    style: TextStyle(color: AppColors.premiumGold, fontSize: 12),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -186,7 +186,7 @@ class _ProfileShopScreenState extends State<ProfileShopScreen> with SingleTicker
                    Row(
                     children: [
                       const Icon(Icons.star, color: Colors.amber, size: 14),
-                      Text(" (${item['rating']})", style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      Text(" (${item['rating']})", style: const TextStyle(fontSize: 12, color: AppColors.premiumGold)),
                     ],
                   ),
                    const SizedBox(height: 8),
@@ -204,7 +204,7 @@ class _ProfileShopScreenState extends State<ProfileShopScreen> with SingleTicker
                             "${item['oldPrice']}",
                             style: const TextStyle(
                               decoration: TextDecoration.lineThrough,
-                              color: Colors.grey,
+                              color: AppColors.premiumGold,
                               fontSize: 12
                             ),
                            ),
@@ -219,7 +219,7 @@ class _ProfileShopScreenState extends State<ProfileShopScreen> with SingleTicker
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
                           ),
-                          child: Text(isProduct ? "BUY NOW" : "VIEW NOW", style: const TextStyle(fontSize: 10, color: Colors.white)),
+                          child: Text(isProduct ? "BUY NOW" : "VIEW NOW", style: const TextStyle(fontSize: 10, color: AppColors.white)),
                         )
                      ],
                    )

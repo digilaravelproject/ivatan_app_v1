@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -63,11 +64,11 @@ import '../../../../core/theme/app_colors.dart';
             hintText: hintText,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Colors.grey),
+              borderSide: const BorderSide(color: AppColors.premiumGold),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Colors.grey),
+              borderSide: const BorderSide(color: AppColors.premiumGold),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
@@ -81,7 +82,7 @@ import '../../../../core/theme/app_colors.dart';
                     style: Theme.of(context).iconButtonTheme.style?.copyWith(
                       side: const WidgetStatePropertyAll(BorderSide.none),
                       backgroundColor: const WidgetStatePropertyAll(
-                        Colors.transparent,
+                        AppColors.transparent,
                       ),
                     ),
                   ).marginOnly(right: 8),
@@ -94,7 +95,6 @@ import '../../../../core/theme/app_colors.dart';
     );
   }
 }*/
-
 
 class AuthInputFields extends StatefulWidget {
   final String? label;
@@ -111,7 +111,7 @@ class AuthInputFields extends StatefulWidget {
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
 
-  final bool readOnly;       // for DOB calendar
+  final bool readOnly; // for DOB calendar
   final VoidCallback? onTap;
 
   const AuthInputFields({
@@ -175,47 +175,50 @@ class _AuthInputFieldsState extends State<AuthInputFields> {
       style: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: widget.readOnly ? Colors.grey.shade600 : Colors.black87,
+        color: widget.readOnly ? AppColors.premiumGold : AppColors.white,
       ),
 
       decoration: InputDecoration(
         labelText: widget.label,
         labelStyle: TextStyle(
           fontSize: 14,
-          color: _isFocused ? AppColors.primary : Colors.grey.shade600,
+          color: AppColors.premiumGold,
           fontWeight: FontWeight.w500,
         ),
 
         hintText: widget.hintText,
-        hintStyle: TextStyle(
-          fontSize: 14,
-          color: Colors.grey.shade400,
-        ),
+        hintStyle: TextStyle(fontSize: 14, color: AppColors.premiumGold),
 
-        prefixIcon: widget.iconData == null
-            ? null
-            : Icon(widget.iconData, size: 20, color: AppColors.primary),
+        prefixIcon:
+            widget.iconData == null
+                ? null
+                : Icon(widget.iconData, size: 20, color: AppColors.primary),
 
         // Prefer suffixIcon widget, else fallback to endIcon button
-        suffixIcon: widget.suffixIcon ?? (widget.endIcon == null
-            ? null
-            : IconButton(
-          onPressed: widget.onEndIconTap,
-          icon: Icon(widget.endIcon, size: 20),
-          color: AppColors.primary,
-        )),
+        suffixIcon:
+            widget.suffixIcon ??
+            (widget.endIcon == null
+                ? null
+                : IconButton(
+                  onPressed: widget.onEndIconTap,
+                  icon: Icon(widget.endIcon, size: 20),
+                  color: AppColors.primary,
+                )),
 
         // Premium rounded borders with fill
         filled: true,
-        fillColor: widget.readOnly ? Colors.grey.shade50 : Colors.white,
+        fillColor:
+            widget.readOnly
+                ? AppColors.premiumGold.withOpacity(0.1)
+                : AppColors.transparent,
 
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: AppColors.premiumGold),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: AppColors.premiumGold),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
@@ -231,17 +234,17 @@ class _AuthInputFieldsState extends State<AuthInputFields> {
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide(color: AppColors.premiumGold),
         ),
 
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 18,
+        ),
       ),
     );
   }
 }
-
-
-
 
 class CustomTextField extends StatefulWidget {
   final String labelText;
@@ -295,25 +298,23 @@ class _CustomTextFieldState extends State<CustomTextField> {
         suffixIcon: widget.suffixIcon,
         labelText: widget.labelText,
         labelStyle: TextStyle(
-          color: _isFocused ? Colors.blue : Colors.grey,
+          color: _isFocused ? Colors.blue : AppColors.premiumGold,
           fontSize: 14,
         ),
         enabledBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey, width: 1),
+          borderSide: BorderSide(color: AppColors.premiumGold, width: 1),
         ),
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.blue, width: 1.5),
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: AppColors.white,
         contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
       ),
-      style: const TextStyle(color: Colors.black, fontSize: 15),
+      style: const TextStyle(color: AppColors.white, fontSize: 15),
     );
   }
 }
-
-
 
 class AuthInputFieldsBorder extends StatefulWidget {
   final String? label;
@@ -391,46 +392,48 @@ class _AuthInputFieldsBorderState extends State<AuthInputFieldsBorder> {
       style: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: widget.readOnly ? Colors.grey.shade600 : Colors.black87,
+        color: widget.readOnly ? AppColors.premiumGold : AppColors.white,
       ),
 
       decoration: InputDecoration(
         labelText: widget.label,
         labelStyle: TextStyle(
           fontSize: 14,
-          color: _isFocused ? AppColors.primary : Colors.grey.shade600,
+          color: AppColors.premiumGold,
           fontWeight: FontWeight.w500,
         ),
 
         hintText: widget.hintText,
-        hintStyle: TextStyle(
-          fontSize: 14,
-          color: Colors.grey.shade400,
-        ),
+        hintStyle: TextStyle(fontSize: 14, color: AppColors.premiumGold),
 
-        prefixIcon: widget.iconData == null
-            ? null
-            : Icon(widget.iconData, size: 20, color: AppColors.primary),
+        prefixIcon:
+            widget.iconData == null
+                ? null
+                : Icon(widget.iconData, size: 20, color: AppColors.primary),
 
-        suffixIcon: widget.endIcon == null
-            ? null
-            : IconButton(
-          onPressed: widget.onEndIconTap,
-          icon: Icon(widget.endIcon, size: 20),
-          color: AppColors.primary,
-        ),
+        suffixIcon:
+            widget.endIcon == null
+                ? null
+                : IconButton(
+                  onPressed: widget.onEndIconTap,
+                  icon: Icon(widget.endIcon, size: 20),
+                  color: AppColors.primary,
+                ),
 
         // Premium rounded borders with fill
         filled: true,
-        fillColor: widget.readOnly ? Colors.grey.shade50 : Colors.white,
+        fillColor:
+            widget.readOnly
+                ? AppColors.premiumGold.withOpacity(0.1)
+                : AppColors.transparent,
 
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: AppColors.premiumGold),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: AppColors.premiumGold),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
@@ -446,12 +449,14 @@ class _AuthInputFieldsBorderState extends State<AuthInputFieldsBorder> {
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide(color: AppColors.premiumGold),
         ),
 
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 18,
+        ),
       ),
-
     );
   }
 }

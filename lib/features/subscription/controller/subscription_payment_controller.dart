@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/network/api_services.dart';
@@ -91,7 +92,7 @@ class SubscriptionPaymentController extends GetxController {
         "Error",
         "Could not locate or initialize profile details. Please try again.",
         backgroundColor: Colors.red,
-        colorText: Colors.white,
+        colorText: AppColors.white,
       );
       return;
     }
@@ -100,7 +101,7 @@ class SubscriptionPaymentController extends GetxController {
     try {
       isLoading.value = true;
       Get.dialog(
-        const Center(child: CircularProgressIndicator(color: Colors.black)),
+        const Center(child: CircularProgressIndicator(color: AppColors.white)),
         barrierDismissible: false,
       );
 
@@ -149,7 +150,7 @@ class SubscriptionPaymentController extends GetxController {
           "Initiation Failed",
           errorMsg,
           backgroundColor: Colors.red.shade600,
-          colorText: Colors.white,
+          colorText: AppColors.white,
         );
       }
     } catch (e) {
@@ -158,7 +159,7 @@ class SubscriptionPaymentController extends GetxController {
         "Error",
         "Something went wrong: $e",
         backgroundColor: Colors.red,
-        colorText: Colors.white,
+        colorText: AppColors.white,
       );
     } finally {
       isLoading.value = false;
@@ -217,7 +218,7 @@ class SubscriptionPaymentController extends GetxController {
     try {
       isLoading.value = true;
       Get.dialog(
-        const Center(child: CircularProgressIndicator(color: Colors.black)),
+        const Center(child: CircularProgressIndicator(color: AppColors.white)),
         barrierDismissible: false,
       );
 
@@ -337,8 +338,8 @@ class SubscriptionPaymentController extends GetxController {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
+              backgroundColor: AppColors.transparent,
+              foregroundColor: AppColors.white,
               minimumSize: const Size(120, 45),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
@@ -359,7 +360,7 @@ class SubscriptionPaymentController extends GetxController {
     try {
       isLoading.value = true;
       Get.dialog(
-        const Center(child: CircularProgressIndicator(color: Colors.black)),
+        const Center(child: CircularProgressIndicator(color: AppColors.white)),
         barrierDismissible: false,
       );
 
@@ -434,8 +435,8 @@ class SubscriptionPaymentController extends GetxController {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppColors.transparent,
+                  foregroundColor: AppColors.white,
                   minimumSize: const Size(120, 45),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
@@ -451,7 +452,7 @@ class SubscriptionPaymentController extends GetxController {
           "Subscription Failed",
           errorMsg,
           backgroundColor: Colors.red.shade600,
-          colorText: Colors.white,
+          colorText: AppColors.white,
           duration: const Duration(seconds: 4),
         );
       }
@@ -461,7 +462,7 @@ class SubscriptionPaymentController extends GetxController {
         "Error",
         "Something went wrong: $e",
         backgroundColor: Colors.red,
-        colorText: Colors.white,
+        colorText: AppColors.white,
       );
     } finally {
       isLoading.value = false;
@@ -509,7 +510,7 @@ class SubscriptionPaymentController extends GetxController {
               ),
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
             ),
-            child: const Text("Okay", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: const Text("Okay", style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),

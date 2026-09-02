@@ -1,3 +1,4 @@
+import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,9 +21,9 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
     return Obx(() {
       if (controller.isLoading.value) {
         return const Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.transparent,
           body: Center(
-            child: CircularProgressIndicator(color: Colors.black),
+            child: CircularProgressIndicator(color: AppColors.white),
           ),
         );
       }
@@ -36,19 +37,19 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
       }
 
       return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.transparent,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            icon: const Icon(Icons.arrow_back, color: AppColors.white),
             onPressed: () => Get.back(),
           ),
           actions: [
             // Only show edit/delete for recruiters
             if (_isRecruiter() && job.isMine) ...[
               IconButton(
-                icon: const Icon(Icons.edit, color: Colors.black),
+                icon: const Icon(Icons.edit, color: AppColors.white),
                 onPressed: () => controller.editJob(),
               ),
               IconButton(
@@ -58,7 +59,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
             ],
             const SizedBox(width: 8),
           ],
-          title:  Column(
+          title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -66,7 +67,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                 style: GoogleFonts.poppins(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: AppColors.white,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -75,7 +76,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                 job.companyName,
                 style: GoogleFonts.poppins(
                   fontSize: 13,
-                  color: Colors.grey[600],
+                  color: AppColors.premiumGold.withOpacity(0.6),
                 ),
               ),
             ],
@@ -90,18 +91,23 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                   // _buildHeader(job),
+                    // _buildHeader(job),
                     _buildJobInfo(job),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Divider(color: Colors.grey),
+                      child: Divider(color: AppColors.premiumGold),
                     ),
                     _buildJobDescription(job),
-                    if (job.requirements != null && job.requirements!.isNotEmpty)
+                    if (job.requirements != null &&
+                        job.requirements!.isNotEmpty)
                       _buildChipSection('Requirements', job.requirements!),
-                    if (job.responsibilities != null && job.responsibilities!.isNotEmpty)
-                      _buildBulletSection('Responsibilities', job.responsibilities!),
-                   // _buildCompanyInfo(job),
+                    if (job.responsibilities != null &&
+                        job.responsibilities!.isNotEmpty)
+                      _buildBulletSection(
+                        'Responsibilities',
+                        job.responsibilities!,
+                      ),
+                    // _buildCompanyInfo(job),
                     const SizedBox(height: 20),
                   ],
                 ),
@@ -139,7 +145,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black,
+                    color: AppColors.white,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -148,7 +154,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                   job.companyName,
                   style: GoogleFonts.poppins(
                     fontSize: 13,
-                    color: Colors.grey[600],
+                    color: AppColors.premiumGold.withOpacity(0.6),
                   ),
                 ),
               ],
@@ -160,12 +166,12 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
           //   height: 45,
           //   decoration: BoxDecoration(
           //     shape: BoxShape.circle,
-          //     border: Border.all(color: Colors.grey[300]!),
+          //     border: Border.all(color: AppColors.premiumGold.withOpacity(0.3)),
           //   ),
           //   child: Obx(() => IconButton(
           //     icon: Icon(
           //       controller.isBookmarked.value ? Icons.bookmark : Icons.bookmark_border,
-          //       color: Colors.black,
+          //       color: AppColors.white,
           //     ),
           //     onPressed: () => controller.toggleBookmark(),
           //   )),
@@ -181,11 +187,12 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.black,
+          border: Border.all(color: AppColors.premiumGold),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.17), // increase opacity
+              color: AppColors.transparent, // increase opacity
               blurRadius: 12, // increase blur
               spreadRadius: 2,
               offset: const Offset(0, 6), // better offset
@@ -200,17 +207,22 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
               height: 45,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.grey[100]!),
+                border: Border.all(
+                  color: AppColors.premiumGold.withOpacity(0.1),
+                ),
               ),
               child: ClipOval(
                 child: CachedNetworkImage(
-                  imageUrl: AppUrls.getFullImageUrl(job.companyLogo ?? job.employer.profilePhotoPath),
-                  fit: BoxFit.cover,
-                  errorWidget: (context, url, error) => const Icon(
-                    Icons.business,
-                    size: 24,
-                    color: Colors.grey,
+                  imageUrl: AppUrls.getFullImageUrl(
+                    job.companyLogo ?? job.employer.profilePhotoPath,
                   ),
+                  fit: BoxFit.cover,
+                  errorWidget:
+                      (context, url, error) => const Icon(
+                        Icons.business,
+                        size: 24,
+                        color: AppColors.premiumGold,
+                      ),
                 ),
               ),
             ),
@@ -224,7 +236,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: AppColors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -236,7 +248,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: Colors.grey[700],
+                            color: AppColors.premiumGold.withOpacity(0.7),
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -244,7 +256,10 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                       const SizedBox(width: 6),
                       Text(
                         '•',
-                        style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                        style: TextStyle(
+                          color: AppColors.premiumGold.withOpacity(0.5),
+                          fontSize: 12,
+                        ),
                       ),
                       const SizedBox(width: 6),
                       Flexible(
@@ -252,7 +267,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                           job.location.isNotEmpty ? job.location : 'Remote',
                           style: GoogleFonts.poppins(
                             fontSize: 12,
-                            color: Colors.grey[600],
+                            color: AppColors.premiumGold.withOpacity(0.6),
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -265,7 +280,10 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                     runSpacing: 6,
                     children: [
                       _buildTag(job.employmentType, Icons.work_outline),
-                      _buildTag('${job.currency} ${job.salaryMax}', Icons.attach_money_outlined),
+                      _buildTag(
+                        '${job.currency} ${job.salaryMax}',
+                        Icons.attach_money_outlined,
+                      ),
                       if (job.isRemote)
                         _buildTag('Remote', Icons.home_outlined),
                     ],
@@ -283,21 +301,21 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: AppColors.premiumGold.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: AppColors.premiumGold.withOpacity(0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: Colors.grey[700]),
+          Icon(icon, size: 14, color: AppColors.premiumGold.withOpacity(0.7)),
           const SizedBox(width: 4),
           Text(
             text,
             style: GoogleFonts.poppins(
               fontSize: 11,
               fontWeight: FontWeight.w500,
-              color: Colors.grey[800],
+              color: AppColors.premiumGold.withOpacity(0.8),
             ),
           ),
         ],
@@ -316,7 +334,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
             style: GoogleFonts.poppins(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: AppColors.white,
             ),
           ),
           const SizedBox(height: 12),
@@ -324,7 +342,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
             job.description,
             style: GoogleFonts.poppins(
               fontSize: 15,
-              color: Colors.grey[700],
+              color: AppColors.premiumGold.withOpacity(0.7),
               height: 1.6,
             ),
           ),
@@ -334,8 +352,13 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
   }
 
   Widget _buildChipSection(String title, String content) {
-    final List<String> items = content.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
-    
+    final List<String> items =
+        content
+            .split(',')
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
+
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -346,34 +369,38 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
             style: GoogleFonts.poppins(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: AppColors.white,
             ),
           ),
           const SizedBox(height: 12),
           Wrap(
             spacing: 10,
             runSpacing: 10,
-            children: items.map((item) {
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.black, width: 1),
-                ),
-                child: Text(
-                  item,
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                  ),
-                ),
-              );
-            }).toList(),
+            children:
+                items.map((item) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.black,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: AppColors.premiumGold,
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      item,
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.white,
+                      ),
+                    ),
+                  );
+                }).toList(),
           ),
         ],
       ),
@@ -386,9 +413,9 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.grey[50],
+          color: AppColors.premiumGold.withOpacity(0.1),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey[200]!),
+          border: Border.all(color: AppColors.premiumGold.withOpacity(0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,17 +427,22 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                   height: 50,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.grey[100]!),
+                    border: Border.all(
+                      color: AppColors.premiumGold.withOpacity(0.1),
+                    ),
                   ),
                   child: ClipOval(
                     child: CachedNetworkImage(
-                      imageUrl: AppUrls.getFullImageUrl(job.employer.profilePhotoPath),
-                      fit: BoxFit.cover,
-                      errorWidget: (context, url, error) => const Icon(
-                        Icons.business,
-                        size: 30,
-                        color: Colors.grey,
+                      imageUrl: AppUrls.getFullImageUrl(
+                        job.employer.profilePhotoPath,
                       ),
+                      fit: BoxFit.cover,
+                      errorWidget:
+                          (context, url, error) => const Icon(
+                            Icons.business,
+                            size: 30,
+                            color: AppColors.premiumGold,
+                          ),
                     ),
                   ),
                 ),
@@ -424,14 +456,14 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                         style: GoogleFonts.poppins(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                          color: AppColors.white,
                         ),
                       ),
                       Text(
                         job.employer.occupation ?? 'Recruiter',
                         style: GoogleFonts.poppins(
                           fontSize: 14,
-                          color: Colors.grey[600],
+                          color: AppColors.premiumGold.withOpacity(0.6),
                         ),
                       ),
                     ],
@@ -445,7 +477,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                 job.employer.bio!,
                 style: GoogleFonts.poppins(
                   fontSize: 14,
-                  color: Colors.grey[700],
+                  color: AppColors.premiumGold.withOpacity(0.7),
                   height: 1.5,
                 ),
               ),
@@ -453,7 +485,10 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
             const SizedBox(height: 15),
             Row(
               children: [
-                _buildCompanyStat('${job.employer.followersCount}', 'Followers'),
+                _buildCompanyStat(
+                  '${job.employer.followersCount}',
+                  'Followers',
+                ),
                 const SizedBox(width: 20),
                 _buildCompanyStat('${job.employer.postsCount}', 'Posts'),
                 const SizedBox(width: 20),
@@ -475,20 +510,28 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
           style: GoogleFonts.poppins(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: Colors.black,
+            color: AppColors.white,
           ),
         ),
         Text(
           label,
-          style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
+          style: GoogleFonts.poppins(
+            fontSize: 12,
+            color: AppColors.premiumGold.withOpacity(0.6),
+          ),
         ),
       ],
     );
   }
 
   Widget _buildBulletSection(String title, String content) {
-    final List<String> items = content.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
-    
+    final List<String> items =
+        content
+            .split(',')
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
@@ -499,7 +542,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
             style: GoogleFonts.poppins(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: AppColors.white,
             ),
           ),
           const SizedBox(height: 12),
@@ -514,7 +557,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                     width: 4,
                     height: 4,
                     decoration: const BoxDecoration(
-                      color: Colors.black,
+                      color: AppColors.white,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -523,7 +566,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                       item,
                       style: GoogleFonts.poppins(
                         fontSize: 14,
-                        color: Colors.grey[700],
+                        color: AppColors.premiumGold.withOpacity(0.7),
                         height: 1.5,
                       ),
                     ),
@@ -547,10 +590,11 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.black,
+          border: Border(top: BorderSide(color: AppColors.premiumGold)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: AppColors.transparent,
               blurRadius: 20,
               offset: const Offset(0, -5),
             ),
@@ -567,7 +611,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                     'Salary Range',
                     style: GoogleFonts.poppins(
                       fontSize: 12,
-                      color: Colors.grey[600],
+                      color: AppColors.premiumGold.withOpacity(0.6),
                     ),
                   ),
                   Text(
@@ -575,7 +619,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: Colors.black,
+                      color: AppColors.white,
                     ),
                   ),
                 ],
@@ -589,10 +633,11 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.black,
+        border: Border(top: BorderSide(color: AppColors.premiumGold)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.transparent,
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -609,7 +654,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                   'Salary Range',
                   style: GoogleFonts.poppins(
                     fontSize: 12,
-                    color: Colors.grey[600],
+                    color: AppColors.premiumGold.withOpacity(0.6),
                   ),
                 ),
                 Text(
@@ -617,12 +662,13 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black,
+                    color: AppColors.white,
                   ),
                 ),
               ],
             ),
           ),
+
           /*ElevatedButton(
             onPressed: () {
               if (canViewApplicants) {
@@ -634,8 +680,8 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
             },
             style:
             ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
+              backgroundColor: AppColors.transparent,
+              foregroundColor: AppColors.white,
               padding: const EdgeInsets.symmetric(horizontal: 30),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -650,23 +696,29 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
               ),
             ),
           ),*/
-
           ElevatedButton(
-            onPressed: (!isRecruiter && isApplied)
-                ? null // disable क्लिक
-                : () {
-              if (canViewApplicants) {
-                Get.toNamed(AppRoutes.applicantListScreen, arguments: job.id);
-              } else {
-                Get.to(() => const ResumeFormScreen(),
-                    arguments: {'jobId': job.id});
-              }
-            },
+            onPressed:
+                (!isRecruiter && isApplied)
+                    ? null // disable क्लिक
+                    : () {
+                      if (canViewApplicants) {
+                        Get.toNamed(
+                          AppRoutes.applicantListScreen,
+                          arguments: job.id,
+                        );
+                      } else {
+                        Get.to(
+                          () => const ResumeFormScreen(),
+                          arguments: {'jobId': job.id},
+                        );
+                      }
+                    },
             style: ElevatedButton.styleFrom(
-              backgroundColor: (!isRecruiter && isApplied)
-                  ? Colors.grey // disabled look
-                  : Colors.black,
-              foregroundColor: Colors.white,
+              backgroundColor:
+                  (!isRecruiter && isApplied)
+                      ? AppColors.premiumGold.withOpacity(0.5) // disabled look
+                      : AppColors.premiumGold,
+              foregroundColor: AppColors.black,
               padding: const EdgeInsets.symmetric(horizontal: 30),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -683,7 +735,6 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
               ),
             ),
           ),
-
         ],
       ),
     );
@@ -691,6 +742,6 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
 
   bool _isRecruiter() {
     return ProfilePermissionManager.isProfileActive(ProfileType.employer);
-  //    SharedPrefManager().user?.isEmployer ?? false;
+    //    SharedPrefManager().user?.isEmployer ?? false;
   }
 }
