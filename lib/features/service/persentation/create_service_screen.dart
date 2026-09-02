@@ -154,7 +154,7 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
                 decoration: BoxDecoration(
                   color: controller.status.value == 'active'
                       ? AppColors.success.withOpacity(0.1)
-                      : AppColors.premiumGold,
+                      : AppColors.transparent,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: controller.status.value == 'active'
@@ -208,7 +208,7 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.transparent,
+                  backgroundColor: AppColors.premiumGold,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -220,13 +220,13 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
                         height: 20,
                         width: 20,
                         child: CircularProgressIndicator(
-                          color: AppColors.white,
+                          color: AppColors.black,
                           strokeWidth: 2,
                         ),
                       )
                     : Text(
                   widget.service != null ? "Update Service" : "Create Service",
-                  style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(color: AppColors.black, fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               )),
             ),

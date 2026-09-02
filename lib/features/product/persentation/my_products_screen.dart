@@ -278,9 +278,9 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppColors.black,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.lightBorder),
+          border: Border.all(color: AppColors.premiumGold),
           boxShadow: [
             BoxShadow(
               color: AppColors.white.withOpacity(0.05),
@@ -329,6 +329,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                color: AppColors.white,
                               ),
                             ),
                           ),
@@ -338,8 +339,13 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                             decoration: BoxDecoration(
                               color: _isPositiveStatus(product.status)
                                   ? AppColors.success.withOpacity(0.1)
-                                  : AppColors.premiumGold,
+                                  : AppColors.transparent,
                               borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: _isPositiveStatus(product.status) 
+                                    ? AppColors.transparent 
+                                    : AppColors.premiumGold,
+                              ),
                             ),
                             child: Text(
                               product.status.toString().toUpperCase(),

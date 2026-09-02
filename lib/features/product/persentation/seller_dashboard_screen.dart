@@ -37,7 +37,7 @@ class SellerDashboard extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.premiumGold,
+      backgroundColor: AppColors.black,
       appBar: AppBar(
         backgroundColor: AppColors.transparent,
         elevation: 0,
@@ -56,9 +56,8 @@ class SellerDashboard extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [AppColors.white, AppColors.white.withOpacity(0.6)],
-                    ),
+                    color: AppColors.black,
+                    border: Border.all(color: AppColors.premiumGold),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: Row(
@@ -83,11 +82,11 @@ class SellerDashboard extends StatelessWidget {
                       ),
                       Container(
                         padding: const EdgeInsets.all(12),
-                        decoration: const BoxDecoration(
-                          color: AppColors.white,
+                        decoration: BoxDecoration(
+                          color: AppColors.premiumGold.withOpacity(0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.storefront, color: AppColors.white, size: 32),
+                        child: const Icon(Icons.storefront, color: AppColors.premiumGold, size: 32),
                       ),
                     ],
                   ),
@@ -98,7 +97,7 @@ class SellerDashboard extends StatelessWidget {
               // Stats Grid
               const Text(
                 'Overview',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.white),
               ),
               const SizedBox(height: 16),
           Obx(() => GridView.count(
@@ -140,7 +139,7 @@ class SellerDashboard extends StatelessWidget {
             // Quick Actions
             const Text(
               'Quick Actions',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.white),
             ),
             const SizedBox(height: 10),
             Row(
@@ -192,7 +191,8 @@ class SellerDashboard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.black,
+        border: Border.all(color: AppColors.premiumGold.withOpacity(0.5)),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -232,6 +232,7 @@ class SellerDashboard extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: AppColors.white,
                 ),
               ),
               Text(
@@ -254,7 +255,8 @@ class SellerDashboard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppColors.black,
+          border: Border.all(color: AppColors.premiumGold.withOpacity(0.5)),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -269,7 +271,7 @@ class SellerDashboard extends StatelessWidget {
             Icon(icon, color: color, size: 28),
             const SizedBox(height: 8),
             Text(label,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.white)),
           ],
         ),
       ),
@@ -283,7 +285,8 @@ class SellerDashboard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppColors.black,
+          border: Border.all(color: AppColors.premiumGold.withOpacity(0.5)),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -533,7 +536,8 @@ class SellerDashboard1 extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.black,
+        border: Border.all(color: AppColors.premiumGold.withOpacity(0.5)),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -595,7 +599,8 @@ class SellerDashboard1 extends StatelessWidget {
       height: 200,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.black,
+        border: Border.all(color: AppColors.premiumGold.withOpacity(0.5)),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(

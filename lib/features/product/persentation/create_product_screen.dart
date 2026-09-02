@@ -457,7 +457,7 @@ class CreateProductScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: controller.productStatus.value == 'active'
                         ? AppColors.success.withOpacity(0.1)
-                        : AppColors.premiumGold,
+                        : AppColors.transparent,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: controller.productStatus.value == 'active'
@@ -524,6 +524,7 @@ class CreateProductScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: AppColors.premiumGold),
                     ),
                     elevation: 0,
                   ),
@@ -539,7 +540,7 @@ class CreateProductScreen extends StatelessWidget {
                       : Text(
                           product != null ? "Update Product" : "Add Product",
                           style: const TextStyle(
-                            color: AppColors.white,
+                            color: AppColors.premiumGold,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),

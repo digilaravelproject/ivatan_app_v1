@@ -69,7 +69,7 @@ class TransactionHistoryScreen extends StatelessWidget {
         centerTitle: true,
         elevation: 0,
       ),
-      backgroundColor: AppColors.premiumGold,
+      backgroundColor: AppColors.black,
       body: Obx(
             () => ListView.builder(
           padding: const EdgeInsets.all(16),
@@ -81,11 +81,12 @@ class TransactionHistoryScreen extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 16),
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: AppColors.black,
                 borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.premiumGold),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.white.withOpacity(0.05),
+                    color: AppColors.premiumGold.withOpacity(0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -119,6 +120,7 @@ class TransactionHistoryScreen extends StatelessWidget {
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                color: AppColors.white,
                               ),
                             ),
                             const SizedBox(height: 4),

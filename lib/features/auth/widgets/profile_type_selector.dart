@@ -35,23 +35,23 @@ class ProfileTypeSelector extends StatelessWidget {
             labelText: label,
             labelStyle: TextStyle(color: AppColors.premiumGold),
             floatingLabelStyle: const TextStyle(
-              color: AppColors.primary,
+              color: AppColors.premiumGold,
               fontWeight: FontWeight.w600,
             ),
             suffixIcon:
                 enabled
                     ? const Icon(
                       Icons.keyboard_arrow_down_rounded,
-                      color: AppColors.primary,
+                      color: AppColors.premiumGold,
                     )
                     : null,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.premiumGold),
+              borderSide: const BorderSide(color: AppColors.transparent),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderSide: const BorderSide(color: AppColors.transparent),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -230,11 +230,11 @@ class ProfileTypeSelector extends StatelessWidget {
           decoration: BoxDecoration(
             color:
                 isSelected
-                    ? AppColors.primary.withOpacity(0.03)
-                    : AppColors.premiumGold.withOpacity(0.1),
+                    ? AppColors.premiumGold.withOpacity(0.15)
+                    : AppColors.transparent,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.premiumGold,
+              color: isSelected ? AppColors.premiumGold : AppColors.premiumGold.withOpacity(0.5),
               width: isSelected ? 1.5 : 1,
             ),
           ),
@@ -244,24 +244,24 @@ class ProfileTypeSelector extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color:
-                          isSelected
-                              ? AppColors.primary.withOpacity(0.1)
-                              : AppColors.premiumGold,
-                      shape: BoxShape.circle,
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color:
+                            isSelected
+                                ? AppColors.premiumGold
+                                : AppColors.premiumGold.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        _getIconForType(pType.type),
+                        color:
+                            isSelected
+                                ? AppColors.black
+                                : AppColors.premiumGold,
+                        size: 24,
+                      ),
                     ),
-                    child: Icon(
-                      _getIconForType(pType.type),
-                      color:
-                          isSelected
-                              ? AppColors.primary
-                              : AppColors.premiumGold,
-                      size: 24,
-                    ),
-                  ),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
@@ -269,13 +269,10 @@ class ProfileTypeSelector extends StatelessWidget {
                       children: [
                         Text(
                           pType.label,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color:
-                                isSelected
-                                    ? AppColors.primary
-                                    : AppColors.white,
+                            color: AppColors.white,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -296,7 +293,7 @@ class ProfileTypeSelector extends StatelessWidget {
                       isSellerExpanded
                           ? Icons.keyboard_arrow_up_rounded
                           : Icons.keyboard_arrow_down_rounded,
-                      color: AppColors.primary,
+                      color: AppColors.premiumGold,
                     )
                   else if (isSelected)
                     const Icon(

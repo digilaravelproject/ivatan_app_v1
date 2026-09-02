@@ -163,7 +163,7 @@ class JobHistoryScreen extends StatelessWidget {
     return GetBuilder<JobHistoryController>(
       init: JobHistoryController(Get.find()),
       builder: (controller) => Scaffold(
-        backgroundColor: AppColors.premiumGold.withOpacity(0.1),
+        backgroundColor: AppColors.black,
         appBar: AppBar(
           backgroundColor: AppColors.transparent,
           elevation: 0,

@@ -16,7 +16,7 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.premiumGold.withOpacity(0.1),
+      backgroundColor: AppColors.black,
       appBar: AppBar(
         backgroundColor: AppColors.transparent,
         elevation: 0,
@@ -110,9 +110,9 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppColors.black,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.premiumGold.withOpacity(0.2)),
+          border: Border.all(color: AppColors.premiumGold),
           boxShadow: [
             BoxShadow(
               color: AppColors.white.withOpacity(0.05),
@@ -281,7 +281,7 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
       child: Container(
         height: 50,
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppColors.black,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(

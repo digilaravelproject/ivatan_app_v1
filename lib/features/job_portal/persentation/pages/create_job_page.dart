@@ -319,6 +319,7 @@ class JobCreateScreen extends GetView<JobController> {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
+                      side: const BorderSide(color: AppColors.premiumGold),
                     ),
                   ),
                   child: controller.isCreating.value

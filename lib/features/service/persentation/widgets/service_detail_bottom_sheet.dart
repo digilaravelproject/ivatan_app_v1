@@ -52,9 +52,10 @@ void showServiceDetailBottomSheet(BuildContext context, int serviceId, {bool isO
         maxChildSize: 0.95,
         builder: (context, scrollController) {
           return Container(
-            decoration: const BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+              color: AppColors.black,
+              border: Border.all(color: AppColors.premiumGold),
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(25),
                 topRight: Radius.circular(25),
               ),
@@ -83,9 +84,10 @@ void showServiceDetailBottomSheet(BuildContext context, int serviceId, {bool isO
 Widget _buildLoadingSheet(BuildContext context) {
   return Container(
     height: MediaQuery.of(context).size.height * 0.9,
-    decoration: const BoxDecoration(
-      color: AppColors.white,
-      borderRadius: BorderRadius.only(
+    decoration: BoxDecoration(
+      color: AppColors.black,
+      border: Border.all(color: AppColors.premiumGold),
+      borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(25),
         topRight: Radius.circular(25),
       ),
@@ -97,9 +99,10 @@ Widget _buildLoadingSheet(BuildContext context) {
 Widget _buildErrorSheet(BuildContext context) {
   return Container(
     height: MediaQuery.of(context).size.height * 0.9,
-    decoration: const BoxDecoration(
-      color: AppColors.white,
-      borderRadius: BorderRadius.only(
+    decoration: BoxDecoration(
+      color: AppColors.black,
+      border: Border.all(color: AppColors.premiumGold),
+      borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(25),
         topRight: Radius.circular(25),
       ),
@@ -155,7 +158,7 @@ Widget _buildServiceDetailContent(BuildContext context, ServiceModel service) {
                 end: Alignment.bottomCenter,
                 colors: [
                   AppColors.transparent,
-                  AppColors.white.withOpacity(0.7),
+                  AppColors.black.withOpacity(0.9),
                 ],
               ),
             ),
@@ -250,9 +253,9 @@ Widget _buildServiceDetailContent(BuildContext context, ServiceModel service) {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
+                color: AppColors.black,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.green.withOpacity(0.3)),
+                border: Border.all(color: AppColors.premiumGold.withOpacity(0.5)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -262,6 +265,7 @@ Widget _buildServiceDetailContent(BuildContext context, ServiceModel service) {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
+                      color: AppColors.white,
                     ),
                   ),
                   Row(
@@ -272,7 +276,7 @@ Widget _buildServiceDetailContent(BuildContext context, ServiceModel service) {
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.green,
+                          color: AppColors.premiumGold,
                         ),
                       ),
                       if (service.discountPrice != null && service.discountPrice != service.price) ...[
@@ -298,6 +302,7 @@ Widget _buildServiceDetailContent(BuildContext context, ServiceModel service) {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: AppColors.white,
               ),
             ),
             const SizedBox(height: 8),
@@ -305,7 +310,7 @@ Widget _buildServiceDetailContent(BuildContext context, ServiceModel service) {
               service.description,
               style: TextStyle(
                 fontSize: 15,
-                color: AppColors.premiumGold,
+                color: AppColors.white.withOpacity(0.8),
                 height: 1.5,
               ),
             ),
@@ -386,10 +391,10 @@ Widget _buildActionButtons(BuildContext context, ServiceModel service, bool isOw
   return Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      color: AppColors.white,
+      color: AppColors.black,
       boxShadow: [
         BoxShadow(
-          color: AppColors.premiumGold.withOpacity(0.3),
+          color: AppColors.premiumGold.withOpacity(0.1),
           blurRadius: 10,
           offset: const Offset(0, -5),
         ),
@@ -407,11 +412,12 @@ Widget _buildActionButtons(BuildContext context, ServiceModel service, bool isOw
                 icon: const Icon(Icons.edit, size: 20),
                 label: const Text('Edit Service'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: AppColors.white,
+                  backgroundColor: AppColors.transparent,
+                  foregroundColor: Colors.blue,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Colors.blue),
                   ),
                 ),
               ),
@@ -434,11 +440,12 @@ Widget _buildActionButtons(BuildContext context, ServiceModel service, bool isOw
                 icon: const Icon(Icons.delete, size: 20),
                 label: const Text('Delete Service'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: AppColors.white,
+                  backgroundColor: AppColors.transparent,
+                  foregroundColor: Colors.red,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Colors.red),
                   ),
                 ),
               ),
@@ -456,8 +463,8 @@ Widget _buildActionButtons(BuildContext context, ServiceModel service, bool isOw
                 icon: const Icon(Icons.mail_outline, size: 20),
                 label: const Text('Send Enquiry'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.white,
+                  backgroundColor: AppColors.premiumGold,
+                  foregroundColor: AppColors.black,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

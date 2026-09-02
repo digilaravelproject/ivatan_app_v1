@@ -632,7 +632,10 @@ class LiveGroupDetailsScreen extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: AppColors.accent,
+            activeColor: AppColors.black,
+            activeTrackColor: AppColors.premiumGold,
+            inactiveThumbColor: AppColors.white,
+            inactiveTrackColor: Colors.grey.shade800,
           ),
         ],
       ),

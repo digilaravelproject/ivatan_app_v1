@@ -101,7 +101,7 @@ class ServiceController extends GetxController {
         marketplacePage++;
       }
     } catch (e) {
-      errorMessage('Error fetching products: $e');
+      errorMessage('Error fetching services: $e');
       print('Error fetching marketplace services: $e');
     } finally {
       isMarketplaceLoading(false);

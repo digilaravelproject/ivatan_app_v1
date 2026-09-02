@@ -239,8 +239,7 @@ class SettingsScreen extends StatelessWidget {
               _buildSectionHeader("Profile Settings"),
               const SizedBox(height: 16),
 
-              _buildCleanField(
-                child: ProfileTypeSelector(
+              ProfileTypeSelector(
                   label: "Current Profile",
                   controller: profileController.profileTypeController,
                   profileTypes: profileController.profileTypes,
@@ -316,7 +315,6 @@ class SettingsScreen extends StatelessWidget {
                     );
                   },
                 ),
-              ),
 
               const SizedBox(height: 12),
               _buildSectionHeader("Account Actions"),

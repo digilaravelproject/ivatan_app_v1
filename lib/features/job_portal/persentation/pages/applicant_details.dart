@@ -41,7 +41,7 @@ class ApplicantDetail extends GetView<ApplicantController> {
     final applicant = application.applicant;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppColors.black,
       appBar: AppBar(
         title: Text(
           applicant.name,
@@ -67,7 +67,7 @@ class ApplicantDetail extends GetView<ApplicantController> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 28),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: AppColors.black,
                 border: Border(
                   bottom: BorderSide(color: AppColors.premiumGold),
                 ),
@@ -339,7 +339,7 @@ class ApplicantDetail extends GetView<ApplicantController> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.black,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(

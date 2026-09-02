@@ -275,7 +275,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.premiumGold, // Premium soft background
+      backgroundColor: AppColors.black, // Premium soft background
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -300,7 +300,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                   BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                     child: Container(
-                      color: AppColors.white.withOpacity(0.4),
+                      color: AppColors.black.withOpacity(0.6),
                     ),
                   ),
 

@@ -132,7 +132,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.premiumGold.withOpacity(0.1),
+      backgroundColor: AppColors.black,
       appBar: AppBar(
         title: const Text(
           'Orders History',
@@ -188,7 +188,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     return Container(
       height: 60,
       width: double.infinity,
-      color: AppColors.white,
+      color: AppColors.transparent,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         scrollDirection: Axis.horizontal,
@@ -209,9 +209,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 margin: const EdgeInsets.only(right: 10),
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.black : AppColors.premiumGold,
+                  color: isSelected ? AppColors.premiumGold : AppColors.transparent,
                   borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: isSelected ? AppColors.black : AppColors.premiumGold),
+                  border: Border.all(color: AppColors.premiumGold),
                 ),
                 child: Center(
                   child: Text(
@@ -219,7 +219,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                      color: isSelected ? AppColors.white : AppColors.premiumGold,
+                      color: isSelected ? AppColors.black : AppColors.white,
                     ),
                   ),
                 ),
@@ -262,7 +262,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.black,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -283,7 +283,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
               children: [
                 Text(
                   "Order #${order.id}",
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.white),
                 ),
                 _statusBadge(order.status ?? 'pending'),
               ],
@@ -311,7 +311,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     children: [
                       Text(
                         order.buyer?.name ?? 'Unknown Buyer',
-                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: AppColors.white),
                       ),
                       Text(
                         order.buyer?.phone ?? '',

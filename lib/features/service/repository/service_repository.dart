@@ -62,7 +62,13 @@ class ServiceRepositoryImpl implements ServiceRepository {
     final response = await apiServices.callGet(endpoint, queryParams: {'page': page.toString()});
 
     if (response != null && response['success'] == true) {
-      final List dataList = response['data']['data'];
+      dynamic responseData = response['data'];
+      List dataList = [];
+      if (responseData is List) {
+        dataList = responseData;
+      } else if (responseData is Map && responseData.containsKey('data')) {
+        dataList = responseData['data'];
+      }
       return dataList.map((e) => ServiceModel.fromJson(e)).toList();
     }
 
@@ -75,7 +81,13 @@ class ServiceRepositoryImpl implements ServiceRepository {
     final response = await apiServices.callGet(endpoint, queryParams: {'page': page.toString()});
 
     if (response != null && response['success'] == true) {
-      final List dataList = response['data']['data'];
+      dynamic responseData = response['data'];
+      List dataList = [];
+      if (responseData is List) {
+        dataList = responseData;
+      } else if (responseData is Map && responseData.containsKey('data')) {
+        dataList = responseData['data'];
+      }
       return dataList.map((e) => ServiceModel.fromJson(e)).toList();
     }
 

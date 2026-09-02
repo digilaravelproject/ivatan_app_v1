@@ -63,9 +63,8 @@ class BankDetailsScreen extends StatelessWidget {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? AppColors.premiumGold
-            : AppColors.white,
+        color: AppColors.black,
+        border: Border.all(color: AppColors.premiumGold),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -211,9 +210,9 @@ class AddBankAccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final FinancialController controller = Get.put(FinancialController());
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? AppColors.white : AppColors.white;
-    final cardColor = isDark ? AppColors.premiumGold : AppColors.premiumGold;
-    final textColor = isDark ? AppColors.white : AppColors.white;
+    final backgroundColor = AppColors.black;
+    final cardColor = AppColors.black;
+    final textColor = AppColors.white;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -290,15 +289,16 @@ class AddBankAccountScreen extends StatelessWidget {
               Obx(() => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.premiumGold : AppColors.white,
+                  color: AppColors.transparent,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.premiumGold),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: controller.selectedAccountType.value,
                     isExpanded: true,
-                    dropdownColor: isDark ? AppColors.premiumGold : AppColors.white,
-                    style: TextStyle(color: isDark ? AppColors.white : AppColors.white),
+                    dropdownColor: AppColors.black,
+                    style: TextStyle(color: AppColors.premiumGold),
                     items: controller.accountTypes.map((String type) {
                       return DropdownMenuItem<String>(
                         value: type,
@@ -322,7 +322,7 @@ class AddBankAccountScreen extends StatelessWidget {
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
-                            color: isDark ? AppColors.white : AppColors.white),
+                            color: AppColors.premiumGold),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
@@ -331,7 +331,7 @@ class AddBankAccountScreen extends StatelessWidget {
                       child: Text(
                         'Cancel',
                         style: TextStyle(
-                            color: isDark ? AppColors.white : AppColors.white),
+                            color: AppColors.premiumGold),
                       ),
                     ),
                   ),
@@ -339,8 +339,7 @@ class AddBankAccountScreen extends StatelessWidget {
                   Expanded(
                     child: Obx(() => ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                        isDark ? AppColors.white : AppColors.white,
+                        backgroundColor: AppColors.premiumGold,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
@@ -364,8 +363,8 @@ class AddBankAccountScreen extends StatelessWidget {
                           )
                         : const Text(
                             'Add Account',
-                            style: TextStyle(
-                                color: AppColors.white,
+                            style: const TextStyle(
+                                color: AppColors.black,
                                 fontWeight: FontWeight.w600),
                           ),
                     )),
@@ -389,19 +388,23 @@ class AddBankAccountScreen extends StatelessWidget {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
-      style: TextStyle(color: isDark ? AppColors.white : AppColors.white),
+      style: TextStyle(color: AppColors.premiumGold),
       decoration: InputDecoration(
         labelText: label,
         labelStyle:
-        TextStyle(color: isDark ? AppColors.white : AppColors.white),
-        prefixIcon: Icon(icon, color: isDark ? AppColors.white : AppColors.white),
+        TextStyle(color: AppColors.premiumGold),
+        prefixIcon: Icon(icon, color: AppColors.premiumGold),
         filled: true,
-        fillColor: isDark ? AppColors.premiumGold : AppColors.white,
+        fillColor: AppColors.transparent,
         contentPadding:
         const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: AppColors.premiumGold),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.premiumGold),
         ),
       ),
     );
