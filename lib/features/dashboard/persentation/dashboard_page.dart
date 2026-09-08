@@ -50,7 +50,7 @@ class DashboardPage extends StatelessWidget {
           ),
         ),
         child: Scaffold(
-          extendBody: true,
+          extendBody: false,
           backgroundColor: AppColors.transparent,
           body: Stack(
             children: [
@@ -65,26 +65,33 @@ class DashboardPage extends StatelessWidget {
               _buildGlobalUploadProgress(),
             ],
           ),
-        bottomNavigationBar: Container(
-          decoration: const BoxDecoration(
-            color: AppColors.mainBackground,
-            border: Border(top: BorderSide(color: AppColors.border, width: 0.5)),
-          ),
-          child: SafeArea(
-            child: Container(
-              height: 65,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  _item(context, Iconsax.home_2, Iconsax.home_2_copy, 0, label: "Home"),
-                  _item(context, Iconsax.search_normal, Iconsax.search_normal_copy, 1, label: "Search"),
-                  _item(context, Iconsax.video_play, Iconsax.video_play_copy, 2, isCenter: true),
-                  _item(context, Iconsax.video, Iconsax.video_copy, 3, label: "Video"),
-                  _item(context, Iconsax.user, Iconsax.user_copy, 4, imageUrl: controller.userProfileImage, label: "Profile"),
-                ],
-              ),
+        bottomNavigationBar: SafeArea(
+          child: Container(
+            margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+            height: 65,
+            decoration: BoxDecoration(
+              color: const Color(0xFF141414),
+              borderRadius: BorderRadius.circular(35),
+              border: Border.all(color: Colors.white.withOpacity(0.05), width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _item(context, Iconsax.home_2, Iconsax.home_2_copy, 0, label: "Home"),
+                _item(context, Iconsax.search_normal, Iconsax.search_normal_copy, 1, label: "Search"),
+                _item(context, Iconsax.video_play, Iconsax.video_play_copy, 2, isCenter: true),
+                _item(context, Iconsax.video, Iconsax.video_copy, 3, label: "Video"),
+                _item(context, Iconsax.user, Iconsax.user_copy, 4, imageUrl: controller.userProfileImage, label: "Profile"),
+              ],
             ),
           ),
         ),
@@ -160,24 +167,34 @@ class DashboardPage extends StatelessWidget {
   Widget _item(BuildContext context, dynamic iconDataSelected, dynamic iconDataUnselected, int index, {String? imageUrl, String label = "", bool isCenter = false}) {
     return Obx(() {
       final isSelected = controller.selectedIndex.value == index;
-      final color = isSelected ? AppColors.premiumGold : AppColors.secondaryText;
+      final color = isSelected ? AppColors.premiumGold : Colors.white60;
 
       if (isCenter) {
-        return Expanded(
-          child: GestureDetector(
-            onTap: () => controller.changeIndex(index),
-            behavior: HitTestBehavior.opaque,
+        return GestureDetector(
+          onTap: () => controller.changeIndex(index),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.premiumGold.withOpacity(0.3),
+                  blurRadius: 15,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
             child: Container(
-              width: 46,
-              height: 46,
-              margin: const EdgeInsets.only(bottom: 6),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.premiumGold, width: 1.5),
+                border: Border.all(color: AppColors.premiumGold.withOpacity(0.8), width: 1.5),
+                color: const Color(0xFF1A1A1A),
               ),
               child: Icon(
-                Icons.add,
-                color: AppColors.secondaryText,
+                iconDataSelected ?? Icons.add,
+                color: Colors.white,
                 size: 24,
               ),
             ),
@@ -189,62 +206,59 @@ class DashboardPage extends StatelessWidget {
         child: GestureDetector(
           onTap: () => controller.changeIndex(index),
           behavior: HitTestBehavior.opaque,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              if (index == 4)
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isSelected ? AppColors.premiumGold : AppColors.transparent,
-                      width: 1.2,
+          child: Container(
+            height: 65,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (index == 4)
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isSelected ? AppColors.premiumGold : AppColors.transparent,
+                            width: 1.2,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(1.0),
+                          child: ClipOval(
+                            child: (imageUrl != null && imageUrl.isNotEmpty)
+                                ? Image.network(
+                                    AppUrls.getFullImageUrl(imageUrl),
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                                  )
+                                : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
+                          ),
+                        ),
+                      )
+                    else
+                      Icon(
+                        isSelected ? iconDataSelected : iconDataUnselected,
+                        size: 22,
+                        color: color,
+                      ),
+                    const SizedBox(height: 4),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 10,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                      ),
                     ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(1.0),
-                    child: ClipOval(
-                      child: (imageUrl != null && imageUrl.isNotEmpty)
-                          ? Image.network(
-                              AppUrls.getFullImageUrl(imageUrl),
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
-                            )
-                          : Image.asset(AppAssets.imgAppLogo, fit: BoxFit.cover),
-                    ),
-                  ),
-                )
-              else
-                Icon(
-                  isSelected ? iconDataSelected : iconDataUnselected,
-                  size: 22,
-                  color: color,
+                    const SizedBox(height: 6),
+                  ],
                 ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 10,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                ),
-              ),
-              const SizedBox(height: 4),
-              if (isSelected)
-                Container(
-                  width: 4,
-                  height: 4,
-                  decoration: const BoxDecoration(
-                    color: AppColors.premiumGold,
-                    shape: BoxShape.circle,
-                  ),
-                )
-              else
-                const SizedBox(height: 4),
-            ],
+              ],
+            ),
           ),
         ),
       );
