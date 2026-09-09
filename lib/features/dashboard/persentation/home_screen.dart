@@ -215,8 +215,9 @@ class HomePage extends StatelessWidget {
                               ),
                             ),
                           ],
-                        ),
-                      ),
+                        );
+                      },
+                    ),
 
                       // ============= STORIES SECTION (Always Visible) =============
                       SliverToBoxAdapter(
