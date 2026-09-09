@@ -102,14 +102,6 @@ class HomePage extends StatelessWidget {
                             elevation: 0,
                             automaticallyImplyLeading: false,
                             toolbarHeight: 60,
-                            flexibleSpace: isGold
-                                ? FlexibleSpaceBar(
-                                    background: Image.asset(
-                                      AppAssets.imgStoryBackground,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
-                                : null,
                             titleSpacing: 0,
                           title: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -222,6 +214,7 @@ class HomePage extends StatelessWidget {
                       // ============= STORIES SECTION (Always Visible) =============
                       SliverToBoxAdapter(
                         child: Obx(() {
+                          final isGold = AppColors.isGoldEligible;
                           if (controller.isStoryLoading.value) {
                             return _buildStoriesShimmer();
                           }
@@ -256,7 +249,17 @@ class HomePage extends StatelessWidget {
                               opacity: controller.showStories.value ? 1.0 : 0.0,
                               child: Container(
                                 height: 130,
-                                color: AppColors.transparent,
+                                decoration: isGold
+                                    ? const BoxDecoration(
+                                        image: DecorationImage(
+                                          image: AssetImage(
+                                            AppAssets.imgStoryBackground,
+                                          ),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    : null,
+                                color: isGold ? null : AppColors.transparent,
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 8,
                                 ),
@@ -372,9 +375,18 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildStoriesShimmer() {
+    final isGold = AppColors.isGoldEligible;
     return Container(
       height: 130,
-      color: AppColors.transparent,
+      decoration: isGold
+          ? const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(AppAssets.imgStoryBackground),
+                fit: BoxFit.cover,
+              ),
+            )
+          : null,
+      color: isGold ? null : AppColors.transparent,
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
