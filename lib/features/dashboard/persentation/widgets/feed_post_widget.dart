@@ -58,16 +58,17 @@ class FeedPostWidget extends StatelessWidget {
                     height: 40,
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.secondaryBackground
+                        color: AppColors.secondaryBackground,
+                        border: Border.all(color: AppColors.premiumGold.withOpacity(0.3), width: 1),
                     ),
                     child: ClipOval(
                       child: post.user.avatar != null && post.user.avatar!.isNotEmpty && !post.user.avatar!.contains("ui-avatars.com")
                           ? Image.network(
                               post.user.avatar!, 
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => Icon(CupertinoIcons.person, color: AppColors.premiumGold),
+                              errorBuilder: (context, error, stackTrace) => Icon(Icons.person, color: AppColors.premiumGold, size: 24),
                             )
-                          : Icon(CupertinoIcons.person, color: AppColors.premiumGold),
+                          : Icon(Icons.person, color: AppColors.premiumGold, size: 24),
                     ),
                   ),
                 ),

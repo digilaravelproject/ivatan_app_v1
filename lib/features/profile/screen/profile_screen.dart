@@ -1656,8 +1656,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         width: 90,
                                         height: 90,
                                         decoration: BoxDecoration(
-                                          color: AppColors.premiumGold,
+                                          color: AppColors.secondaryBackground,
                                           shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: AppColors.premiumGold.withOpacity(0.5),
+                                            width: 1.5,
+                                          ),
                                         ),
                                         child: ClipOval(
                                           child:
@@ -1684,9 +1688,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                       return Icon(
                                                         Icons.person,
                                                         color:
-                                                            Colors
-                                                                .grey
-                                                                .shade600,
+                                                            AppColors.premiumGold,
                                                         size: 60,
                                                       );
                                                     },
@@ -1911,6 +1913,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             CircleAvatar(
               radius: 40,
+              backgroundColor: AppColors.secondaryBackground,
               backgroundImage:
                   (user.profilePhotoPath != null &&
                           user.profilePhotoPath!.isNotEmpty &&
@@ -1923,7 +1926,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   (user.profilePhotoPath == null ||
                           user.profilePhotoPath!.isEmpty ||
                           user.profilePhotoPath!.contains("ui-avatars.com"))
-                      ? const Icon(Icons.person, size: 40)
+                      ? Icon(Icons.person, size: 40, color: AppColors.premiumGold)
                       : null,
             ),
             const SizedBox(height: 16),

@@ -1103,7 +1103,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
               color: AppColors.white,
               shape: BoxShape.circle,
             ),
-            child: item.user.avatar.isNotEmpty
+            child: (item.user.avatar.isNotEmpty && !item.user.avatar.contains("ui-avatars.com"))
                 ? CustomImageView(
                     url: AppUrls.getFullImageUrl(item.user.avatar),
                     height: 38,
@@ -1112,8 +1112,8 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                   )
                 : CircleAvatar(
                     radius: 19,
-                    backgroundColor: AppColors.premiumGold,
-                    child: Icon(Icons.person, size: 24, color: AppColors.white),
+                    backgroundColor: AppColors.secondaryBackground,
+                    child: Icon(Icons.person, size: 24, color: AppColors.premiumGold),
                   ),
           ),
           const SizedBox(width: 12),

@@ -58,12 +58,25 @@ class ContactScreen extends StatelessWidget {
                 },
                 child: CircleAvatar(
                   radius: 20,
+                  backgroundColor: AppColors.secondaryBackground,
                   child: ClipOval(
-                    child: CustomImageView(
-                      url: AppUrls.imageurl+SharedPrefManager().user!.profilePhotoPath.toString(),
-                        imagePath: AppAssets.imgAppLogo,
-                      //"https://wallpapers.com/images/high/pretty-profile-pictures-526voksmtgllopn4.webp",
-                    ),
+                    child: (SharedPrefManager().user?.profilePhotoPath != null &&
+                            SharedPrefManager().user!.profilePhotoPath!.toString().isNotEmpty &&
+                            !SharedPrefManager().user!.profilePhotoPath!.toString().contains("ui-avatars.com"))
+                        ? Image.network(
+                            AppUrls.getFullImageUrl(SharedPrefManager().user!.profilePhotoPath!.toString()),
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Icon(
+                              Icons.person,
+                              color: AppColors.premiumGold,
+                              size: 20,
+                            ),
+                          )
+                        : Icon(
+                            Icons.person,
+                            color: AppColors.premiumGold,
+                            size: 20,
+                          ),
                   ),
                 ),
               ),
@@ -177,16 +190,16 @@ class ContactScreen extends StatelessWidget {
                               child: Container(
                                 height: 50,
                                 width: 50,
-                                color: AppColors.premiumGold,
-                                child: contact.avatar != null && contact.avatar!.isNotEmpty
+                                color: AppColors.secondaryBackground,
+                                child: (contact.avatar != null && contact.avatar!.isNotEmpty && !contact.avatar!.contains("ui-avatars.com"))
                                     ? Image.network(
                                   contact.avatar!,
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
-                                    return  Image.asset(AppAssets.imgAppLogo);
+                                    return Icon(Icons.person, color: AppColors.premiumGold, size: 24);
                                   },
                                 )
-                                    : const Icon(Icons.person),
+                                    : Icon(Icons.person, color: AppColors.premiumGold, size: 24),
                               ),
                             ),
                             const SizedBox(width: 20),

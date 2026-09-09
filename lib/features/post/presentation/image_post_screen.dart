@@ -112,13 +112,11 @@ class JobPostController extends GetxController {
           // Profile Picture
           CircleAvatar(
             radius: 24,
-            backgroundColor: AppColors.premiumGold,
-            child: const Text(
-              'GS',
-              style: TextStyle(
-                color: AppColors.white,
-                fontWeight: FontWeight.bold,
-              ),
+            backgroundColor: AppColors.secondaryBackground,
+            child: Icon(
+              Icons.person,
+              color: AppColors.premiumGold,
+              size: 24,
             ),
           ),
           const SizedBox(width: 12),
@@ -415,7 +413,13 @@ class _ImagePostScreenState extends State<ImagePostScreen> {
                     children: [
                       CircleAvatar(
                         radius: 22,
-                        backgroundImage: NetworkImage(AppUrls.getFullImageUrl(post.user.avatar)),
+                        backgroundColor: AppColors.secondaryBackground,
+                        backgroundImage: (post.user.avatar.isNotEmpty && !post.user.avatar.contains("ui-avatars.com"))
+                            ? NetworkImage(AppUrls.getFullImageUrl(post.user.avatar))
+                            : null,
+                        child: (post.user.avatar.isEmpty || post.user.avatar.contains("ui-avatars.com"))
+                            ? Icon(Icons.person, color: AppColors.premiumGold, size: 22)
+                            : null,
                       ),
                       const SizedBox(width: 10),
                       Expanded(

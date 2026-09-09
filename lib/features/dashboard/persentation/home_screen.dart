@@ -852,19 +852,23 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildUserAvatar(String? avatarUrl) {
-    if (avatarUrl != null && avatarUrl.isNotEmpty) {
+    final bool hasValid = avatarUrl != null &&
+        avatarUrl.isNotEmpty &&
+        avatarUrl != "null" &&
+        !avatarUrl.contains("ui-avatars.com");
+    if (hasValid) {
       return Image.network(
         avatarUrl,
         fit: BoxFit.cover,
         errorBuilder:
             (ctx, err, stack) => Container(
-              color: AppColors.premiumGold,
+              color: AppColors.secondaryBackground,
               child: Icon(Icons.person, color: AppColors.premiumGold),
             ),
       );
     }
     return Container(
-      color: AppColors.premiumGold,
+      color: AppColors.secondaryBackground,
       child: Icon(Icons.person, color: AppColors.premiumGold),
     );
   }
@@ -911,13 +915,18 @@ class HomePage extends StatelessWidget {
                       height: 40,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.premiumGold,
+                        color: AppColors.secondaryBackground,
+                        border: Border.all(
+                          color: AppColors.premiumGold.withOpacity(0.4),
+                          width: 1,
+                        ),
                       ),
                       child: ClipOval(
                         child:
                             (post.user.avatar != null &&
                                     post.user.avatar!.isNotEmpty &&
-                                    post.user.avatar != "null")
+                                    post.user.avatar != "null" &&
+                                    !post.user.avatar!.contains("ui-avatars.com"))
                                 ? Image.network(
                                   AppUrls.getFullImageUrl(post.user.avatar!),
                                   fit: BoxFit.cover,
@@ -1624,13 +1633,18 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                         height: 40,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.premiumGold,
+                          color: AppColors.secondaryBackground,
+                          border: Border.all(
+                            color: AppColors.premiumGold.withOpacity(0.4),
+                            width: 1,
+                          ),
                         ),
                         child: ClipOval(
                           child:
                               (comment.user?.avtar != null &&
                                       comment.user!.avtar!.isNotEmpty &&
-                                      comment.user!.avtar != "null")
+                                      comment.user!.avtar != "null" &&
+                                      !comment.user!.avtar!.contains("ui-avatars.com"))
                                   ? Image.network(
                                     AppUrls.getFullImageUrl(
                                       comment.user!.avtar!,
@@ -1639,13 +1653,13 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                                     errorBuilder:
                                         (context, error, stackTrace) => Icon(
                                           Icons.person,
-                                          color: AppColors.black,
+                                          color: AppColors.premiumGold,
                                           size: 24,
                                         ),
                                   )
                                   : Icon(
                                     Icons.person,
-                                    color: AppColors.black,
+                                    color: AppColors.premiumGold,
                                     size: 24,
                                   ),
                         ),

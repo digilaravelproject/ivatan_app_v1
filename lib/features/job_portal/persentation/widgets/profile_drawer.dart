@@ -43,28 +43,30 @@ class ProfileDrawer extends StatelessWidget {
                               child: Container(
                                 width: 40,
                                 height: 40,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: AppColors.white, width: 2),
-                                ),
-                                child: ClipOval(
-                                  child: SharedPrefManager().user!.profilePhotoPath != null &&
-                                          SharedPrefManager().user!.profilePhotoPath!.toString().isNotEmpty
-                                      ? Image.network(
-                                          AppUrls.getFullImageUrl(SharedPrefManager().user!.profilePhotoPath!.toString()),
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) => const Icon(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: AppColors.premiumGold, width: 2),
+                                    color: AppColors.secondaryBackground,
+                                  ),
+                                  child: ClipOval(
+                                    child: SharedPrefManager().user?.profilePhotoPath != null &&
+                                            SharedPrefManager().user!.profilePhotoPath!.toString().isNotEmpty &&
+                                            !SharedPrefManager().user!.profilePhotoPath!.toString().contains("ui-avatars.com")
+                                        ? Image.network(
+                                            AppUrls.getFullImageUrl(SharedPrefManager().user!.profilePhotoPath!.toString()),
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) => const Icon(
+                                              Icons.person,
+                                              color: AppColors.premiumGold,
+                                              size: 24,
+                                            ),
+                                          )
+                                        : const Icon(
                                             Icons.person,
-                                            color: AppColors.white,
+                                            color: AppColors.premiumGold,
                                             size: 24,
                                           ),
-                                        )
-                                      : const Icon(
-                                          Icons.person,
-                                          color: AppColors.white,
-                                          size: 24,
-                                        ),
-                                ),
+                                  ),
                               ),
                             ),
                             const SizedBox(width: 10,),

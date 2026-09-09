@@ -919,12 +919,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               children: [
                 CircleAvatar(
                   radius: 22,
-                  backgroundColor: AppColors.premiumGold,
-                  backgroundImage: NetworkImage(
-                    video.user.avatar.isNotEmpty
-                        ? video.user.avatar
-                        : 'https://i.pravatar.cc/100?img=5',
-                  ),
+                  backgroundColor: AppColors.secondaryBackground,
+                  backgroundImage: (video.user.avatar.isNotEmpty && !video.user.avatar.contains("ui-avatars.com"))
+                      ? NetworkImage(video.user.avatar)
+                      : null,
+                  child: (video.user.avatar.isEmpty || video.user.avatar.contains("ui-avatars.com"))
+                      ? Icon(Icons.person, color: AppColors.premiumGold, size: 22)
+                      : null,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -1162,14 +1163,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           children: [
             CircleAvatar(
               radius: 40,
-              backgroundColor: AppColors.premiumGold,
+              backgroundColor: AppColors.secondaryBackground,
               backgroundImage:
-                  user.avatar != null && user.avatar!.isNotEmpty
+                  user.avatar != null && user.avatar!.isNotEmpty && !user.avatar!.contains("ui-avatars.com")
                       ? NetworkImage(user.avatar!)
                       : null,
               child:
-                  (user.avatar == null || user.avatar!.isEmpty)
-                      ? const Icon(Icons.person, size: 40)
+                  (user.avatar == null || user.avatar!.isEmpty || user.avatar!.contains("ui-avatars.com"))
+                      ? Icon(Icons.person, size: 40, color: AppColors.premiumGold)
                       : null,
             ),
             const SizedBox(height: 16),

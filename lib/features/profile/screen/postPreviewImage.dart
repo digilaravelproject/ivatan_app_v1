@@ -170,16 +170,18 @@ class _PreviewScreenState extends State<PreviewScreen> {
                           children: [
                             CircleAvatar(
                               radius: 20,
-                              backgroundColor: AppColors.premiumGold,
+                              backgroundColor: AppColors.secondaryBackground,
                               backgroundImage: SharedPrefManager().user?.profilePhotoPath != null &&
-                                      SharedPrefManager().user!.profilePhotoPath!.isNotEmpty
+                                      SharedPrefManager().user!.profilePhotoPath!.isNotEmpty &&
+                                      !SharedPrefManager().user!.profilePhotoPath!.contains("ui-avatars.com")
                                   ? NetworkImage(
                                       AppUrls.getFullImageUrl(
                                           SharedPrefManager().user!.profilePhotoPath),
                                     )
                                   : null,
                               child: SharedPrefManager().user?.profilePhotoPath == null ||
-                                      SharedPrefManager().user!.profilePhotoPath!.isEmpty
+                                      SharedPrefManager().user!.profilePhotoPath!.isEmpty ||
+                                      SharedPrefManager().user!.profilePhotoPath!.contains("ui-avatars.com")
                                   ? Icon(Icons.person, color: AppColors.premiumGold, size: 24)
                                   : null,
                             ),

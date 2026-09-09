@@ -224,7 +224,13 @@ import '../controller/video_controller.dart';
                   children: [
                     CircleAvatar(
                       radius: 26,
-                      backgroundImage: NetworkImage(profileImage),
+                      backgroundColor: AppColors.secondaryBackground,
+                      backgroundImage: (profileImage.isNotEmpty && !profileImage.contains("ui-avatars.com"))
+                          ? NetworkImage(profileImage)
+                          : null,
+                      child: (profileImage.isEmpty || profileImage.contains("ui-avatars.com"))
+                          ? Icon(Icons.person, color: AppColors.premiumGold, size: 26)
+                          : null,
                     ),
                     SizedBox(width: 12),
 
@@ -823,8 +829,13 @@ class _VideosScreenState extends State<VideosScreen> {
                     children: [
                       CircleAvatar(
                         radius: 12,
-                        backgroundImage: NetworkImage(profileImage),
-                        backgroundColor: AppColors.premiumGold,
+                        backgroundColor: AppColors.secondaryBackground,
+                        backgroundImage: (profileImage.isNotEmpty && !profileImage.contains("ui-avatars.com"))
+                            ? NetworkImage(profileImage)
+                            : null,
+                        child: (profileImage.isEmpty || profileImage.contains("ui-avatars.com"))
+                            ? Icon(Icons.person, color: AppColors.premiumGold, size: 14)
+                            : null,
                       ),
                       const SizedBox(width: 6),
                       Expanded(
@@ -1008,8 +1019,13 @@ class _VideosScreenState extends State<VideosScreen> {
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundImage: NetworkImage(profileImage),
-                      backgroundColor: AppColors.premiumGold,
+                      backgroundColor: AppColors.secondaryBackground,
+                      backgroundImage: (profileImage.isNotEmpty && !profileImage.contains("ui-avatars.com"))
+                          ? NetworkImage(profileImage)
+                          : null,
+                      child: (profileImage.isEmpty || profileImage.contains("ui-avatars.com"))
+                          ? Icon(Icons.person, color: AppColors.premiumGold, size: 20)
+                          : null,
                     ),
                     const SizedBox(width: 10),
 

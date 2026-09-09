@@ -207,12 +207,12 @@ class FollowingList extends StatelessWidget {
                             // Avatar
                             CircleAvatar(
                               radius: 26,
-                              backgroundColor: AppColors.premiumGold,
-                              backgroundImage: (user.avatar != null && user.avatar!.isNotEmpty)
+                              backgroundColor: AppColors.secondaryBackground,
+                              backgroundImage: (user.avatar != null && user.avatar!.isNotEmpty && !user.avatar!.contains("ui-avatars.com"))
                                   ? NetworkImage(AppUrls.getFullImageUrl(user.avatar))
                                   : null,
-                              child: (user.avatar == null || user.avatar!.isEmpty)
-                                  ? const Icon(Icons.person, size: 26)
+                              child: (user.avatar == null || user.avatar!.isEmpty || user.avatar!.contains("ui-avatars.com"))
+                                  ? Icon(Icons.person, size: 26, color: AppColors.premiumGold)
                                   : null,
                             ),
 
@@ -380,12 +380,12 @@ class FollowerList extends StatelessWidget {
                             // Avatar
                             CircleAvatar(
                               radius: 26,
-                              backgroundColor: AppColors.premiumGold,
-                              backgroundImage: (user.avatar != null && user.avatar!.isNotEmpty)
+                              backgroundColor: AppColors.secondaryBackground,
+                              backgroundImage: (user.avatar != null && user.avatar!.isNotEmpty && !user.avatar!.contains("ui-avatars.com"))
                                   ? NetworkImage(AppUrls.getFullImageUrl(user.avatar))
                                   : null,
-                              child: (user.avatar == null || user.avatar!.isEmpty)
-                                  ? const Icon(Icons.person, size: 26)
+                              child: (user.avatar == null || user.avatar!.isEmpty || user.avatar!.contains("ui-avatars.com"))
+                                  ? Icon(Icons.person, size: 26, color: AppColors.premiumGold)
                                   : null,
                             ),
 
@@ -475,12 +475,12 @@ void _showUnfollowBottomSheet(BuildContext context, dynamic user, dynamic contro
         children: [
           CircleAvatar(
             radius: 40,
-            backgroundColor: AppColors.premiumGold,
-            backgroundImage: user.avatar != null && user.avatar!.isNotEmpty
+            backgroundColor: AppColors.secondaryBackground,
+            backgroundImage: user.avatar != null && user.avatar!.isNotEmpty && !user.avatar!.contains("ui-avatars.com")
                 ? NetworkImage(AppUrls.getFullImageUrl(user.avatar))
                 : null,
-            child: (user.avatar == null || user.avatar!.isEmpty)
-                ? const Icon(Icons.person, size: 40)
+            child: (user.avatar == null || user.avatar!.isEmpty || user.avatar!.contains("ui-avatars.com"))
+                ? Icon(Icons.person, size: 40, color: AppColors.premiumGold)
                 : null,
           ),
           const SizedBox(height: 16),
