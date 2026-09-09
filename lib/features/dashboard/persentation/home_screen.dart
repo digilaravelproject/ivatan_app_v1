@@ -102,6 +102,14 @@ class HomePage extends StatelessWidget {
                             elevation: 0,
                             automaticallyImplyLeading: false,
                             toolbarHeight: 60,
+                            flexibleSpace: isGold
+                                ? FlexibleSpaceBar(
+                                    background: Image.asset(
+                                      AppAssets.imgStoryBackground,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : null,
                             titleSpacing: 0,
                           title: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -207,105 +215,28 @@ class HomePage extends StatelessWidget {
                               ),
                             ),
                           ],
-                        );
-                      },
-                    ),
-
-                      // ============= STORIES SECTION (Always Visible) =============
-                      SliverToBoxAdapter(
-                        child: Obx(() {
-                          final isGold = AppColors.isGoldEligible;
-                          if (controller.isStoryLoading.value) {
-                            return _buildStoriesShimmer();
-                          }
-
-                          // Identify My Story vs Others
-                          final currentUserId =
-                              controller.currentUser.value?.id;
-                          UserStoryGroup? myStoryGroup;
-                          List<UserStoryGroup> otherStories = [];
-
-                          if (currentUserId != null) {
-                            // Split existing stories
-                            for (var group in controller.storyData) {
-                              if (group.user.id == currentUserId ||
-                                  (group.stories.isNotEmpty &&
-                                      group.stories.first.is_mine)) {
-                                myStoryGroup = group;
-                              } else {
-                                otherStories.add(group);
-                              }
-                            }
-                          } else {
-                            otherStories = List.from(controller.storyData);
-                          }
-
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 500),
-                            height: controller.showStories.value ? 130 : 0,
-                            curve: Curves.easeInOut,
-                            child: AnimatedOpacity(
+                          bottom: PreferredSize(
+                            preferredSize: Size.fromHeight(controller.showStories.value ? 130 : 0),
+                            child: AnimatedContainer(
                               duration: const Duration(milliseconds: 500),
-                              opacity: controller.showStories.value ? 1.0 : 0.0,
-                              child: Container(
-                                height: 130,
-                                decoration: isGold
-                                    ? const BoxDecoration(
-                                        image: DecorationImage(
-                                          image: AssetImage(
-                                            AppAssets.imgStoryBackground,
-                                          ),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      )
-                                    : null,
-                                color: isGold ? null : AppColors.transparent,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8,
-                                ),
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  padding: EdgeInsets.symmetric(horizontal: 16),
-                                  itemCount:
-                                      otherStories.length +
-                                      1, // +1 for "Your Story"
-                                  itemBuilder: (context, index) {
-                                    if (index == 0) {
-                                      return _buildMyStoryItem(
-                                        imageUrl,
-                                        myStoryGroup,
-                                      );
-                                    }
-
-                                    final story = otherStories[index - 1];
-
-                                    // Double-check: Skip if this is somehow the current user's story
-                                    if (story.user.id == currentUserId ||
-                                        (story.stories.isNotEmpty &&
-                                            story.stories.first.is_mine)) {
-                                      return SizedBox.shrink(); // Don't show duplicate
-                                    }
-
-                                    return GestureDetector(
-                                      onTap: () {
-                                        Get.to(
-                                          () => FullScreenStoryViewer(
-                                            stories: story.stories,
-                                            initialIndex: 0,
-                                          ),
-                                        );
-                                      },
-                                      child: _buildStoryCard(
-                                        story, // Pass full story object
-                                      ),
-                                    );
-                                  },
+                              height: controller.showStories.value ? 130 : 0,
+                              curve: Curves.easeInOut,
+                              child: AnimatedOpacity(
+                                duration: const Duration(milliseconds: 500),
+                                opacity: controller.showStories.value ? 1.0 : 0.0,
+                                child: SingleChildScrollView(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  child: SizedBox(
+                                    height: 130,
+                                    child: _buildStoriesSectionWidget(imageUrl),
+                                  ),
                                 ),
                               ),
                             ),
-                          );
-                        }),
-                      ),
+                          ),
+                        );
+                      },
+                    ),
 
                       // ============= POSTS SECTION =============
                       Obx(() {
@@ -374,19 +305,78 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  Widget _buildStoriesSectionWidget(String imageUrl) {
+    return Obx(() {
+      if (controller.isStoryLoading.value) {
+        return _buildStoriesShimmer();
+      }
+
+      // Identify My Story vs Others
+      final currentUserId = controller.currentUser.value?.id;
+      UserStoryGroup? myStoryGroup;
+      List<UserStoryGroup> otherStories = [];
+
+      if (currentUserId != null) {
+        // Split existing stories
+        for (var group in controller.storyData) {
+          if (group.user.id == currentUserId ||
+              (group.stories.isNotEmpty && group.stories.first.is_mine)) {
+            myStoryGroup = group;
+          } else {
+            otherStories.add(group);
+          }
+        }
+      } else {
+        otherStories = List.from(controller.storyData);
+      }
+
+      return Container(
+        height: 130,
+        color: AppColors.transparent,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: otherStories.length + 1, // +1 for "Your Story"
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return _buildMyStoryItem(
+                imageUrl,
+                myStoryGroup,
+              );
+            }
+
+            final story = otherStories[index - 1];
+
+            // Double-check: Skip if this is somehow the current user's story
+            if (story.user.id == currentUserId ||
+                (story.stories.isNotEmpty && story.stories.first.is_mine)) {
+              return const SizedBox.shrink(); // Don't show duplicate
+            }
+
+            return GestureDetector(
+              onTap: () {
+                Get.to(
+                  () => FullScreenStoryViewer(
+                    stories: story.stories,
+                    initialIndex: 0,
+                  ),
+                );
+              },
+              child: _buildStoryCard(
+                story, // Pass full story object
+              ),
+            );
+          },
+        ),
+      );
+    });
+  }
+
   Widget _buildStoriesShimmer() {
-    final isGold = AppColors.isGoldEligible;
     return Container(
       height: 130,
-      decoration: isGold
-          ? const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(AppAssets.imgStoryBackground),
-                fit: BoxFit.cover,
-              ),
-            )
-          : null,
-      color: isGold ? null : AppColors.transparent,
+      color: AppColors.transparent,
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
