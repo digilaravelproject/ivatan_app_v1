@@ -464,6 +464,35 @@ class SettingsController extends GetxController {
     }
   }
 
+  Future<void> refreshAllSettingsData() async {
+    try {
+      isLoading.value = true;
+      String finalUserName = userName.isNotEmpty ? userName : (SharedPrefManager().user?.username ?? "");
+
+      // 1. Refresh profile switch requests (so approved/pending status is fresh)
+      await fetchProfileSwitchRequests();
+
+      // 2. Refresh HomeController config & current user if registered
+      if (Get.isRegistered<HomeController>()) {
+        await Get.find<HomeController>().fetchProfileConfig();
+        await Get.find<HomeController>().fetchCurrentUserDetails();
+      }
+
+      // 3. Fetch profile types
+      await fetchProfileTypes();
+
+      // 4. Fetch latest user details
+      await fetchUserDetails(finalUserName);
+
+      // 5. Re-run matching so the Current Profile dropdown updates
+      _matchProfileType();
+    } catch (e) {
+      debugPrint("Error refreshing settings data: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   void showAdminApprovalDialog(String profileName) {
     final isGold = ppm.ProfilePermissionManager.isGoldEligible;
     Get.dialog(

@@ -19,22 +19,32 @@ import '../controller/homeController.dart';
 import '../../subscription/persentation/subscription_history_screen.dart';
 import 'blocked_users_screen.dart';
 
-class SettingsScreen extends StatelessWidget {
-  SettingsScreen({super.key});
-  final String? currentUserName = SharedPrefManager().user?.username;
-
-  // Using reactive variables from controller instead of static ones
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Avoid duplicate controller tags if possible, or handle gracefully
-    final profileController = Get.put(
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  final String? currentUserName = SharedPrefManager().user?.username;
+  late final SettingsController profileController;
+
+  @override
+  void initState() {
+    super.initState();
+    profileController = Get.put(
       SettingsController(userName: currentUserName ?? ""),
       tag: currentUserName,
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      profileController.refreshAllSettingsData();
+    });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: const Color(0xFFF8F9FA), // Clean, slightly off-white background
       appBar: AppBar(
         backgroundColor: AppColors.transparent,
         elevation: 0,
@@ -54,11 +64,27 @@ class SettingsScreen extends StatelessWidget {
             letterSpacing: 0.5,
           ),
         ),
+        actions: [
+          IconButton(
+            tooltip: "Refresh",
+            icon: const Icon(Icons.refresh_rounded, color: AppColors.white),
+            onPressed: () async {
+              await profileController.refreshAllSettingsData();
+            },
+          ),
+        ],
       ),
       body: Obx(() {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Column(
+        return RefreshIndicator(
+          color: AppColors.premiumGold,
+          backgroundColor: AppColors.cardSurface,
+          onRefresh: () async {
+            await profileController.refreshAllSettingsData();
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
@@ -410,8 +436,9 @@ class SettingsScreen extends StatelessWidget {
               }),
             ],
           ),
-        );
-      }),
+        ),
+      );
+    }),
     );
   }
 
