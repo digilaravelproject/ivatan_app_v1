@@ -67,13 +67,13 @@ class MyVideoScreen extends StatelessWidget {
                               const SizedBox(height: 12),
                               const Text("This account is private", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                               const SizedBox(height: 4),
-                              const Text("Follow to see their videos", style: TextStyle(color: AppColors.premiumGold)),
+                              Text("Follow to see their videos", style: TextStyle(color: AppColors.premiumGold)),
                             ],
                           ),
                         );
                       }
 
-                      return const Center(
+                      return Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -161,11 +161,11 @@ class MyVideoScreen extends StatelessWidget {
                       highlightColor: AppColors.premiumGold.withOpacity(0.1),
                       child: Container(color: AppColors.white),
                     ),
-                    errorWidget: (context, url, error) => const Center(
+                    errorWidget: (context, url, error) => Center(
                       child: Icon(Icons.videocam_off, color: AppColors.premiumGold),
                     ),
                   )
-                : const Center(child: Icon(Icons.videocam_off, color: AppColors.premiumGold)),
+                : Center(child: Icon(Icons.videocam_off, color: AppColors.premiumGold)),
           ),
           
           // Gradient Overlay

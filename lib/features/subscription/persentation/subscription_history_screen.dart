@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import '../../../core/helper/profile_permission_manager.dart';
 import '../controller/subscription_history_controller.dart';
 import '../data/model/subscription_history_model.dart';
 
@@ -86,6 +87,7 @@ class SubscriptionHistoryScreen extends StatelessWidget {
         }
 
         if (controller.historyList.isEmpty) {
+          final isGold = ProfilePermissionManager.isGoldEligible;
           return RefreshIndicator(
             onRefresh: () => controller.fetchSubscriptionHistory(),
             color: AppColors.white,
@@ -100,7 +102,7 @@ class SubscriptionHistoryScreen extends StatelessWidget {
                       Icon(
                         Icons.history_rounded,
                         size: 64,
-                        color: AppColors.premiumGold,
+                        color: isGold ? const Color(0xFFC0A062) : AppColors.secondaryText,
                       ),
                       const SizedBox(height: 16),
                       const Text(
@@ -119,7 +121,7 @@ class SubscriptionHistoryScreen extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 13,
-                            color: AppColors.premiumGold,
+                            color: isGold ? const Color(0xFFC0A062) : AppColors.secondaryText,
                           ),
                         ),
                       ),
@@ -149,6 +151,7 @@ class SubscriptionHistoryScreen extends StatelessWidget {
   }
 
   Widget _buildHistoryCard(BuildContext context, SubscriptionHistoryItem item) {
+    final isGold = ProfilePermissionManager.isGoldEligible;
     final plan = item.plan;
     final profile = item.profile;
 
@@ -161,16 +164,16 @@ class SubscriptionHistoryScreen extends StatelessWidget {
 
     if (isActive) {
       accentColor = const Color(0xFF10B981); // Green
-      statusBgColor = const Color(0xFFD1FAE5);
-      statusTextColor = const Color(0xFF065F46);
+      statusBgColor = const Color(0xFF10B981).withOpacity(0.15);
+      statusTextColor = const Color(0xFF34D399);
     } else if (isPending) {
       accentColor = const Color(0xFFF59E0B); // Amber
-      statusBgColor = const Color(0xFFFEF3C7);
-      statusTextColor = const Color(0xFFD97706);
+      statusBgColor = const Color(0xFFF59E0B).withOpacity(0.15);
+      statusTextColor = const Color(0xFFFBBF24);
     } else {
-      accentColor = AppColors.premiumGold; // Grey / Cancelled
-      statusBgColor = AppColors.premiumGold;
-      statusTextColor = AppColors.premiumGold;
+      accentColor = const Color(0xFF6B7280); // Grey / Cancelled / Expired
+      statusBgColor = const Color(0xFF374151);
+      statusTextColor = const Color(0xFFD1D5DB);
     }
 
     String startsDateStr = "";
@@ -200,12 +203,14 @@ class SubscriptionHistoryScreen extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.black,
+        color: const Color(0xFF141414),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.premiumGold),
+        border: Border.all(
+          color: isGold ? const Color(0xFFC0A062).withOpacity(0.4) : const Color(0xFF2A2A2A),
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.premiumGold.withOpacity(0.1),
+            color: Colors.black.withOpacity(0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -228,7 +233,7 @@ class SubscriptionHistoryScreen extends StatelessWidget {
                         horizontal: 16,
                         vertical: 12,
                       ),
-                      color: AppColors.premiumGold.withOpacity(0.1),
+                      color: (isGold ? const Color(0xFFC0A062) : Colors.white).withOpacity(0.06),
                       child: Row(
                         children: [
                           Icon(
@@ -236,7 +241,7 @@ class SubscriptionHistoryScreen extends StatelessWidget {
                               profile?.type ?? plan?.profileType ?? '',
                             ),
                             size: 20,
-                            color: AppColors.white,
+                            color: isGold ? const Color(0xFFC0A062) : AppColors.white,
                           ),
                           const SizedBox(width: 8),
                           Text(
@@ -310,14 +315,14 @@ class SubscriptionHistoryScreen extends StatelessWidget {
                               plan.description,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: AppColors.premiumGold,
+                                color: isGold ? const Color(0xFFC0A062) : AppColors.secondaryText,
                                 height: 1.3,
                               ),
                             ),
                             const SizedBox(height: 12),
                           ],
 
-                          const Divider(height: 1),
+                          Divider(height: 1, color: isGold ? const Color(0xFFC0A062).withOpacity(0.2) : const Color(0xFF2A2A2A)),
                           const SizedBox(height: 12),
 
                           // Dates and auto-renew details
@@ -325,6 +330,7 @@ class SubscriptionHistoryScreen extends StatelessWidget {
                             Icons.calendar_today_outlined,
                             "Started At",
                             startsDateStr,
+                            isGold,
                           ),
                           const SizedBox(height: 8),
                           _buildDetailRow(
@@ -333,12 +339,14 @@ class SubscriptionHistoryScreen extends StatelessWidget {
                             endsDateStr.isNotEmpty
                                 ? endsDateStr
                                 : "Lifetime (Auto-Renew)",
+                            isGold,
                           ),
                           const SizedBox(height: 8),
                           _buildDetailRow(
                             Icons.autorenew_rounded,
                             "Auto Renew",
                             item.autoRenew ? "Enabled" : "Disabled",
+                            isGold,
                           ),
 
                           if (item.gatewayOrderId != null &&
@@ -348,6 +356,7 @@ class SubscriptionHistoryScreen extends StatelessWidget {
                               Icons.receipt_long_outlined,
                               "Order ID",
                               item.gatewayOrderId!,
+                              isGold,
                             ),
                           ],
 
@@ -358,12 +367,13 @@ class SubscriptionHistoryScreen extends StatelessWidget {
                               Icons.vpn_key_outlined,
                               "Subscription ID",
                               item.gatewaySubscriptionId!,
+                              isGold,
                             ),
                           ],
 
                           if (plan != null && plan.features.isNotEmpty) ...[
                             const SizedBox(height: 12),
-                            const Divider(height: 1),
+                            Divider(height: 1, color: isGold ? const Color(0xFFC0A062).withOpacity(0.2) : const Color(0xFF2A2A2A)),
                             const SizedBox(height: 12),
                             const Text(
                               "Plan Features",
@@ -386,27 +396,25 @@ class SubscriptionHistoryScreen extends StatelessWidget {
                                             vertical: 4,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: AppColors.premiumGold,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
+                                            color: (isGold ? const Color(0xFFC0A062) : Colors.white).withOpacity(0.12),
+                                            borderRadius: BorderRadius.circular(8),
                                             border: Border.all(
-                                              color: AppColors.premiumGold,
+                                              color: (isGold ? const Color(0xFFC0A062) : Colors.white).withOpacity(0.25),
                                             ),
                                           ),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              const Icon(
+                                              Icon(
                                                 Icons.check_circle,
-                                                size: 10,
-                                                color: AppColors.white,
+                                                size: 11,
+                                                color: isGold ? const Color(0xFFC0A062) : AppColors.white,
                                               ),
-                                              const SizedBox(width: 4),
+                                              const SizedBox(width: 5),
                                               Text(
                                                 feat,
                                                 style: const TextStyle(
-                                                  fontSize: 10,
+                                                  fontSize: 11,
                                                   fontWeight: FontWeight.w600,
                                                   color: AppColors.white,
                                                 ),
@@ -431,16 +439,20 @@ class SubscriptionHistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(IconData icon, String label, String value) {
+  Widget _buildDetailRow(IconData icon, String label, String value, bool isGold) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: AppColors.premiumGold),
+        Icon(
+          icon, 
+          size: 14, 
+          color: isGold ? const Color(0xFFC0A062) : AppColors.secondaryText,
+        ),
         const SizedBox(width: 8),
         Text(
           label,
           style: TextStyle(
             fontSize: 12,
-            color: AppColors.premiumGold,
+            color: isGold ? const Color(0xFFC0A062) : AppColors.secondaryText,
             fontWeight: FontWeight.w500,
           ),
         ),

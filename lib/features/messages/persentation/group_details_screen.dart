@@ -89,7 +89,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 ],
               ),
             ),
-            const Divider(height: 1, color: AppColors.premiumGold),
+            Divider(height: 1, color: AppColors.premiumGold),
             Obx(() {
               final existingParticipantIds = groupData.participants.map((p) => p.userId).toSet();
               final contacts = contactController.filteredContactList
@@ -132,7 +132,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                                   contact.name.isNotEmpty
                                       ? contact.name[0].toUpperCase()
                                       : "?",
-                                  style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.premiumGold),
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.premiumGold),
                                 )
                               : null,
                         ),
@@ -143,7 +143,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                 ),
               );
             }),
-            const Divider(height: 1, color: AppColors.premiumGold),
+            Divider(height: 1, color: AppColors.premiumGold),
             Padding(
               padding: const EdgeInsets.all(16),
               child: SizedBox(
@@ -186,14 +186,14 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
         backgroundColor: AppColors.black,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.premiumGold),
+          side: BorderSide(color: AppColors.premiumGold),
         ),
         title: const Text("Remove Participant", style: TextStyle(color: AppColors.white)),
         content: const Text("Are you sure you want to remove this participant?", style: TextStyle(color: AppColors.white)),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const Text("Cancel", style: TextStyle(color: AppColors.premiumGold)),
+            child: Text("Cancel", style: TextStyle(color: AppColors.premiumGold)),
           ),
           ElevatedButton(
             onPressed: () => Get.back(result: true),
@@ -323,7 +323,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                               ? NetworkImage(groupData.avatar.toString())
                               : null,
                           child: (groupData.avatar == null || groupData.avatar.toString().isEmpty)
-                              ? const Icon(Icons.groups_rounded, size: 50, color: AppColors.premiumGold)
+                              ? Icon(Icons.groups_rounded, size: 50, color: AppColors.premiumGold)
                               : null,
                         ),
                       ),
@@ -425,7 +425,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen> {
                         ),
                         
                         if (groupData.participants.isEmpty)
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.symmetric(vertical: 40),
                             child: Center(
                               child: Text(

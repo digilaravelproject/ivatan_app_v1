@@ -98,7 +98,7 @@ class EditProfileScreen extends StatelessWidget {
                                     fit: BoxFit.cover,
                                   );
                                 } else {
-                                  avatarChild = const Center(
+                                  avatarChild = Center(
                                     key: ValueKey("placeholder"),
                                     child: Icon(
                                       Icons.person,
@@ -268,7 +268,7 @@ class EditProfileScreen extends StatelessWidget {
                           onPressed: () {
                             profileController.updateProfile();
                           },
-                          gradient: const LinearGradient(
+                          gradient: LinearGradient(
                             colors: [
                               AppColors.premiumGold,
                               AppColors.premiumGold,

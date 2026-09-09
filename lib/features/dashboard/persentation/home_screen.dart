@@ -118,7 +118,7 @@ class HomePage extends StatelessWidget {
                                 alignment: Alignment.center,
                                 children: [
                                   IconButton(
-                                    icon: const Icon(
+                                    icon: Icon(
                                       CupertinoIcons.bell,
                                       color: AppColors.premiumGold,
                                       size: 26,
@@ -167,7 +167,7 @@ class HomePage extends StatelessWidget {
                               alignment: Alignment.center,
                               children: [
                                 IconButton(
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.wechat_outlined,
                                     color: AppColors.premiumGold,
                                     size: 26,
@@ -195,7 +195,7 @@ class HomePage extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.only(right: 12.0),
                               child: IconButton(
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.menu_rounded,
                                   color: AppColors.premiumGold,
                                   size: 28,
@@ -528,7 +528,7 @@ class HomePage extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           gradient:
               hasStory
-                  ? const LinearGradient(
+                  ? LinearGradient(
                     colors: [
                       AppColors.premiumGold,
                       AppColors.goldHighlight,
@@ -617,7 +617,7 @@ class HomePage extends StatelessWidget {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
+                      gradient: LinearGradient(
                         colors: [
                           AppColors.premiumGold,
                           AppColors.goldHighlight,
@@ -720,7 +720,7 @@ class HomePage extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           gradient:
               hasUnseen
-                  ? const LinearGradient(
+                  ? LinearGradient(
                     colors: [
                       AppColors.premiumGold,
                       AppColors.goldHighlight,
@@ -798,7 +798,7 @@ class HomePage extends StatelessWidget {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
+                        gradient: LinearGradient(
                           colors: [
                             AppColors.premiumGold,
                             AppColors.goldHighlight,
@@ -4808,7 +4808,7 @@ class _AnimatedProBadgeState extends State<AnimatedProBadge>
               margin: const EdgeInsets.symmetric(horizontal: 4),
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
+                gradient: LinearGradient(
                   colors: [
                     AppColors.premiumGold,
                     AppColors.goldHighlight,

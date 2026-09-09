@@ -2,6 +2,7 @@ import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import '../../../core/helper/profile_permission_manager.dart';
 import '../controller/creator_dashboard_controller.dart';
 import '../data/model/exclusive_content_item_model.dart';
 import '../data/model/exclusive_stats_model.dart';
@@ -36,142 +37,152 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: ThemeData.light().copyWith(
-        scaffoldBackgroundColor: AppColors.premiumGold.withOpacity(0.1),
-        appBarTheme: AppBarTheme(backgroundColor: AppColors.premiumGold.withOpacity(0.1), elevation: 0),
-        cardColor: const Color(0xFFFFFFFF),
-      ),
-      child: Scaffold(
-        backgroundColor: AppColors.premiumGold.withOpacity(0.1),
-        body: RefreshIndicator(
-          onRefresh: () async {
-            await controller.fetchDashboardStats();
-            await controller.fetchExclusiveContent(isRefresh: true);
-          },
-          child: CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      _buildDateDropdown(),
-                      const SizedBox(width: 10),
-                      Obx(() => _buildDateRangeDisplay(controller.dateFrom.value, controller.dateTo.value)),
-                    ],
-                  ),
-                ),
+    final isGold = ProfilePermissionManager.isGoldEligible;
+    return RefreshIndicator(
+      onRefresh: () async {
+        await controller.fetchDashboardStats();
+        await controller.fetchExclusiveContent(isRefresh: true);
+      },
+      child: CustomScrollView(
+        controller: _scrollController,
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  _buildDateDropdown(isGold),
+                  const SizedBox(width: 10),
+                  Obx(() => _buildDateRangeDisplay(controller.dateFrom.value, controller.dateTo.value, isGold)),
+                ],
               ),
-              SliverToBoxAdapter(
-                child: Obx(() {
-                  if (controller.isLoadingStats.value && controller.stats.value == null) {
-                    return const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator()));
-                  }
-                  if (controller.stats.value == null) {
-                    return const SizedBox();
-                  }
-                  return _buildOverview(controller.stats.value!.globalStats);
-                }),
-              ),
-              SliverToBoxAdapter(
-                child: Obx(() {
-                  if (controller.stats.value == null) return const SizedBox();
-                  return _buildSpotlight(controller.stats.value!.spotlight);
-                }),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Top Performing Content",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.white),
-                      ),
-                      Row(
-                        children: [
-                          Obx(() => DropdownButton<String>(
-                            value: controller.selectedSortBy.value,
-                            dropdownColor: const Color(0xFFF5F5F5),
-                            underline: const SizedBox(),
-                            icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.premiumGold),
-                            style: const TextStyle(color: AppColors.premiumGold, fontSize: 12),
-                            onChanged: (val) {
-                              if (val != null) controller.onSortChange(val);
-                            },
-                            items: const [
-                              DropdownMenuItem(value: 'earnings', child: Text('Sort: Earnings')),
-                              DropdownMenuItem(value: 'views', child: Text('Sort: Views')),
-                              DropdownMenuItem(value: 'purchases', child: Text('Sort: Purchases')),
-                            ],
-                          )),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.premiumGold),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: const Icon(Icons.filter_alt_outlined, color: AppColors.premiumGold, size: 16),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Obx(() {
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (index == controller.contentItems.length) {
-                        return controller.hasMoreContent.value
-                            ? const Center(child: Padding(padding: EdgeInsets.all(16.0), child: CircularProgressIndicator()))
-                            : const SizedBox(height: 80);
-                      }
-                      return _buildContentItem(controller.contentItems[index]);
-                    },
-                    childCount: controller.contentItems.length + 1,
-                  ),
-                );
-              }),
-            ],
+            ),
           ),
-        ),
+          SliverToBoxAdapter(
+            child: Obx(() {
+              if (controller.isLoadingStats.value && controller.stats.value == null) {
+                return const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator()));
+              }
+              if (controller.stats.value == null) {
+                return const SizedBox();
+              }
+              return _buildOverview(controller.stats.value!.globalStats, isGold);
+            }),
+          ),
+          SliverToBoxAdapter(
+            child: Obx(() {
+              if (controller.stats.value == null) return const SizedBox();
+              return _buildSpotlight(controller.stats.value!.spotlight, isGold);
+            }),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Top Performing Content",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.white),
+                  ),
+                  Row(
+                    children: [
+                      Obx(() => DropdownButton<String>(
+                        value: controller.selectedSortBy.value,
+                        dropdownColor: const Color(0xFF1E1E1E),
+                        underline: const SizedBox(),
+                        icon: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: isGold ? const Color(0xFFC0A062) : AppColors.white,
+                        ),
+                        style: TextStyle(
+                          color: isGold ? const Color(0xFFC0A062) : AppColors.white,
+                          fontSize: 12,
+                        ),
+                        onChanged: (val) {
+                          if (val != null) controller.onSortChange(val);
+                        },
+                        items: const [
+                          DropdownMenuItem(value: 'earnings', child: Text('Sort: Earnings', style: TextStyle(color: AppColors.white))),
+                          DropdownMenuItem(value: 'views', child: Text('Sort: Views', style: TextStyle(color: AppColors.white))),
+                          DropdownMenuItem(value: 'purchases', child: Text('Sort: Purchases', style: TextStyle(color: AppColors.white))),
+                        ],
+                      )),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF181818),
+                          border: Border.all(
+                            color: isGold ? const Color(0xFFC0A062) : const Color(0xFF3A3A3A),
+                          ),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Icon(
+                          Icons.filter_alt_outlined,
+                          color: isGold ? const Color(0xFFC0A062) : AppColors.white,
+                          size: 16,
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Obx(() {
+            return SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  if (index == controller.contentItems.length) {
+                    return controller.hasMoreContent.value
+                        ? const Center(child: Padding(padding: EdgeInsets.all(16.0), child: CircularProgressIndicator()))
+                        : const SizedBox(height: 80);
+                  }
+                  return _buildContentItem(controller.contentItems[index], isGold);
+                },
+                childCount: controller.contentItems.length + 1,
+              ),
+            );
+          }),
+        ],
       ),
     );
   }
 
-  Widget _buildDateDropdown() {
+  Widget _buildDateDropdown(bool isGold) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-        border: Border.all(color: AppColors.premiumGold),
+        color: const Color(0xFF181818),
+        border: Border.all(
+          color: isGold ? const Color(0xFFC0A062) : const Color(0xFF3A3A3A),
+        ),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Obx(() => DropdownButton<String>(
         value: controller.selectedDateRangeLabel.value,
-        dropdownColor: const Color(0xFFF5F5F5),
+        dropdownColor: const Color(0xFF1E1E1E),
         isDense: true,
         underline: const SizedBox(),
-        icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.white, size: 18),
-        style: const TextStyle(color: AppColors.white, fontSize: 13),
+        icon: Icon(
+          Icons.keyboard_arrow_down,
+          color: isGold ? const Color(0xFFC0A062) : AppColors.white,
+          size: 18,
+        ),
+        style: const TextStyle(color: AppColors.white, fontSize: 13, fontWeight: FontWeight.w500),
         onChanged: (val) {
           if (val != null) controller.applyFilter(dateRange: val);
         },
         items: const [
-          DropdownMenuItem(value: 'This Month', child: Text('This Month')),
-          DropdownMenuItem(value: 'All Time', child: Text('All Time')),
+          DropdownMenuItem(value: 'This Month', child: Text('This Month', style: TextStyle(color: AppColors.white))),
+          DropdownMenuItem(value: 'All Time', child: Text('All Time', style: TextStyle(color: AppColors.white))),
         ],
       )),
     );
   }
 
-  Widget _buildDateRangeDisplay(String? from, String? to) {
+  Widget _buildDateRangeDisplay(String? from, String? to, bool isGold) {
     if (from == null || to == null) return const SizedBox();
     try {
       final f = DateFormat('yyyy-MM-dd');
@@ -181,17 +192,27 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: const Color(0xFFF5F5F5),
-          border: Border.all(color: AppColors.premiumGold),
+          color: const Color(0xFF181818),
+          border: Border.all(
+            color: isGold ? const Color(0xFFC0A062) : const Color(0xFF3A3A3A),
+          ),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           children: [
-            const Icon(Icons.calendar_today_outlined, color: AppColors.premiumGold, size: 14),
+            Icon(
+              Icons.calendar_today_outlined,
+              color: isGold ? const Color(0xFFC0A062) : AppColors.white,
+              size: 14,
+            ),
             const SizedBox(width: 8),
             Text(
               "${formatter.format(dFrom)} - ${formatter.format(dTo)}",
-              style: const TextStyle(color: AppColors.premiumGold, fontSize: 12),
+              style: TextStyle(
+                color: isGold ? const Color(0xFFC0A062) : AppColors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -201,7 +222,7 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
     }
   }
 
-  Widget _buildOverview(GlobalStats stats) {
+  Widget _buildOverview(GlobalStats stats, bool isGold) {
     final formatCurrency = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
     final formatNumber = NumberFormat.compact();
 
@@ -214,17 +235,17 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
           const SizedBox(height: 12),
           Row(
             children: [
-              Expanded(child: _buildOverviewCard(Icons.visibility_outlined, "Total Views", formatNumber.format(stats.totalViews))),
+              Expanded(child: _buildOverviewCard(Icons.visibility_outlined, "Total Views", formatNumber.format(stats.totalViews), isGold)),
               const SizedBox(width: 12),
-              Expanded(child: _buildOverviewCard(Icons.monetization_on_outlined, "Total Earnings", formatCurrency.format(stats.totalEarnings))),
+              Expanded(child: _buildOverviewCard(Icons.monetization_on_outlined, "Total Earnings", formatCurrency.format(stats.totalEarnings), isGold)),
             ],
           ),
           const SizedBox(height: 12),
           Row(
             children: [
-              Expanded(child: _buildOverviewCard(Icons.shopping_cart_outlined, "Total Purchases", formatNumber.format(stats.totalPurchases))),
+              Expanded(child: _buildOverviewCard(Icons.shopping_cart_outlined, "Total Purchases", formatNumber.format(stats.totalPurchases), isGold)),
               const SizedBox(width: 12),
-              Expanded(child: _buildOverviewCard(Icons.insert_drive_file_outlined, "Total Content", formatNumber.format(stats.totalExclusiveContent))),
+              Expanded(child: _buildOverviewCard(Icons.insert_drive_file_outlined, "Total Content", formatNumber.format(stats.totalExclusiveContent), isGold)),
             ],
           ),
         ],
@@ -232,12 +253,21 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
     );
   }
 
-  Widget _buildOverviewCard(IconData icon, String title, String value) {
+  Widget _buildOverviewCard(IconData icon, String title, String value, bool isGold) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFFFFF),
-        boxShadow: [BoxShadow(color: AppColors.white.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+        color: const Color(0xFF181818),
+        border: Border.all(
+          color: isGold ? const Color(0xFFC0A062).withOpacity(0.35) : const Color(0xFF2E2E2E),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -246,21 +276,39 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
+              color: (isGold ? const Color(0xFFC0A062) : Colors.blue).withOpacity(0.15),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: Colors.blue.shade700, size: 20),
+            child: Icon(
+              icon,
+              color: isGold ? const Color(0xFFC0A062) : Colors.blue.shade300,
+              size: 20,
+            ),
           ),
           const SizedBox(height: 12),
-          Text(title, style: const TextStyle(color: AppColors.premiumGold, fontSize: 12)),
+          Text(
+            title,
+            style: TextStyle(
+              color: isGold ? const Color(0xFFC0A062) : AppColors.secondaryText,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           const SizedBox(height: 4),
-          Text(value, style: const TextStyle(color: AppColors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: const TextStyle(
+              color: AppColors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSpotlight(List<SpotlightItem> spotlight) {
+  Widget _buildSpotlight(List<SpotlightItem> spotlight, bool isGold) {
     if (spotlight.isEmpty) {
       return const SizedBox();
     }
@@ -279,9 +327,9 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
                   onTap: () {
                     Get.to(() => SpotlightAllScreen());
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Text("View All >", style: TextStyle(fontSize: 12, color: Colors.blue)),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Text("View All >", style: TextStyle(fontSize: 12, color: Colors.blueAccent)),
                   ),
                 ),
               ],
@@ -295,7 +343,7 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               itemCount: spotlight.length,
               itemBuilder: (context, index) {
-                return _buildSpotlightCard("Featured", spotlight[index]);
+                return _buildSpotlightCard("Featured", spotlight[index], isGold);
               },
             ),
           ),
@@ -304,7 +352,7 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
     );
   }
 
-  Widget _buildSpotlightCard(String label, SpotlightItem item) {
+  Widget _buildSpotlightCard(String label, SpotlightItem item, bool isGold) {
     final formatCurrency = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
     final formatNumber = NumberFormat.compact();
     
@@ -312,8 +360,11 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
       width: 220,
       margin: const EdgeInsets.only(right: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFFFFF),
-        boxShadow: [BoxShadow(color: AppColors.white.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+        color: const Color(0xFF181818),
+        border: Border.all(
+          color: isGold ? const Color(0xFFC0A062).withOpacity(0.3) : const Color(0xFF2A2A2A),
+        ),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))],
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -325,8 +376,8 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                 child: item.thumbnailUrl.isNotEmpty
-                    ? Image.network(item.thumbnailUrl, height: 120, width: double.infinity, fit: BoxFit.cover, errorBuilder: (_,__,___) => Container(height: 120, color: AppColors.premiumGold))
-                    : Container(height: 120, color: AppColors.premiumGold),
+                    ? Image.network(item.thumbnailUrl, height: 120, width: double.infinity, fit: BoxFit.cover, errorBuilder: (_,__,___) => Container(height: 120, color: isGold ? const Color(0xFFC0A062).withOpacity(0.3) : const Color(0xFF252525)))
+                    : Container(height: 120, color: isGold ? const Color(0xFFC0A062).withOpacity(0.3) : const Color(0xFF252525)),
               ),
               Positioned(
                 top: 8,
@@ -334,8 +385,9 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.white,
+                    color: Colors.black.withOpacity(0.75),
                     borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: (isGold ? const Color(0xFFC0A062) : Colors.white).withOpacity(0.3)),
                   ),
                   child: Text(label, style: const TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.w600)),
                 ),
@@ -365,25 +417,25 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.visibility_outlined, color: AppColors.premiumGold, size: 14),
+                    Icon(Icons.visibility_outlined, color: isGold ? const Color(0xFFC0A062) : AppColors.secondaryText, size: 14),
                     const SizedBox(width: 4),
-                    Text("${formatNumber.format(item.viewsCount)} Views", style: const TextStyle(color: AppColors.premiumGold, fontSize: 10)),
+                    Text("${formatNumber.format(item.viewsCount)} Views", style: TextStyle(color: isGold ? const Color(0xFFC0A062) : AppColors.secondaryText, fontSize: 10)),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.shopping_cart_outlined, color: AppColors.premiumGold, size: 14),
+                    Icon(Icons.shopping_cart_outlined, color: isGold ? const Color(0xFFC0A062) : AppColors.secondaryText, size: 14),
                     const SizedBox(width: 4),
-                    Text("${formatNumber.format(item.purchasesCount)} Purchases", style: const TextStyle(color: AppColors.premiumGold, fontSize: 10)),
+                    Text("${formatNumber.format(item.purchasesCount)} Purchases", style: TextStyle(color: isGold ? const Color(0xFFC0A062) : AppColors.secondaryText, fontSize: 10)),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.monetization_on_outlined, color: AppColors.premiumGold, size: 14),
+                    Icon(Icons.monetization_on_outlined, color: isGold ? const Color(0xFFC0A062) : AppColors.secondaryText, size: 14),
                     const SizedBox(width: 4),
-                    Text("${formatCurrency.format(item.totalEarnings)} Earnings", style: const TextStyle(color: AppColors.premiumGold, fontSize: 10)),
+                    Text("${formatCurrency.format(item.totalEarnings)} Earnings", style: TextStyle(color: isGold ? const Color(0xFFC0A062) : AppColors.secondaryText, fontSize: 10)),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -391,11 +443,11 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
+                    color: (isGold ? const Color(0xFFC0A062) : Colors.blue).withOpacity(0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Center(
-                    child: Text(formatCurrency.format(item.price), style: TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.bold, fontSize: 13)),
+                    child: Text(formatCurrency.format(item.price), style: TextStyle(color: isGold ? const Color(0xFFC0A062) : Colors.blue.shade300, fontWeight: FontWeight.bold, fontSize: 13)),
                   ),
                 ),
               ],
@@ -406,7 +458,7 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
     );
   }
 
-  Widget _buildContentItem(ExclusiveContentItemModel item) {
+  Widget _buildContentItem(ExclusiveContentItemModel item, bool isGold) {
     final formatCurrency = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
     final formatNumber = NumberFormat.compact();
     final DateFormat formatter = DateFormat('MMM dd, yyyy');
@@ -421,8 +473,11 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFFFFF),
-        boxShadow: [BoxShadow(color: AppColors.white.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))],
+        color: const Color(0xFF181818),
+        border: Border.all(
+          color: isGold ? const Color(0xFFC0A062).withOpacity(0.25) : const Color(0xFF2A2A2A),
+        ),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.25), blurRadius: 8, offset: const Offset(0, 2))],
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -432,8 +487,8 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: item.thumbnailUrl.isNotEmpty
-                ? Image.network(item.thumbnailUrl, width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (_,__,___) => Container(width: 60, height: 60, color: AppColors.premiumGold))
-                : Container(width: 60, height: 60, color: AppColors.premiumGold),
+                ? Image.network(item.thumbnailUrl, width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (_,__,___) => Container(width: 60, height: 60, color: isGold ? const Color(0xFFC0A062).withOpacity(0.3) : const Color(0xFF252525)))
+                : Container(width: 60, height: 60, color: isGold ? const Color(0xFFC0A062).withOpacity(0.3) : const Color(0xFF252525)),
           ),
           const SizedBox(width: 12),
           // Info
@@ -454,11 +509,14 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
                   runSpacing: 4,
                   children: [
                     Text(formatCurrency.format(item.price), style: const TextStyle(color: AppColors.white, fontSize: 11)),
-                    const Text("•", style: TextStyle(color: AppColors.white, fontSize: 11)),
-                    Text(dateStr, style: const TextStyle(color: AppColors.white, fontSize: 11)),
+                    const Text("•", style: TextStyle(color: AppColors.secondaryText, fontSize: 11)),
+                    Text(dateStr, style: const TextStyle(color: AppColors.secondaryText, fontSize: 11)),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                      decoration: BoxDecoration(color: AppColors.premiumGold, borderRadius: BorderRadius.circular(4)),
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: (isGold ? const Color(0xFFC0A062) : Colors.white).withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                       child: Text(item.type.capitalizeFirst ?? item.type, style: const TextStyle(color: AppColors.white, fontSize: 9)),
                     )
                   ],
@@ -471,7 +529,7 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text("Views", style: TextStyle(color: AppColors.white, fontSize: 10)),
+              const Text("Views", style: TextStyle(color: AppColors.secondaryText, fontSize: 10)),
               const SizedBox(height: 2),
               Text(formatNumber.format(item.totalViews), style: const TextStyle(color: AppColors.white, fontSize: 12, fontWeight: FontWeight.w600)),
             ],
@@ -480,7 +538,7 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text("Purchases", style: TextStyle(color: AppColors.white, fontSize: 10)),
+              const Text("Purchases", style: TextStyle(color: AppColors.secondaryText, fontSize: 10)),
               const SizedBox(height: 2),
               Text(formatNumber.format(item.totalPurchaseCount), style: const TextStyle(color: AppColors.white, fontSize: 12, fontWeight: FontWeight.w600)),
             ],
@@ -489,9 +547,9 @@ class _CreatorDashboardViewState extends State<CreatorDashboardView> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text("Earnings", style: TextStyle(color: AppColors.white, fontSize: 10)),
+              const Text("Earnings", style: TextStyle(color: AppColors.secondaryText, fontSize: 10)),
               const SizedBox(height: 2),
-              Text(formatCurrency.format(item.totalEarnings), style: TextStyle(color: Colors.green.shade700, fontSize: 12, fontWeight: FontWeight.w600)),
+              Text(formatCurrency.format(item.totalEarnings), style: TextStyle(color: Colors.greenAccent.shade400, fontSize: 12, fontWeight: FontWeight.w600)),
             ],
           ),
         ],

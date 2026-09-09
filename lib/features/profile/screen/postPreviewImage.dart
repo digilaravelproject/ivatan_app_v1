@@ -180,7 +180,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                                   : null,
                               child: SharedPrefManager().user?.profilePhotoPath == null ||
                                       SharedPrefManager().user!.profilePhotoPath!.isEmpty
-                                  ? const Icon(Icons.person, color: AppColors.premiumGold, size: 24)
+                                  ? Icon(Icons.person, color: AppColors.premiumGold, size: 24)
                                   : null,
                             ),
                             const SizedBox(width: 12),
@@ -489,7 +489,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
             child: Icon(Icons.image_outlined, size: 64, color: AppColors.premiumGold),
           ),
           const SizedBox(height: 20),
-          const Text("No media selected", style: TextStyle(color: AppColors.premiumGold, fontSize: 16, fontWeight: FontWeight.w500)),
+          Text("No media selected", style: TextStyle(color: AppColors.premiumGold, fontSize: 16, fontWeight: FontWeight.w500)),
           const SizedBox(height: 20),
           ElevatedButton.icon(
             onPressed: () => controller.showPickerOptions(),

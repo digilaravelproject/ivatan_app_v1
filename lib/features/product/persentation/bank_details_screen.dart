@@ -27,7 +27,7 @@ class BankDetailsScreen extends StatelessWidget {
         }
 
         if (controller.bankData.isEmpty) {
-          return const Center(
+          return Center(
             child: Text(
               'No bank accounts added yet',
               style: TextStyle(fontSize: 16, color: AppColors.premiumGold),

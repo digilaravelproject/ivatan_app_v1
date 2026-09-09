@@ -183,7 +183,7 @@ class _FeedMediaWidgetState extends State<FeedMediaWidget> {
             placeholder: (context, url) => const _ShimmerPlaceholder(),
             errorWidget: (context, url, error) => Container(
               color: AppColors.premiumGold,
-              child: const Icon(Icons.broken_image, size: 50, color: AppColors.premiumGold),
+              child: Icon(Icons.broken_image, size: 50, color: AppColors.premiumGold),
             ),
           );
         },

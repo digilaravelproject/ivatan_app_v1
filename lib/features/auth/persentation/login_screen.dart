@@ -326,7 +326,7 @@ class LoginPage extends GetWidget<LoginController> {
                                       controller.callPasswordLogin();
                                     }
                                   },
-                                  gradient: const LinearGradient(
+                                  gradient: LinearGradient(
                                     colors: [AppColors.premiumGold, AppColors.premiumGold],
                                     begin: Alignment.centerLeft,
                                     end: Alignment.centerRight,

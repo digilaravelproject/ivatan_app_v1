@@ -301,10 +301,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
           color: _isFocused ? AppColors.premiumGold : AppColors.premiumGold,
           fontSize: 14,
         ),
-        enabledBorder: const UnderlineInputBorder(
+        enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: AppColors.premiumGold, width: 1),
         ),
-        focusedBorder: const UnderlineInputBorder(
+        focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: AppColors.premiumGold, width: 1.5),
         ),
         filled: true,

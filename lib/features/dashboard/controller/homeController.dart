@@ -23,6 +23,7 @@ import 'settings_controller.dart';
 import '../../../core/network/app_urls.dart';
 import '../../../core/widgets/custom_dialog.dart';
 import 'package:i_vatan_app/features/Notification/controller/notification_controller.dart';
+import '../../exclusive_content/controller/exclusive_controller.dart';
 
 class HomeController extends GetxController with WidgetsBindingObserver {
   RxBool isLoading = false.obs;
@@ -96,6 +97,21 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     }
   }
 
+  Future<void> fetchCurrentUserDetails() async {
+    final username = SharedPrefManager().user?.username;
+    if (username == null || username.isEmpty) return;
+    try {
+      final response = await api.callGet(AppUrls.userProfileUrl(username), showErrorToast: false);
+      if (response != null && response['status'] == true && response['data'] != null && response['data']['user'] != null) {
+        final userJson = response['data']['user'] as Map<String, dynamic>;
+        await SharedPrefManager().updateUserOnly(userJson);
+        loadCurrentUser();
+      }
+    } catch (e) {
+      debugPrint("Error fetching current user details in HomeController: $e");
+    }
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -106,6 +122,14 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     fetchStories();
     fetchUnreadNotificationCount();
     fetchProfileConfig();
+    fetchCurrentUserDetails();
+    try {
+      if (Get.isRegistered<ExclusiveController>()) {
+        Get.find<ExclusiveController>().checkEnablementStatus();
+      } else {
+        Get.put(ExclusiveController(), permanent: true);
+      }
+    } catch (_) {}
   }
 
   @override
@@ -118,6 +142,12 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       fetchProfileConfig();
+      fetchCurrentUserDetails();
+      try {
+        if (Get.isRegistered<ExclusiveController>()) {
+          Get.find<ExclusiveController>().checkEnablementStatus();
+        }
+      } catch (_) {}
     }
   }
 

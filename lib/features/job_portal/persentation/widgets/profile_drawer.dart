@@ -220,7 +220,7 @@ class ProfileDrawer extends StatelessWidget {
                         Get.to(JobHistoryScreen());
                       },
                     ),
-                  const Divider(color: AppColors.premiumGold),
+                  Divider(color: AppColors.premiumGold),
                   _buildDrawerItem(
                     icon: Icons.help_outline,
                     title: 'Help & Privacy',

@@ -48,7 +48,7 @@ class BookmarksScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   const Text("No bookmarks yet", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.white)),
                   const SizedBox(height: 8),
-                  const Text("Saved posts will appear here", style: TextStyle(color: AppColors.premiumGold)),
+                  Text("Saved posts will appear here", style: TextStyle(color: AppColors.premiumGold)),
                 ],
               ),
             );

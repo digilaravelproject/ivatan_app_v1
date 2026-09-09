@@ -1,6 +1,7 @@
 import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../core/helper/profile_permission_manager.dart';
 import '../../../../core/network/api_services.dart';
 import '../../../../db/shared_pref_manager.dart';
 import '../../dashboard/controller/settings_controller.dart';
@@ -270,19 +271,30 @@ class SubscriptionPaymentController extends GetxController {
   }
 
   void _showSubscriptionSuccessDialog(int profileId, int planId, String message, bool isSynced) {
+    final isGold = ProfilePermissionManager.isGoldEligible;
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: const Color(0xFF1E1E1E),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(
+            color: isGold ? const Color(0xFFC0A062).withOpacity(0.4) : const Color(0xFF38383A),
+          ),
+        ),
         title: Column(
           children: [
             const Icon(Icons.check_circle, color: Colors.green, size: 60),
             const SizedBox(height: 16),
-            const Text("Subscribed Successfully", style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text("Subscribed Successfully", style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.white)),
           ],
         ),
         content: Text(
           message,
           textAlign: TextAlign.center,
+          style: TextStyle(
+            color: isGold ? const Color(0xFFC0A062) : const Color(0xFFB0B0B0),
+            fontSize: 14,
+          ),
         ),
         actionsAlignment: MainAxisAlignment.center,
         actions: [
@@ -336,14 +348,20 @@ class SubscriptionPaymentController extends GetxController {
                 settingsController.fetchUserDetails(settingsController.userName);
                 settingsController.fetchProfileSwitchRequests();
               }
+
+              // Sync Profile Config for dynamic permissions and gold theme
+              if (Get.isRegistered<HomeController>()) {
+                Get.find<HomeController>().fetchProfileConfig();
+              }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.transparent,
-              foregroundColor: AppColors.white,
-              minimumSize: const Size(120, 45),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              backgroundColor: isGold ? const Color(0xFFC0A062) : AppColors.white,
+              foregroundColor: AppColors.black,
+              minimumSize: const Size(140, 45),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              elevation: 0,
             ),
-            child: const Text("Done"),
+            child: const Text("Done", style: TextStyle(color: AppColors.black, fontWeight: FontWeight.bold, fontSize: 15)),
           ),
         ],
       ),
@@ -485,17 +503,22 @@ class SubscriptionPaymentController extends GetxController {
   void _showSubscriptionFailureDialog(String message) {
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: const Color(0xFF1E1E1E),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFF38383A)),
+        ),
         title: Column(
           children: [
-            const Icon(Icons.error_outline, color: Colors.red, size: 60),
+            const Icon(Icons.error_outline, color: Colors.redAccent, size: 60),
             const SizedBox(height: 16),
-            const Text("Payment Failed", style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text("Payment Failed", style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.white)),
           ],
         ),
         content: Text(
           message,
           textAlign: TextAlign.center,
+          style: const TextStyle(color: Color(0xFFB0B0B0), fontSize: 14),
         ),
         actionsAlignment: MainAxisAlignment.center,
         actions: [
@@ -504,13 +527,15 @@ class SubscriptionPaymentController extends GetxController {
               Get.back(); // Close dialog
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: Colors.redAccent,
+              foregroundColor: AppColors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(10),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+              elevation: 0,
             ),
-            child: const Text("Okay", style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold)),
+            child: const Text("Okay", style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 15)),
           ),
         ],
       ),

@@ -77,12 +77,12 @@ class MyApp extends StatelessWidget {
           theme: ThemeData.dark().copyWith(
             scaffoldBackgroundColor: AppColors.transparent,
             primaryColor: AppColors.premiumGold,
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: AppColors.premiumGold,
               secondary: AppColors.goldHighlight,
               surface: AppColors.transparent,
             ),
-            appBarTheme: const AppBarTheme(
+            appBarTheme: AppBarTheme(
               backgroundColor: AppColors.transparent,
               elevation: 0,
               iconTheme: IconThemeData(color: AppColors.premiumGold),
@@ -93,18 +93,18 @@ class MyApp extends StatelessWidget {
                 fontFamily: 'DMSans',
               ),
             ),
-            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+            bottomNavigationBarTheme: BottomNavigationBarThemeData(
               backgroundColor: AppColors.mainBackground,
               selectedItemColor: AppColors.premiumGold,
               unselectedItemColor: AppColors.white,
             ),
-            iconTheme: const IconThemeData(color: AppColors.premiumGold),
+            iconTheme: IconThemeData(color: AppColors.premiumGold),
             textTheme: ThemeData.dark().textTheme.apply(
               bodyColor: AppColors.white,
               displayColor: AppColors.white,
               fontFamily: 'DMSans',
             ),
-            progressIndicatorTheme: const ProgressIndicatorThemeData(
+            progressIndicatorTheme: ProgressIndicatorThemeData(
               color: AppColors.premiumGold,
             ),
           ),

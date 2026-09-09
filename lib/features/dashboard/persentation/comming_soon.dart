@@ -117,7 +117,7 @@ void showComingSoonDialog(
           backgroundColor: AppColors.black,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            side: const BorderSide(color: AppColors.premiumGold),
+            side: BorderSide(color: AppColors.premiumGold),
           ),
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -132,7 +132,7 @@ void showComingSoonDialog(
                     shape: BoxShape.circle,
                   ),
                   child: Center(
-                    child: const Icon(
+                    child: Icon(
                       Icons.rocket_launch_rounded,
                       size: 40,
                       color: AppColors.premiumGold,

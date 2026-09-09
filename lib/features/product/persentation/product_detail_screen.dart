@@ -421,7 +421,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                         errorBuilder: (context, error, stackTrace) {
                                           return Container(
                                             color: AppColors.premiumGold,
-                                            child: const Icon(Icons.image_not_supported, color: AppColors.premiumGold),
+                                            child: Icon(Icons.image_not_supported, color: AppColors.premiumGold),
                                           );
                                         },
                                       ),

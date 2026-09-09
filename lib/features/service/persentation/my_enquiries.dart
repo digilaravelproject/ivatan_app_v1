@@ -438,7 +438,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Seller',
                             style: TextStyle(
                               fontSize: 12,

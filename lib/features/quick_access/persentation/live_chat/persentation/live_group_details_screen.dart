@@ -234,7 +234,7 @@ class LiveGroupDetailsController extends GetxController {
               ],
               
               ListTile(
-                leading: const Icon(Icons.close_rounded, color: AppColors.premiumGold),
+                leading: Icon(Icons.close_rounded, color: AppColors.premiumGold),
                 title: Text("Cancel", style: GoogleFonts.poppins(color: AppColors.premiumGold)),
                 onTap: () => Navigator.pop(ctx),
               ),
@@ -335,7 +335,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
               ),
             ),
             if (controller.isLoading.value)
-              const Positioned(
+              Positioned(
                 top: 0,
                 left: 0,
                 right: 0,
@@ -803,7 +803,7 @@ class LiveGroupDetailsScreen extends StatelessWidget {
         child: Column(
           children: [
             ListTile(
-              leading: const Icon(Icons.chat_bubble_outline_rounded, color: AppColors.accent),
+              leading: Icon(Icons.chat_bubble_outline_rounded, color: AppColors.accent),
               title: Text(
                 "View Messages",
                 style: GoogleFonts.poppins(

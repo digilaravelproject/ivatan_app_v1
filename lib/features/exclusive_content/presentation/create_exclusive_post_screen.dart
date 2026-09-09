@@ -146,7 +146,7 @@ class _CreateExclusivePostScreenState extends State<CreateExclusivePostScreen> {
                   child: _selectedMedia == null
                       ? Column(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
+                          children: [
                             Icon(Icons.add_photo_alternate_outlined, color: AppColors.premiumGold, size: 48),
                             SizedBox(height: 8),
                             Text("Tap to select media", style: TextStyle(color: AppColors.premiumGold, fontSize: 14)),
@@ -177,7 +177,7 @@ class _CreateExclusivePostScreenState extends State<CreateExclusivePostScreen> {
                 maxLines: 5,
                 minLines: 3,
                 maxLength: 2200, // Insta style limit
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: "Write a captivating description...",
                   hintStyle: TextStyle(color: AppColors.premiumGold, fontSize: 14),
                   border: InputBorder.none,
@@ -208,11 +208,11 @@ class _CreateExclusivePostScreenState extends State<CreateExclusivePostScreen> {
                     ),
                     child: const Icon(Icons.lock, color: Colors.blue, size: 20),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text("Unlock Price", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                         SizedBox(height: 2),
                         Text("Amount followers pay to view", style: TextStyle(fontSize: 12, color: AppColors.premiumGold)),

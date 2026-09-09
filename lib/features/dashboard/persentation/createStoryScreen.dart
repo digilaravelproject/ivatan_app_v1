@@ -1348,7 +1348,7 @@ class _StoryScreenState extends State<StoryScreen> {
                                   child: Container(
                                     width: 48,
                                     height: 48,
-                                    decoration: const BoxDecoration(
+                                    decoration: BoxDecoration(
                                       color: AppColors.premiumGold,
                                       shape: BoxShape.circle,
                                     ),

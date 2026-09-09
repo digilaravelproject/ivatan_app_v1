@@ -86,7 +86,7 @@ class SellerDashboard extends StatelessWidget {
                           color: AppColors.premiumGold.withOpacity(0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.storefront, color: AppColors.premiumGold, size: 32),
+                        child: Icon(Icons.storefront, color: AppColors.premiumGold, size: 32),
                       ),
                     ],
                   ),
@@ -859,7 +859,7 @@ class SellerDashboard1 extends StatelessWidget {
                         Container(
                           width: 4,
                           height: 4,
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             color: AppColors.premiumGold,
                             shape: BoxShape.circle,
                           ),

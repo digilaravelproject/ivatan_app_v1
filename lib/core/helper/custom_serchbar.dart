@@ -40,7 +40,7 @@ class CustomSearchBar extends StatelessWidget {
                       onTap: onTap,
                       onChanged: onChanged,
                       cursorColor: AppColors.premiumGold,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Search...',
                         hintStyle: TextStyle(
                           color: AppColors.premiumGold,
@@ -54,7 +54,7 @@ class CustomSearchBar extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const Icon(
+                  Icon(
                     Icons.search,
                     color: AppColors.premiumGold,
                     size: 22,

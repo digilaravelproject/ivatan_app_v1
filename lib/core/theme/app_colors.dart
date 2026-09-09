@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import '../helper/profile_permission_manager.dart';
 
 class AppColors {
   AppColors._();
+
+  static bool get _isGoldEligible {
+    try {
+      return ProfilePermissionManager.isGoldEligible;
+    } catch (e) {
+      return false;
+    }
+  }
 
   // ================= CLIENT BRAND COLORS =================
   static const Color mainBackground = Color(0xFF050505);
@@ -12,34 +21,34 @@ class AppColors {
   static const Color secondaryText = Color(0xFFB8B8B8);
   static const Color border = Color(0xFF3A3A3A);
   
-  static const Color premiumGold = Color(0xFFC0A062); // Deeper, more authentic metallic gold
-  static const Color goldHighlight = Color(0xFFD4B776);
-  static const Color goldGlow = Color(0xFFA68748);
-  static const Color successSoftGold = Color(0xFFC0A062);
+  static Color get premiumGold => _isGoldEligible ? const Color(0xFFC0A062) : const Color(0xFFF5F5F5); 
+  static Color get goldHighlight => _isGoldEligible ? const Color(0xFFD4B776) : const Color(0xFFFFFFFF);
+  static Color get goldGlow => _isGoldEligible ? const Color(0xFFA68748) : const Color(0xFFE0E0E0);
+  static Color get successSoftGold => premiumGold;
 
   // ================= BACKWARD COMPATIBILITY & ALIASES =================
   static const Color primary = mainBackground;
   static const Color primaryDark = Color(0xFF000000);
   static const Color primaryLight = secondaryBackground;
 
-  static const Color secondary = premiumGold;
-  static const Color secondaryDark = premiumGold;
-  static const Color secondaryLight = goldHighlight;
+  static Color get secondary => premiumGold;
+  static Color get secondaryDark => premiumGold;
+  static Color get secondaryLight => goldHighlight;
 
-  static const Color accent = premiumGold;
-  static const Color accentGold = premiumGold;
+  static Color get accent => premiumGold;
+  static Color get accentGold => premiumGold;
 
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
   static const Color transparent = Color(0x00000000);
 
   // ================= SEMANTIC COLORS =================
-  static const Color success = successSoftGold;
-  static const Color warning = goldHighlight;
+  static Color get success => successSoftGold;
+  static Color get warning => goldHighlight;
   static const Color error = Color(0xFFEF4444);
   static const Color info = Color(0xFF3B82F6);
 
-  static const Color bullishGreen = successSoftGold;
+  static Color get bullishGreen => successSoftGold;
   static const Color bearishRed = Color(0xFFDC2626);
   static const Color neutralGray = secondaryText;
 
@@ -58,7 +67,7 @@ class AppColors {
   static const Color lightShadowMedium = Color(0x14000000);
   static const Color lightShadowStrong = Color(0x1F000000);
 
-  static const List<Color> lightGradientPrimary = [
+  static List<Color> get lightGradientPrimary => [
     premiumGold,
     goldHighlight,
   ];
@@ -84,7 +93,7 @@ class AppColors {
   static const Color darkShadowMedium = Color(0x1F000000);
   static const Color darkShadowStrong = Color(0x29000000);
 
-  static const List<Color> darkGradientPrimary = [
+  static List<Color> get darkGradientPrimary => [
     premiumGold,
     goldHighlight,
   ];

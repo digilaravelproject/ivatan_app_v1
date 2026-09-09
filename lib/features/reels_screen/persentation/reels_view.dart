@@ -1110,7 +1110,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                     width: 38,
                     radius: BorderRadius.circular(19),
                   )
-                : const CircleAvatar(
+                : CircleAvatar(
                     radius: 19,
                     backgroundColor: AppColors.premiumGold,
                     child: Icon(Icons.person, size: 24, color: AppColors.white),
@@ -1145,7 +1145,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                       ),
                     ),
                     if (true)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(left: 4),
                         child: Icon(
                           Icons.verified,
@@ -1173,7 +1173,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                           ),
                           child: Text(
                             isFollowing ? "Following" : "Follow",
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.premiumGold,
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -1221,7 +1221,7 @@ class ScreenOptions extends GetWidget<ShortPlayController> {
                       ),
                       child: Center(
                         child: controller.getIsLiked(item.id, item.stats.isLiked).value == true
-                            ? const Icon(
+                            ? Icon(
                                 CupertinoIcons.heart_fill,
                                 size: 24,
                                 color: AppColors.premiumGold,

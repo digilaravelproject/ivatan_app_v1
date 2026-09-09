@@ -50,7 +50,7 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
             ),
           ),
         ),
-        body: const Center(
+        body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -109,7 +109,7 @@ class _ProfilePlansScreenState extends State<ProfilePlansScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Center(
+                    Center(
                       child: Text(
                         "Choose a plan that fits your business needs.",
                         style: TextStyle(

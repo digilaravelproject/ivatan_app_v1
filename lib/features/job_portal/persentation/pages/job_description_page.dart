@@ -93,7 +93,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                   children: [
                     // _buildHeader(job),
                     _buildJobInfo(job),
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20),
                       child: Divider(color: AppColors.premiumGold),
                     ),
@@ -218,7 +218,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                   ),
                   fit: BoxFit.cover,
                   errorWidget:
-                      (context, url, error) => const Icon(
+                      (context, url, error) => Icon(
                         Icons.business,
                         size: 24,
                         color: AppColors.premiumGold,
@@ -438,7 +438,7 @@ class JobDescriptionScreen extends GetView<JobDescriptionController> {
                       ),
                       fit: BoxFit.cover,
                       errorWidget:
-                          (context, url, error) => const Icon(
+                          (context, url, error) => Icon(
                             Icons.business,
                             size: 30,
                             color: AppColors.premiumGold,

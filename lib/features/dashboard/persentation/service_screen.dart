@@ -80,7 +80,7 @@ class _DigitalProductListScreenState extends State<DigitalProductListScreen> {
             children: [
               Icon(Icons.room_service_outlined, size: 40, color: AppColors.premiumGold),
               const SizedBox(height: 8),
-              const Text('No products found', style: TextStyle(color: AppColors.premiumGold)),
+              Text('No products found', style: TextStyle(color: AppColors.premiumGold)),
             ],
           ),
         );
@@ -317,7 +317,7 @@ class _MyServicesTabView extends StatelessWidget {
             children: [
               Icon(Icons.room_service_outlined, size: 80, color: AppColors.premiumGold),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'No services yet',
                 style: TextStyle(
                   fontSize: 18,
@@ -382,7 +382,7 @@ class _MyServicesTabView extends StatelessWidget {
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Container(
                         color: AppColors.premiumGold,
-                        child: const Icon(Icons.room_service, size: 40, color: AppColors.premiumGold),
+                        child: Icon(Icons.room_service, size: 40, color: AppColors.premiumGold),
                       ),
                     ),
                   ),

@@ -139,11 +139,11 @@ class MyCreatedJobScreen extends GetView<RecruiterJobsController> {
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Container(
                         color: AppColors.premiumGold.withOpacity(0.1),
-                        child: const Icon(Icons.business, color: AppColors.premiumGold),
+                        child: Icon(Icons.business, color: AppColors.premiumGold),
                       ),
                       errorWidget: (context, url, error) => Container(
                         color: AppColors.premiumGold.withOpacity(0.1),
-                        child: const Icon(Icons.business, color: AppColors.premiumGold),
+                        child: Icon(Icons.business, color: AppColors.premiumGold),
                       ),
                     ),
                   ),

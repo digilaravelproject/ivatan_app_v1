@@ -94,7 +94,7 @@ class RegistrationScreen extends GetWidget<RegisterController> {
                   labelText: 'Mobile No',
                   enabled: controller.phoneController.text.isEmpty,
                   suffixIcon: controller.phoneController.text.isNotEmpty
-                      ? const Icon(Icons.lock, color: AppColors.premiumGold)
+                      ? Icon(Icons.lock, color: AppColors.premiumGold)
                       : null,
                 ),
                 const SizedBox(height: 20),
@@ -206,7 +206,7 @@ class RegistrationScreen extends GetWidget<RegisterController> {
                         registerController.onRegister();
                       }
                     },
-                    gradient: const LinearGradient(
+                    gradient: LinearGradient(
                       colors: [AppColors.premiumGold, AppColors.premiumGold],
                     ),
                     textColor: AppColors.black,

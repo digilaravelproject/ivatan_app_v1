@@ -301,7 +301,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   child: ClipOval(
                     child: order.buyer?.profilePhotoPath != null
                       ? Image.network((AppUrls.imageurl+order.buyer!.profilePhotoPath!), fit: BoxFit.cover)
-                      : const Icon(Icons.person, color: AppColors.premiumGold),
+                      : Icon(Icons.person, color: AppColors.premiumGold),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -344,7 +344,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     Container(
                       width: 4,
                       height: 4,
-                      decoration: const BoxDecoration(color: AppColors.premiumGold, shape: BoxShape.circle),
+                      decoration: BoxDecoration(color: AppColors.premiumGold, shape: BoxShape.circle),
                     ),
                     const SizedBox(width: 8),
                     Expanded(

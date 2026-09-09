@@ -106,15 +106,15 @@ class LiveChatInboxScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
           children: [
-            const Icon(Icons.search_rounded, color: AppColors.premiumGold, size: 20),
+            const Icon(Icons.search_rounded, color: AppColors.black, size: 20),
             const SizedBox(width: 8),
             Expanded(
               child: TextField(
                 controller: controller.searchController,
-                style: GoogleFonts.poppins(fontSize: 14, color: AppColors.white),
+                style: GoogleFonts.poppins(fontSize: 14, color: AppColors.black),
                 decoration: InputDecoration(
                   hintText: "Search chats...",
-                  hintStyle: GoogleFonts.poppins(fontSize: 14, color: AppColors.premiumGold.withOpacity(0.4)),
+                  hintStyle: GoogleFonts.poppins(fontSize: 14, color: Colors.black54),
                   border: InputBorder.none,
                   isDense: true,
                 ),
@@ -126,7 +126,7 @@ class LiveChatInboxScreen extends StatelessWidget {
                       controller.searchController.clear();
                       controller.searchQuery.value = "";
                     },
-                    child: const Icon(Icons.close_rounded, color: AppColors.premiumGold, size: 18),
+                    child: const Icon(Icons.close_rounded, color: AppColors.black, size: 18),
                   )
                 : const SizedBox.shrink()),
           ],

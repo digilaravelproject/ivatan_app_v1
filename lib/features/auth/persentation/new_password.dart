@@ -52,7 +52,7 @@ class NewPassword extends GetWidget<LoginController> {
                   keyboardType: TextInputType.text,
                   controller: controller.passwordController,
                   obscureText: true,
-                  suffixIcon: const Icon(Icons.visibility_off, color: AppColors.premiumGold)
+                  suffixIcon: Icon(Icons.visibility_off, color: AppColors.premiumGold)
               ),
               const SizedBox(height: 20),
 
@@ -61,7 +61,7 @@ class NewPassword extends GetWidget<LoginController> {
                   keyboardType: TextInputType.text,
                   controller: controller.confirmPassworController,
                   obscureText: true,
-                  suffixIcon: const Icon(Icons.visibility_off, color: AppColors.premiumGold)
+                  suffixIcon: Icon(Icons.visibility_off, color: AppColors.premiumGold)
               ),
 
               const SizedBox(height: 40),

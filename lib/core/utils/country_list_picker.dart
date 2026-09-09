@@ -7663,7 +7663,7 @@ class CountriesList extends StatelessWidget {
         valueListenable: filteredCountries,
         builder: (context, list, _) {
           if (list.isEmpty) {
-            return const Center(
+            return Center(
               child: Text(
                 "No countries found",
                 style: TextStyle(fontSize: 16, color: AppColors.premiumGold),
@@ -7694,7 +7694,7 @@ class CountriesList extends StatelessWidget {
                   ),
                   subtitle: Text(
                     "Code: ${country.code}   Dial: ${country.dialCode}",
-                    style: const TextStyle(color: AppColors.premiumGold),
+                    style: TextStyle(color: AppColors.premiumGold),
                   ),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {

@@ -139,7 +139,7 @@ class DashboardPage extends StatelessWidget {
                   )),
                   Obx(() => Text(
                     "${(homeController.uploadProgress.value * 100).toInt()}%",
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.premiumGold,
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
@@ -153,7 +153,7 @@ class DashboardPage extends StatelessWidget {
                 child: Obx(() => LinearProgressIndicator(
                   value: homeController.uploadProgress.value,
                   backgroundColor: AppColors.mainBackground,
-                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.premiumGold),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.premiumGold),
                   minHeight: 3,
                 )),
               ),

@@ -145,7 +145,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     width: double.infinity,
                     height: 200,
                     color: AppColors.premiumGold,
-                    child: const Icon(Icons.image_not_supported,
+                    child: Icon(Icons.image_not_supported,
                         color: AppColors.premiumGold),
                   );
                 },

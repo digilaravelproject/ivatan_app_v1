@@ -386,7 +386,7 @@ class _VideosScreenState extends State<VideosScreen> {
                               ),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.tune_rounded,
                               color: AppColors.premiumGold,
                               size: 22,
@@ -407,7 +407,7 @@ class _VideosScreenState extends State<VideosScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.search,
                             color: AppColors.premiumGold,
                             size: 22,

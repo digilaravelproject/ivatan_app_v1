@@ -24,7 +24,7 @@ class UserSearchScreen extends StatelessWidget {
           onTap: () {
             Navigator.pop(context);
           },
-          child: const Icon(CupertinoIcons.back, color: AppColors.premiumGold, size: 24),
+          child: Icon(CupertinoIcons.back, color: AppColors.premiumGold, size: 24),
         ),
         titleSpacing: 0,
         title: Container(

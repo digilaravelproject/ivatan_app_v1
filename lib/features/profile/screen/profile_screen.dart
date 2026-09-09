@@ -354,7 +354,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 ),
                                                 child: const Icon(
                                                   Icons.arrow_back,
-                                                  color: AppColors.premiumGold,
+                                                  color: AppColors.black,
                                                   size: 20,
                                                 ),
                                               ),
@@ -396,7 +396,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                       Icons
                                                           .shopping_cart_outlined,
                                                       color:
-                                                          AppColors.premiumGold,
+                                                          AppColors.black,
                                                       size: 22,
                                                     ),
                                                   ),
@@ -585,7 +585,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                                 Icon(
                                                                   CupertinoIcons
                                                                       .cube_box,
-                                                                  size: 20,
+                                                                                                                   size: 20,
                                                                 ),
                                                                 const SizedBox(
                                                                   width: 10,
@@ -707,6 +707,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         ),
                                                       ],
                                                     ],
+
                                                   ).then((value) async {
                                                     if (value == null) return;
                                                     if (value == 'profile') {
@@ -837,8 +838,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                       ),
                                                   child: const Icon(
                                                     Icons.more_vert,
-                                                    color:
-                                                        AppColors.premiumGold,
+                                                    color: AppColors.black,
                                                     size: 22,
                                                   ),
                                                 ),
@@ -1015,7 +1015,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                               true
                                                           ? user.occupation!
                                                           : "Digital Creator",
-                                                      style: const TextStyle(
+                                                      style: TextStyle(
                                                         color:
                                                             AppColors
                                                                 .premiumGold,
@@ -1344,7 +1344,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   ),
                                                   child: Row(
                                                     children: [
-                                                      const Icon(
+                                                      Icon(
                                                         Icons.add,
                                                         size: 14,
                                                         color:
@@ -1352,7 +1352,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                                 .premiumGold,
                                                       ),
                                                       const SizedBox(width: 6),
-                                                      const Text(
+                                                      Text(
                                                         "Create",
                                                         style: TextStyle(
                                                           fontSize: 12,
@@ -1872,7 +1872,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               shape: BoxShape.circle,
               border: Border.all(color: AppColors.border, width: 2),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.lock_outline,
               size: 50,
               color: AppColors.premiumGold,
@@ -1888,7 +1888,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             "Follow to see their posts and photos.",
             style: TextStyle(color: AppColors.premiumGold, fontSize: 14),
           ),
@@ -1977,7 +1977,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 20),
             ListTile(
-              leading: const Icon(Icons.phone, color: AppColors.premiumGold),
+              leading: Icon(Icons.phone, color: AppColors.premiumGold),
               title: const Text("Call", style: TextStyle(color: AppColors.white)),
               subtitle: Text(user.phone ?? "No phone number", style: const TextStyle(color: Colors.grey)),
               onTap: () async {
@@ -1988,7 +1988,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.email, color: AppColors.premiumGold),
+              leading: Icon(Icons.email, color: AppColors.premiumGold),
               title: const Text("Email", style: TextStyle(color: AppColors.white)),
               subtitle: Text(user.email ?? "No email address", style: const TextStyle(color: Colors.grey)),
               onTap: () async {
@@ -2904,7 +2904,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.premiumGold,
                     fontSize: 12,
                   ),
@@ -2912,7 +2912,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
             const Spacer(),
-            const Icon(
+            Icon(
               Icons.arrow_forward_ios_rounded,
               size: 16,
               color: AppColors.premiumGold,

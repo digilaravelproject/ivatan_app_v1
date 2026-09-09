@@ -827,7 +827,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                       const SizedBox(height: 4),
                                       Text(
                                         item.user?.name ?? "",
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           color: AppColors.premiumGold,
                                           fontSize: 12,
                                         ),
@@ -835,7 +835,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                       const SizedBox(height: 8),
                                       Row(
                                         children: [
-                                          const Icon(
+                                          Icon(
                                             Icons.remove_red_eye,
                                             size: 14,
                                             color: AppColors.premiumGold,
@@ -844,13 +844,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                           Text(
                                             item.stats.viewCount?.toString() ??
                                                 "0",
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 11,
                                               color: AppColors.premiumGold,
                                             ),
                                           ),
                                           const SizedBox(width: 8),
-                                          const Icon(
+                                          Icon(
                                             Icons.thumb_up_outlined,
                                             size: 14,
                                             color: AppColors.premiumGold,
@@ -859,13 +859,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                           Text(
                                             item.stats.likeCount?.toString() ??
                                                 "0",
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 11,
                                               color: AppColors.premiumGold,
                                             ),
                                           ),
                                           const SizedBox(width: 8),
-                                          const Icon(
+                                          Icon(
                                             Icons.comment,
                                             size: 14,
                                             color: AppColors.premiumGold,
@@ -875,7 +875,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                             item.stats.commentCount
                                                     ?.toString() ??
                                                 "0",
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 11,
                                               color: AppColors.premiumGold,
                                             ),

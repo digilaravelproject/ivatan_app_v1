@@ -431,7 +431,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                                 loadingProgress,
                               ) {
                                 if (loadingProgress == null) return child;
-                                return const Center(
+                                return Center(
                                   child: SizedBox(
                                     width: 12,
                                     height: 12,
@@ -586,7 +586,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                                                       color:
                                                           isMe
                                                               ? AppColors.white
-                                                              : AppColors.white,
+                                                              : AppColors.black,
                                                     ),
                                                     const SizedBox(width: 4),
                                                   ] else if (message
@@ -600,7 +600,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                                                       color:
                                                           isMe
                                                               ? AppColors.white
-                                                              : AppColors.white,
+                                                              : AppColors.black,
                                                     ),
                                                     const SizedBox(width: 4),
                                                   ],
@@ -635,7 +635,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                                                                     ? AppColors
                                                                         .white
                                                                     : AppColors
-                                                                        .white,
+                                                                        .black,
                                                             height: 1.3,
                                                           ),
                                                     ),
@@ -745,7 +745,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                                               height: 160,
                                               color: AppColors.premiumGold
                                                   .withOpacity(0.2),
-                                              child: const Center(
+                                              child: Center(
                                                 child: Icon(
                                                   Icons.broken_image_rounded,
                                                   color: AppColors.premiumGold,
@@ -898,7 +898,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                                               color:
                                                   isMe
                                                       ? AppColors.white
-                                                      : AppColors.white,
+                                                      : AppColors.black,
                                             ),
                                           ),
                                           Text(
@@ -910,7 +910,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                                               color:
                                                   isMe
                                                       ? AppColors.white
-                                                      : AppColors.premiumGold
+                                                      : AppColors.black
                                                           .withOpacity(0.6),
                                             ),
                                           ),
@@ -1019,7 +1019,7 @@ class LiveGroupChatScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.attach_file_rounded,
                         color: AppColors.premiumGold,
                         size: 22,

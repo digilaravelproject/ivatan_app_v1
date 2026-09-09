@@ -115,16 +115,16 @@ class SpotlightAllScreen extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.visibility_outlined, color: AppColors.premiumGold, size: 12),
+                                Icon(Icons.visibility_outlined, color: AppColors.premiumGold, size: 12),
                                 const SizedBox(width: 4),
-                                Text(formatNumber.format(item.viewsCount), style: const TextStyle(color: AppColors.premiumGold, fontSize: 10)),
+                                Text(formatNumber.format(item.viewsCount), style: TextStyle(color: AppColors.premiumGold, fontSize: 10)),
                               ],
                             ),
                             Row(
                               children: [
-                                const Icon(Icons.shopping_cart_outlined, color: AppColors.premiumGold, size: 12),
+                                Icon(Icons.shopping_cart_outlined, color: AppColors.premiumGold, size: 12),
                                 const SizedBox(width: 4),
-                                Text(formatNumber.format(item.purchasesCount), style: const TextStyle(color: AppColors.premiumGold, fontSize: 10)),
+                                Text(formatNumber.format(item.purchasesCount), style: TextStyle(color: AppColors.premiumGold, fontSize: 10)),
                               ],
                             ),
                           ],

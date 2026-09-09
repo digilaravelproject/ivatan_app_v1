@@ -465,62 +465,92 @@ class SettingsController extends GetxController {
   }
 
   void showAdminApprovalDialog(String profileName) {
+    final isGold = ppm.ProfilePermissionManager.isGoldEligible;
     Get.dialog(
       Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: AppColors.transparent,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: Colors.transparent,
+        elevation: 10,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF1C1C1E),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isGold
+                  ? const Color(0xFFC0A062)
+                  : const Color(0xFF38383A),
+              width: 1.2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.6),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFEF3C7),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: (isGold ? const Color(0xFFC0A062) : const Color(0xFFF59E0B)).withOpacity(0.15),
                   shape: BoxShape.circle,
+                  border: Border.all(
+                    color: (isGold ? const Color(0xFFC0A062) : const Color(0xFFF59E0B)).withOpacity(0.35),
+                    width: 1.5,
+                  ),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.hourglass_top_rounded,
-                  color: Color(0xFFD97706),
-                  size: 28,
+                  color: isGold ? const Color(0xFFC0A062) : const Color(0xFFF59E0B),
+                  size: 32,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
               const Text(
                 "Awaiting Admin Approval",
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 17,
                   fontWeight: FontWeight.bold,
                   color: AppColors.white,
                 ),
+                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               Text(
                 "Switching to $profileName does not require any subscription. Your request is currently pending review by the admin team.",
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.white,
-                  height: 1.4,
+                  color: isGold ? const Color(0xFFC0A062) : const Color(0xFFB0B0B0),
+                  height: 1.45,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
-                height: 40,
+                height: 46,
                 child: ElevatedButton(
                   onPressed: () => Get.back(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.transparent,
+                    backgroundColor: isGold ? const Color(0xFFC0A062) : AppColors.white,
+                    foregroundColor: AppColors.black,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 0,
                   ),
                   child: const Text(
                     "Okay",
-                    style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: AppColors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
                   ),
                 ),
               ),
@@ -663,6 +693,7 @@ class SettingsController extends GetxController {
       if (response != null && response["status"] == true) {
         selectedProfileType.value = profileType;
         selectedSellerType.value = sellerType;
+        await SharedPrefManager().setActiveProfileType(profileType.type);
 
         if (profileType.type == 'seller') {
           isSeller.value = true;
@@ -1276,8 +1307,15 @@ class SettingsController extends GetxController {
   Future<UserDetailsModel?> getUserDetails(String username) async {
     final response = await api.callGet(AppUrls.userProfileUrl(username), showErrorToast: false);
 
-    print("getUserDetails : "+response!.values.toString());
     if (response == null) return null;
+
+    if (response['data'] != null && response['data']['user'] != null) {
+      final userJson = response['data']['user'] as Map<String, dynamic>;
+      final currentUsername = SharedPrefManager().user?.username;
+      if (userJson['is_mine'] == true || userJson['username'] == currentUsername) {
+        await SharedPrefManager().updateUserOnly(userJson);
+      }
+    }
 
     return UserDetailsModel.fromJson(response);
   }

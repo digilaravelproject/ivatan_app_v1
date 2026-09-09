@@ -142,8 +142,12 @@ class UserModel {
       hidePhone: _toBool(data["hide_phone"]),
       countryCode: data["country_code"],
       isoCode: data["iso_code"],
-      profileType: data["profile_type"],
-      profileSubType: data["profile_sub_type"],
+      profileType: (data["active_profile"] is Map ? data["active_profile"]["type"]?.toString() : null) ??
+          data["profile_type"],
+      profileSubType: (data["active_profile"] is Map && data["active_profile"]["ecommerce_details"] is Map
+              ? data["active_profile"]["ecommerce_details"]["profile_sub_type"]?.toString()
+              : null) ??
+          data["profile_sub_type"],
 
       interests: List<Map<String, dynamic>>.from(data["interests"] ?? []),
 

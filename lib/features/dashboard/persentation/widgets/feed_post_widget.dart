@@ -65,9 +65,9 @@ class FeedPostWidget extends StatelessWidget {
                           ? Image.network(
                               post.user.avatar!, 
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => const Icon(CupertinoIcons.person, color: AppColors.premiumGold),
+                              errorBuilder: (context, error, stackTrace) => Icon(CupertinoIcons.person, color: AppColors.premiumGold),
                             )
-                          : const Icon(CupertinoIcons.person, color: AppColors.premiumGold),
+                          : Icon(CupertinoIcons.person, color: AppColors.premiumGold),
                     ),
                   ),
                 ),
@@ -118,14 +118,14 @@ class FeedPostWidget extends StatelessWidget {
                         child: Row(
                           children: [
                             if (post.type == 'video') ...[
-                               const Icon(Icons.music_note, size: 12, color: AppColors.premiumGold),
+                               Icon(Icons.music_note, size: 12, color: AppColors.premiumGold),
                                const SizedBox(width: 4),
                             ],
                             
                             Flexible(
                               child: Text(
                                 post.type == 'video' ? "Original Audio" : post.user.occupation,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
                                   color: AppColors.premiumGold,
                                 ),
@@ -296,7 +296,7 @@ class FeedPostWidget extends StatelessWidget {
                             const SizedBox(width: 6),
                             Text(
                               "${post.stats.likeCount}",
-                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.premiumGold),
+                              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.premiumGold),
                             ),
                           ],
                         ],
@@ -317,12 +317,12 @@ class FeedPostWidget extends StatelessWidget {
                       },
                       child: Row(
                         children: [
-                          const Icon(Icons.chat_bubble_outline, color: AppColors.premiumGold, size: 24),
+                          Icon(Icons.chat_bubble_outline, color: AppColors.premiumGold, size: 24),
                           if ((post.stats.commentCount ?? 0) > 0) ...[
                             const SizedBox(width: 6),
                             Text(
                               "${post.stats.commentCount}",
-                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.premiumGold),
+                              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.premiumGold),
                             ),
                           ],
                         ],
@@ -337,7 +337,7 @@ class FeedPostWidget extends StatelessWidget {
                         final link = "https://ivatan.in/post/${post.id}?type=${post.media.first.type}";
                         Share.share("Check this post 👇\n$link");
                       },
-                      child: const Icon(Icons.share, color: AppColors.premiumGold, size: 24),
+                      child: Icon(Icons.share, color: AppColors.premiumGold, size: 24),
                     ),
 
                     const Spacer(),

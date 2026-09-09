@@ -154,7 +154,7 @@ class OrderDetailScreen extends StatelessWidget {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.phone_outlined,
                     size: 14,
                     color: AppColors.premiumGold,

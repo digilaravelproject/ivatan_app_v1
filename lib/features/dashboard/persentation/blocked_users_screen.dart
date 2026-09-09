@@ -100,7 +100,7 @@ class BlockedUsersScreen extends StatelessWidget {
                               : null,
                       child:
                           user.avatar == null
-                              ? const Icon(
+                              ? Icon(
                                 CupertinoIcons.person,
                                 color: AppColors.premiumGold,
                               )

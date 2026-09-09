@@ -123,8 +123,8 @@ class CustomSearchableDropdown extends StatelessWidget {
                     style: const TextStyle(color: AppColors.white),
                       decoration: InputDecoration(
                       hintText: "Search $label...",
-                      hintStyle: const TextStyle(color: AppColors.premiumGold),
-                      prefixIcon: const Icon(Icons.search, color: AppColors.premiumGold),
+                      hintStyle: TextStyle(color: AppColors.premiumGold),
+                      prefixIcon: Icon(Icons.search, color: AppColors.premiumGold),
                       filled: true,
                       fillColor: AppColors.transparent,
                       border: OutlineInputBorder(

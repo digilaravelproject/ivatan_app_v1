@@ -522,13 +522,13 @@ class JobSearchScreen extends GetView<JobController> {
                           ? CachedNetworkImage(
                               imageUrl: AppUrls.getFullImageUrl(job.companyLogo),
                               fit: BoxFit.cover,
-                              errorWidget: (context, url, error) => const Icon(
+                              errorWidget: (context, url, error) => Icon(
                                 Icons.business,
                                 size: 24,
                                 color: AppColors.premiumGold,
                               ),
                             )
-                          : const Icon(
+                          : Icon(
                               Icons.business,
                               size: 24,
                               color: AppColors.premiumGold,

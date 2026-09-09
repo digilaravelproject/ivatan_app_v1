@@ -67,13 +67,13 @@ class MyPostScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       const Text("This account is private", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                       const SizedBox(height: 4),
-                      const Text("Follow to see their posts", style: TextStyle(color: AppColors.premiumGold)),
+                      Text("Follow to see their posts", style: TextStyle(color: AppColors.premiumGold)),
                     ],
                   ),
                 );
               }
 
-              return const Center(
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

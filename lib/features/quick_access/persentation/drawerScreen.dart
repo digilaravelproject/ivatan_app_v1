@@ -61,7 +61,7 @@ class DrawerScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 16),
-                        const Text(
+                        Text(
                           "Quick Access",
                           style: TextStyle(
                             fontSize: 20,
@@ -163,7 +163,7 @@ class DrawerScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: AppColors.black,
-                  border: const Border(
+                  border: Border(
                     top: BorderSide(color: AppColors.premiumGold),
                   ),
                 ),
@@ -392,7 +392,7 @@ class DrawerScreen extends StatelessWidget {
         return Dialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: AppColors.premiumGold),
+            side: BorderSide(color: AppColors.premiumGold),
           ),
           elevation: 2,
           backgroundColor: AppColors.black,

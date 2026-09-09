@@ -462,7 +462,7 @@ class _PlanDetailsScreenState extends State<PlanDetailsScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(3),
-          decoration: const BoxDecoration(color: AppColors.premiumGold, shape: BoxShape.circle),
+          decoration: BoxDecoration(color: AppColors.premiumGold, shape: BoxShape.circle),
           child: const Icon(Icons.check, color: AppColors.black, size: 11),
         ),
         const SizedBox(width: 10),

@@ -63,7 +63,7 @@ class ProfileLivePostsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(names[index % names.length], style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                      Text("12.5k", style: const TextStyle(fontSize: 10, color: AppColors.premiumGold)),
+                      Text("12.5k", style: TextStyle(fontSize: 10, color: AppColors.premiumGold)),
                     ],
                   );
                 },

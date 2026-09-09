@@ -186,7 +186,7 @@ class _ProfileShopScreenState extends State<ProfileShopScreen> with SingleTicker
                    Row(
                     children: [
                       const Icon(Icons.star, color: Colors.amber, size: 14),
-                      Text(" (${item['rating']})", style: const TextStyle(fontSize: 12, color: AppColors.premiumGold)),
+                      Text(" (${item['rating']})", style: TextStyle(fontSize: 12, color: AppColors.premiumGold)),
                     ],
                   ),
                    const SizedBox(height: 8),
@@ -202,7 +202,7 @@ class _ProfileShopScreenState extends State<ProfileShopScreen> with SingleTicker
                            const SizedBox(width: 6),
                            Text(
                             "${item['oldPrice']}",
-                            style: const TextStyle(
+                            style: TextStyle(
                               decoration: TextDecoration.lineThrough,
                               color: AppColors.premiumGold,
                               fontSize: 12

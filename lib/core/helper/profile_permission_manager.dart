@@ -4,6 +4,8 @@ import '../../db/shared_pref_manager.dart';
 import '../../features/dashboard/controller/homeController.dart';
 import '../../features/dashboard/model/user_profile.dart';
 import '../../features/subscription/data/model/profile_config_model.dart';
+import '../../features/exclusive_content/controller/exclusive_controller.dart';
+import '../../features/dashboard/controller/settings_controller.dart';
 
 enum ProfileType {
   personal,
@@ -37,9 +39,91 @@ class ProfilePermissionManager {
     return null;
   }
 
+  static bool get _isAuthScreen {
+    try {
+      final route = Get.currentRoute.toLowerCase();
+      if (route.isNotEmpty) {
+        if (route == '/' ||
+            route.contains('login') ||
+            route.contains('signup') ||
+            route.contains('register') ||
+            route.contains('otp') ||
+            route.contains('password') ||
+            route.contains('splash') ||
+            route.contains('interest') ||
+            route.contains('onboarding')) {
+          return true;
+        }
+      }
+    } catch (_) {}
+    return false;
+  }
+
   /// Get the current active profile name (e.g. 'personal', 'content_creation', etc.)
   static String? get currentProfileName {
-    return _config?.data?.userProfile?.currentProfileName;
+    // If not logged in, no active profile
+    if (!SharedPrefManager().isUserLogin) {
+      return null;
+    }
+
+    // 1. Direct from SettingsController userProfile if loaded (/api/v1/users/{username})
+    try {
+      SettingsController? sc;
+      final currentUsername = SharedPrefManager().user?.username;
+      if (currentUsername != null && Get.isRegistered<SettingsController>(tag: currentUsername)) {
+        sc = Get.find<SettingsController>(tag: currentUsername);
+      } else if (Get.isRegistered<SettingsController>()) {
+        sc = Get.find<SettingsController>();
+      }
+      if (sc?.userProfile.value != null) {
+        final up = sc!.userProfile.value!;
+        final pType = up.profileType?.toLowerCase().trim();
+        if (pType != null && pType.isNotEmpty) return pType;
+        if (up.isSeller == true) return 'ecommerce';
+        if (up.isEmployer == true) return 'employer';
+      }
+    } catch (_) {}
+
+    // 2. Direct active profile type from active_profile in API response / SharedPref!
+    final activeType = SharedPrefManager().activeProfileType;
+    if (activeType != null && activeType.isNotEmpty) {
+      return activeType.toLowerCase().trim();
+    }
+
+    // 3. Fallback to UserModel (available immediately upon login!)
+    final user = SharedPrefManager().user;
+    if (user != null) {
+      final pType = user.profileType?.toLowerCase().trim();
+      if (pType != null && pType.isNotEmpty) return pType;
+      if (user.isSeller == true) return 'ecommerce';
+      if (user.isEmployer == true) return 'employer';
+    }
+
+    // 4. Check active HomeController profileConfig
+    try {
+      if (Get.isRegistered<HomeController>()) {
+        final config = Get.find<HomeController>().profileConfig.value;
+        final name = config?.data?.userProfile?.currentProfileName ?? config?.data?.userProfile?.currentProfile;
+        if (name != null && name.isNotEmpty) return name.toLowerCase().trim();
+      }
+    } catch (e) {
+      debugPrint("ProfilePermissionManager: HomeController not initialized: $e");
+    }
+
+    // 5. Check cached profile config
+    final cached = SharedPrefManager().profileConfig;
+    if (cached != null) {
+      try {
+        final config = ProfileConfigModel.fromJson(cached);
+        final name = config.data?.userProfile?.currentProfileName ?? config.data?.userProfile?.currentProfile;
+        if (name != null && name.isNotEmpty) return name.toLowerCase().trim();
+      } catch (e) {
+        debugPrint("ProfilePermissionManager: Error parsing cached config: $e");
+      }
+    }
+
+    // 6. If user is logged in and not employer/seller, default profile is 'personal'
+    return 'personal';
   }
 
   /// Get the current ecommerce subtype (e.g. 'product', 'service', 'both')
@@ -48,12 +132,13 @@ class ProfilePermissionManager {
   }
 
   static bool isCurrentProfile(ProfileType type) {
-    final name = currentProfileName?.toLowerCase();
+    final name = currentProfileName?.toLowerCase().trim();
+    if (name == null || name.isEmpty) return false;
     switch (type) {
       case ProfileType.personal:
         return name == 'personal' || name == 'personal_profile';
       case ProfileType.contentCreation:
-        return name == 'content_creation' || name == 'creator';
+        return name == 'content_creation' || name == 'creator' || name == 'exclusive';
       case ProfileType.employer:
         return name == 'employer';
       case ProfileType.musicPlay:
@@ -119,7 +204,70 @@ class ProfilePermissionManager {
         break;
     }
 
-    return subscription?.isActive ?? false;
+    final bool isSubActive = subscription?.isActive == true || subscription?.hasPaidSubscription == true;
+    if (type == ProfileType.contentCreation) {
+      return isSubActive || (data.contentCreation?.isActive == true && subscription != null);
+    }
+    return isSubActive;
+  }
+
+  /// Check if exclusive content was purchased (via SharedPreferences, active controller, or backend config)
+  static bool get isExclusivePurchased {
+    try {
+      if (!SharedPrefManager().isUserLogin || _isAuthScreen) return false;
+
+      // 1. Controller check: payment status is success or status is active/approved
+      if (Get.isRegistered<ExclusiveController>()) {
+        final ec = Get.find<ExclusiveController>();
+        final isPaid = (ec.isPaymentSuccessful || ec.isFullyActive) &&
+            ec.paymentStatus.value.toLowerCase() != 'none' &&
+            ec.enablementStatus.value.toLowerCase() != 'none';
+        if (isPaid) {
+          return true;
+        }
+        // If controller is active and not paid/approved, don't fall back to stale cache
+        return false;
+      }
+
+      // 2. Profile config: Check if contentCreation has an active paid subscription
+      final data = _config?.data;
+      final sub = data?.contentCreation?.subscriptionDetails;
+      if (sub?.hasPaidSubscription == true) return true;
+      if (sub?.isActive == true && (sub?.price != null && sub?.price != 0 && sub?.price != "0")) {
+        return true;
+      }
+
+      // 3. Fallback to SharedPref only if controller has not run yet
+      return SharedPrefManager().isExclusivePurchased;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Check if golden theme should be displayed:
+  /// - Login / Registration / Auth screens: ALWAYS WHITE (false)
+  /// - Not logged in: ALWAYS WHITE (false)
+  /// - Exclusive content purchased: GOLDEN (true)
+  /// - Current active profile is Personal: GOLDEN (true)
+  /// - Otherwise (employer, ecommerce/seller, music, content creation bina purchase ke) -> WHITE (false)
+  static bool get isGoldEligible {
+    try {
+      // 1. Login, Registration, and Auth screens are ALWAYS WHITE
+      if (!SharedPrefManager().isUserLogin || _isAuthScreen) {
+        return false;
+      }
+
+      // 2. Agar exclusive content ke liye purchase kiya hai -> golden dikhega
+      if (isExclusivePurchased) return true;
+
+      // 3. Agar current profile Personal Profile hai -> golden dikhega
+      if (isCurrentProfile(ProfileType.personal)) return true;
+
+      // 4. Otherwise (employer, ecommerce/seller, music, etc.) -> white hi dikhega
+      return false;
+    } catch (e) {
+      return false;
+    }
   }
 
   /// Check if a specific profile is active AND has an active subscription

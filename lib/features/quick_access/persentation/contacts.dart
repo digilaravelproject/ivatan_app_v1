@@ -206,7 +206,7 @@ class ContactScreen extends StatelessWidget {
                                   if (contact.username != null && contact.username!.isNotEmpty)
                                     Text(
                                       contact.username!,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 14,
                                         color: AppColors.premiumGold,
                                       ),

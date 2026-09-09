@@ -524,7 +524,7 @@ class CreateProductScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: const BorderSide(color: AppColors.premiumGold),
+                      side: BorderSide(color: AppColors.premiumGold),
                     ),
                     elevation: 0,
                   ),
@@ -539,7 +539,7 @@ class CreateProductScreen extends StatelessWidget {
                         )
                       : Text(
                           product != null ? "Update Product" : "Add Product",
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.premiumGold,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

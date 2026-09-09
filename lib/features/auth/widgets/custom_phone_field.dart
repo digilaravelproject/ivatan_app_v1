@@ -44,7 +44,7 @@ class CustomPhoneField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.premiumGold, width: 2),
+          borderSide: BorderSide(color: AppColors.premiumGold, width: 2),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -121,7 +121,7 @@ class CustomPhoneField extends StatelessWidget {
                 return ListTile(
                   leading: Text(country['flag']!, style: const TextStyle(fontSize: 24)),
                   title: Text(country['name']!, style: const TextStyle(fontWeight: FontWeight.w500)),
-                  trailing: Text(country['dialCode']!, style: const TextStyle(color: AppColors.premiumGold, fontWeight: FontWeight.bold)),
+                  trailing: Text(country['dialCode']!, style: TextStyle(color: AppColors.premiumGold, fontWeight: FontWeight.bold)),
                   onTap: () {
                     countryCode.value = country['dialCode']!;
                     Navigator.pop(context);

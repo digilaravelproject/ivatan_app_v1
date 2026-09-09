@@ -156,7 +156,7 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
                   ),
                   child: imageUrl.isNotEmpty 
                       ? Image.network(imageUrl, fit: BoxFit.cover)
-                      : const Icon(Icons.image, color: AppColors.premiumGold, size: 40),
+                      : Icon(Icons.image, color: AppColors.premiumGold, size: 40),
                 ),
                 
                 // Blur & Lock Overlay if locked
@@ -180,7 +180,7 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.lock, color: AppColors.premiumGold, size: 12),
+                          Icon(Icons.lock, color: AppColors.premiumGold, size: 12),
                           const SizedBox(width: 4),
                           Text("Unlock for $price", style: const TextStyle(color: AppColors.white, fontSize: 10, fontWeight: FontWeight.w500)),
                         ],
@@ -190,13 +190,13 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
                 ],
               // Top right lock icon indicator
               if (isLocked)
-                const Positioned(
+                Positioned(
                   top: 8,
                   right: 8,
                   child: Icon(Icons.lock, color: AppColors.premiumGold, size: 18),
                 )
               else if (!widget.isOwnProfile)
-                const Positioned(
+                Positioned(
                   top: 8,
                   right: 8,
                   child: Icon(Icons.lock_open, color: AppColors.premiumGold, size: 18),
@@ -217,14 +217,14 @@ class _ExclusiveTabViewState extends State<ExclusiveTabView> {
           backgroundColor: AppColors.black,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: AppColors.premiumGold),
+            side: BorderSide(color: AppColors.premiumGold),
           ),
           title: const Text("Unlock Content", style: TextStyle(color: AppColors.white)),
           content: Text("This is exclusive content. Would you like to unlock it for $price?", style: const TextStyle(color: AppColors.white)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel", style: TextStyle(color: AppColors.premiumGold)),
+              child: Text("Cancel", style: TextStyle(color: AppColors.premiumGold)),
             ),
             ElevatedButton(
               onPressed: () async {

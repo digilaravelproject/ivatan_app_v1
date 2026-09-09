@@ -1,6 +1,7 @@
 import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import '../../../db/shared_pref_manager.dart';
 import '../data/exclusive_api_service.dart';
 import '../../payment/presentation/widgets/payment_webview_page.dart';
 
@@ -20,6 +21,16 @@ class ExclusiveController extends GetxController {
   RxInt currentTransactionPage = 1.obs;
   RxBool hasMoreTransactions = true.obs;
 
+  bool get isPaymentSuccessful {
+    final ps = paymentStatus.value.toLowerCase();
+    return ps == 'success' || ps == 'completed' || ps == 'paid' || ps == 'captured';
+  }
+
+  bool get isFullyActive {
+    final es = enablementStatus.value.toLowerCase();
+    return es == 'active' || es == 'approved';
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -31,21 +42,33 @@ class ExclusiveController extends GetxController {
     try {
       final response = await _apiService.checkEnablementStatus();
       if (response != null) {
-        // Handle case where API returns {"status": true} instead of a string
-        if (response['status'] is bool || response['status'] == null) {
-          // Fallback if backend doesn't have the string status yet
-          // But don't overwrite if we manually set it to pending/active during test
-          if (enablementStatus.value == 'not_requested') {
-            enablementStatus.value = 'not_requested';
-          }
+        final data = (response['data'] is Map<String, dynamic>)
+            ? response['data'] as Map<String, dynamic>
+            : response;
+
+        final rawStatus = data['status'] ?? (response['status'] is! bool ? response['status'] : null);
+        if (rawStatus != null) {
+          enablementStatus.value = rawStatus.toString().toLowerCase();
+        }
+
+        if (data['fee_paid'] != null) {
+          feePaid.value = double.tryParse(data['fee_paid'].toString()) ?? 0.0;
+        }
+
+        final rawPaymentStatus = data['payment_status'] ?? response['payment_status'];
+        if (rawPaymentStatus != null) {
+          paymentStatus.value = rawPaymentStatus.toString().toLowerCase();
+        }
+
+        final bool isPurchased = (isPaymentSuccessful || isFullyActive) &&
+            paymentStatus.value.toLowerCase() != 'none' &&
+            enablementStatus.value.toLowerCase() != 'none';
+
+        if (isPurchased) {
+          SharedPrefManager().setExclusivePurchased(true);
         } else {
-          enablementStatus.value = response['status'].toString();
+          SharedPrefManager().setExclusivePurchased(false);
         }
-        
-        if (response['fee_paid'] != null) {
-           feePaid.value = double.tryParse(response['fee_paid'].toString()) ?? 0.0;
-        }
-        paymentStatus.value = response['payment_status']?.toString() ?? '';
       }
     } catch (e) {
       debugPrint("Error checking enablement status: $e");
@@ -60,13 +83,18 @@ class ExclusiveController extends GetxController {
       final response = await _apiService.requestEnablement();
       
       if (response != null && (response['success'] == true || response['status'] == true)) {
-        final redirectUrl = response['redirect_url']?.toString() ?? '';
+        final data = (response['data'] is Map<String, dynamic>)
+            ? response['data'] as Map<String, dynamic>
+            : response;
+        final redirectUrl = data['redirect_url']?.toString() ?? response['redirect_url']?.toString() ?? '';
         
         if (redirectUrl.isNotEmpty) {
           // Open PhonePe Payment SDK
           final result = await Get.to<bool?>(() => PaymentWebViewPage(url: redirectUrl));
           
           if (result == true) {
+            paymentStatus.value = 'success';
+            SharedPrefManager().setExclusivePurchased(true);
             Get.snackbar(
               "Success", 
               "Payment successful! Enablement requested.",
@@ -74,6 +102,7 @@ class ExclusiveController extends GetxController {
               colorText: AppColors.white,
             );
           } else if (result == false) {
+            paymentStatus.value = 'failed';
             Get.snackbar(
               "Payment Failed", 
               "Payment failed on PhonePe. Please try again.",
@@ -81,6 +110,7 @@ class ExclusiveController extends GetxController {
               colorText: AppColors.white,
             );
           } else {
+            paymentStatus.value = 'cancelled';
             Get.snackbar(
               "Payment Cancelled", 
               "Payment was cancelled or interrupted.",
@@ -92,6 +122,8 @@ class ExclusiveController extends GetxController {
           await checkEnablementStatus();
         } else {
           // Fallback if no payment URL is provided (e.g. fee is 0)
+          paymentStatus.value = 'success';
+          SharedPrefManager().setExclusivePurchased(true);
           Get.snackbar("Success", "Enablement requested successfully.");
           await checkEnablementStatus();
         }

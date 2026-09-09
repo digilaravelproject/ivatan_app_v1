@@ -89,7 +89,7 @@ class _EnquiryFormState extends State<EnquiryForm> {
                 ),
               ),
               const SizedBox(height: 5),
-              const Center(
+              Center(
                 child: Text(
                   'Fill the details to enquire about this service',
                   style: TextStyle(
@@ -363,7 +363,7 @@ class _EnquiriesListScreenState extends State<EnquiriesListScreen> {
             // Enquiries List
             Expanded(
               child: controller.sellerEnquiries.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -779,7 +779,7 @@ class EnquiryDetailScreen extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Current Status',
                         style: TextStyle(fontSize: 12, color: AppColors.premiumGold),
                       ),

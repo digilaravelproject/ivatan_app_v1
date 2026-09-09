@@ -145,7 +145,7 @@ class MyServicesScreen extends StatelessWidget {
                 errorBuilder: (_, __, ___) => Container(
                   height: 150,
                   color: AppColors.premiumGold,
-                  child: const Icon(Icons.room_service, size: 50, color: AppColors.premiumGold),
+                  child: Icon(Icons.room_service, size: 50, color: AppColors.premiumGold),
                 ),
               ),
             ),

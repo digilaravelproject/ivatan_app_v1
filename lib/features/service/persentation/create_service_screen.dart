@@ -252,7 +252,7 @@ class _CreateServiceScreenState extends State<CreateServiceScreen> {
             color: AppColors.premiumGold.withOpacity(0.1),
           ),
           child: (controller.coverImage.value == null && !hasExistingImage)
-              ? const Column(
+              ? Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.add_photo_alternate_outlined, size: 45, color: AppColors.premiumGold),

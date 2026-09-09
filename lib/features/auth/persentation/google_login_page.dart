@@ -174,7 +174,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
-            const Text(
+            Text(
               'Aapko ek OTP verification code milega',
               style: TextStyle(fontSize: 14, color: AppColors.premiumGold),
               textAlign: TextAlign.center,
@@ -311,7 +311,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
             const SizedBox(height: 10),
             Text(
               '${widget.phoneNumber} pe bheja gaya code enter karein',
-              style: const TextStyle(fontSize: 14, color: AppColors.premiumGold),
+              style: TextStyle(fontSize: 14, color: AppColors.premiumGold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 40),

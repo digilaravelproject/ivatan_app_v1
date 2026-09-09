@@ -26,11 +26,11 @@ class _ExpandableCaptionState extends State<ExpandableCaption> {
   @override
   Widget build(BuildContext context) {
     // Base styles
-    final styleUsername = TextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.bold,
-      color: widget.textColor,
-    );
+    // final styleUsername = TextStyle(
+    //   fontSize: 14,
+    //   fontWeight: FontWeight.bold,
+    //   color: widget.textColor,
+    // );
     final styleCaption = TextStyle(
       fontSize: 12,
       color: widget.textColor,
@@ -40,7 +40,7 @@ class _ExpandableCaptionState extends State<ExpandableCaption> {
       fontSize: 14,
       color: Color(0xFF00376B), // Instagram Blue
     );
-    const styleMore = TextStyle(
+    final styleMore = TextStyle(
       fontSize: 14,
       color: AppColors.premiumGold,
     );
@@ -116,8 +116,8 @@ class _ExpandableCaptionState extends State<ExpandableCaption> {
           ),
           GestureDetector(
             onTap: () => setState(() => _isExpanded = true),
-            child: const Padding(
-              padding: EdgeInsets.only(top: 4),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4),
               child: Text(
                 "more",
                 style: styleMore,

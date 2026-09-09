@@ -1,4 +1,5 @@
 import 'package:i_vatan_app/core/theme/app_colors.dart';
+import 'package:i_vatan_app/core/helper/custom_date_picker.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -622,12 +623,11 @@ class ResumeFormScreen extends GetView<JobApplicationController> {
         const SizedBox(height: 6),
         Obx(() => InkWell(
           onTap: () async {
-            DateTime? picked = await showDatePicker(
+            DateTime? picked = await CustomDatePicker.show(
               context: context,
-              initialDate: DateTime.now(),
+              initialDate: date.value ?? DateTime.now(),
               firstDate: DateTime(1900),
               lastDate: DateTime.now(),
-              builder: (context, child) => Theme(data: ThemeData.light().copyWith(colorScheme: const ColorScheme.light(primary: AppColors.white)), child: child!),
             );
             if (picked != null) date.value = picked;
           },

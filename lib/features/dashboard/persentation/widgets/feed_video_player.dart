@@ -95,7 +95,7 @@ class _FeedVideoPlayerState extends State<FeedVideoPlayer> {
       return Container(
         color: AppColors.white,
         height: 300, // Default height to avoid layout shift
-        child: const Center(
+        child: Center(
           child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.premiumGold),
         ),
       );

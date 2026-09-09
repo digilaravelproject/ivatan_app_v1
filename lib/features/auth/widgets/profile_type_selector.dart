@@ -34,13 +34,13 @@ class ProfileTypeSelector extends StatelessWidget {
           decoration: InputDecoration(
             labelText: label,
             labelStyle: TextStyle(color: AppColors.premiumGold),
-            floatingLabelStyle: const TextStyle(
+            floatingLabelStyle: TextStyle(
               color: AppColors.premiumGold,
               fontWeight: FontWeight.w600,
             ),
             suffixIcon:
                 enabled
-                    ? const Icon(
+                    ? Icon(
                       Icons.keyboard_arrow_down_rounded,
                       color: AppColors.premiumGold,
                     )

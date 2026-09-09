@@ -1,7 +1,6 @@
 import 'package:i_vatan_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../controller/subscription_controller.dart';
 import 'profile_plans_screen.dart';
 
@@ -95,7 +94,7 @@ class ProfileTypesScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: const Color(0xFF141414),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -107,7 +106,7 @@ class ProfileTypesScreen extends StatelessWidget {
           border: Border.all(
             color: isActive 
                 ? const Color(0xFFD4AF37) 
-                : (sub.status == 'pending' ? const Color(0xFFF59E0B) : AppColors.premiumGold),
+                : (sub.status == 'pending' ? const Color(0xFFF59E0B) : const Color(0xFF2A2A2A)),
             width: hasSubscription ? 1.5 : 1,
           ),
         ),
@@ -117,11 +116,15 @@ class ProfileTypesScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: (hasSubscription ? const Color(0xFFD4AF37) : Colors.white).withOpacity(0.12),
                 borderRadius: BorderRadius.circular(8),
                 border: hasSubscription ? Border.all(color: const Color(0xFFD4AF37), width: 1) : null,
               ),
-              child: Icon(sub.icon, color: AppColors.white, size: 18),
+              child: Icon(
+                sub.icon, 
+                color: hasSubscription ? const Color(0xFFD4AF37) : AppColors.white, 
+                size: 18,
+              ),
             ),
             const SizedBox(width: 10),
             
@@ -143,7 +146,7 @@ class ProfileTypesScreen extends StatelessWidget {
                     "${sub.plansCount} Plans",
                     style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.premiumGold,
+                      color: AppColors.secondaryText,
                     ),
                   ),
                 ],
@@ -158,7 +161,7 @@ class ProfileTypesScreen extends StatelessWidget {
                 const SizedBox(width: 4),
                 Icon(
                   Icons.arrow_forward_ios_rounded,
-                  color: AppColors.premiumGold,
+                  color: AppColors.secondaryText,
                   size: 11,
                 ),
               ],
@@ -175,16 +178,16 @@ class ProfileTypesScreen extends StatelessWidget {
     String text;
 
     if (status == 'active') {
-      bgColor = AppColors.white;
-      textColor = AppColors.white;
+      bgColor = const Color(0xFF10B981).withOpacity(0.15);
+      textColor = const Color(0xFF34D399);
       text = "Subscribed & Approved";
     } else if (status == 'pending') {
       bgColor = const Color(0xFFFEF3C7);
       textColor = const Color(0xFFD97706);
       text = "Subscribed\nPending Approval";
     } else {
-      bgColor = AppColors.premiumGold;
-      textColor = AppColors.premiumGold;
+      bgColor = const Color(0xFF2A2A2A);
+      textColor = Colors.grey.shade400;
       text = "No Subscription";
     }
 

@@ -91,7 +91,7 @@ class SettingsScreen extends StatelessWidget {
                       color: AppColors.premiumGold.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.lock_outline_rounded,
                       color: AppColors.premiumGold,
                     ),
@@ -358,7 +358,7 @@ class SettingsScreen extends StatelessWidget {
                             profileController.updateProfile();
                           },
                           textColor: AppColors.black,
-                          gradient: const LinearGradient(
+                          gradient: LinearGradient(
                             colors: [
                               AppColors.premiumGold,
                               AppColors.premiumGold,

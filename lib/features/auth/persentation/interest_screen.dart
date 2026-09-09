@@ -337,7 +337,7 @@ class _InterestScreenState extends State<InterestScreen> with SingleTickerProvid
           mainAxisSize: MainAxisSize.min,
           children: [
             if (isSelected) ...[
-              const Icon(Icons.check, color: AppColors.premiumGold, size: 16),
+              Icon(Icons.check, color: AppColors.premiumGold, size: 16),
               const SizedBox(width: 8),
             ],
             Text(

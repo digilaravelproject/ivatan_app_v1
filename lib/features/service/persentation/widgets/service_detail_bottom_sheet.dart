@@ -138,7 +138,7 @@ Widget _buildServiceDetailContent(BuildContext context, ServiceModel service) {
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     color: AppColors.premiumGold,
-                    child: const Center(
+                    child: Center(
                       child: Icon(Icons.image_not_supported, size: 80, color: AppColors.premiumGold),
                     ),
                   );
@@ -273,7 +273,7 @@ Widget _buildServiceDetailContent(BuildContext context, ServiceModel service) {
                     children: [
                       Text(
                         '₹${service.discountPrice ?? service.price}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: AppColors.premiumGold,

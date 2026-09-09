@@ -1293,7 +1293,7 @@ class VideoGridSection extends StatelessWidget {
             children: [
               Text(
                 "\$${order.totalAmount}",
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: AppColors.premiumGold,
                 ),

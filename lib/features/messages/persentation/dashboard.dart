@@ -1037,7 +1037,7 @@ class LoopHomeScreen extends StatelessWidget {
                           ),
                       ],
                     ),
-                    const Text(
+                    Text(
                       '🎵 Imam Malboo • Neha Nair, Kinanu Kondu',
                       style: TextStyle(fontSize: 11, color: AppColors.premiumGold),
                     ),
@@ -1142,10 +1142,10 @@ class LoopHomeScreen extends StatelessWidget {
             children: [
               Text(
                 time,
-                style: const TextStyle(fontSize: 12, color: AppColors.premiumGold),
+                style: TextStyle(fontSize: 12, color: AppColors.premiumGold),
               ),
               const SizedBox(height: 4),
-              const Text(
+              Text(
                 '@vibeteller, @mooddreamlms and others liked this post!',
                 style: TextStyle(fontSize: 12, color: AppColors.premiumGold),
               ),
@@ -1487,7 +1487,7 @@ class DatingLoginScreen extends StatelessWidget {
                         const SizedBox(height: 12),
 
                         // Subtitle
-                        const Text(
+                        Text(
                           'Enter your mobile number and start connecting with amazing date!',
                           style: TextStyle(
                             fontSize: 15,
@@ -1499,7 +1499,7 @@ class DatingLoginScreen extends StatelessWidget {
                         const SizedBox(height: 32),
 
                         // Mobile Number Label
-                        const Text(
+                        Text(
                           'MOBILE NUMBER',
                           style: TextStyle(
                             fontSize: 13,
@@ -1521,9 +1521,9 @@ class DatingLoginScreen extends StatelessWidget {
                             children: [
                               // Country Code Selector
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                                 child: Row(
-                                  children: const [
+                                  children: [
                                     Text('🇮🇳', style: TextStyle(fontSize: 24)),
                                     SizedBox(width: 8),
                                     Text(
@@ -1661,7 +1661,7 @@ class DatingLoginScreen extends StatelessWidget {
                           child: RichText(
                             textAlign: TextAlign.center,
                             text: TextSpan(
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 color: AppColors.premiumGold,
                               ),

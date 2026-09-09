@@ -19,7 +19,7 @@ class CustomDialog {
       Dialog(
         backgroundColor: AppColors.black,
         shape: RoundedRectangleBorder(
-          side: const BorderSide(color: AppColors.premiumGold),
+          side: BorderSide(color: AppColors.premiumGold),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(
@@ -131,7 +131,7 @@ class CustomDialog {
       Dialog(
         backgroundColor: AppColors.black,
         shape: RoundedRectangleBorder(
-          side: const BorderSide(color: AppColors.premiumGold),
+          side: BorderSide(color: AppColors.premiumGold),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(
@@ -145,7 +145,7 @@ class CustomDialog {
                   color: AppColors.success.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.check_circle_outline,
                   size: 50,
                   color: AppColors.success,
@@ -214,7 +214,7 @@ class CustomDialog {
       Dialog(
         backgroundColor: AppColors.black,
         shape: RoundedRectangleBorder(
-          side: const BorderSide(color: AppColors.premiumGold),
+          side: BorderSide(color: AppColors.premiumGold),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(
@@ -297,7 +297,7 @@ class CustomDialog {
       Dialog(
         backgroundColor: AppColors.black,
         shape: RoundedRectangleBorder(
-          side: const BorderSide(color: AppColors.premiumGold),
+          side: BorderSide(color: AppColors.premiumGold),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(
@@ -375,7 +375,7 @@ class CustomDialog {
       Dialog(
         backgroundColor: AppColors.black,
         shape: RoundedRectangleBorder(
-          side: const BorderSide(color: AppColors.premiumGold),
+          side: BorderSide(color: AppColors.premiumGold),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(
@@ -383,7 +383,7 @@ class CustomDialog {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const CircularProgressIndicator(
+              CircularProgressIndicator(
                 color: AppColors.premiumGold,
                 strokeWidth: 3,
               ),

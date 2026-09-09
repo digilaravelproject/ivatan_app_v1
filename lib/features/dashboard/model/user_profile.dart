@@ -236,8 +236,12 @@ class UserData {
       chat_id: json["chat_id"],
       contactVisibility: json["contact_visibility"] ?? 'both',
       pageCategory: json["page_category"],
-      profileType: json["profile_type"],
-      profileSubType: json["profile_sub_type"],
+      profileType: (json["active_profile"] is Map ? json["active_profile"]["type"]?.toString() : null) ??
+          json["profile_type"],
+      profileSubType: (json["active_profile"] is Map && json["active_profile"]["ecommerce_details"] is Map
+              ? json["active_profile"]["ecommerce_details"]["profile_sub_type"]?.toString()
+              : null) ??
+          json["profile_sub_type"],
     );
   }
 

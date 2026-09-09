@@ -159,7 +159,7 @@ class SellerOrderDetailScreen extends StatelessWidget {
                       child: ClipOval(
                         child: order.buyer!.profilePhotoPath != null
                           ? Image.network(AppUrls.getFullImageUrl(order.buyer!.profilePhotoPath!), fit: BoxFit.cover)
-                          : const Icon(Icons.person, color: AppColors.premiumGold),
+                          : Icon(Icons.person, color: AppColors.premiumGold),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -175,7 +175,7 @@ class SellerOrderDetailScreen extends StatelessWidget {
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                const Icon(Icons.phone_outlined, size: 14, color: AppColors.premiumGold),
+                                Icon(Icons.phone_outlined, size: 14, color: AppColors.premiumGold),
                                 const SizedBox(width: 4),
                                 Text(
                                   order.buyer!.phone!,
@@ -188,7 +188,7 @@ class SellerOrderDetailScreen extends StatelessWidget {
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                const Icon(Icons.email_outlined, size: 14, color: AppColors.premiumGold),
+                                Icon(Icons.email_outlined, size: 14, color: AppColors.premiumGold),
                                 const SizedBox(width: 4),
                                 Text(
                                   order.buyer!.email!,
@@ -207,7 +207,7 @@ class SellerOrderDetailScreen extends StatelessWidget {
                 const SizedBox(height: 16),
               ],
               if (order.address != null) ...[
-                const Text(
+                Text(
                   "Shipping Address",
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.premiumGold),
                 ),
@@ -229,7 +229,7 @@ class SellerOrderDetailScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.phone_outlined, size: 14, color: AppColors.premiumGold),
+                      Icon(Icons.phone_outlined, size: 14, color: AppColors.premiumGold),
                       const SizedBox(width: 4),
                       Text(
                         order.address!.phone!,
@@ -293,9 +293,9 @@ class SellerOrderDetailScreen extends StatelessWidget {
                   ? Image.network(
                       AppUrls.getFullImageUrl(item.image),
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, color: AppColors.premiumGold),
+                      errorBuilder: (_, __, ___) => Icon(Icons.broken_image, color: AppColors.premiumGold),
                     )
-                  : const Icon(Icons.shopping_bag_outlined, color: AppColors.premiumGold),
+                  : Icon(Icons.shopping_bag_outlined, color: AppColors.premiumGold),
             ),
           ),
           const SizedBox(width: 12),

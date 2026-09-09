@@ -307,7 +307,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                         width: 80,
                         height: 80,
                         color: AppColors.premiumGold,
-                        child: const Icon(Icons.image_not_supported, color: AppColors.premiumGold),
+                        child: Icon(Icons.image_not_supported, color: AppColors.premiumGold),
                       );
                     },
                   ),
