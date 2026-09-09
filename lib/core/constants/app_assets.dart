@@ -28,4 +28,5 @@ class AppAssets {
   static const String icCategory = "assets/images/category.png";
   static const String icVideo = "assets/images/video.png";
   static const String icProduct = "assets/images/product.png";
+  static const String imgStoryBackground = "assets/images/storyBackground.png";
 }

@@ -12,6 +12,8 @@ class AppColors {
     }
   }
 
+  static bool get isGoldEligible => _isGoldEligible;
+
   // ================= CLIENT BRAND COLORS =================
   static const Color mainBackground = Color(0xFF050505);
   static const Color secondaryBackground = Color(0xFF111111);

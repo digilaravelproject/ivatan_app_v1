@@ -55,13 +55,13 @@ class ProfileDrawer extends StatelessWidget {
                                         ? Image.network(
                                             AppUrls.getFullImageUrl(SharedPrefManager().user!.profilePhotoPath!.toString()),
                                             fit: BoxFit.cover,
-                                            errorBuilder: (context, error, stackTrace) => const Icon(
+                                            errorBuilder: (context, error, stackTrace) => Icon(
                                               Icons.person,
                                               color: AppColors.premiumGold,
                                               size: 24,
                                             ),
                                           )
-                                        : const Icon(
+                                        :  Icon(
                                             Icons.person,
                                             color: AppColors.premiumGold,
                                             size: 24,
