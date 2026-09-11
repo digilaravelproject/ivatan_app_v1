@@ -463,7 +463,8 @@ class StoryController extends GetxController {
               },
             ),
 
-            // Highlight
+            // Highlight (Commented Out)
+            /*
             ListTile(
               //     leading: const Icon(Icons.star, color: AppColors.white),
               title: const Text(
@@ -479,6 +480,7 @@ class StoryController extends GetxController {
                 // Get.back();
               },
             ),
+            */
           ],
         ),
       ),

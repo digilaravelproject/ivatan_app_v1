@@ -1450,6 +1450,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             ],
                                           ),
                                         ],
+                                        // ============= HIGHLIGHTS SECTION (Commented Out) =============
+                                        /*
                                         Obx(() {
                                           final bool isCurrentlyOtherHighlight =
                                               finalUserName !=
@@ -1628,6 +1630,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             ],
                                           );
                                         }),
+                                        */
                                       ],
                                     ),
                                   ),

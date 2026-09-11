@@ -93,7 +93,6 @@ class HomePage extends StatelessWidget {
                       Obx(
                         () {
                           final _ = controller.currentUser.value;
-                          final isGold = AppColors.isGoldEligible;
                           return SliverAppBar(
                             floating: true,
                             snap: true,
@@ -102,14 +101,6 @@ class HomePage extends StatelessWidget {
                             elevation: 0,
                             automaticallyImplyLeading: false,
                             toolbarHeight: 60,
-                            flexibleSpace: isGold
-                                ? FlexibleSpaceBar(
-                                    background: Image.asset(
-                                      AppAssets.imgStoryBackground,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
-                                : null,
                             titleSpacing: 0,
                           title: Row(
                             mainAxisSize: MainAxisSize.min,
