@@ -66,6 +66,9 @@ class ProfilePermissionManager {
       return null;
     }
 
+    final activeType = SharedPrefManager().activeProfileType?.toLowerCase().trim();
+    final regType = SharedPrefManager().registeredProfileType?.toLowerCase().trim();
+
     // 1. Direct from SettingsController userProfile if loaded (/api/v1/users/{username})
     try {
       SettingsController? sc;
@@ -77,24 +80,30 @@ class ProfilePermissionManager {
       }
       if (sc?.userProfile.value != null) {
         final up = sc!.userProfile.value!;
-        final pType = up.profileType?.toLowerCase().trim();
-        if (pType != null && pType.isNotEmpty) return pType;
-        if (up.isSeller == true) return 'ecommerce';
-        if (up.isEmployer == true) return 'employer';
+        final pType = (up.activeProfile is Map ? up.activeProfile!["type"]?.toString() : null) ?? up.profileType;
+        if (pType != null && pType.isNotEmpty) {
+          return pType.toLowerCase().trim();
+        }
       }
     } catch (_) {}
 
     // 2. Direct active profile type from active_profile in API response / SharedPref!
-    final activeType = SharedPrefManager().activeProfileType;
     if (activeType != null && activeType.isNotEmpty) {
-      return activeType.toLowerCase().trim();
+      return activeType;
     }
 
-    // 3. Fallback to UserModel (available immediately upon login!)
+    // 3. Fallback to registered profile type if active profile is not yet loaded
+    if (regType != null && regType.isNotEmpty) {
+      return regType;
+    }
+
+    // 4. Fallback to UserModel
     final user = SharedPrefManager().user;
     if (user != null) {
-      final pType = user.profileType?.toLowerCase().trim();
-      if (pType != null && pType.isNotEmpty) return pType;
+      final pType = (user.activeProfile is Map ? user.activeProfile!["type"]?.toString() : null) ?? user.profileType;
+      if (pType != null && pType.isNotEmpty) return pType.toLowerCase().trim();
+      final nonPersonal = user.nonPersonalProfileType;
+      if (nonPersonal != null && nonPersonal.isNotEmpty) return nonPersonal;
       if (user.isSeller == true) return 'ecommerce';
       if (user.isEmployer == true) return 'employer';
     }
@@ -122,12 +131,18 @@ class ProfilePermissionManager {
       }
     }
 
-    // 6. If user is logged in and not employer/seller, default profile is 'personal'
+    if (activeType != null && activeType.isNotEmpty) {
+      return activeType;
+    }
+
+    // 6. Default profile is 'personal'
     return 'personal';
   }
 
   /// Get the current ecommerce subtype (e.g. 'product', 'service', 'both')
   static String? get ecommerceSubType {
+    final cachedSub = SharedPrefManager().registeredProfileSubType;
+    if (cachedSub != null && cachedSub.isNotEmpty) return cachedSub;
     return _config?.data?.ecommerce?.type;
   }
 
@@ -211,18 +226,17 @@ class ProfilePermissionManager {
     return isSubActive;
   }
 
-  /// Check if exclusive content was purchased (via SharedPreferences, active controller, or backend config)
+  /// Check if exclusive content was purchased or approved by admin
   static bool get isExclusivePurchased {
     try {
       if (!SharedPrefManager().isUserLogin || _isAuthScreen) return false;
 
-      // 1. Controller check: payment status is success or status is active/approved
+      // 1. Controller check: status is active/approved by admin OR payment status is success
       if (Get.isRegistered<ExclusiveController>()) {
         final ec = Get.find<ExclusiveController>();
-        final isPaid = (ec.isPaymentSuccessful || ec.isFullyActive) &&
-            ec.paymentStatus.value.toLowerCase() != 'none' &&
-            ec.enablementStatus.value.toLowerCase() != 'none';
-        if (isPaid) {
+        final isApprovedByAdmin = ec.isFullyActive && ec.enablementStatus.value.toLowerCase() != 'none';
+        final isPaid = ec.isPaymentSuccessful && ec.paymentStatus.value.toLowerCase() != 'none';
+        if (isApprovedByAdmin || isPaid) {
           return true;
         }
         // If controller is active and not paid/approved, don't fall back to stale cache
@@ -244,12 +258,122 @@ class ProfilePermissionManager {
     }
   }
 
+  /// Check if the currently active profile is Personal Profile AND has valid non-null subscription gateway IDs:
+  /// - gateway_subscription_id
+  /// - gateway_order_id
+  /// - gateway_payment_id
+  static bool get isActiveProfilePersonalWithGatewayIds {
+    bool isValid(String? val) =>
+        val != null &&
+        val.toString().trim().isNotEmpty &&
+        val.toString().trim().toLowerCase() != 'null' &&
+        val.toString().trim().toLowerCase() != 'undefined';
+
+    // 1. SettingsController userProfile
+    try {
+      SettingsController? sc;
+      final currentUsername = SharedPrefManager().user?.username;
+      if (currentUsername != null && Get.isRegistered<SettingsController>(tag: currentUsername)) {
+        sc = Get.find<SettingsController>(tag: currentUsername);
+      } else if (Get.isRegistered<SettingsController>()) {
+        sc = Get.find<SettingsController>();
+      }
+      if (sc?.userProfile.value != null) {
+        final up = sc!.userProfile.value!;
+        if (up.isActiveProfilePersonal && up.hasValidPersonalSubscription) {
+          return true;
+        }
+        if (up.activeProfile != null) {
+          final t = up.activeProfile!["type"]?.toString().toLowerCase().trim();
+          if (t != null && t.isNotEmpty && t != 'personal' && t != 'personal_profile') {
+            return false;
+          }
+        }
+      }
+    } catch (_) {}
+
+    // 2. HomeController currentUser
+    try {
+      if (Get.isRegistered<HomeController>()) {
+        final cu = Get.find<HomeController>().currentUser.value;
+        if (cu != null) {
+          if (cu.isActiveProfilePersonal && cu.hasValidPersonalSubscription) {
+            return true;
+          }
+          if (cu.activeProfile != null) {
+            final t = cu.activeProfile!["type"]?.toString().toLowerCase().trim();
+            if (t != null && t.isNotEmpty && t != 'personal' && t != 'personal_profile') {
+              return false;
+            }
+          }
+        }
+      }
+    } catch (_) {}
+
+    // 3. UserModel
+    final user = SharedPrefManager().user;
+    if (user != null) {
+      if (user.isActiveProfilePersonal && user.hasValidPersonalSubscription) {
+        return true;
+      }
+      if (user.activeProfile != null) {
+        final t = user.activeProfile!["type"]?.toString().toLowerCase().trim();
+        if (t != null && t.isNotEmpty && t != 'personal' && t != 'personal_profile') {
+          return false;
+        }
+      }
+    }
+
+    // 4. Check rawUserData directly
+    final raw = SharedPrefManager().rawUserData;
+    if (raw != null) {
+      Map<String, dynamic> u = raw;
+      if (u["user"] is Map) {
+        u = u["user"] as Map<String, dynamic>;
+      } else if (u["data"] is Map && (u["data"] as Map)["user"] is Map) {
+        u = (u["data"] as Map)["user"] as Map<String, dynamic>;
+      }
+
+      if (u["active_profile"] is Map) {
+        final ap = u["active_profile"] as Map<String, dynamic>;
+        final t = ap["type"]?.toString().toLowerCase().trim();
+        if (t == 'personal' || t == 'personal_profile') {
+          Map<String, dynamic>? subMap;
+          if (ap["active_subscription"] is Map) {
+            subMap = ap["active_subscription"] as Map<String, dynamic>;
+          }
+          final subId = (subMap?["gateway_subscription_id"] ?? ap["gateway_subscription_id"])?.toString();
+          final orderId = (subMap?["gateway_order_id"] ?? ap["gateway_order_id"])?.toString();
+          final paymentId = (subMap?["gateway_payment_id"] ?? ap["gateway_payment_id"])?.toString();
+
+          if (isValid(subId) && isValid(orderId) && isValid(paymentId)) {
+            return true;
+          }
+        } else if (t != null && t.isNotEmpty) {
+          return false;
+        }
+      }
+    }
+
+    // 5. Check SharedPrefManager cached gateway IDs if active profile is personal
+    final activeType = SharedPrefManager().activeProfileType?.toLowerCase().trim();
+    final isPersonal = activeType == null || activeType.isEmpty || activeType == 'personal' || activeType == 'personal_profile';
+    if (isPersonal && SharedPrefManager().hasPersonalSubscriptionGatewayIds) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /// Alias for backward compatibility
+  static bool get hasPersonalSubscriptionGatewayIds => isActiveProfilePersonalWithGatewayIds;
+
   /// Check if golden theme should be displayed:
   /// - Login / Registration / Auth screens: ALWAYS WHITE (false)
   /// - Not logged in: ALWAYS WHITE (false)
-  /// - Exclusive content purchased: GOLDEN (true)
-  /// - Current active profile is Personal: GOLDEN (true)
-  /// - Otherwise (employer, ecommerce/seller, music, content creation bina purchase ke) -> WHITE (false)
+  /// - Exclusive content approved by admin (or paid): GOLDEN (true) (regardless of profile)
+  /// - active_profile is Personal AND all 3 gateway IDs (gateway_subscription_id, gateway_order_id, gateway_payment_id) are non-null: GOLDEN (true)
+  /// - Otherwise (null gateway IDs, employer, ecommerce/seller, music, etc.) -> WHITE (false)
   static bool get isGoldEligible {
     try {
       // 1. Login, Registration, and Auth screens are ALWAYS WHITE
@@ -257,13 +381,17 @@ class ProfilePermissionManager {
         return false;
       }
 
-      // 2. Agar exclusive content ke liye purchase kiya hai -> golden dikhega
+      // 2. Agar exclusive ke lia approve hai admin se tbhi bhi golden rhega tab to chahe jo profile rhe
       if (isExclusivePurchased) return true;
 
-      // 3. Agar current profile Personal Profile hai -> golden dikhega
-      if (isCurrentProfile(ProfileType.personal)) return true;
+      // 3. active profiles ke andar se check karna hai:
+      // jo profile current time me active hai agar o personal hai aur usme ye
+      // gateway_subscription_id, gateway_order_id, gateway_payment_id id ka data aa rha hai tab golden dikhana hai
+      if (isActiveProfilePersonalWithGatewayIds) {
+        return true;
+      }
 
-      // 4. Otherwise (employer, ecommerce/seller, music, etc.) -> white hi dikhega
+      // 4. Otherwise (null gateway IDs, employer, ecommerce/seller, music, etc.) -> white hi rhega
       return false;
     } catch (e) {
       return false;

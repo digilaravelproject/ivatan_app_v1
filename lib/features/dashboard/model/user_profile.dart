@@ -144,6 +144,11 @@ class UserData {
   String? pageCategory;
   String? profileType;
   String? profileSubType;
+  String? gatewaySubscriptionId;
+  String? gatewayOrderId;
+  String? gatewayPaymentId;
+  Map<String, dynamic>? activeProfile;
+  List<dynamic>? profiles;
 
   UserData({
     this.id,
@@ -189,9 +194,83 @@ class UserData {
     this.pageCategory,
     this.profileType,
     this.profileSubType,
+    this.gatewaySubscriptionId,
+    this.gatewayOrderId,
+    this.gatewayPaymentId,
+    this.activeProfile,
+    this.profiles,
   });
 
+  bool get isActiveProfilePersonal {
+    if (activeProfile != null) {
+      final t = activeProfile!["type"]?.toString().toLowerCase().trim();
+      if (t != null && t.isNotEmpty) {
+        return t == 'personal' || t == 'personal_profile';
+      }
+    }
+    final t = profileType?.toLowerCase().trim();
+    return t == 'personal' || t == 'personal_profile';
+  }
+
+  bool get hasValidPersonalSubscription {
+    bool isValid(String? val) =>
+        val != null &&
+        val.trim().isNotEmpty &&
+        val.trim().toLowerCase() != 'null' &&
+        val.trim().toLowerCase() != 'undefined';
+
+    return isValid(gatewaySubscriptionId) &&
+        isValid(gatewayOrderId) &&
+        isValid(gatewayPaymentId);
+  }
+
+  /// Extracts any non-personal profile type (e.g. employer, seller, creator, music) from profiles list
+  String? get nonPersonalProfileType {
+    if (profiles != null && profiles!.isNotEmpty) {
+      for (final p in profiles!) {
+        if (p is Map) {
+          final t = p['type']?.toString().toLowerCase().trim();
+          if (t != null && t.isNotEmpty && t != 'personal' && t != 'personal_profile') {
+            return t;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   factory UserData.fromJson(Map<String, dynamic> json) {
+    Map<String, dynamic>? activeProfileMap;
+    if (json["active_profile"] is Map) {
+      activeProfileMap = json["active_profile"] as Map<String, dynamic>;
+    }
+
+    List<dynamic>? profilesList;
+    if (json["profiles"] is List) {
+      profilesList = json["profiles"] as List<dynamic>;
+    }
+
+    Map<String, dynamic>? subMap;
+    if (activeProfileMap != null && activeProfileMap["active_subscription"] is Map) {
+      subMap = activeProfileMap["active_subscription"] as Map<String, dynamic>;
+    }
+    if (subMap == null && profilesList != null) {
+      for (final p in profilesList) {
+        if (p is Map) {
+          final pType = p['type']?.toString().toLowerCase().trim();
+          if (pType == 'personal' || pType == 'personal_profile') {
+            if (p['active_subscription'] is Map) {
+              subMap = p['active_subscription'] as Map<String, dynamic>;
+              break;
+            }
+          }
+        }
+      }
+    }
+    if (subMap == null && json["active_subscription"] is Map) {
+      subMap = json["active_subscription"] as Map<String, dynamic>;
+    }
+
     return UserData(
       id: json["id"],
       uuid: json["uuid"],
@@ -242,6 +321,11 @@ class UserData {
               ? json["active_profile"]["ecommerce_details"]["profile_sub_type"]?.toString()
               : null) ??
           json["profile_sub_type"],
+      gatewaySubscriptionId: (subMap?["gateway_subscription_id"] ?? activeProfileMap?["gateway_subscription_id"])?.toString(),
+      gatewayOrderId: (subMap?["gateway_order_id"] ?? activeProfileMap?["gateway_order_id"])?.toString(),
+      gatewayPaymentId: (subMap?["gateway_payment_id"] ?? activeProfileMap?["gateway_payment_id"])?.toString(),
+      activeProfile: activeProfileMap,
+      profiles: profilesList,
     );
   }
 
@@ -290,6 +374,11 @@ class UserData {
       "page_category": pageCategory,
       "profile_type": profileType,
       "profile_sub_type": profileSubType,
+      "gateway_subscription_id": gatewaySubscriptionId,
+      "gateway_order_id": gatewayOrderId,
+      "gateway_payment_id": gatewayPaymentId,
+      "active_profile": activeProfile,
+      "profiles": profiles,
     };
   }
 }

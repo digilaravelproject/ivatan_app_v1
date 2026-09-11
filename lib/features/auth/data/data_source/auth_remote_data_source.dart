@@ -101,6 +101,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     // Save user session
     final userModel = UserModel.fromJson(response['data']);
     final pref = SharedPrefManager();
+    if (req.profileType != null && req.profileType!.isNotEmpty) {
+      await pref.setRegisteredProfileType(req.profileType);
+      await pref.setActiveProfileType(req.profileType);
+      if (req.profileSubType != null && req.profileSubType!.isNotEmpty) {
+        await pref.setRegisteredProfileSubType(req.profileSubType);
+      }
+    }
     await pref.saveUserData(userModel.toJson());
     
     return userModel;

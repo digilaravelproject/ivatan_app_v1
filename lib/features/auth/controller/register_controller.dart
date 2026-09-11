@@ -431,6 +431,14 @@ class RegisterController extends GetxController {
       final modal = await dataSource.makeUserRegister(req);
       final msg = "Registration successful! Welcome ${modal.name}";
 
+      if (apiProfileType != null && apiProfileType.isNotEmpty) {
+        await SharedPrefManager().setRegisteredProfileType(apiProfileType);
+        await SharedPrefManager().setActiveProfileType(apiProfileType);
+        if (apiProfileSubType != null && apiProfileSubType.isNotEmpty) {
+          await SharedPrefManager().setRegisteredProfileSubType(apiProfileSubType);
+        }
+      }
+
       try {
         Get.find<NotificationController>().initNotification();
       } catch (e) {

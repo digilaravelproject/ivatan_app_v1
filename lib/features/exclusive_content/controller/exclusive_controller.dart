@@ -60,9 +60,9 @@ class ExclusiveController extends GetxController {
           paymentStatus.value = rawPaymentStatus.toString().toLowerCase();
         }
 
-        final bool isPurchased = (isPaymentSuccessful || isFullyActive) &&
-            paymentStatus.value.toLowerCase() != 'none' &&
-            enablementStatus.value.toLowerCase() != 'none';
+        final bool isApprovedByAdmin = isFullyActive && enablementStatus.value.toLowerCase() != 'none';
+        final bool isPaid = isPaymentSuccessful && paymentStatus.value.toLowerCase() != 'none';
+        final bool isPurchased = isApprovedByAdmin || isPaid;
 
         if (isPurchased) {
           SharedPrefManager().setExclusivePurchased(true);

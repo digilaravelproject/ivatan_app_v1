@@ -641,8 +641,20 @@ class SettingsController extends GetxController {
   void _matchProfileType() {
     String? userProfileType = ppm.ProfilePermissionManager.currentProfileName?.toLowerCase();
     
-    if (userProfileType == null || userProfileType.isEmpty) {
-      userProfileType = userProfile.value?.profileType?.toLowerCase();
+    if (userProfileType == null || userProfileType.isEmpty || userProfileType == 'personal') {
+      final activeType = SharedPrefManager().activeProfileType?.toLowerCase();
+      final regType = SharedPrefManager().registeredProfileType?.toLowerCase();
+      final nonPersonal = userProfile.value?.nonPersonalProfileType?.toLowerCase();
+
+      if (activeType != null && activeType.isNotEmpty && activeType != 'personal') {
+        userProfileType = activeType;
+      } else if (regType != null && regType.isNotEmpty && regType != 'personal') {
+        userProfileType = regType;
+      } else if (nonPersonal != null && nonPersonal.isNotEmpty) {
+        userProfileType = nonPersonal;
+      } else {
+        userProfileType = userProfile.value?.profileType?.toLowerCase();
+      }
     }
 
     // Normalize type strings to match backend/controller types
@@ -656,7 +668,7 @@ class SettingsController extends GetxController {
 
     String? userProfileSubType = ppm.ProfilePermissionManager.ecommerceSubType;
     if (userProfileSubType == null || userProfileSubType.isEmpty) {
-      userProfileSubType = userProfile.value?.profileSubType;
+      userProfileSubType = SharedPrefManager().registeredProfileSubType ?? userProfile.value?.profileSubType;
     }
 
     if (userProfileType != null && userProfileType.isNotEmpty) {

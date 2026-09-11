@@ -41,6 +41,11 @@ class UserModel {
   final String? isoCode;
   final String? profileType;
   final String? profileSubType;
+  final String? gatewaySubscriptionId;
+  final String? gatewayOrderId;
+  final String? gatewayPaymentId;
+  final Map<String, dynamic>? activeProfile;
+  final List<dynamic>? profiles;
 
   /// FIX: Interests should be List<Map>
   final List<Map<String, dynamic>> interests;
@@ -89,9 +94,52 @@ class UserModel {
     this.isoCode,
     this.profileType,
     this.profileSubType,
+    this.gatewaySubscriptionId,
+    this.gatewayOrderId,
+    this.gatewayPaymentId,
+    this.activeProfile,
+    this.profiles,
     required this.interests,
     required this.token,
   });
+
+  bool get isActiveProfilePersonal {
+    if (activeProfile != null) {
+      final t = activeProfile!["type"]?.toString().toLowerCase().trim();
+      if (t != null && t.isNotEmpty) {
+        return t == 'personal' || t == 'personal_profile';
+      }
+    }
+    final t = profileType?.toLowerCase().trim();
+    return t == 'personal' || t == 'personal_profile';
+  }
+
+  bool get hasValidPersonalSubscription {
+    bool isValid(String? val) =>
+        val != null &&
+        val.trim().isNotEmpty &&
+        val.trim().toLowerCase() != 'null' &&
+        val.trim().toLowerCase() != 'undefined';
+
+    return isValid(gatewaySubscriptionId) &&
+        isValid(gatewayOrderId) &&
+        isValid(gatewayPaymentId);
+  }
+
+  /// Extracts any non-personal profile type (e.g. employer, seller, creator, music) from profiles list
+  String? get nonPersonalProfileType {
+    if (profiles != null && profiles!.isNotEmpty) {
+      for (final p in profiles!) {
+        if (p is Map) {
+          final t = p['type']?.toString().toLowerCase().trim();
+          if (t != null && t.isNotEmpty && t != 'personal' && t != 'personal_profile') {
+            return t;
+          }
+        }
+      }
+    }
+    return null;
+  }
 
   static bool _toBool(dynamic value) {
     if (value is bool) return value;
@@ -102,6 +150,37 @@ class UserModel {
   /// FIXED PARSER – supports both API & SharedPref
   factory UserModel.fromJson(Map<String, dynamic> json) {
     final data = json["user"] ?? json; // <— magic line
+
+    Map<String, dynamic>? activeProfileMap;
+    if (data["active_profile"] is Map) {
+      activeProfileMap = data["active_profile"] as Map<String, dynamic>;
+    }
+
+    List<dynamic>? profilesList;
+    if (data["profiles"] is List) {
+      profilesList = data["profiles"] as List<dynamic>;
+    }
+
+    Map<String, dynamic>? subMap;
+    if (activeProfileMap != null && activeProfileMap["active_subscription"] is Map) {
+      subMap = activeProfileMap["active_subscription"] as Map<String, dynamic>;
+    }
+    if (subMap == null && profilesList != null) {
+      for (final p in profilesList) {
+        if (p is Map) {
+          final pType = p['type']?.toString().toLowerCase().trim();
+          if (pType == 'personal' || pType == 'personal_profile') {
+            if (p['active_subscription'] is Map) {
+              subMap = p['active_subscription'] as Map<String, dynamic>;
+              break;
+            }
+          }
+        }
+      }
+    }
+    if (subMap == null && data["active_subscription"] is Map) {
+      subMap = data["active_subscription"] as Map<String, dynamic>;
+    }
 
     return UserModel(
       id: data["id"] ?? 0,
@@ -148,6 +227,11 @@ class UserModel {
               ? data["active_profile"]["ecommerce_details"]["profile_sub_type"]?.toString()
               : null) ??
           data["profile_sub_type"],
+      gatewaySubscriptionId: (subMap?["gateway_subscription_id"] ?? activeProfileMap?["gateway_subscription_id"])?.toString(),
+      gatewayOrderId: (subMap?["gateway_order_id"] ?? activeProfileMap?["gateway_order_id"])?.toString(),
+      gatewayPaymentId: (subMap?["gateway_payment_id"] ?? activeProfileMap?["gateway_payment_id"])?.toString(),
+      activeProfile: activeProfileMap,
+      profiles: profilesList,
 
       interests: List<Map<String, dynamic>>.from(data["interests"] ?? []),
 
